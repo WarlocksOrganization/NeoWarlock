@@ -14,6 +14,13 @@ namespace DataSystem
             Team = 1,           // 팀전
         }
         
+        public enum CharacterClass
+        {
+            Mage,   // 마법사
+            Archer, // 궁수
+            Warrior // 전사
+        }
+        
         public enum AttackType
         {
             Projectile,

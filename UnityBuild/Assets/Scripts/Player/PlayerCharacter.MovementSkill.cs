@@ -22,7 +22,7 @@ namespace Player
                     lastMovementSkillTime = Time.time;
                     attackLockTime = movementSkill.EndTime;
                     canMove = false;
-                    playerUI?.UseSkill(4);
+                    playerUI?.UseSkill(0);
                     animator.SetTrigger("isMoveSkill");
                     CmdUseMovementSkill(hit.point);
                 }
@@ -32,7 +32,7 @@ namespace Player
         public void SetMovementSkill(MovementSkillBase movementSkill)
         {
             this.movementSkill = movementSkill;
-            playerUI?.SetQuickSlotData(4, movementSkill.SkillIcon, movementSkill.Cooldown);
+            playerUI?.SetQuickSlotData(0, movementSkill.SkillIcon, movementSkill.Cooldown);
             CMDSetMovementSkill(movementSkill.SkillType);
         }
 
@@ -40,7 +40,7 @@ namespace Player
         private void CMDSetMovementSkill(Constants.SkillType skillType)
         {
             movementSkill = MovementSkillFactory.GetMovementSkill(skillType);
-            playerUI?.SetQuickSlotData(4, movementSkill.SkillIcon, movementSkill.Cooldown);
+            playerUI?.SetQuickSlotData(0, movementSkill.SkillIcon, movementSkill.Cooldown);
         }
         
         [Command]

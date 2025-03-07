@@ -34,6 +34,9 @@ namespace Player
             _characterController = GetComponent<CharacterController>();
             buffSystem = GetComponent<BuffSystem>();
             effectSystem = GetComponent<EffectSystem>();
+            
+            InitializeCharacterModels();
+            ApplyCharacterClass(characterClass);
 
             if (isOwned)
             {

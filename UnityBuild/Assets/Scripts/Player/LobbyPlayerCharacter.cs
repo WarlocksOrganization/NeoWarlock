@@ -1,4 +1,7 @@
+using System.Collections.Generic;
+using DataSystem;
 using DataSystem.Database;
+using Mirror;
 using Player.Combat;
 using UnityEngine;
 
@@ -8,16 +11,11 @@ namespace Player
     {
         public override void Start()
         {
-            
             base.Start();
-
+            
             if (isOwned)
             {
-                SetAvailableAttack(1,1);
-                //SetAvailableAttack(4,2);
-                SetAvailableAttack(2,3);
-                SetAvailableAttack(3,4);
-                SetMovementSkill(new TeleportSkill());
+                SetCharacterClass(Constants.CharacterClass.Mage);
             }
         }
     }
