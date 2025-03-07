@@ -22,6 +22,8 @@ namespace Player
                     lastMovementSkillTime = Time.time;
                     attackLockTime = movementSkill.EndTime;
                     canMove = false;
+                    playerUI?.UseSkill(4);
+                    animator.SetTrigger("isMoveSkill");
                     CmdUseMovementSkill(hit.point);
                 }
             }
@@ -38,6 +40,7 @@ namespace Player
         private void CMDSetMovementSkill(Constants.SkillType skillType)
         {
             movementSkill = MovementSkillFactory.GetMovementSkill(skillType);
+            playerUI?.SetQuickSlotData(4, movementSkill.SkillIcon, movementSkill.Cooldown);
         }
         
         [Command]
@@ -48,7 +51,6 @@ namespace Player
             playerModel.transform.rotation = Quaternion.LookRotation((targetPosition - transform.position).normalized);
             // ✅ 1. 스킬 이펙트 먼저 출력
             RpcPlaySkillEffect(movementSkill.SkillType);
-            playerUI?.UseSkill(4);
 
             // ✅ 2. 시전 시간 후 이동 실행
             StartCoroutine(CastAndMove(targetPosition, movementSkill.CastTime));
