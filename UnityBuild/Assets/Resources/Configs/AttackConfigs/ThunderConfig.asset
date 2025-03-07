@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df90348267cf8264a9dedab5a56b461f, type: 3}
+  m_Name: ThunderConfig
+  m_EditorClassIdentifier: 
+  attackType: 2
+  attackIcon: {fileID: 21300000, guid: 2e09ab7d4ba6d584283ea70ffa47016e, type: 3}
+  attackDelay: 1.5
+  recoveryTime: 0.5
+  animParameter: isAttack3
+  Prefab: {fileID: 322783647940636695, guid: 5fa1a9a3f42805547b97751442a226c0, type: 3}
+  explosionEffectPrefab: {fileID: 4731148487824652538, guid: 44781c93e25a0da4583cf6f466818cc4, type: 3}
+  skillType: 1
