@@ -6,7 +6,7 @@ public class TeleportSkill : MovementSkillBase
 {
     private float maxDistance = 10f;
 
-    public override  float Cooldown => 1f;
+    public override  float Cooldown => 10f;
     public override  float CastTime => 0.5f;
     public override  float MoveDuration => 0f;
     public override  float EndTime => 0.75f;

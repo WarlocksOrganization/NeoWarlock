@@ -17965,6 +17965,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   animator: {fileID: 5766581736010466980}
+  attackTransform: {fileID: 2138096227263670792}
   playerHUD: {fileID: 7880346224794796878}
   MaxSpeed: 5
   MoveSpeed: 5
@@ -18654,6 +18655,37 @@ Transform:
   - {fileID: 682140938784859488}
   m_Father: {fileID: 2629793491719783423}
   m_LocalEulerAnglesHint: {x: -0.0000006893751, y: -0.0000033818396, z: -0.0000014567927}
+--- !u!1 &7914446782416622035
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2138096227263670792}
+  m_Layer: 7
+  m_Name: AttackTrans
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2138096227263670792
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7914446782416622035}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0.25}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7540334960470079236}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7937557645108855153
 GameObject:
   m_ObjectHideFlags: 0
@@ -20148,6 +20180,7 @@ Transform:
   m_Children:
   - {fileID: 7810272076791560738}
   - {fileID: 4132506912303891559}
+  - {fileID: 2138096227263670792}
   m_Father: {fileID: 6148179427594687961}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &8893131406347228750

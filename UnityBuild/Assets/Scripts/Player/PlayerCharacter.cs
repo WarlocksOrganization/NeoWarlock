@@ -27,6 +27,8 @@ namespace Player
         
         private float attackLockTime = 0f;
 
+        [SerializeField] private Transform attackTransform;
+
         public virtual void Start()
         {
             _characterController = GetComponent<CharacterController>();

@@ -6,19 +6,19 @@ namespace Player
 {
     public class AttackProjectile : NetworkBehaviour
     {
-        [SerializeField] private LayerMask layerMask;
-        [SerializeField] private GameObject explosionPrefab;
+        [SerializeField] protected LayerMask layerMask;
+        [SerializeField] protected GameObject explosionPrefab;
 
-        [SyncVar] private float damage;
-        [SyncVar] private float speed;
-        [SyncVar] private float radius;
-        [SyncVar] private float range;
-        [SyncVar] private float lifeTime;
-        [SyncVar] private float knockbackForce;
+        [SyncVar] protected float damage;
+        [SyncVar] protected float speed;
+        [SyncVar] protected float radius;
+        [SyncVar] protected float range;
+        [SyncVar] protected float lifeTime;
+        [SyncVar] protected float knockbackForce;
 
-        private Vector3 moveDirection;
-        private Rigidbody rb;
-        private AttackConfig attackConfig; // ✅ 공격별 설정값 저장
+        protected Vector3 moveDirection;
+        protected Rigidbody rb;
+        protected AttackConfig attackConfig; // ✅ 공격별 설정값 저장
 
         public void SetProjectileData(float damage, float speed, float radius, float range, float lifeTime, float knockback, AttackConfig config)
         {
@@ -44,12 +44,11 @@ namespace Player
             {
                 StartCoroutine(MoveProjectile()); // ✅ MovePosition을 이용한 이동 처리
             }
-
-            Invoke(nameof(EnsureCorrectPosition), 0.1f);
+            
             Invoke(nameof(DestroySelf), lifeTime);
         }
 
-        private System.Collections.IEnumerator MoveProjectile()
+        protected System.Collections.IEnumerator MoveProjectile()
         {
             while (true)
             {
@@ -58,12 +57,7 @@ namespace Player
             }
         }
 
-        private void EnsureCorrectPosition()
-        {
-            transform.position += Vector3.up * 0.1f; // ✅ 클라이언트 위치 보정
-        }
-
-        private void DestroySelf()
+        protected void DestroySelf()
         {
             if (isServer)
             {
@@ -71,7 +65,7 @@ namespace Player
             }
         }
 
-        private void OnCollisionEnter(Collision col)
+        protected void OnCollisionEnter(Collision col)
         {
             if (!isServer) return;
 
@@ -80,7 +74,7 @@ namespace Player
             Explode();
         }
 
-        private void OnTriggerEnter(Collider col)
+        protected void OnTriggerEnter(Collider col)
         {
             if (!isServer) return;
 
@@ -89,7 +83,7 @@ namespace Player
             Explode();
         }
 
-        private void Explode()
+        protected void Explode()
         {
             // ✅ 공격별 파티클 효과 적용
             if (attackConfig != null && attackConfig.explosionEffectPrefab != null)
