@@ -43,7 +43,14 @@ namespace DataSystem.Database
 
                 if (attackConfig == null)
                 {
-                    Debug.LogError($"공격 설정을 찾을 수 없습니다. Config: {columns[9]}");
+                    Debug.LogError($"공격 설정을 찾을 수 없습니다. Config: {columns[8]}");
+                    continue;
+                }
+                
+                Sprite attackIcon = Resources.Load<Sprite>(Constants.IconPath + columns[9]);
+                if (attackIcon == null)
+                {
+                    Debug.LogError($"아이콘을 찾을 수 없습니다: {columns[9]}");
                     continue;
                 }
 
@@ -57,7 +64,8 @@ namespace DataSystem.Database
                     Damage = float.Parse(columns[5]),
                     KnockbackForce = float.Parse(columns[6]),
                     Cooldown = float.Parse(columns[7]),
-                    config = attackConfig  // ✅ ScriptableObject 설정
+                    config = attackConfig ,
+                    Icon = attackIcon
                 };
 
                 attackDataDictionary[data.ID] = data;
@@ -79,6 +87,7 @@ namespace DataSystem.Database
             public float Cooldown;
 
             public AttackConfig config; // ✅ 공격 설정을 ScriptableObject로 참조
+            public Sprite Icon;
         }
     }
 }

@@ -15,7 +15,7 @@ namespace Player
         private int curHp = 100;
 
         [SyncVar] private int maxHp = 100;
-
+        
         public void takeDamage(int damage, Vector3 attackTran, float knockbackForce, AttackConfig attackConfig)
         {
             if (curHp <= 0) return;
@@ -32,11 +32,12 @@ namespace Player
             {
                 Vector3 direction = transform.position - attackTran;
                 direction.y = 0;
+                direction = direction.normalized;
 
                 if (knockbackForce > 0)
                 {
                     RpcApplyKnockback(direction * knockbackForce);
-                    RpcTriggerAnimation("isHit"); // 클라이언트에서도 "isHit" 트리거 실행
+                    RpcTriggerAnimation("isHit"); 
                 }
 
                 if (attackConfig.appliedBuff != null)

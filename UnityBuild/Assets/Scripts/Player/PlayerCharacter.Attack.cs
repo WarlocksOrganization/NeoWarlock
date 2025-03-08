@@ -90,7 +90,7 @@ namespace Player
                 if (playerUI != null)
                 {
                     // ✅ ScriptableObject 데이터 활용
-                    playerUI.SetQuickSlotData(index, attackData.config.attackIcon, attackData.Cooldown);
+                    playerUI.SetQuickSlotData(index, attackData.Icon, attackData.Cooldown);
                 }
             }
             else

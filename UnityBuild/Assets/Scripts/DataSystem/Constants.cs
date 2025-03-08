@@ -7,6 +7,7 @@ namespace DataSystem
     {
         public static string CSVFileName = "Data/AttacksData";
         public static string ConfigPath = "Configs/AttackConfigs/";
+        public static string IconPath = "Sprites/AttackIcons/";
         
         public enum RoomType
         {
