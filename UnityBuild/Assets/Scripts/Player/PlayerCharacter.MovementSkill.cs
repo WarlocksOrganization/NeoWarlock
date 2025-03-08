@@ -23,7 +23,7 @@ namespace Player
                     attackLockTime = movementSkill.EndTime;
                     canMove = false;
                     playerUI?.UseSkill(0);
-                    animator.SetTrigger("isMoveSkill");
+                    CmdTriggerAnimation("isMoveSkill");
                     CmdUseMovementSkill(hit.point);
                 }
             }

@@ -77,5 +77,17 @@ namespace Player
             nicknameText.text = value;
             nickname = value;
         }
+        
+        [Command]
+        private void CmdTriggerAnimation(string animParameter)
+        {
+            RpcTriggerAnimation(animParameter);
+        }
+        
+        [ClientRpc]
+        private void RpcTriggerAnimation(string trigger)
+        {
+            animator.SetTrigger(trigger);
+        }
     }
 }

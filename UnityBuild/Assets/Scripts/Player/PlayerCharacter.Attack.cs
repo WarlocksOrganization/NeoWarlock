@@ -243,7 +243,7 @@ namespace Player
                 case Constants.AttackType.ProjectileSky:
                 case Constants.AttackType.Point:
                 case Constants.AttackType.Area:
-                    animator.SetTrigger(currentAttack.GetAttackData().config.animParameter);
+                    CmdTriggerAnimation(currentAttack.GetAttackData().config.animParameter);
                     break;
                 default:
                     Debug.LogError($"알 수 없는 공격 타입: {currentAttack.GetAttackData().config.attackType}");

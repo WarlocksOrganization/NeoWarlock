@@ -65,12 +65,6 @@ namespace Player
         }
         
         [ClientRpc]
-        private void RpcTriggerAnimation(string trigger)
-        {
-            animator.SetTrigger(trigger);
-        }
-        
-        [ClientRpc]
         private void RpcApplyKnockback(Vector3 force)
         {
             ApplyKnockback(force); // ✅ 넉백 적용 함수 호출

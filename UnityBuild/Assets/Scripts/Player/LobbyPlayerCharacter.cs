@@ -13,7 +13,7 @@ namespace Player
         {
             base.Start();
             
-            if (isOwned)
+            if (isServer)
             {
                 SetCharacterClass(Constants.CharacterClass.Mage);
             }
