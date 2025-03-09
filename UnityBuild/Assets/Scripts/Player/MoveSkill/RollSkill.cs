@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class RollSkill : MovementSkillBase
 {
-    private float maxDistance = 10f;
+    private float maxDistance = 5f;
 
     public override  float Cooldown => 5f;
     public override  float CastTime => 0f;

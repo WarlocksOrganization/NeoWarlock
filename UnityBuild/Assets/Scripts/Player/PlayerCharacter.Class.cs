@@ -94,7 +94,7 @@ namespace Player
                     SetMovementSkill(new TeleportSkill());
                     SetAvailableAttack(1, 1); // 파이어볼
                     SetAvailableAttack(2, 2); // 번개
-                    SetAvailableAttack(3, 4); // 얼음
+                    SetAvailableAttack(3, 3); // 얼음
                     break;
 
                 case Constants.CharacterClass.Archer:
