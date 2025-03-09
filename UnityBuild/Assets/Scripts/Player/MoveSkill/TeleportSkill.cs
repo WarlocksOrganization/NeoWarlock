@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class TeleportSkill : MovementSkillBase
 {
-    private float maxDistance = 10f;
+    private float maxDistance = 20f;
 
     public override  float Cooldown => 10f;
     public override  float CastTime => 0.5f;

@@ -288,7 +288,7 @@ namespace Player
             Vector3 direction = (attackPosition - transform.position).normalized;
             
             availableAttacks[nextAttckIndex]?.Execute(attackPosition, 
-                attackTransform.position + availableAttacks[nextAttckIndex].GetAttackData().Radius*0.5f*direction, gameObject);
+                attackTransform.position + availableAttacks[nextAttckIndex].GetAttackData().Radius* 1f*direction, gameObject);
         }
     }
 }

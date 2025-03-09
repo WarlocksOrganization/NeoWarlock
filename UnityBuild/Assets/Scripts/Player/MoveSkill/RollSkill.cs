@@ -1,26 +1,24 @@
-/*
 using System.Collections;
+using DataSystem;
 using Player;
 using UnityEngine;
 
-public class RollSkill : IMovementSkill
+public class RollSkill : MovementSkillBase
 {
-    public void UseSkill(PlayerCharacter player)
-    {
-        Vector3 rollDirection = player.transform.forward * 3f; // 3m 앞으로 구르기
-        player.StartCoroutine(RollCoroutine(player, rollDirection));
-    }
+    private float maxDistance = 10f;
 
-    private IEnumerator RollCoroutine(PlayerCharacter player, Vector3 rollDirection)
+    public override  float Cooldown => 5f;
+    public override  float CastTime => 0f;
+    public override  float MoveDuration => 0.5f;
+    public override  float EndTime => 0.5f;
+
+    public override  Constants.SkillType SkillType => Constants.SkillType.Roll;
+
+    public override  Vector3 GetTargetPosition(PlayerCharacter player, Vector3 target)
     {
-        float duration = 0.5f; // 0.5초 동안 구르기
-        float time = 0;
-        while (time < duration)
-        {
-            //player._characterController.Move(rollDirection * (Time.deltaTime / duration)); // 부드러운 이동
-            time += Time.deltaTime;
-            yield return null;
-        }
+        Vector3 direction = (target - player.transform.position).normalized;
+        float distanceToTarget = Vector3.Distance(player.transform.position, target);
+        float moveDistance = Mathf.Min(distanceToTarget, maxDistance);
+        return player.transform.position + direction * moveDistance;
     }
 }
-*/

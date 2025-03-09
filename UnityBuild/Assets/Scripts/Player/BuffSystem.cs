@@ -48,6 +48,12 @@ public class BuffSystem : NetworkBehaviour
     {
         ApplyBuffEffect(buffData);
 
+        // ✅ 지속 피해(DoT) 실행
+        if (buffData.tickDamage > 0)
+        {
+            StartCoroutine(TickDamage(buffData));
+        }
+
         yield return new WaitForSeconds(buffData.duration);
 
         RemoveBuffEffect(buffData);
@@ -90,6 +96,24 @@ public class BuffSystem : NetworkBehaviour
         {
             playerCharacter.MoveSpeed -= activeBuffValues[buffType]; // 버프 해제
             activeBuffValues.Remove(buffType);
+        }
+    }
+
+    private IEnumerator TickDamage(BuffData buffData)
+    {
+        float elapsedTime = 0f;
+
+        while (elapsedTime < buffData.duration)
+        {
+            yield return new WaitForSeconds(0.5f);
+
+            if (playerCharacter != null)
+            {
+                Debug.Log(111);
+                playerCharacter.DecreaseHp(buffData.tickDamage); // ✅ 0.5초마다 지속 피해 적용
+            }
+
+            elapsedTime += 0.5f;
         }
     }
 }

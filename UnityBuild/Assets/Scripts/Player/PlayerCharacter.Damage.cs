@@ -20,8 +20,7 @@ namespace Player
         {
             if (curHp <= 0) return;
 
-            curHp -= damage;
-            curHp = Mathf.Clamp(curHp, 0, maxHp);
+            DecreaseHp(damage);
 
             if (curHp == 0)
             {
@@ -45,6 +44,12 @@ namespace Player
                     ApplyBuffFromAttack(attackConfig.appliedBuff);
                 }
             }
+        }
+
+        public void DecreaseHp(int damage)
+        {
+            curHp -= damage;
+            curHp = Mathf.Clamp(curHp, 0, maxHp);
         }
         
         private void ApplyBuffFromAttack(BuffData buffData)

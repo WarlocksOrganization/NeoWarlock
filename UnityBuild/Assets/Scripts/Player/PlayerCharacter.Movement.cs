@@ -54,6 +54,7 @@ namespace Player
             float moveZ = Input.GetAxis("Vertical");
 
             Vector3 move = transform.right * moveX + transform.forward * moveZ;
+            move = move.normalized;
             bool isMoving = move.magnitude > 0.1f;
 
             if (isMoving)

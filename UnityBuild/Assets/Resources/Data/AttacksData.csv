@@ -3,3 +3,6 @@ ID,Name,Speed,Range,Radius,Damage,KnockbackForce,Cooldown,ConfigName,Icon
 2,Thunder,20,15,2,10,2,5,ThunderConfig,thunder_icon
 3,IceArea,20,15,5,1,0,8,IceAreaConfig,IceArea_icon
 4,Meteor,20,15,3,20,2,5,MeteorConfig,meteor_icon
+11,Arrow,20,15,1,3,0.5,1.5,ArrowConfig,arrow_icon
+12,PoisonArrow,50,25,1,5,0.5,5,PoisonArrowConfig,poisonarrow_icon
+13,PoisonArrow,50,25,1,5,0.5,5,ExplosionArrowConfig,explosionarrow_icon

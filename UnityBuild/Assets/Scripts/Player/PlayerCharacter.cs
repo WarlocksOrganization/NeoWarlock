@@ -1,3 +1,4 @@
+using System;
 using Cinemachine;
 using Mirror;
 using TMPro;
@@ -29,12 +30,15 @@ namespace Player
 
         [SerializeField] private Transform attackTransform;
 
-        public virtual void Start()
+        private void Awake()
         {
             _characterController = GetComponent<CharacterController>();
             buffSystem = GetComponent<BuffSystem>();
             effectSystem = GetComponent<EffectSystem>();
-            
+        }
+
+        public virtual void Start()
+        {
             InitializeCharacterModels();
             ApplyCharacterClass(characterClass);
 

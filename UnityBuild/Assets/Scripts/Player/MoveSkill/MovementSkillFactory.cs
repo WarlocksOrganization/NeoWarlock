@@ -14,6 +14,7 @@ public static class MovementSkillFactory
     private static void LoadSkillIcons()
     {
         skillIcons[Constants.SkillType.TelePort] = Resources.Load<Sprite>("Sprites/MoveIcons/teleport_icon");
+        skillIcons[Constants.SkillType.Roll] = Resources.Load<Sprite>("Sprites/MoveIcons/roll_icon");
     }
 
     public static MovementSkillBase GetMovementSkill(Constants.SkillType skillType)
@@ -22,14 +23,8 @@ public static class MovementSkillFactory
         {
             case Constants.SkillType.TelePort:
                 return new TeleportSkill();
-            /*case Constants.SkillType.Fire:
-                return new FireSkill();
-            case Constants.SkillType.Thunder:
-                return new ThunderSkill();
-            case Constants.SkillType.Ice:
-                return new IceSkill();
-            case Constants.SkillType.Meteor:
-                return new MeteorSkill();*/
+            case Constants.SkillType.Roll:
+                return new RollSkill();
             default:
                 return null;
         }

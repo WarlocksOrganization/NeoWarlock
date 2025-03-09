@@ -19433,7 +19433,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &16844339066320879
 Transform:
   m_ObjectHideFlags: 0
@@ -29168,6 +29168,9 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   explosionPrefab: {fileID: 5412338807302183837, guid: 68a8102c387cfd24583565c4ddfae556, type: 3}
+  skilleffectList:
+  - skillType: 3
+    gObject: {fileID: 15761658498700503}
 --- !u!114 &642507581500943264
 MonoBehaviour:
   m_ObjectHideFlags: 0

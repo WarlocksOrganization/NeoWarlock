@@ -5,9 +5,9 @@ namespace DataSystem
 {
     public static class Constants
     {
-        public static string CSVFileName = "Data/AttacksData";
-        public static string ConfigPath = "Configs/AttackConfigs/";
-        public static string IconPath = "Sprites/AttackIcons/";
+        public static readonly string CsvFileName = "Data/AttacksData";
+        public static readonly string ConfigPath = "Configs/AttackConfigs/";
+        public static readonly string IconPath = "Sprites/AttackIcons/";
         
         public enum RoomType
         {
@@ -19,7 +19,8 @@ namespace DataSystem
         {
             Mage,   // 마법사
             Archer, // 궁수
-            Warrior // 전사
+            Warrior, // 전사
+            None = 100,
         }
         
         public enum AttackType
@@ -48,6 +49,12 @@ namespace DataSystem
             Ice,
             Meteor,
             TelePort,
+            Arrow,
+            PoisonArrow,
+            ExplosionArrow,
+            Roll,
+            
+            None = 100,
         }
         
         [Serializable]
@@ -62,6 +69,13 @@ namespace DataSystem
         {
             public Constants.SkillType skillType;
             public ParticleSystem effect;
+        }
+        
+        [Serializable]
+        public class SkillEffectGameObjectEntry
+        {
+            public Constants.SkillType skillType;
+            public GameObject gObject;
         }
     }
 }

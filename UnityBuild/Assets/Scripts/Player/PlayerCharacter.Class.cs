@@ -93,17 +93,17 @@ namespace Player
                 case Constants.CharacterClass.Mage:
                     SetMovementSkill(new TeleportSkill());
                     SetAvailableAttack(1, 1); // 파이어볼
-                    SetAvailableAttack(2, 2); // 번개 공격
-                    SetAvailableAttack(3, 3); // 얼음 폭발
+                    SetAvailableAttack(2, 2); // 번개
+                    SetAvailableAttack(3, 3); // 얼음
                     break;
 
-                /*case Constants.CharacterClass.Archer:
+                case Constants.CharacterClass.Archer:
                     SetMovementSkill(new RollSkill());
-                    SetAvailableAttack(1, 4); // 원거리 화살 공격
-                    SetAvailableAttack(2, 5); // 연발 사격
-                    SetAvailableAttack(3, 6); // 화염 화살
+                    SetAvailableAttack(1, 11); // 원거리 화살 공격
+                    SetAvailableAttack(2, 12); // 독화살
+                    SetAvailableAttack(3, 13); // 폭발 화살
                     break;
-
+                /*
                 case Constants.CharacterClass.Warrior:
                     SetMovementSkill(new ChargeSkill());
                     SetAvailableAttack(1, 7); // 돌진 공격

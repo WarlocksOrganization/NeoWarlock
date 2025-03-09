@@ -21,7 +21,7 @@ namespace DataSystem.Database
 
         public static void LoadAttackData()
         {
-            string csvFileName = Constants.CSVFileName;
+            string csvFileName = Constants.CsvFileName;
             TextAsset csvFile = Resources.Load<TextAsset>(csvFileName);
 
             if (csvFile == null)
