@@ -13,10 +13,11 @@ MonoBehaviour:
   m_Name: ExplosionArrowConfig
   m_EditorClassIdentifier: 
   attackType: 1
-  attackDelay: 0.25
-  recoveryTime: 0.5
-  animParameter: isAttack2
-  Prefab: {fileID: 322783647940636695, guid: 62731b0ab5cbf294d94385f67d394ac3, type: 3}
-  explosionEffectPrefab: {fileID: 5353179313893722497, guid: cfdb38e930386bf4c9b29c0a86f1cf87, type: 3}
-  skillType: 5
+  attackDelay: 0.75
+  recoveryTime: 1.5
+  animParameter: isAttack4
+  attackTrans: {x: 0, y: 3.5, z: 0}
+  Prefab: {fileID: 322783647940636695, guid: 37f2acf25e527df43a982a902e47a741, type: 3}
+  explosionEffectPrefab: {fileID: 5353179313893722497, guid: 7d2f8500645b8d84694ffb8444a561fe, type: 3}
+  skillType: 7
   appliedBuff: {fileID: 0}

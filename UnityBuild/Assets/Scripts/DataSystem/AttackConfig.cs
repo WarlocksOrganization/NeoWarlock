@@ -8,6 +8,7 @@ public class AttackConfig : ScriptableObject
     public float attackDelay;      // ✅ 공격이 나갈 때까지의 간격
     public float recoveryTime;     // ✅ 공격 후 이동 가능 시간
     public string animParameter;
+    public Vector3 attackTrans;
     public GameObject Prefab;
     public GameObject explosionEffectPrefab; // ✅ 공격별 파티클 프리팹
     public Constants.SkillType skillType;

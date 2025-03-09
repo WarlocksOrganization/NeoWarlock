@@ -94,7 +94,7 @@ namespace Player
                     SetMovementSkill(new TeleportSkill());
                     SetAvailableAttack(1, 1); // 파이어볼
                     SetAvailableAttack(2, 2); // 번개
-                    SetAvailableAttack(3, 3); // 얼음
+                    SetAvailableAttack(3, 4); // 얼음
                     break;
 
                 case Constants.CharacterClass.Archer:
@@ -112,7 +112,7 @@ namespace Player
                     break;*/
             }
 
-            Debug.Log($"[{characterClass}] 직업에 맞게 스킬과 공격을 설정했습니다!");
+            //Debug.Log($"[{characterClass}] 직업에 맞게 스킬과 공격을 설정했습니다!");
         }
     }
 }

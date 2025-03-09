@@ -13,10 +13,11 @@ MonoBehaviour:
   m_Name: MeteorConfig
   m_EditorClassIdentifier: 
   attackType: 1
-  attackIcon: {fileID: 21300000, guid: f3b15868a044a704c817c65addf049c7, type: 3}
   attackDelay: 1
   recoveryTime: 1
   animParameter: isAttack2
+  attackTrans: {x: 0, y: 20, z: 0}
   Prefab: {fileID: 322783647940636695, guid: 37f2acf25e527df43a982a902e47a741, type: 3}
   explosionEffectPrefab: {fileID: 4731148487824652538, guid: a09924bec23affa47add8d296fa9010f, type: 3}
   skillType: 3
+  appliedBuff: {fileID: 0}

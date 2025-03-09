@@ -8,7 +8,7 @@ namespace Player.Combat
         // ✅ 공중에서 생성되도록 오버라이드
         protected override Vector3 GetSpawnPosition(Vector3 firePoint)
         {
-            return firePoint + new Vector3(0, 20f, 0); // ✅ 기본 위치에서 20m 위에서 발사
+            return firePoint + attackData.config.attackTrans; // ✅ 기본 위치에서 20m 위에서 발사
         }
 
         // ✅ lifeTime을 5초로 고정

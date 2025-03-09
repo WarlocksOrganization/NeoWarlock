@@ -81,6 +81,11 @@ namespace Player
             while (true)
             {
                 rb.MovePosition(rb.position + moveDirection * speed * Time.fixedDeltaTime);
+                if (rb.transform.position.y <= 0)
+                {
+                    transform.position = new Vector3(transform.position.x, 0, transform.position.z);
+                    Explode();
+                }
                 yield return new WaitForFixedUpdate();
             }
         }
