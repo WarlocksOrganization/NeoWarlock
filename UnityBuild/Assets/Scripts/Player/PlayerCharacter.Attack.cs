@@ -27,6 +27,11 @@ namespace Player
             if (Input.GetKeyDown(KeyCode.Alpha2)) SetAttackType(2);
             if (Input.GetKeyDown(KeyCode.Alpha3)) SetAttackType(3);
             if (Input.GetKeyDown(KeyCode.Alpha4)) SetAttackType(4);
+            
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                SetAttackType(0);
+            }
 
             if (currentAttack == null) return;
 

@@ -10,9 +10,10 @@ namespace Player
     {
         [Header("Player Movement")]
         public float MaxSpeed = 5f;
+        [SyncVar(hook = nameof(OnMoveSpeedChanged))]
         public float MoveSpeed = 5.0f;
         public float KnockbackDamping = 5f;
-        private float speed;
+        private float animationSpeed;
         
         private Vector3 _moveDirection = Vector3.zero;
         private Vector3 _knockbackDirection = Vector3.zero;
@@ -129,9 +130,14 @@ namespace Player
         {
             if (animator != null)
             {
-                speed = Mathf.Clamp(_moveDirection.magnitude, 0, 1) * MoveSpeed/5f;
-                animator.SetFloat("isMove", speed); // ✅ 이동 여부에 따라 isMove 설정
+                animationSpeed = Mathf.Clamp(_moveDirection.magnitude, 0, 1) * MoveSpeed/5f;
+                animator.SetFloat("isMove", animationSpeed); // ✅ 이동 여부에 따라 isMove 설정
             }
+        }
+
+        private void OnMoveSpeedChanged(float oldValue, float newValue)
+        {
+            MoveSpeed = newValue;
         }
     }
 }

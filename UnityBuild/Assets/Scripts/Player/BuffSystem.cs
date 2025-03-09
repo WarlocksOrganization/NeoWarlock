@@ -13,13 +13,13 @@ public class BuffSystem : NetworkBehaviour
     private PlayerCharacter playerCharacter;
     private EffectSystem effectSystem;
 
-    public override void OnStartServer()
+    private void Start()
     {
         playerCharacter = GetComponent<PlayerCharacter>();
         effectSystem = GetComponent<EffectSystem>();
     }
 
-    [Command]
+    [Command(requiresAuthority = false)]
     public void CmdApplyBuff(BuffData buffData)
     {
         if (activeBuffs.ContainsKey(buffData.BuffType))
