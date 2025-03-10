@@ -7,6 +7,7 @@ namespace DataSystem
     {
         public static readonly string CsvFileName = "Data/AttacksData";
         public static readonly string ConfigPath = "Configs/AttackConfigs/";
+        public static readonly string MovementConfigPath = "Configs/MoveSkillConfigs";
         public static readonly string IconPath = "Sprites/AttackIcons/";
         
         public enum RoomType
@@ -20,6 +21,8 @@ namespace DataSystem
             Mage,   // 마법사
             Archer, // 궁수
             Warrior, // 전사
+            Necromancer,
+            Priest,
             None = 100,
         }
         
@@ -53,6 +56,10 @@ namespace DataSystem
             PoisonArrow,
             ExplosionArrow,
             Roll,
+            PhantomAttack,
+            SoulVortex,
+            InfernalFlask,
+            PhantomStep,
             
             None = 100,
         }

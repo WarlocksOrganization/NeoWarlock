@@ -33,7 +33,7 @@ namespace Player
                 direction.y = 0;
                 direction = direction.normalized;
 
-                if (knockbackForce > 0)
+                if (knockbackForce != 0)
                 {
                     RpcApplyKnockback(direction * knockbackForce);
                     RpcTriggerAnimation("isHit"); 

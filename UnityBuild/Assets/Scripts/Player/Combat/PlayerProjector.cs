@@ -90,7 +90,7 @@ namespace Player.Combat
 
                 if (arrowMaterial != null)
                 {
-                    arrowMaterial.mainTextureScale = new Vector2(1, distance / 10f);
+                    arrowMaterial.mainTextureScale = new Vector2(projectileAttack.GetAttackData().Radius, distance / 10f);
                 }
             }
 

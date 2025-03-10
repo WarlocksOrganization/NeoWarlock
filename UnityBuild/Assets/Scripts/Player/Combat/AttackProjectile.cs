@@ -9,7 +9,6 @@ namespace Player
     public class AttackProjectile : NetworkBehaviour
     {
         [SerializeField] protected LayerMask layerMask;
-        [SerializeField] protected GameObject explosionPrefab;
 
         [SyncVar] protected float damage;
         [SyncVar] protected float speed;
@@ -121,7 +120,7 @@ namespace Player
             // ✅ 공격별 파티클 효과 적용
             if (attackConfig != null)
             {
-                GameObject explosion = Instantiate(explosionPrefab, transform.position, Quaternion.identity);
+                GameObject explosion = Instantiate(attackConfig.explosionEffectPrefab, transform.position, Quaternion.identity);
                 Explosion explosionComponent = explosion.GetComponent<Explosion>();
 
                 if (explosionComponent != null)

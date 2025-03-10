@@ -5,6 +5,7 @@ namespace DataSystem.Database
         public static void LoadDataBase()
         {
             LoadAttackData();
+            LoadMovementSkillData();
         }
     }
 }

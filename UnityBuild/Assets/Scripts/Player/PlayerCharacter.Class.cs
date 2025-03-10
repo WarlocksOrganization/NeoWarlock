@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Cinemachine;
 using DataSystem;
+using DataSystem.Database;
 using Mirror;
 using TMPro;
 using UI;
@@ -19,6 +20,8 @@ namespace Player
         public GameObject[] mageModel;
         public GameObject[] archerModel;
         public GameObject[] warriorModel;
+        public GameObject[] necromancerModel;
+        public GameObject[] priestModel;
 
         private Dictionary<Constants.CharacterClass, GameObject[]> characterModels;
 
@@ -29,7 +32,9 @@ namespace Player
             {
                 { Constants.CharacterClass.Mage, mageModel },
                 { Constants.CharacterClass.Archer, archerModel },
-                { Constants.CharacterClass.Warrior, warriorModel }
+                { Constants.CharacterClass.Warrior, warriorModel },
+                { Constants.CharacterClass.Necromancer, necromancerModel },
+                { Constants.CharacterClass.Priest, priestModel }
             };
         }
 
@@ -91,25 +96,37 @@ namespace Player
             switch (characterClass)
             {
                 case Constants.CharacterClass.Mage:
-                    SetMovementSkill(new TeleportSkill());
+                    SetMovementSkill(Constants.SkillType.TelePort);
                     SetAvailableAttack(1, 1); // 파이어볼
                     SetAvailableAttack(2, 2); // 번개
                     SetAvailableAttack(3, 3); // 얼음
                     break;
 
                 case Constants.CharacterClass.Archer:
-                    SetMovementSkill(new RollSkill());
+                    SetMovementSkill(Constants.SkillType.Roll);
                     SetAvailableAttack(1, 11); // 원거리 화살 공격
                     SetAvailableAttack(2, 12); // 독화살
                     SetAvailableAttack(3, 13); // 폭발 화살
                     break;
-                /*
+                
                 case Constants.CharacterClass.Warrior:
-                    SetMovementSkill(new ChargeSkill());
-                    SetAvailableAttack(1, 21); // 돌진 공격
-                    SetAvailableAttack(2, 22); // 광역 베기
-                    SetAvailableAttack(3, 23); // 방패 치기
-                    break;*/
+                    //SetMovementSkill(new ChargeSkill());
+                    //SetAvailableAttack(1, 21); // 돌진 공격
+                    //SetAvailableAttack(2, 22); // 광역 베기
+                    //SetAvailableAttack(3, 23); // 방패 치기
+                    break;
+                case Constants.CharacterClass.Necromancer:
+                    //SetMovementSkill(new TeleportSkill());
+                    SetAvailableAttack(1, 31); // 유령
+                    SetAvailableAttack(2, 32); // 유령2
+                    SetAvailableAttack(3, 33); // 폭발 플라스크
+                    break;
+                case Constants.CharacterClass.Priest:
+                    //SetMovementSkill(new TeleportSkill());
+                    //SetAvailableAttack(1, 31); // 원거리 화살 공격
+                    //SetAvailableAttack(2, 32); // 독화살
+                    //SetAvailableAttack(3, 33); // 폭발 화살
+                    break;
             }
 
             //Debug.Log($"[{characterClass}] 직업에 맞게 스킬과 공격을 설정했습니다!");

@@ -1,5 +1,6 @@
 using System.Collections;
 using DataSystem;
+using DataSystem.Database;
 using Interfaces;
 using Mirror;
 using UnityEngine;
@@ -8,11 +9,10 @@ namespace Player
 {
     public partial class PlayerCharacter
     {
-
-        private MovementSkillBase movementSkill;
+        private MovementSkillConfig movementSkill;
         private float lastMovementSkillTime = -Mathf.Infinity;
 
-        private void TryUseMovementSkill()
+         private void TryUseMovementSkill()
         {
             if (Input.GetKeyDown(KeyCode.Space) && movementSkill != null && CanUseMovementSkill())
             {
@@ -20,56 +20,40 @@ namespace Player
                 if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, mouseTargetLayer))
                 {
                     lastMovementSkillTime = Time.time;
-                    attackLockTime = movementSkill.EndTime;
+                    attackLockTime = movementSkill.endTime;
                     canMove = false;
                     playerUI?.UseSkill(0);
                     CmdTriggerAnimation("isMoveSkill");
-                    if (moveKeyboard.magnitude > 0.1f)
-                    {
-                        CmdUseMovementSkill(transform.position + moveKeyboard * 100);
-                    }
-                    else
-                    {
-                        CmdUseMovementSkill(hit.point);
-                    }
+
+                    Vector3 targetPos = moveKeyboard.magnitude > 0.1f
+                        ? transform.position + moveKeyboard * 100
+                        : hit.point;
+
+                    CmdUseMovementSkill(movementSkill.GetTargetPosition(transform.position, targetPos));
                 }
             }
         }
 
-        public void SetMovementSkill(MovementSkillBase movementSkill)
+        public void SetMovementSkill(Constants.SkillType skillType)
         {
-            this.movementSkill = movementSkill;
-            playerUI?.SetQuickSlotData(0, movementSkill.SkillIcon, movementSkill.Cooldown);
-            CMDSetMovementSkill(movementSkill.SkillType);
+            movementSkill = Database.GetMovementSkillData(skillType);
+            playerUI?.SetQuickSlotData(0, movementSkill.skillIcon, movementSkill.cooldown);
         }
 
-        [Command]
-        private void CMDSetMovementSkill(Constants.SkillType skillType)
-        {
-            movementSkill = MovementSkillFactory.GetMovementSkill(skillType);
-            playerUI?.SetQuickSlotData(0, movementSkill.SkillIcon, movementSkill.Cooldown);
-        }
-        
         [Command]
         private void CmdUseMovementSkill(Vector3 targetPosition)
         {
             if (movementSkill == null) return;
 
             playerModel.transform.rotation = Quaternion.LookRotation((targetPosition - transform.position).normalized);
-            // ✅ 1. 스킬 이펙트 먼저 출력
-            RpcPlaySkillEffect(movementSkill.SkillType);
-
-            // ✅ 2. 시전 시간 후 이동 실행
-            StartCoroutine(CastAndMove(targetPosition, movementSkill.CastTime));
+            RpcPlaySkillEffect(movementSkill.skillType);
+            StartCoroutine(CastAndMove(targetPosition, movementSkill.castTime));
         }
 
         private IEnumerator CastAndMove(Vector3 targetPosition, float castTime)
         {
-            yield return new WaitForSeconds(castTime); // ✅ 시전 시간 대기
-
-            // ✅ 3. 이동 실행
-            Vector3 newPosition = movementSkill.GetTargetPosition(this, targetPosition);
-            RpcUseMovementSkill(newPosition, movementSkill.MoveDuration, movementSkill.EndTime);
+            yield return new WaitForSeconds(castTime);
+            RpcUseMovementSkill(targetPosition, movementSkill.moveDuration, movementSkill.endTime);
         }
 
         [ClientRpc]
@@ -81,7 +65,7 @@ namespace Player
         private IEnumerator MovementSkillRoutine(Vector3 targetPosition, float moveDuration, float endLag)
         {
             canMove = false;
-            _characterController.enabled = false; // ✅ 이동 중 CharacterController 비활성화
+            _characterController.enabled = false;
 
             float elapsed = 0f;
             Vector3 startPosition = transform.position;
@@ -93,17 +77,17 @@ namespace Player
                 yield return null;
             }
 
-            transform.position = targetPosition; // 최종 위치 보정
+            transform.position = targetPosition;
 
-            yield return new WaitForSeconds(endLag); // ✅ 이동 후 대기 시간 적용
+            yield return new WaitForSeconds(endLag);
 
-            _characterController.enabled = true; // ✅ 이동 후 CharacterController 다시 활성화
+            _characterController.enabled = true;
             canMove = true;
         }
 
         private bool CanUseMovementSkill()
         {
-            return Time.time >= lastMovementSkillTime + movementSkill.Cooldown;
+            return Time.time >= lastMovementSkillTime + movementSkill.cooldown;
         }
     }
 }

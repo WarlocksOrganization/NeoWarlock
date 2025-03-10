@@ -109,7 +109,6 @@ public class BuffSystem : NetworkBehaviour
 
             if (playerCharacter != null)
             {
-                Debug.Log(111);
                 playerCharacter.DecreaseHp(buffData.tickDamage); // ✅ 0.5초마다 지속 피해 적용
             }
 

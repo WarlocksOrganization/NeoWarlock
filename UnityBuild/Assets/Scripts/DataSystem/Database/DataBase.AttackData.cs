@@ -39,18 +39,18 @@ namespace DataSystem.Database
 
                 string[] columns = row.Split(',');
                 
-                AttackConfig attackConfig = Resources.Load<AttackConfig>(Constants.ConfigPath + columns[8]); // ✅ ConfigName 사용
+                AttackConfig attackConfig = Resources.Load<AttackConfig>(Constants.ConfigPath + columns[1] + "Config"); // ✅ ConfigName 사용
 
                 if (attackConfig == null)
                 {
-                    Debug.LogError($"공격 설정을 찾을 수 없습니다. Config: {columns[8]}");
+                    Debug.LogError($"공격 설정을 찾을 수 없습니다. Config: {columns[1]}");
                     continue;
                 }
                 
-                Sprite attackIcon = Resources.Load<Sprite>(Constants.IconPath + columns[9]);
+                Sprite attackIcon = Resources.Load<Sprite>(Constants.IconPath + columns[1] + "_icon");
                 if (attackIcon == null)
                 {
-                    Debug.LogError($"아이콘을 찾을 수 없습니다: {columns[9]}");
+                    Debug.LogError($"아이콘을 찾을 수 없습니다: {columns[8]}");
                     continue;
                 }
 
