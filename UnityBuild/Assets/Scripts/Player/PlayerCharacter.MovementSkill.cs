@@ -12,7 +12,7 @@ namespace Player
         private MovementSkillConfig movementSkill;
         private float lastMovementSkillTime = -Mathf.Infinity;
 
-         private void TryUseMovementSkill()
+        private void TryUseMovementSkill()
         {
             if (Input.GetKeyDown(KeyCode.Space) && movementSkill != null && CanUseMovementSkill())
             {
@@ -24,15 +24,25 @@ namespace Player
                     canMove = false;
                     playerUI?.UseSkill(0);
                     CmdTriggerAnimation("isMoveSkill");
+                    
+                    Vector3 targetPos = Vector3.zero;
+                    if (moveKeyboard.magnitude > 0.1f)
+                    {
+                        targetPos = transform.position + moveKeyboard * movementSkill.maxDistance;
+                    }
+                    else
+                    {
+                        Vector3 direction = (hit.point - transform.position).normalized;
+                        float distanceToTarget = Vector3.Distance(transform.position, hit.point);
+                        float moveDistance = Mathf.Min(distanceToTarget, movementSkill.maxDistance);
+                        targetPos = transform.position + direction * moveDistance;
+                    }
 
-                    Vector3 targetPos = moveKeyboard.magnitude > 0.1f
-                        ? transform.position + moveKeyboard * 100
-                        : hit.point;
-
-                    CmdUseMovementSkill(movementSkill.GetTargetPosition(transform.position, targetPos));
+                    CmdUseMovementSkill(targetPos);
                 }
             }
         }
+
 
         public void SetMovementSkill(Constants.SkillType skillType)
         {

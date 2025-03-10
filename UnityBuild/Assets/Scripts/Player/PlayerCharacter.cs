@@ -40,7 +40,7 @@ namespace Player
         public virtual void Start()
         {
             InitializeCharacterModels();
-            ApplyCharacterClass(characterClass);
+            ApplyCharacterClass(PLayerCharacterClass);
 
             if (isOwned)
             {
