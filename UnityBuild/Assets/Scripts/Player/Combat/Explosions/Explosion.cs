@@ -11,15 +11,14 @@ namespace Player.Combat
         protected float explosionRadius;
         protected float knockbackForce;
         protected float knockbackForceFactor = 20f;
-        protected GameObject explosionEffectPrefab; // ✅ 파티클 프리팹
+        [SerializeField] protected GameObject explosionEffectPrefab; // ✅ 파티클 프리팹
         protected AttackConfig config;
 
-        public void Initialize(float damage, float radius, float knockback, GameObject effectPrefab, AttackConfig config)
+        public void Initialize(float damage, float radius, float knockback, AttackConfig config)
         {
             explosionDamage = damage;
             explosionRadius = radius;
             knockbackForce = knockback * knockbackForceFactor;
-            explosionEffectPrefab = effectPrefab; // ✅ 공격별 파티클 설정
             this.config = config;
 
             explosionEffectPrefab.transform.localScale = new Vector3(radius, radius, radius);
@@ -53,6 +52,7 @@ namespace Player.Combat
             if (explosionEffectPrefab != null)
             {
                 GameObject effect = Instantiate(explosionEffectPrefab, transform.position, Quaternion.identity);
+                effect.GetComponent<AttackParticle>().SetAttackParticleData(config.skillType);
                 NetworkServer.Spawn(effect); // ✅ 네트워크에 동기화
             }
         }

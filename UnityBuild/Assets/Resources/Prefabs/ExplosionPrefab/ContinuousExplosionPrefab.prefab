@@ -48,6 +48,7 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
+  explosionEffectPrefab: {fileID: 5353179313893722497, guid: 903f0b777fb23884388c9436d588cdbd, type: 3}
 --- !u!114 &-3001204535410985821
 MonoBehaviour:
   m_ObjectHideFlags: 0

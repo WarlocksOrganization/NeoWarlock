@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: IceAreaConfig
   m_EditorClassIdentifier: 
   attackType: 3
-  attackIcon: {fileID: 21300000, guid: 12aad8510bf287547944df880ba20387, type: 3}
   attackDelay: 1
   recoveryTime: 1
   animParameter: isAttack3
+  attackTrans: {x: 0, y: 0, z: 0}
   Prefab: {fileID: 322783647940636695, guid: 0bc3aa79cdf75474792eabbf250360a0, type: 3}
-  explosionEffectPrefab: {fileID: 4731148487824652538, guid: 797be3ddff412cc4e8571e37027b4011, type: 3}
+  explosionEffectPrefab: {fileID: 5412338807302183837, guid: 49b0b289a6b5c634c81eb0bfb7c92e6c, type: 3}
   skillType: 2
   appliedBuff: {fileID: 11400000, guid: 5f3216c808def3644922762efec99eab, type: 2}

@@ -48,6 +48,7 @@ namespace Player
                 else
                 {
                     float remainingTime = (currentAttack.LastUsedTime + currentAttack.CooldownTime) - Time.time;
+                    playerProjector.CloseProjectile();
                     Debug.Log($"공격 준비 중! 남은 쿨타임: {remainingTime:F1}초");
                 }
             }

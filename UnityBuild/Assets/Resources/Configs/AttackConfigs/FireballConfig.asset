@@ -13,10 +13,11 @@ MonoBehaviour:
   m_Name: FireballConfig
   m_EditorClassIdentifier: 
   attackType: 0
-  attackIcon: {fileID: 21300000, guid: 9234a9f9d4c56884796fcabc0d43a83b, type: 3}
   attackDelay: 0.5
   recoveryTime: 1
   animParameter: isAttack1
+  attackTrans: {x: 0, y: 0, z: 0}
   Prefab: {fileID: 322783647940636695, guid: 62731b0ab5cbf294d94385f67d394ac3, type: 3}
-  explosionEffectPrefab: {fileID: 5353179313893722497, guid: 1a2aa849b6a8bb543a71afbe5473a028, type: 3}
+  explosionEffectPrefab: {fileID: 5412338807302183837, guid: 68a8102c387cfd24583565c4ddfae556, type: 3}
   skillType: 0
+  appliedBuff: {fileID: 0}

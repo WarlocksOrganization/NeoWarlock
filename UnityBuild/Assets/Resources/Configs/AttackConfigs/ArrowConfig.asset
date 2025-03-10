@@ -16,7 +16,8 @@ MonoBehaviour:
   attackDelay: 0.25
   recoveryTime: 0.5
   animParameter: isAttack2
+  attackTrans: {x: 0, y: 0, z: 0}
   Prefab: {fileID: 322783647940636695, guid: 62731b0ab5cbf294d94385f67d394ac3, type: 3}
-  explosionEffectPrefab: {fileID: 5353179313893722497, guid: cfdb38e930386bf4c9b29c0a86f1cf87, type: 3}
+  explosionEffectPrefab: {fileID: 5412338807302183837, guid: 68a8102c387cfd24583565c4ddfae556, type: 3}
   skillType: 5
   appliedBuff: {fileID: 0}

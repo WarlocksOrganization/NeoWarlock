@@ -22,12 +22,12 @@ namespace UI
 
         public void SelectSkill(int index, bool selected)
         {
+            for (int i = 1; i < quickSlots.Length; i++)
+            {
+                quickSlots[i].SelectSkill(false);
+            }
             if (index > 0)
             {
-                for (int i = 1; i < quickSlots.Length; i++)
-                {
-                    quickSlots[i].SelectSkill(false);
-                }
                 quickSlots[index].SelectSkill(selected);
             }
         }

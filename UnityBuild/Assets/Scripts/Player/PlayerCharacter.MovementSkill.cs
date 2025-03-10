@@ -24,7 +24,14 @@ namespace Player
                     canMove = false;
                     playerUI?.UseSkill(0);
                     CmdTriggerAnimation("isMoveSkill");
-                    CmdUseMovementSkill(hit.point);
+                    if (moveKeyboard.magnitude > 0.1f)
+                    {
+                        CmdUseMovementSkill(transform.position + moveKeyboard * 100);
+                    }
+                    else
+                    {
+                        CmdUseMovementSkill(hit.point);
+                    }
                 }
             }
         }

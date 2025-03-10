@@ -18,6 +18,6 @@ MonoBehaviour:
   animParameter: isAttack4
   attackTrans: {x: 0, y: 3.5, z: 0}
   Prefab: {fileID: 322783647940636695, guid: 37f2acf25e527df43a982a902e47a741, type: 3}
-  explosionEffectPrefab: {fileID: 5353179313893722497, guid: 7d2f8500645b8d84694ffb8444a561fe, type: 3}
+  explosionEffectPrefab: {fileID: 5412338807302183837, guid: 68a8102c387cfd24583565c4ddfae556, type: 3}
   skillType: 7
   appliedBuff: {fileID: 0}

@@ -106,9 +106,9 @@ namespace Player
                 /*
                 case Constants.CharacterClass.Warrior:
                     SetMovementSkill(new ChargeSkill());
-                    SetAvailableAttack(1, 7); // 돌진 공격
-                    SetAvailableAttack(2, 8); // 광역 베기
-                    SetAvailableAttack(3, 9); // 방패 치기
+                    SetAvailableAttack(1, 21); // 돌진 공격
+                    SetAvailableAttack(2, 22); // 광역 베기
+                    SetAvailableAttack(3, 23); // 방패 치기
                     break;*/
             }
 

@@ -21,6 +21,8 @@ namespace Player
         private bool canMove = true;
         private bool isMovingToTarget = false;
 
+        private Vector3 moveKeyboard;
+
         public void Move()
         {
             _moveDirection = Vector3.zero;
@@ -53,14 +55,14 @@ namespace Player
             float moveX = Input.GetAxis("Horizontal");
             float moveZ = Input.GetAxis("Vertical");
 
-            Vector3 move = transform.right * moveX + transform.forward * moveZ;
-            move = move.normalized;
-            bool isMoving = move.magnitude > 0.1f;
+            moveKeyboard = transform.right * moveX + transform.forward * moveZ;
+            moveKeyboard = moveKeyboard.normalized;
+            bool isMoving = moveKeyboard.magnitude > 0.1f;
 
             if (isMoving)
             {
                 isMovingToTarget = false; // 키보드 이동 시 마우스 이동 중단
-                _moveDirection = move * MoveSpeed;
+                _moveDirection = moveKeyboard * MoveSpeed;
             }
             else if (!isMovingToTarget)
             {

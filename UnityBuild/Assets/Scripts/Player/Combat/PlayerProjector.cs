@@ -93,6 +93,8 @@ namespace Player.Combat
                     arrowMaterial.mainTextureScale = new Vector2(1, distance / 10f);
                 }
             }
+
+            UpdateDecalProjector();
         }
     
         private void UpdateDecalProjector()
