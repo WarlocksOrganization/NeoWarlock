@@ -41,7 +41,13 @@ namespace Player
         {
             InitializeCharacterModels();
             ApplyCharacterClass(PLayerCharacterClass);
-
+            
+            GameLobbyUI gameLobbyUI = FindFirstObjectByType<GameLobbyUI>();
+            if (gameLobbyUI != null)
+            {
+                gameLobbyUI.UpdatePlayerInRoon();
+            }
+            
             if (isOwned)
             {
                 virtualCamera = FindFirstObjectByType<CinemachineVirtualCamera>();
@@ -63,6 +69,15 @@ namespace Player
             if (!isOwned) return;
 
             if (isDead) return;
+            
+            if (!_characterController.isGrounded)
+            {
+                gravityVelocity.y += gravity * Time.deltaTime; // 중력 가속도 증가
+            }
+            else
+            {
+                gravityVelocity.y = -1f; // ✅ 바닥에 있으면 살짝 눌러줌 (떨림 방지)
+            }
 
             Move();
             UpdateCameraTarget();
