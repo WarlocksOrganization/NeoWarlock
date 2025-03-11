@@ -48,7 +48,9 @@ MonoBehaviour:
   m_RendererFeatures:
   - {fileID: 7833122117494664109}
   - {fileID: -9100440671254458038}
-  m_RendererFeatureMap: ad6b866f10d7b46c4a515cfa6cbdb481
+  - {fileID: 477566761544294812}
+  - {fileID: 2510143473911078196}
+  m_RendererFeatureMap: ad6b866f10d7b46c4a515cfa6cbdb4819ca1617a70a8a006341dbcb130d2d522
   m_UseNativeRenderPass: 1
   xrSystemData: {fileID: 0}
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
@@ -74,6 +76,44 @@ MonoBehaviour:
   m_DepthTextureFormat: 0
   m_AccurateGbufferNormals: 0
   m_IntermediateTextureMode: 0
+--- !u!114 &477566761544294812
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 521933c422ef94aa58e7d435b6f8921a, type: 3}
+  m_Name: WideOutline
+  m_EditorClassIdentifier: 
+  m_Active: 1
+  settings: {fileID: 11400000, guid: 09f1500a66562244b9ea157fbed75e3e, type: 2}
+  shaders:
+    mask: {fileID: 4800000, guid: 1ed7bc804a124d559675facf61722b63, type: 3}
+    silhouette: {fileID: 4800000, guid: 2a1be836d8f24bbb91714e9a51f8fec1, type: 3}
+    silhouetteInstanced: {fileID: 4800000, guid: 85d004b6af6cd48209d21826b2f0a5a3, type: 3}
+    outline: {fileID: 4800000, guid: 90865e175cad4ccd80a2e1965c38f3e9, type: 3}
+--- !u!114 &2510143473911078196
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1bf42c897c344772a8dea9cae097da4, type: 3}
+  m_Name: FastOutline
+  m_EditorClassIdentifier: 
+  m_Active: 1
+  settings: {fileID: 11400000, guid: 04302ffbc45108e48b1b804d8899e555, type: 2}
+  shaders:
+    mask: {fileID: 4800000, guid: d6efd8a53bb54ff68576b38c066c3134, type: 3}
+    outline: {fileID: 4800000, guid: 981392195909457093e91e09efd412a1, type: 3}
+    outlineInstanced: {fileID: 4800000, guid: 43dbe363270164c96812acf35572a126, type: 3}
+    clear: {fileID: 4800000, guid: 9d6033fe8c48f4059a892093b5eec20b, type: 3}
 --- !u!114 &7833122117494664109
 MonoBehaviour:
   m_ObjectHideFlags: 0
