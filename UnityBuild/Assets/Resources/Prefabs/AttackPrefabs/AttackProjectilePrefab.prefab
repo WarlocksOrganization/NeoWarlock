@@ -104,6 +104,8 @@ MonoBehaviour:
     gObject: {fileID: 6538190977423909251}
   - skillType: 13
     gObject: {fileID: 37912878890382076}
+  - skillType: 8
+    gObject: {fileID: 37912878890382076}
 --- !u!114 &642507581500943264
 MonoBehaviour:
   m_ObjectHideFlags: 0

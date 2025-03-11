@@ -1,6 +1,7 @@
 using System.Collections;
 using Interfaces;
 using Mirror;
+using Unity.Burst.CompilerServices;
 using UnityEngine;
 
 namespace Player.Combat
@@ -43,8 +44,7 @@ namespace Player.Combat
             foreach (Collider hit in hitColliders)
             {
                 IDamagable damagable = hit.transform.GetComponent<IDamagable>();
-                Debug.Log(hit.transform.gameObject == this.owner);
-                if (damagable != null && hit.transform.gameObject != this.owner)
+                if (damagable != null && (config.attackType != DataSystem.Constants.AttackType.Melee || hit.transform.gameObject != this.owner))
                 {
                     damagable.takeDamage((int)explosionDamage, transform.position, knockbackForce, config);
                 }

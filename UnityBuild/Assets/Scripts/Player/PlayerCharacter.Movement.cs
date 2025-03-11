@@ -55,7 +55,11 @@ namespace Player
             finalMove += gravityVelocity; // ✅ 중력 값을 이동 벡터에 추가
 
             if (canMove)
-            {
+            {   
+                if (transform.position.y > 0f)
+                {
+                    finalMove.y = -0.2f;
+                }
                 _characterController.Move(finalMove * Time.deltaTime);
                 TryUseMovementSkill();
             }
