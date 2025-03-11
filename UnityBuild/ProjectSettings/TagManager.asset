@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 3
   tags:
   - CinemachineTarget
+  - ChatWindow
   layers:
   - Default
   - TransparentFX
@@ -35,9 +36,9 @@ TagManager:
   - 
   - 
   - 
+  - Special
   - 
-  - 
-  - 
+  - Select
   m_SortingLayers:
   - name: Default
     uniqueID: 0
