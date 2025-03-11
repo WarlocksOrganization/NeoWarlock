@@ -14,7 +14,9 @@ namespace Player.Combat
         [SerializeField] protected GameObject explosionEffectPrefab; // ✅ 파티클 프리팹
         protected AttackConfig config;
 
-        public void Initialize(float damage, float radius, float knockback, AttackConfig config)
+        protected GameObject owner;
+
+        public void Initialize(float damage, float radius, float knockback, AttackConfig config, GameObject owner = null)
         {
             explosionDamage = damage;
             explosionRadius = radius;
@@ -22,6 +24,8 @@ namespace Player.Combat
             this.config = config;
 
             explosionEffectPrefab.transform.localScale = new Vector3(radius, radius, radius);
+
+            this.owner = owner;
         }
 
         public override void OnStartServer()
@@ -39,7 +43,8 @@ namespace Player.Combat
             foreach (Collider hit in hitColliders)
             {
                 IDamagable damagable = hit.transform.GetComponent<IDamagable>();
-                if (damagable != null)
+                Debug.Log(hit.transform.gameObject == this.owner);
+                if (damagable != null && hit.transform.gameObject != this.owner)
                 {
                     damagable.takeDamage((int)explosionDamage, transform.position, knockbackForce, config);
                 }

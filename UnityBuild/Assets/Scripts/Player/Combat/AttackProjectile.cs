@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using DataSystem;
 using Mirror;
 using Player.Combat;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace Player
@@ -27,7 +28,9 @@ namespace Player
         [SerializeField] private List<Constants.SkillEffectGameObjectEntry> skilleffectList = new List<Constants.SkillEffectGameObjectEntry>();
         private Dictionary<Constants.SkillType, GameObject> skillEffects;
 
-        public void SetProjectileData(float damage, float speed, float radius, float range, float lifeTime, float knockback, AttackConfig config)
+        [SyncVar] private GameObject owner;
+
+        public void SetProjectileData(float damage, float speed, float radius, float range, float lifeTime, float knockback, AttackConfig config, GameObject owner = null)
         {
             this.damage = damage;
             this.speed = speed;
@@ -40,6 +43,8 @@ namespace Player
             transform.localScale = new Vector3(radius, radius, radius);
 
             skillType = config.skillType;
+
+            this.owner = owner;
         }
 
         void Awake()
@@ -102,7 +107,11 @@ namespace Player
             if (!isServer) return;
 
             if ((layerMask.value & (1 << col.gameObject.layer)) == 0) return;
-
+            // ✅ 공격자와 동일한 레이어에 속한 대상은 무시
+            if (col.gameObject == this.owner) return;
+            // ✅ 근접 공격일 경우 플레이어에게만 피해를 줌
+            if (this.attackConfig.attackType is Constants.AttackType.Melee && col.gameObject.GetComponent<CharacterController>() == null) return;
+            Debug.Log("OnCollisionEnter");
             Explode();
         }
 
@@ -111,7 +120,12 @@ namespace Player
             if (!isServer) return;
 
             if ((layerMask.value & (1 << col.gameObject.layer)) == 0) return;
-
+            Debug.Log(col.gameObject == this.owner);
+            // ✅ 공격자와 동일한 레이어에 속한 대상은 무시
+            if (col.gameObject == this.owner) return;
+            // ✅ 근접 공격일 경우 플레이어에게만 피해를 줌
+            if (this.attackConfig.attackType is Constants.AttackType.Melee && col.gameObject.GetComponent<CharacterController>() == null) return;
+            Debug.Log("OnTriggerEnter");
             Explode();
         }
 
@@ -125,7 +139,7 @@ namespace Player
 
                 if (explosionComponent != null)
                 {
-                    explosionComponent.Initialize(damage, radius, knockbackForce, attackConfig);
+                    explosionComponent.Initialize(damage, radius, knockbackForce, attackConfig, this.owner);
                 }
 
                 NetworkServer.Spawn(explosion);

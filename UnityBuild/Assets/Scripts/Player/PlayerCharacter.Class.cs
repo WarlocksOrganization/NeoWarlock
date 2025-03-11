@@ -110,10 +110,10 @@ namespace Player
                     break;
                 
                 case Constants.CharacterClass.Warrior:
-                    //SetMovementSkill(new ChargeSkill());
-                    //SetAvailableAttack(1, 21); // 돌진 공격
-                    //SetAvailableAttack(2, 22); // 광역 베기
-                    //SetAvailableAttack(3, 23); // 방패 치기
+                    SetMovementSkill(Constants.SkillType.Roll);
+                    SetAvailableAttack(1, 21); // 베기
+                    // SetAvailableAttack(2, 22); // 몸빵 강화
+                    // SetAvailableAttack(3, 23); // 돌진
                     break;
                 case Constants.CharacterClass.Necromancer:
                     SetMovementSkill(Constants.SkillType.PhantomStep);

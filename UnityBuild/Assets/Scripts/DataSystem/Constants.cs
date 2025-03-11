@@ -60,6 +60,7 @@ namespace DataSystem
             SoulVortex,
             InfernalFlask,
             PhantomStep,
+            Slash,
             
             None = 100,
         }

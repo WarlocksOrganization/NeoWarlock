@@ -80,6 +80,15 @@ namespace Player.Combat
                 rangeDecalProjector.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
                 rangeDecalProjector.size = new Vector3(attackData.Range*2 + attackData.Radius*2, attackData.Range*2 + attackData.Radius*2, 1f);
             }
+
+            else if (currentAttack is MeleeAttack)
+            {
+                attackRange = attackData.Range;
+                decalProjector.material = circleMaterial;
+                decalProjector.size = new Vector3(attackData.Range*2, attackData.Range*2, 1f);
+            }
+
+
             else if (currentAttack is ProjectileAttack projectileAttack)
             {
                 distance = projectileAttack.GetAttackData().Range;
@@ -94,6 +103,7 @@ namespace Player.Combat
                 }
             }
 
+            
             UpdateDecalProjector();
         }
     
@@ -123,6 +133,13 @@ namespace Player.Combat
 
                 decalProjector.transform.position = aimPosition + Vector3.up * 0.1f;
             }
+
+            else if (currentAttack is MeleeAttack)
+            {
+                startPosition = transform.position;
+                decalProjector.transform.position = startPosition + Vector3.up * 0.1f;
+            }
+
             else if (currentAttack is ProjectileAttack projectileAttack)
             {
                 startPosition = fireTransform.position;
@@ -136,7 +153,7 @@ namespace Player.Combat
                 direction.y = 0;
                 decalProjector.transform.rotation = Quaternion.LookRotation(Vector3.down, direction);
                 
-            }
+            }            
         }
     }
 }
