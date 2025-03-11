@@ -43,6 +43,7 @@ namespace DataSystem
             DefenseBoost,
             Slow,
             Poison,
+            Charge,
         }
 
         public enum SkillType
@@ -60,7 +61,9 @@ namespace DataSystem
             SoulVortex,
             InfernalFlask,
             PhantomStep,
-            
+            Slash,
+            PowerBody,
+            Charge,
             None = 100,
         }
         
