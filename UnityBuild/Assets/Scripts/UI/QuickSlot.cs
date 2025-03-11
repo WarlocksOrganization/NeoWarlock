@@ -13,6 +13,7 @@ namespace UI
         [SerializeField] private Image skillCulImage3; // 페이드아웃 효과를 줄 이미지
         [SerializeField] private GameObject isSelectedImage;
         [SerializeField] private TMP_Text culText;
+        [SerializeField] private Image frameImage; // 스킬버튼 프레임 이미지
 
         private float maxSkillCul;
         private float currentSkillCul;
@@ -34,6 +35,14 @@ namespace UI
             currentSkillCul = maxSkillCul;
             skillCulImage2.fillAmount = 1;
             SelectSkill(false);
+        }
+
+        public void SetFrame(Sprite newFrame)
+        {
+            if (frameImage != null && newFrame != null)
+            {
+                frameImage.sprite = newFrame;
+            }
         }
 
         void Update()
