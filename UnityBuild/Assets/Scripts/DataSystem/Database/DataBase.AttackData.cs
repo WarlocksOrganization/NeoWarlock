@@ -50,7 +50,7 @@ namespace DataSystem.Database
                 Sprite attackIcon = Resources.Load<Sprite>(Constants.IconPath + columns[1] + "_icon");
                 if (attackIcon == null)
                 {
-                    Debug.LogError($"아이콘을 찾을 수 없습니다: {columns[8]}");
+                    Debug.LogError($"아이콘을 찾을 수 없습니다: {columns[1]}");
                     continue;
                 }
 

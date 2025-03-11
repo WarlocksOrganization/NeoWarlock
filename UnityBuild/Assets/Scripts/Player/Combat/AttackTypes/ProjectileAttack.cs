@@ -1,3 +1,4 @@
+using System;
 using Mirror;
 using UnityEngine;
 
@@ -23,7 +24,7 @@ namespace Player.Combat
                     attackData.Speed,
                     attackData.Radius,
                     attackData.Range,
-                    attackData.Range / attackData.Speed,
+                    attackData.Range / Math.Abs(attackData.Speed),
                     attackData.KnockbackForce,
                     attackData.config
                 );

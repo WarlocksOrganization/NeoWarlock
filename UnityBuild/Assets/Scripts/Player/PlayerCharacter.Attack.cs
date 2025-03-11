@@ -136,6 +136,10 @@ namespace Player
                     attackInstance = new GameObject($"{data.Name} Attack").AddComponent<AreaAttack>();
                     break;
 
+                case Constants.AttackType.Melee:
+                    attackInstance = new GameObject($"{data.Name} Attack").AddComponent<MeleeAttack>();
+                    break;
+
                 default:
                     Debug.LogError($"알 수 없는 공격 타입: {data.config.attackType}");
                     return null;
@@ -249,6 +253,7 @@ namespace Player
                 case Constants.AttackType.ProjectileSky:
                 case Constants.AttackType.Point:
                 case Constants.AttackType.Area:
+                case Constants.AttackType.Melee:
                     CmdTriggerAnimation(currentAttack.GetAttackData().config.animParameter);
                     break;
                 default:

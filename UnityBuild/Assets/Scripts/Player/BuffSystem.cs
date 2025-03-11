@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using DataSystem;
 using Mirror;
 using Player;
+using Player.Combat;
+using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.Animations;
 
 public class BuffSystem : NetworkBehaviour
 {
@@ -52,6 +55,11 @@ public class BuffSystem : NetworkBehaviour
         if (buffData.tickDamage > 0)
         {
             StartCoroutine(TickDamage(buffData));
+        }
+
+        if (buffData.moveDirection != Vector3.zero)
+        {
+            StartCoroutine(ForcedMove(buffData));
         }
 
         yield return new WaitForSeconds(buffData.duration);
@@ -113,6 +121,35 @@ public class BuffSystem : NetworkBehaviour
             }
 
             elapsedTime += 0.5f;
+        }
+    }
+
+    private IEnumerator ForcedMove(BuffData buffData)
+    {
+        float elapsedTime = 0f;
+
+        // bool isChargeSkill = buffData.BuffType == Constants.BuffType.Charge;
+        // AttackBase chargeInstance = null;
+        // if (isChargeSkill)
+        // {
+        //     chargeInstance = new GameObject("Melee Attack").AddComponent<MeleeAttack>();
+        // }
+
+        while (elapsedTime < buffData.duration)
+        {
+            yield return new WaitForSeconds(0.016f);
+
+            if (playerCharacter != null)
+            {
+                Debug.Log("Forced Move");
+                CharacterController characterController = playerCharacter.GetComponent<CharacterController>();
+                Quaternion quaternion = playerCharacter.gameObject.transform.GetChild(2).rotation;
+                Vector3 moveDirection = quaternion * buffData.moveDirection;
+                moveDirection.y = 0f;
+                characterController.Move(moveDirection * 0.1f); // ✅ 강제 이동 적용
+            }
+
+            elapsedTime += 0.016f;
         }
     }
 }
