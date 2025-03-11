@@ -8,7 +8,7 @@ namespace Player
     public class RoomPlayer : NetworkRoomPlayer
     {
         private GameRoomData roomData;
-    
+
         [SyncVar]
         public string PlayerNickname;
 
@@ -31,11 +31,8 @@ namespace Player
 
         private void SpawnLobbyPlayerCharacter()
         {
-            // 플레이어 스폰 위치 설정 및 생성
             Vector3 spawnPos = FindFirstObjectByType<SpawnPosition>().GetSpawnPosition();
-        
-            LobbyPlayer = Instantiate(RoomManager.singleton.spawnPrefabs[0], spawnPos, Quaternion.identity).GetComponent<LobbyPlayerCharacter>();
-        
+            LobbyPlayer = Instantiate((NetworkRoomManager.singleton as RoomManager).spawnPrefabs[0], spawnPos, Quaternion.identity).GetComponent<LobbyPlayerCharacter>();
             NetworkServer.Spawn(LobbyPlayer.gameObject, connectionToClient);
         }
 
@@ -43,7 +40,6 @@ namespace Player
         {
             base.OnStartClient();
 
-            // GameRoomData 자동 동기화 확인
             roomData = FindFirstObjectByType<GameRoomData>();
 
             if (roomData != null && isOwned)

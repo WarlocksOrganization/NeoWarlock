@@ -22,15 +22,18 @@ namespace Player
         private bool isMovingToTarget = false;
 
         private Vector3 moveKeyboard;
+        
+        private Vector3 gravityVelocity = Vector3.zero; // ✅ 중력 가속도를 저장할 변수
+        private float gravity = -9.81f; // ✅ Unity 기본 중력 값
 
         public void Move()
         {
             _moveDirection = Vector3.zero;
             Vector3 finalMove = Vector3.zero;
-            
-            ApplyKnockbackMovement(); // ✅ 넉백 감속은 항상 적용
+
+            ApplyKnockbackMovement(); // ✅ 넉백 감속 유지
             finalMove += _knockbackDirection;
-            
+
             // ✅ 캐릭터 이동만 차단, 넉백은 계속 적용됨
             if (attackLockTime <= 0 && canMove)
             {
@@ -38,6 +41,18 @@ namespace Player
                 HandleMouseMovement();
                 finalMove += _moveDirection;
             }
+
+            // ✅ 중력 적용
+            if (_characterController.isGrounded)
+            {
+                gravityVelocity.y = 0f; // 바닥에 닿으면 중력 초기화
+            }
+            else
+            {
+                gravityVelocity.y += gravity * Time.deltaTime; // 중력 가속도 증가
+            }
+
+            finalMove += gravityVelocity; // ✅ 중력 값을 이동 벡터에 추가
 
             if (canMove)
             {
@@ -47,7 +62,6 @@ namespace Player
 
             RotateModelToMoveDirection();
             UpdateAnimator();
-            
         }
 
         private void HandleKeyboardMovement()
