@@ -14,7 +14,7 @@ namespace Player
     public partial class PlayerCharacter
     {
         [SyncVar(hook = nameof(OnCharacterClassChanged))]
-        [SerializeField] private Constants.CharacterClass characterClass; // ✅ 직업 동기화
+        public Constants.CharacterClass PLayerCharacterClass; // ✅ 직업 동기화
 
         [Header("Character Models")]
         public GameObject[] mageModel;
@@ -59,7 +59,7 @@ namespace Player
 
         private void ApplyCharacterClass(Constants.CharacterClass newClass)
         {
-            characterClass = newClass;
+            PLayerCharacterClass = newClass;
             SetClassSkills();
             ActivateCharacterModel(newClass);
         }
@@ -93,7 +93,7 @@ namespace Player
 
         private void SetClassSkills()
         {
-            switch (characterClass)
+            switch (PLayerCharacterClass)
             {
                 case Constants.CharacterClass.Mage:
                     SetMovementSkill(Constants.SkillType.TelePort);
@@ -116,7 +116,7 @@ namespace Player
                     //SetAvailableAttack(3, 23); // 방패 치기
                     break;
                 case Constants.CharacterClass.Necromancer:
-                    //SetMovementSkill(new TeleportSkill());
+                    SetMovementSkill(Constants.SkillType.PhantomStep);
                     SetAvailableAttack(1, 31); // 유령
                     SetAvailableAttack(2, 32); // 유령2
                     SetAvailableAttack(3, 33); // 폭발 플라스크

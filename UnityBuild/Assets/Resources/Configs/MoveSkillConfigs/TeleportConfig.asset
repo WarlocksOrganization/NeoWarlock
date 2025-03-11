@@ -17,5 +17,5 @@ MonoBehaviour:
   castTime: 0.5
   moveDuration: 0
   endTime: 0.75
-  maxDistance: 20
+  maxDistance: 10
   skillIcon: {fileID: 21300000, guid: 001427cc48283e648822f2955d95f361, type: 3}
