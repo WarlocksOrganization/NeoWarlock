@@ -108,8 +108,10 @@ namespace Player
             if ((layerMask.value & (1 << col.gameObject.layer)) == 0) return;
             // ✅ 근접 공격은 공격자와 동일한 레이어에 속한 대상은 무시
             if (this.attackConfig.attackType is Constants.AttackType.Melee && col.gameObject == this.owner) return;
-            // ✅ 근접 공격일 경우 플레이어에게만 피해를 줌
-            if (this.attackConfig.attackType is Constants.AttackType.Melee && col.gameObject.GetComponent<CharacterController>() == null) return;
+            // ✅ 자기 공격일 경우 자기 자신에게만 영향을 줌
+            if (this.attackConfig.attackType is Constants.AttackType.Self && col.gameObject != this.owner) return;
+            // ✅ 근접 공격 및 자기 공격일 경우 플레이어에게만 영향을 줌
+            if ((this.attackConfig.attackType is Constants.AttackType.Melee || this.attackConfig.attackType is Constants.AttackType.Self) && col.gameObject.GetComponent<CharacterController>() == null) return;
             Debug.Log("OnCollisionEnter");
             Explode();
         }
@@ -117,13 +119,14 @@ namespace Player
         protected void OnTriggerEnter(Collider col)
         {
             if (!isServer) return;
-            Debug.Log("hit");
+            
             if ((layerMask.value & (1 << col.gameObject.layer)) == 0) return;
             // ✅ 근접 공격은 공격자와 동일한 레이어에 속한 대상은 무시
-            Debug.Log("hit2");
             if (this.attackConfig.attackType is Constants.AttackType.Melee && col.gameObject == this.owner) return;
-            // ✅ 근접 공격일 경우 플레이어에게만 피해를 줌
-            if (this.attackConfig.attackType is Constants.AttackType.Melee && col.gameObject.GetComponent<CharacterController>() == null) return;
+            // ✅ 자기 공격일 경우 자기 자신에게만 영향을 줌
+            if (this.attackConfig.attackType is Constants.AttackType.Self && col.gameObject != this.owner) return;
+            // ✅ 근접 공격및 자기 공격일 경우 플레이어에게만 영향을 줌
+            if ((this.attackConfig.attackType is Constants.AttackType.Melee || this.attackConfig.attackType is Constants.AttackType.Self) && col.gameObject.GetComponent<CharacterController>() == null) return;
             Debug.Log("OnTriggerEnter");
             Explode();
         }
