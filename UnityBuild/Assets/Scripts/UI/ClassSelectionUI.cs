@@ -9,8 +9,9 @@ public class ClassSelectionUI : MonoBehaviour
     private PlayerCharacter playerCharacter;
     private Constants.CharacterClass characterClass = Constants.CharacterClass.Mage;
 
-    private void Start()
+    private void OnEnable()
     {
+        playerCharacter.SetIsDead(true);
         FindPlayerCharacter();
         ChangeClass(0);
     }
@@ -43,13 +44,17 @@ public class ClassSelectionUI : MonoBehaviour
     
     public void SelectClass()
     {
-        FindPlayerCharacter();
+        if (playerCharacter == null)
+        {
+            FindPlayerCharacter();
+        }
 
         if (playerCharacter != null)
         {
             Constants.CharacterClass selectedClass = characterClass; // ✅ int → CharacterClass 변환
             playerCharacter.SetCharacterClass(selectedClass);
             PlayerSetting.PlayerCharacterClass = selectedClass;
+            playerCharacter.SetIsDead(false);
         }
         else
         {

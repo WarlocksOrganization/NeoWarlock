@@ -22,7 +22,8 @@ namespace Player
         
         [SerializeField] private LayerMask mouseTargetLayer;
         
-        [SyncVar] private bool isDead = false;
+        [SyncVar(hook = nameof(SetIsDead_Hook))]
+        private bool isDead = true;
         
         [SerializeField] private Animator animator;
         
@@ -107,6 +108,30 @@ namespace Player
         private void RpcTriggerAnimation(string trigger)
         {
             animator.SetTrigger(trigger);
+        }
+
+        public void SetIsDead(bool value)
+        {
+            if (!isServer)
+            {
+                CmdSetIsDead(value);
+            }
+            else
+            {
+                isDead = value;
+            }
+        }
+
+        [Command]
+        private void CmdSetIsDead(bool value)
+        {
+            isDead = value;
+        }
+
+        public void SetIsDead_Hook(bool oldValue, bool newValue)
+        {
+            isDead = newValue;
+            _characterController.enabled = !newValue;
         }
     }
 }

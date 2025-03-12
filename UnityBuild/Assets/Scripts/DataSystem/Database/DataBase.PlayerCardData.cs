@@ -38,22 +38,12 @@ namespace DataSystem.Database
 
                 string[] columns = row.Split(',');
 
-                // ✅ 아이콘을 카드 이름을 기반으로 로드
-                Sprite cardIcon = Resources.Load<Sprite>($"Sprites/PlayerCards/{columns[1]}_icon");
-                if (cardIcon == null)
-                {
-                    Debug.LogWarning($"[Database] 아이콘을 찾을 수 없습니다: {columns[1]}");
-                    continue;
-                }
-
                 PlayerCardData data = new()
                 {
                     ID = int.Parse(columns[0]),
                     Name = columns[1],
-                    ApplyClass = (Constants.CharacterClass)int.Parse(columns[2]), // 적용 클래스
                     StatType = (PlayerStatType)int.Parse(columns[3]), // 증가 능력치 타입
                     BonusStat = float.Parse(columns[4]), // 증가 능력치 값
-                    AppliedSkillIndex = int.Parse(columns[5]), // ✅ 강화되는 스킬 번호 (0,1,2,3)
                 };
 
                 playerCardDictionary[data.ID] = data;
@@ -66,10 +56,8 @@ namespace DataSystem.Database
         {
             public int ID;
             public string Name;
-            public Constants.CharacterClass ApplyClass; // ✅ 적용할 클래스
             public PlayerStatType StatType; // ✅ 증가하는 능력치 타입
             public float BonusStat; // ✅ 증가하는 수치
-            public int AppliedSkillIndex; // ✅ 강화되는 스킬 번호 (0,1,2,3)
         }
     }
 
@@ -82,13 +70,13 @@ namespace DataSystem.Database
         
         
         AttackSpeed = 10,  // 스킬 이동 속도 증가
-        Range = 11, // 공격거리
-        Radius = 12, // 범위
-        Damage = 13, // 공격력 증가
-        KnockbackForce = 14, // 넉백거리
-        Cooldown = 15, // 쿨타임 감소
+        Range = 11, // 스킬 공격거리
+        Radius = 12, // 스킬 범위
+        Damage = 13, // 스킬 공격력 증가
+        KnockbackForce = 14, // 스킬 넉백거리
+        Cooldown = 15, // 스킬 쿨타임 감소
         
-        Special = 20, //스페셜
+        Special = 20, //스킬 업그레이들
         
         
     }
