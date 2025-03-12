@@ -128,20 +128,12 @@ public class BuffSystem : NetworkBehaviour
     {
         float elapsedTime = 0f;
 
-        // bool isChargeSkill = buffData.BuffType == Constants.BuffType.Charge;
-        // AttackBase chargeInstance = null;
-        // if (isChargeSkill)
-        // {
-        //     chargeInstance = new GameObject("Melee Attack").AddComponent<MeleeAttack>();
-        // }
-
         while (elapsedTime < buffData.duration)
         {
             yield return new WaitForSeconds(0.016f);
 
             if (playerCharacter != null)
             {
-                Debug.Log("Forced Move");
                 CharacterController characterController = playerCharacter.GetComponent<CharacterController>();
                 Quaternion quaternion = playerCharacter.gameObject.transform.GetChild(2).rotation;
                 Vector3 moveDirection = quaternion * buffData.moveDirection;

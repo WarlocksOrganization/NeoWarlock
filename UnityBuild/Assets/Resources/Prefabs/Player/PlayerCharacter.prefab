@@ -62256,7 +62256,7 @@ MonoBehaviour:
   - skillType: 13
     effect: {fileID: 6126243130830549957}
   - skillType: 15
-    effect: {fileID: 5319647565256689068}
+    effect: {fileID: 960552687338469478}
 --- !u!114 &-5323773774099877292
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -71627,11 +71627,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9b21333b068a5084ba09535839bee3c8, type: 3}
---- !u!198 &5319647565256689068 stripped
-ParticleSystem:
-  m_CorrespondingSourceObject: {fileID: 484368387861551534, guid: 9b21333b068a5084ba09535839bee3c8, type: 3}
-  m_PrefabInstance: {fileID: 5722946190535760898}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &7884807444611519478 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2452082064152055796, guid: 9b21333b068a5084ba09535839bee3c8, type: 3}
