@@ -5,6 +5,7 @@ using Interfaces;
 using kcp2k;
 using Mirror;
 using Player.Combat;
+using UI;
 using UnityEngine;
 
 namespace Player
@@ -93,10 +94,18 @@ namespace Player
                 IAttack attackInstance = CreateAttackInstance(attackData);
                 availableAttacks[index] = attackInstance;
 
+                if (isOwned && playerUI == null)
+                {
+                    playerUI = FindFirstObjectByType<PlayerCharacterUI>();
+                }
                 if (playerUI != null)
                 {
                     // ✅ ScriptableObject 데이터 활용
                     playerUI.SetQuickSlotData(index, attackData.Icon, attackData.Cooldown);
+                }
+                else
+                {
+                    Debug.Log("playUI없음");
                 }
             }
             else

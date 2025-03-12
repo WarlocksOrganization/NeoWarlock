@@ -38,7 +38,17 @@ public class GameLobbyUI : MonoBehaviour
             .OrderBy(player => player.GetComponent<NetworkIdentity>().netId)
             .Select(player => player.gameObject) // GameObject만 배열에 저장
             .ToArray();
-        
+
+        // ✅ 본인의 플레이어 번호 찾기
+        var myPlayer = foundCharacters.FirstOrDefault(p => p.isOwned);
+        if (myPlayer != null)
+        {
+            int myIndex = Array.IndexOf(PlayerCharacters, myPlayer.gameObject);
+            PlayerSetting.PlayerNum = myIndex;
+            Debug.Log($"[GameLobbyUI] 내 PlayerNum: {PlayerSetting.PlayerNum}");
+        }
+
+        // ✅ 게임 방 인원 수 업데이트
         GameRoomData gameRoomData = FindFirstObjectByType<GameRoomData>();
         if (gameRoomData != null)
         {

@@ -1,3 +1,4 @@
+using DataSystem;
 using GameManagement;
 using Mirror;
 using Networking;
@@ -7,7 +8,7 @@ namespace Player
 {
     public class RoomPlayer : NetworkRoomPlayer
     {
-        private GameRoomData roomData;
+        protected GameRoomData roomData;
 
         [SyncVar]
         public string PlayerNickname;
@@ -26,10 +27,14 @@ namespace Player
             if (isOwned)
             {
                 CmdSetNickname(PlayerSetting.Nickname);
+                if (PlayerSetting.PlayerCharacterClass != Constants.CharacterClass.None)
+                {
+                    CmdSetClss(PlayerSetting.PlayerCharacterClass);
+                }
             }
         }
 
-        private void SpawnLobbyPlayerCharacter()
+        protected void SpawnLobbyPlayerCharacter()
         {
             Vector3 spawnPos = FindFirstObjectByType<SpawnPosition>().GetSpawnPosition();
             LobbyPlayer = Instantiate((NetworkRoomManager.singleton as RoomManager).spawnPrefabs[0], spawnPos, Quaternion.identity).GetComponent<LobbyPlayerCharacter>();
@@ -53,6 +58,12 @@ namespace Player
         {
             PlayerNickname = nickname;
             LobbyPlayer.nickname = PlayerNickname;
+        }
+        
+        [Command]
+        public void CmdSetClss(Constants.CharacterClass characterClass)
+        {
+            LobbyPlayer.SetCharacterClass(characterClass);
         }
     }
 }

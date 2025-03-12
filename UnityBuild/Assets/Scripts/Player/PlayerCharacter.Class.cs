@@ -40,7 +40,6 @@ namespace Player
 
         public void SetCharacterClass(Constants.CharacterClass newClass)
         {
-            animator.SetFloat("Blend", (int)newClass);
             if (!isServer)
             {
                 CmdSetCharacterClass(newClass);
@@ -66,6 +65,7 @@ namespace Player
 
         private void OnCharacterClassChanged(Constants.CharacterClass oldClass, Constants.CharacterClass newClass)
         {
+            animator.SetFloat("Blend", (int)newClass);
             SetClassSkills();
             ActivateCharacterModel(newClass);
         }

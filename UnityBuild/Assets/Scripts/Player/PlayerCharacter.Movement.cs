@@ -42,24 +42,13 @@ namespace Player
                 finalMove += _moveDirection;
             }
 
-            // ✅ 중력 적용
-            if (_characterController.isGrounded)
-            {
-                gravityVelocity.y = 0f; // 바닥에 닿으면 중력 초기화
-            }
-            else
-            {
-                gravityVelocity.y += gravity * Time.deltaTime; // 중력 가속도 증가
-            }
+            ApplyGravity();
+            
+            finalMove += gravityVelocity;
 
-            finalMove += gravityVelocity; // ✅ 중력 값을 이동 벡터에 추가
 
             if (canMove)
             {   
-                if (transform.position.y > 0f)
-                {
-                    finalMove.y = -0.2f;
-                }
                 _characterController.Move(finalMove * Time.deltaTime);
                 TryUseMovementSkill();
             }
@@ -85,6 +74,18 @@ namespace Player
             else if (!isMovingToTarget)
             {
                 _moveDirection = Vector3.zero;
+            }
+        }
+        
+        private void ApplyGravity()
+        {
+            if (_characterController.isGrounded)
+            {
+                gravityVelocity.y = -2f; // ✅ 땅에 있을 때 약간의 중력 유지 (떨림 방지)
+            }
+            else
+            {
+                gravityVelocity.y += gravity * Time.deltaTime; // ✅ 중력 가속도 적용
             }
         }
         

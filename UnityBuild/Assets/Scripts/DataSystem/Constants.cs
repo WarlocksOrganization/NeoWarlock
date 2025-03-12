@@ -88,6 +88,7 @@ namespace DataSystem
             public Constants.SkillType skillType;
             public GameObject gObject;
         }
+        
     }
 }
 

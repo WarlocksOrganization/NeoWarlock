@@ -75,10 +75,10 @@ namespace Player.Combat
                 
                 decalProjector.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
                 decalProjector.material = circleMaterial;
-                decalProjector.size = new Vector3(attackData.Radius*2, attackData.Radius*2, 1f);
+                decalProjector.size = new Vector3(attackData.Radius*2, attackData.Radius*2, 3f);
                 
                 rangeDecalProjector.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
-                rangeDecalProjector.size = new Vector3(attackData.Range*2 + attackData.Radius*2, attackData.Range*2 + attackData.Radius*2, 1f);
+                rangeDecalProjector.size = new Vector3(attackData.Range*2 + attackData.Radius*2, attackData.Range*2 + attackData.Radius*2, 3f);
             }
 
             else if (currentAttack is MeleeAttack)
@@ -86,7 +86,7 @@ namespace Player.Combat
                 attackRange = attackData.Range;
                 decalProjector.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
                 decalProjector.material = circleMaterial;
-                decalProjector.size = new Vector3(attackData.Range*2, attackData.Range*2, 1f);
+                decalProjector.size = new Vector3(attackData.Range*2, attackData.Range*2, 3);
             }
 
             else if (currentAttack is ProjectileAttack || currentAttack is SelfAttack)
@@ -95,7 +95,7 @@ namespace Player.Combat
                 decalProjector.material = arrowMaterial;
 
                 // Projector 크기 설정 (Y축 길이를 distance에 맞춰 동적으로 변경)
-                decalProjector.size = new Vector3(1f, distance, 1f);
+                decalProjector.size = new Vector3(1f, distance, 3f);
 
                 if (arrowMaterial != null)
                 {
@@ -120,7 +120,7 @@ namespace Player.Combat
             {
                 startPosition = transform.position;
                 
-                rangeDecalProjector.transform.position = startPosition + Vector3.up * 0.1f;
+                rangeDecalProjector.transform.position = startPosition + Vector3.up * 0.5f;
                 // ✅ 현재 마우스 위치와 플레이어(또는 fireTransform) 위치 간 거리 계산
                 distance = Vector3.Distance(startPosition, aimPosition);
                 
@@ -131,13 +131,13 @@ namespace Player.Combat
                     aimPosition = startPosition + direction * attackRange; // 최대 거리로 위치 고정
                 }
 
-                decalProjector.transform.position = aimPosition + Vector3.up * 0.1f;
+                decalProjector.transform.position = aimPosition;
             }
 
             else if (currentAttack is MeleeAttack)
             {
                 startPosition = transform.position;
-                decalProjector.transform.position = startPosition + Vector3.up * 0.1f;
+                decalProjector.transform.position = startPosition;
             }
 
             else if (currentAttack is ProjectileAttack || currentAttack is SelfAttack)

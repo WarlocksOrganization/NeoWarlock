@@ -1,5 +1,6 @@
 using UnityEngine;
 using DataSystem;
+using GameManagement;
 using Player;
 
 public class ClassSelectionUI : MonoBehaviour
@@ -48,6 +49,7 @@ public class ClassSelectionUI : MonoBehaviour
         {
             Constants.CharacterClass selectedClass = characterClass; // ✅ int → CharacterClass 변환
             playerCharacter.SetCharacterClass(selectedClass);
+            PlayerSetting.PlayerCharacterClass = selectedClass;
         }
         else
         {

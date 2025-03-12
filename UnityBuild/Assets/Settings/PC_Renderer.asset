@@ -20,7 +20,7 @@ MonoBehaviour:
     dBufferSettings:
       surfaceData: 2
     screenSpaceSettings:
-      normalBlend: 0
+      normalBlend: 1
 --- !u!114 &-4012050853401571173
 MonoBehaviour:
   m_ObjectHideFlags: 0

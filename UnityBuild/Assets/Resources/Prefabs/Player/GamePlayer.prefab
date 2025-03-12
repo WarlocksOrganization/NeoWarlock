@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6064285774375179337}
-  - component: {fileID: 660859336951979013}
+  - component: {fileID: 6844087234282324276}
   - component: {fileID: 6368749677994769231}
   m_Layer: 0
   m_Name: GamePlayer
@@ -33,7 +33,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &660859336951979013
+--- !u!114 &6844087234282324276
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -42,17 +42,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 4288150329913291611}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dcab5c3435f8d974eb086296ce26c78d, type: 3}
+  m_Script: {fileID: 11500000, guid: e777f8ce757f215458231d09ca15d50c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
-  showRoomGUI: 1
-  readyToBegin: 0
-  index: 0
-  PlayerNickname: 
-  LobbyPlayer: {fileID: 0}
 --- !u!114 &6368749677994769231
 MonoBehaviour:
   m_ObjectHideFlags: 0

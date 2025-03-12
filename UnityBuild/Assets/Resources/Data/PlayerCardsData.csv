@@ -1,0 +1,6 @@
+ID,Name,ApplyClass,StatType,BonusStat,AppliedSkillIndex 
+1,WarriorStrength,2,1,10.0,0
+2,MageMana,0,0,50.0,1
+3,ArcherSpeed,1,3,5.0,2
+4,NecroDefense,3,2,8.0,3
+5,PriestCooldown,4,4,15.0,1

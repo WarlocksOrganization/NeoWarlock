@@ -15,21 +15,7 @@ namespace Networking
 
         public string roomName;
         public Constants.RoomType roomType;
-        public int maxPlayerCount = 4;
-
-        public override void OnRoomServerConnect(NetworkConnectionToClient conn)
-        {
-            base.OnRoomServerConnect(conn);
-
-            Debug.Log($"[RoomManager] 새로운 플레이어가 연결됨! 현재 roomSlots 인원: {roomSlots.Count}");
-
-            // ✅ roomSlots에 있는 RoomPlayer 객체 리스트 출력
-            foreach (var player in roomSlots)
-            {
-                Debug.Log($"[RoomManager] RoomPlayer: {player.netId}");
-            }
-        }
-
+        public int maxPlayerCount = 6;
 
         public override void OnRoomStartHost()
         {
