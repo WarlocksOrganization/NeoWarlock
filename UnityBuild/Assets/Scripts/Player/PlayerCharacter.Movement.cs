@@ -13,6 +13,7 @@ namespace Player
         [SyncVar(hook = nameof(OnMoveSpeedChanged))]
         public float MoveSpeed = 5.0f;
         public float KnockbackDamping = 5f;
+        public float KnockbackFactor = 1f;
         private float animationSpeed;
         
         private Vector3 _moveDirection = Vector3.zero;
@@ -145,6 +146,10 @@ namespace Player
         public void ApplyKnockback(Vector3 force)
         {
             _knockbackDirection = force;
+            Debug.Log($"Knockback Direction: {_knockbackDirection}");
+            _knockbackDirection.x *= KnockbackFactor;
+            _knockbackDirection.z *= KnockbackFactor;
+            Debug.Log($"Knockback Direction: {_knockbackDirection}");
             isMovingToTarget = false; // 넉백 중에는 마우스 이동 중단
         }
         

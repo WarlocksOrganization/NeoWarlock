@@ -40,15 +40,16 @@ namespace Player.Combat
         {
             if (!isServer) return; // ✅ 서버에서만 실행
             Collider[] hitColliders = Physics.OverlapSphere(transform.position, explosionRadius);
-
+            // Debug.Log($"Explosion in {transform.position.x}, {transform.position.z} owner is on {owner.transform.position.x}, {owner.transform.position.z}");
             foreach (Collider hit in hitColliders)
             {
                 IDamagable damagable = hit.transform.GetComponent<IDamagable>();
                 if (damagable != null)
                 {   
                     // ✅ 공격 타입에 따라 대상을 구분하여 데미지 적용
-                    if (config.attackType == DataSystem.Constants.AttackType.Melee && hit.transform.gameObject == this.owner) continue;
-                    if (config.attackType == DataSystem.Constants.AttackType.Self && hit.transform.gameObject != this.owner) continue;
+                    if (config.attackType == DataSystem.Constants.AttackType.Melee && hit.transform.gameObject == owner) continue;
+                    if (config.attackType == DataSystem.Constants.AttackType.Self && hit.transform.gameObject != owner) continue;
+                    // Debug.Log($"Damaging {hit.transform.gameObject.name}");
                     damagable.takeDamage((int)explosionDamage, transform.position, knockbackForce, config);
                 }
             }
