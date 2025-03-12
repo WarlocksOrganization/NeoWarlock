@@ -45,6 +45,7 @@ namespace DataSystem
             Slow,
             Poison,
             Charge,
+            PowerBody,
         }
 
         public enum SkillType

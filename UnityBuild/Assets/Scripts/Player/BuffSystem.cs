@@ -2,9 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using DataSystem;
 using Mirror;
+using Mono.Cecil;
 using Player;
 using Player.Combat;
 using Unity.Mathematics;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Animations;
 
@@ -60,6 +62,17 @@ public class BuffSystem : NetworkBehaviour
         if (buffData.moveDirection != Vector3.zero)
         {
             StartCoroutine(ForcedMove(buffData));
+        }
+
+        // ✅ 부가 효과 함수 실행
+        switch (buffData.BuffType)
+        {
+            case Constants.BuffType.Charge:
+                StartCoroutine(Charge(buffData));
+                break;
+            case Constants.BuffType.PowerBody:
+                StartCoroutine(PowerBody(buffData));
+                break;
         }
 
         yield return new WaitForSeconds(buffData.duration);
@@ -127,14 +140,14 @@ public class BuffSystem : NetworkBehaviour
     private IEnumerator ForcedMove(BuffData buffData)
     {
         float elapsedTime = 0f;
-
+        
+        CharacterController characterController = playerCharacter.GetComponent<CharacterController>();
         while (elapsedTime < buffData.duration)
         {
             yield return new WaitForSeconds(0.016f);
 
             if (playerCharacter != null)
-            {
-                CharacterController characterController = playerCharacter.GetComponent<CharacterController>();
+            {                
                 Quaternion quaternion = playerCharacter.gameObject.transform.GetChild(2).rotation;
                 Vector3 moveDirection = quaternion * buffData.moveDirection;
                 moveDirection.y = 0f;
@@ -143,5 +156,31 @@ public class BuffSystem : NetworkBehaviour
 
             elapsedTime += 0.016f;
         }
+    }
+    // 부가 효과 함수 구현
+    private IEnumerator Charge(BuffData buffData)
+    {
+        Debug.Log($"Charge: {buffData.duration}초 동안 부가 효과 적용");
+        float elapsedTime = 0f;
+        while (elapsedTime < buffData.duration)
+        {
+            yield return new WaitForSeconds(0.016f);
+            elapsedTime += 0.016f;
+        }
+    }
+    private IEnumerator PowerBody(BuffData buffData)
+    {
+        Debug.Log($"PowerBody: {buffData.duration}초 동안 부가 효과과 적용");
+        float elapsedTime = 0f;
+        playerCharacter.KnockbackFactor -= 0.6f; // ✅ 넉백 감소
+
+        while (elapsedTime < buffData.duration)
+        {
+            yield return new WaitForSeconds(0.5f);
+            playerCharacter.DecreaseHp(buffData.tickDamage); // ✅ 0.5초마다 체력 회복
+            elapsedTime += 0.5f;
+        }
+
+        playerCharacter.KnockbackFactor += 0.6f; // ✅ 넉백 감소 해제
     }
 }
