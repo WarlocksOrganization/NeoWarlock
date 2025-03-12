@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: df90348267cf8264a9dedab5a56b461f, type: 3}
   m_Name: ChargeConfig
   m_EditorClassIdentifier: 
-  attackType: 0
+  attackType: 5
   attackDelay: 0
   recoveryTime: 1.5
-  animParameter: isAttack4
+  animParameter: isAttack2
   attackTrans: {x: 0, y: 0, z: 0}
-  Prefab: {fileID: 322783647940636695, guid: 62731b0ab5cbf294d94385f67d394ac3, type: 3}
+  Prefab: {fileID: 322783647940636695, guid: 9c2ab4acb0ca6d54dba0322dfdbba6ea, type: 3}
   explosionEffectPrefab: {fileID: 5412338807302183837, guid: 68a8102c387cfd24583565c4ddfae556, type: 3}
   skillType: 15
   appliedBuff: {fileID: 11400000, guid: 42be0287a11a1fb418e3690b1b738757, type: 2}

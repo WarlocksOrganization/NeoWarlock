@@ -31,7 +31,6 @@ namespace Player.Combat
 
                 SphereCollider meleeColider = bullet.gameObject.GetComponentInChildren<SphereCollider>();
                 meleeColider.radius = attackData.Radius;
-                meleeColider.isTrigger = true;
                 
                 NetworkServer.Spawn(projectile);
             }

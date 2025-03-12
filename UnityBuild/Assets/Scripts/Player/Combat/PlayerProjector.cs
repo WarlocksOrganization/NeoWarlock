@@ -84,14 +84,14 @@ namespace Player.Combat
             else if (currentAttack is MeleeAttack)
             {
                 attackRange = attackData.Range;
+                decalProjector.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
                 decalProjector.material = circleMaterial;
                 decalProjector.size = new Vector3(attackData.Range*2, attackData.Range*2, 1f);
             }
 
-
-            else if (currentAttack is ProjectileAttack projectileAttack)
+            else if (currentAttack is ProjectileAttack || currentAttack is SelfAttack)
             {
-                distance = projectileAttack.GetAttackData().Range;
+                distance = currentAttack.GetAttackData().Range;
                 decalProjector.material = arrowMaterial;
 
                 // Projector 크기 설정 (Y축 길이를 distance에 맞춰 동적으로 변경)
@@ -99,7 +99,7 @@ namespace Player.Combat
 
                 if (arrowMaterial != null)
                 {
-                    arrowMaterial.mainTextureScale = new Vector2(projectileAttack.GetAttackData().Radius, distance / 10f);
+                    arrowMaterial.mainTextureScale = new Vector2(currentAttack.GetAttackData().Radius, distance / 10f);
                 }
             }
 
@@ -140,11 +140,11 @@ namespace Player.Combat
                 decalProjector.transform.position = startPosition + Vector3.up * 0.1f;
             }
 
-            else if (currentAttack is ProjectileAttack projectileAttack)
+            else if (currentAttack is ProjectileAttack || currentAttack is SelfAttack)
             {
                 startPosition = fireTransform.position;
                 
-                endPosition = startPosition + (aimPosition - startPosition).normalized * projectileAttack.GetAttackData().Range;
+                endPosition = startPosition + (aimPosition - startPosition).normalized * currentAttack.GetAttackData().Range;
 
                 midPoint = (startPosition + endPosition) / 2;
                 decalProjector.transform.position = new Vector3(midPoint.x, 0.5f, midPoint.z);

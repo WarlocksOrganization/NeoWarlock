@@ -44,8 +44,11 @@ namespace Player.Combat
             foreach (Collider hit in hitColliders)
             {
                 IDamagable damagable = hit.transform.GetComponent<IDamagable>();
-                if (damagable != null && (config.attackType != DataSystem.Constants.AttackType.Melee || hit.transform.gameObject != this.owner))
-                {
+                if (damagable != null)
+                {   
+                    // ✅ 공격 타입에 따라 대상을 구분하여 데미지 적용
+                    if (config.attackType == DataSystem.Constants.AttackType.Melee && hit.transform.gameObject == this.owner) continue;
+                    if (config.attackType == DataSystem.Constants.AttackType.Self && hit.transform.gameObject != this.owner) continue;
                     damagable.takeDamage((int)explosionDamage, transform.position, knockbackForce, config);
                 }
             }

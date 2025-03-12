@@ -32,7 +32,8 @@ namespace DataSystem
             ProjectileSky,
             Point,
             Area,
-            Melee
+            Melee,
+            Self
         }
         
         public enum BuffType
