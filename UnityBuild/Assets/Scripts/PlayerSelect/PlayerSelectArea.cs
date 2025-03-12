@@ -25,6 +25,9 @@ public class PlayerSelectArea : MonoBehaviour
     private int defaultLayer;
     private int outlineLayer;
 
+    [Header("UI Manager")]
+    public CharacterSelectionManager characterSelectionManager; // ✅ 스킬 UI를 업데이트할 UI 매니저 추가
+
     void Awake()
     {
         InitializeCharacterDictionary();
@@ -70,7 +73,7 @@ public class PlayerSelectArea : MonoBehaviour
             activeCharacter.GetComponent<Animator>().SetBool("isSelect", true);
             SetLayerRecursively(activeCharacter.transform, outlineLayer); // ✅ 선택된 캐릭터와 모든 자식 Layer 변경
 
-            RotateCharacterToTarget((int)selectedClass * 72); // ✅ 목표 각도로 회전
+            RotateCharacterToTarget((int)selectedClass * 72, selectedClass); // ✅ 목표 각도로 회전
         }
         else
         {
@@ -78,7 +81,7 @@ public class PlayerSelectArea : MonoBehaviour
         }
     }
 
-    private void RotateCharacterToTarget(float targetAngle)
+    private void RotateCharacterToTarget(float targetAngle, Constants.CharacterClass selectedClass)
     {
         if (rotationCoroutine != null)
         {
@@ -86,10 +89,10 @@ public class PlayerSelectArea : MonoBehaviour
         }
 
         // ✅ PlayerSelectArea 오브젝트 자체를 회전
-        rotationCoroutine = StartCoroutine(SmoothRotate(this.transform, targetAngle));
+        rotationCoroutine = StartCoroutine(SmoothRotate(this.transform, targetAngle, selectedClass));
     }
 
-    private System.Collections.IEnumerator SmoothRotate(Transform targetTransform, float targetAngle)
+    private System.Collections.IEnumerator SmoothRotate(Transform targetTransform, float targetAngle, Constants.CharacterClass selectedClass)
     {
         float currentAngle = targetTransform.eulerAngles.y;
         float shortestRotation = Mathf.DeltaAngle(currentAngle, targetAngle);
@@ -108,6 +111,15 @@ public class PlayerSelectArea : MonoBehaviour
 
         // ✅ 최종 보정
         targetTransform.rotation = Quaternion.Euler(0, finalTargetAngle, 0);
+        // 추가 : 캐릭터 별 스킬 정보 전달
+        if (characterSelectionManager != null)
+        {
+            characterSelectionManager.SelectCharacter(selectedClass.ToString());
+        }
+        else
+        {
+            Debug.LogError("❌ CharacterSelectionManager가 null입니다! PlayerSelectArea의 Inspector에서 연결했는지 확인하세요.");
+        }
     }
 
 
