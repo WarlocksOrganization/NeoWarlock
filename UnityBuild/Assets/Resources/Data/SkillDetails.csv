@@ -1,0 +1,21 @@
+characterClass,skillType,skillName,skillDescription,iconPath
+Mage,Move,"텔레포트","텔탑니다",teleport_icon
+Mage,Attack,"파이어볼","파이어볼 설명",fireball_icon
+Mage,Attack,"썬더볼트","썬더볼트 설명",thunder_icon
+Mage,Attack,"블리자드","블리자드 설명",IceArea_icon
+Archer,Move,"구르기","구릅니다",roll_icon
+Archer,Attack,"기본화살","기본화살 설명",arrow_icon
+Archer,Attack,"독화살","독화살 설명",poisonArrow_icon
+Archer,Attack,"폭발 화살","폭발화살 설명",explosionArrow_icon
+Warrior,Move,"구르기","구릅니다",roll_icon
+Warrior,Attack,"슬래시","슬래시 설명",slash_icon
+Warrior,Attack,"파워바디","파워바디 설명",powerBody_icon
+Warrior,Attack,"돌진","돌진 설명",charge_icon
+Necromancer,Move,"팬텀 스텝","팬텀 스텝 설명",PhantomStep_icon
+Necromancer,Attack,"팬텀 어택","팬텀 어택 설명",PhantomAttack_icon
+Necromancer,Attack,"소울 볼텍스","소울 볼텍스 설명",SoulVortex_icon
+Necromancer,Attack,"지옥의 불꽃","지옥의 불꽃 설명",InfernalFlask_icon
+Priest,Move,"텔레포트","텔탑니다",teleport_icon
+Priest,Attack,"사제 1스킬","1스킬 설명",blank_icon
+Priest,Attack,"사제 2스킬","2스킬 설명",blank_icon
+Priest,Attack,"사제 3스킬","3스킬 설명",blank_icon
