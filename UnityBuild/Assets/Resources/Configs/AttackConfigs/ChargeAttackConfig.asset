@@ -10,14 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: df90348267cf8264a9dedab5a56b461f, type: 3}
-  m_Name: ChargeConfig
+  m_Name: ChargeAttackConfig
   m_EditorClassIdentifier: 
-  attackType: 5
+  attackType: 4
   attackDelay: 0
-  recoveryTime: 1.5
-  animParameter: isAttack2
+  recoveryTime: 0
+  animParameter: 
   attackTrans: {x: 0, y: 0, z: 0}
-  Prefab: {fileID: 322783647940636695, guid: 3debe98b2148b9b4fa96e032065c9777, type: 3}
+  Prefab: {fileID: 322783647940636695, guid: 35c3f53b17468774aa9150da15eb19cf, type: 3}
   explosionEffectPrefab: {fileID: 5412338807302183837, guid: 68a8102c387cfd24583565c4ddfae556, type: 3}
-  skillType: 15
-  appliedBuff: {fileID: 11400000, guid: 42be0287a11a1fb418e3690b1b738757, type: 2}
+  skillType: 13
+  appliedBuff: {fileID: 0}
