@@ -53,22 +53,20 @@ public class CharacterSelectionManager : MonoBehaviour
         }
 
         // ✅ 기존에 존재하는 버튼을 재사용
-    for (int i = 0; i < skills.Count; i++)
-    {
-        if (i < skillIconContainer.childCount)
+        for (int i = 0; i < skills.Count; i++)
         {
-            GameObject skillButton = skillIconContainer.GetChild(i).gameObject;
-            skillButton.SetActive(true);
-            skillButton.GetComponent<Image>().sprite = skills[i].skillIcon;
+            if (i < skillIconContainer.childCount)
+            {
+                GameObject skillButton = skillIconContainer.GetChild(i).gameObject;
+                skillButton.SetActive(true);
+                skillButton.GetComponent<Image>().sprite = skills[i].skillIcon;
 
-            // ✅ index 값을 고정하여 버튼 이벤트가 올바르게 작동하도록 함
-            int index = i;
-            skillButton.GetComponent<Button>().onClick.RemoveAllListeners();
-            skillButton.GetComponent<Button>().onClick.AddListener(() =>
-                skillDescriptionUI.ShowSkillDetail(skills[index].skillName, skills[index].skillDescription, skillButton.transform.position)
-            );
+                // ✅ SkillButton 스크립트에서 이름과 설명 설정
+                SkillButton skillButtonComponent = skillButton.GetComponent<SkillButton>();
+                skillButtonComponent.skillName = skills[i].skillName;
+                skillButtonComponent.skillDescription = skills[i].skillDescription;
+            }
         }
-    }
     }
 
     private void ResetSkillIcons()
