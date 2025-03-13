@@ -45,7 +45,7 @@ public class GameLobbyUI : MonoBehaviour
         {
             int myIndex = Array.IndexOf(PlayerCharacters, myPlayer.gameObject);
             PlayerSetting.PlayerNum = myIndex;
-            Debug.Log($"[GameLobbyUI] 내 PlayerNum: {PlayerSetting.PlayerNum}");
+            //Debug.Log($"[GameLobbyUI] 내 PlayerNum: {PlayerSetting.PlayerNum}");
         }
 
         // ✅ 게임 방 인원 수 업데이트

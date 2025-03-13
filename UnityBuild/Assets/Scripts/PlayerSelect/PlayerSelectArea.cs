@@ -46,6 +46,7 @@ public class PlayerSelectArea : MonoBehaviour
             if (entry.characterModel != null && !characterModelDict.ContainsKey(entry.characterClass))
             {
                 characterModelDict.Add(entry.characterClass, entry.characterModel);
+                entry.characterModel.GetComponent<Animator>().SetFloat("Blend", (int)entry.characterClass);
             }
             else
             {

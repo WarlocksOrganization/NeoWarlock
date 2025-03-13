@@ -35,11 +35,11 @@ namespace GameManagement
                 Destroy(gameObject);
             }
 
-            onAwake();
+            OnAwake();
         }
         #endregion
 
-        void onAwake()
+        void OnAwake()
         {
             Database.LoadDataBase();
         }

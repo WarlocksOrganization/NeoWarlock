@@ -1,3 +1,4 @@
+using System.Collections;
 using DataSystem;
 using GameManagement;
 using Mirror;
@@ -8,13 +9,15 @@ namespace Player
 {
     public class GamePlayer : NetworkRoomPlayer
     {
-        protected GameRoomData roomData;
         public PlayerGameStats stats;
+        
+        private PlayerCardUI playerCardUI;
+        private float cardSelectionTime = 10f;
 
         [SyncVar]
         public string PlayerNickname;
 
-        public LobbyPlayerCharacter LobbyPlayer;
+        public LobbyPlayerCharacter playerCharacter;
 
         public override void Start()
         {
@@ -23,36 +26,56 @@ namespace Player
             if (isServer)
             {
                 SpawnLobbyPlayerCharacter();
+                StartCoroutine(CardSelectionTimer());
             }
 
             if (isOwned)
             {
                 CmdSetNickname(PlayerSetting.Nickname);
-                if (PlayerSetting.PlayerCharacterClass != Constants.CharacterClass.None)
-                {
-                    CmdSetClss(PlayerSetting.PlayerCharacterClass);
-                }
+                playerCardUI = FindFirstObjectByType<PlayerCardUI>();
             }
         }
 
         protected void SpawnLobbyPlayerCharacter()
         {
             Vector3 spawnPos = FindFirstObjectByType<SpawnPosition>().GetSpawnPosition();
-            LobbyPlayer = Instantiate((NetworkRoomManager.singleton as RoomManager).spawnPrefabs[0], spawnPos, Quaternion.identity).GetComponent<LobbyPlayerCharacter>();
-            NetworkServer.Spawn(LobbyPlayer.gameObject, connectionToClient);
+            playerCharacter = Instantiate((NetworkRoomManager.singleton as RoomManager).spawnPrefabs[0], spawnPos, Quaternion.identity).GetComponent<LobbyPlayerCharacter>();
+            NetworkServer.Spawn(playerCharacter.gameObject, connectionToClient);
         }
 
         [Command]
         public void CmdSetNickname(string nickname)
         {
             PlayerNickname = nickname;
-            LobbyPlayer.nickname = PlayerNickname;
+            playerCharacter.nickname = PlayerNickname;
         }
         
-        [Command]
-        public void CmdSetClss(Constants.CharacterClass characterClass)
+        private IEnumerator CardSelectionTimer()
         {
-            //LobbyPlayer.SetCharacterClass(characterClass);
+            while (cardSelectionTime > 0)
+            {
+                yield return new WaitForSeconds(1f);
+                cardSelectionTime--;
+                RpcUpdateTimer(cardSelectionTime);
+            }
+
+            RpcUpdateTimer(0); // ✅ 0초일 때 최종 업데이트
+            playerCharacter.CmdSetCharacterData(
+                PlayerSetting.PlayerCharacterClass,
+                PlayerSetting.MoveSkill,
+                PlayerSetting.AttackSkillIDs
+            );
+            playerCharacter.SetIsDead(false);
+        }
+
+        // ✅ 서버 -> 클라이언트 타이머 동기화
+        [ClientRpc]
+        private void RpcUpdateTimer(float time)
+        {
+            if (playerCardUI != null)
+            {
+                playerCardUI.UpdateTimer(time);
+            }
         }
     }
 }

@@ -44,6 +44,7 @@ namespace DataSystem.Database
                     Name = columns[1],
                     StatType = (PlayerStatType)int.Parse(columns[2]), // 증가 능력치 타입
                     BonusStat = float.Parse(columns[3]), // 증가 능력치 값
+                    AppliedSkillIndex = int.Parse(columns[4]),
                 };
 
                 playerCardDictionary[data.ID] = data;
@@ -58,6 +59,7 @@ namespace DataSystem.Database
             public string Name;
             public PlayerStatType StatType; // ✅ 증가하는 능력치 타입
             public float BonusStat; // ✅ 증가하는 수치
+            public int AppliedSkillIndex;
         }
     }
 
