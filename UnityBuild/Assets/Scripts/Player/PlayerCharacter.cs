@@ -36,12 +36,12 @@ namespace Player
             _characterController = GetComponent<CharacterController>();
             buffSystem = GetComponent<BuffSystem>();
             effectSystem = GetComponent<EffectSystem>();
+            
+            InitializeCharacterModels();
         }
 
         public virtual void Start()
         {
-            InitializeCharacterModels();
-            ApplyCharacterClass(PLayerCharacterClass);
             
             GameLobbyUI gameLobbyUI = FindFirstObjectByType<GameLobbyUI>();
             if (gameLobbyUI != null)

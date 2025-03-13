@@ -15,7 +15,7 @@ namespace Player
             
             if (isServer)
             {
-                SetCharacterClass(Constants.CharacterClass.Mage);
+                //SetCharacterClass(Constants.CharacterClass.Mage);
             }
         }
     }

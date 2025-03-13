@@ -52,7 +52,7 @@ namespace Player
         [Command]
         public void CmdSetClss(Constants.CharacterClass characterClass)
         {
-            LobbyPlayer.SetCharacterClass(characterClass);
+            //LobbyPlayer.SetCharacterClass(characterClass);
         }
     }
 }

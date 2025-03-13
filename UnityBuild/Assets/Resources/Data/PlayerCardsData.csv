@@ -1,4 +1,4 @@
-ID,Name,Type,Stat,AppliedSkillIndex 
+ID,Name,Type,Stat
 1,Health,1,10,0
 2,Speed,2,10,0
 11,SkillSpeed1,10,20,1

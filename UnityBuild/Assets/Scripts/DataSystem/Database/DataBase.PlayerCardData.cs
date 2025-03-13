@@ -5,7 +5,7 @@ namespace DataSystem.Database
 {
     public static partial class Database
     {
-        private static readonly Dictionary<int, PlayerCardData> playerCardDictionary = new();
+        public static readonly Dictionary<int, PlayerCardData> playerCardDictionary = new();
 
         public static PlayerCardData GetPlayerCardData(int id)
         {
@@ -42,8 +42,8 @@ namespace DataSystem.Database
                 {
                     ID = int.Parse(columns[0]),
                     Name = columns[1],
-                    StatType = (PlayerStatType)int.Parse(columns[3]), // 증가 능력치 타입
-                    BonusStat = float.Parse(columns[4]), // 증가 능력치 값
+                    StatType = (PlayerStatType)int.Parse(columns[2]), // 증가 능력치 타입
+                    BonusStat = float.Parse(columns[3]), // 증가 능력치 값
                 };
 
                 playerCardDictionary[data.ID] = data;

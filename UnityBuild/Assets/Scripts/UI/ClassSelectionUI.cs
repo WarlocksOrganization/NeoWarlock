@@ -1,5 +1,6 @@
 using UnityEngine;
 using DataSystem;
+using DataSystem.Database;
 using GameManagement;
 using Player;
 
@@ -9,9 +10,8 @@ public class ClassSelectionUI : MonoBehaviour
     private PlayerCharacter playerCharacter;
     private Constants.CharacterClass characterClass = Constants.CharacterClass.Mage;
 
-    private void OnEnable()
+    private void Start()
     {
-        playerCharacter.SetIsDead(true);
         FindPlayerCharacter();
         ChangeClass(0);
     }
@@ -51,15 +51,49 @@ public class ClassSelectionUI : MonoBehaviour
 
         if (playerCharacter != null)
         {
-            Constants.CharacterClass selectedClass = characterClass; // ✅ int → CharacterClass 변환
-            playerCharacter.SetCharacterClass(selectedClass);
+            Constants.CharacterClass selectedClass = characterClass;
             PlayerSetting.PlayerCharacterClass = selectedClass;
+
+            switch (selectedClass)
+            {
+                case Constants.CharacterClass.Mage:
+                    PlayerSetting.MoveSkill = Constants.SkillType.TelePort;
+                    PlayerSetting.AttackSkillIDs = new int[] { 0, 1, 2, 3 };
+                    break;
+
+                case Constants.CharacterClass.Archer:
+                    PlayerSetting.MoveSkill = Constants.SkillType.Roll;
+                    PlayerSetting.AttackSkillIDs = new int[] { 0, 11, 12, 13 };
+                    break;
+
+                case Constants.CharacterClass.Warrior:
+                    PlayerSetting.MoveSkill = Constants.SkillType.Roll;
+                    PlayerSetting.AttackSkillIDs = new int[] { 0, 21, 22, 23 };
+                    break;
+
+                case Constants.CharacterClass.Necromancer:
+                    PlayerSetting.MoveSkill = Constants.SkillType.PhantomStep;
+                    PlayerSetting.AttackSkillIDs = new int[] { 0, 31, 32, 33 };
+                    break;
+
+                case Constants.CharacterClass.Priest:
+                    // 특정한 설정이 필요할 경우 추가
+                    break;
+            }
+
+            // 서버에 데이터 전송하여 동기화
+            playerCharacter.CmdSetCharacterData(
+                PlayerSetting.PlayerCharacterClass,
+                PlayerSetting.MoveSkill,
+                PlayerSetting.AttackSkillIDs
+            );
             playerCharacter.SetIsDead(false);
+
+            gameObject.SetActive(false);
         }
         else
         {
             Debug.LogWarning("플레이어 캐릭터를 찾을 수 없습니다.");
         }
-        gameObject.SetActive(false);
     }
 }
