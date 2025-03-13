@@ -94,15 +94,8 @@ namespace Player
             {
                 SetAvailableAttack(i, newSkills[i]);
             }
-        }
 
-        private void SetClassSkills()
-        {
-            SetMovementSkill(MoveSkill);
-            for (int i = 1; i <= 3; i++)
-            {
-                SetAvailableAttack(i, AttackSkills[i]);
-            }
+            ApplyCardBonuses();
         }
 
         private void ActivateCharacterModel(Constants.CharacterClass newClass)

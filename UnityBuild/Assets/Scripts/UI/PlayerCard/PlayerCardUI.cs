@@ -5,10 +5,11 @@ using DataSystem.Database;
 using GameManagement;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class PlayerCardUI : MonoBehaviour
 {
-    [SerializeField] private PlayerCardSlot[] slots; // UI 슬롯 3개
+    public PlayerCardSlot[] slots; // UI 슬롯 3개
     [SerializeField] private TMP_Text timerText; // 남은 시간 표시
 
     private Queue<Database.PlayerCardData> selectedCardsQueue = new();

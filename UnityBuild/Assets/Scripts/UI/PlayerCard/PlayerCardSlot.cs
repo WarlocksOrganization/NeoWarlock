@@ -68,7 +68,7 @@ public class PlayerCardSlot : MonoBehaviour
                 cardTypeText.text = "스킬 강화";
                 carIconImage.sprite = SkillData[currentCard.AppliedSkillIndex].Icon;
                 cardNameText.text = $"{SkillData[currentCard.AppliedSkillIndex].DisplayName} 강화";
-                cardDetailText.text = $"최대 거리 +{cardData.BonusStat}";
+                cardDetailText.text = $"최대 거리 +{cardData.BonusStat}%";
                 break;
 
             case PlayerStatType.Radius:

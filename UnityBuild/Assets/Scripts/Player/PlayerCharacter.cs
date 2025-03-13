@@ -14,6 +14,7 @@ namespace Player
         [SyncVar(hook = nameof(SetNickname_Hook))]
         public string nickname;
         [SerializeField] private TMP_Text nicknameText;
+        [SyncVar] public int playerNumber = -1;
         private CharacterController _characterController;
         private CinemachineVirtualCamera virtualCamera;
         private BuffSystem buffSystem;

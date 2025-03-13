@@ -1,5 +1,6 @@
 using System.Collections;
 using DataSystem;
+using DataSystem.Database;
 using GameManagement;
 using Mirror;
 using Networking;
@@ -32,6 +33,7 @@ namespace Player
             if (isOwned)
             {
                 CmdSetNickname(PlayerSetting.Nickname);
+                CmdSetPlayerNumber(PlayerSetting.PlayerNum);
                 playerCardUI = FindFirstObjectByType<PlayerCardUI>();
             }
         }
@@ -50,21 +52,23 @@ namespace Player
             playerCharacter.nickname = PlayerNickname;
         }
         
+        [Command]
+        public void CmdSetPlayerNumber(int playerNum)
+        {
+            playerCharacter.playerNumber = playerNum;
+        }
+        
         private IEnumerator CardSelectionTimer()
         {
             while (cardSelectionTime > 0)
             {
+                RpcUpdateTimer(cardSelectionTime);
                 yield return new WaitForSeconds(1f);
                 cardSelectionTime--;
-                RpcUpdateTimer(cardSelectionTime);
             }
 
             RpcUpdateTimer(0); // ✅ 0초일 때 최종 업데이트
-            playerCharacter.CmdSetCharacterData(
-                PlayerSetting.PlayerCharacterClass,
-                PlayerSetting.MoveSkill,
-                PlayerSetting.AttackSkillIDs
-            );
+            
             playerCharacter.SetIsDead(false);
         }
 
@@ -75,6 +79,42 @@ namespace Player
             if (playerCardUI != null)
             {
                 playerCardUI.UpdateTimer(time);
+            }
+
+            if (time <= 0)
+            {
+                if (!isOwned)
+                {
+                    return;
+                }
+                if (playerCharacter == null)
+                {
+                    LobbyPlayerCharacter[] pc =
+                        FindObjectsByType<LobbyPlayerCharacter>(sortMode: FindObjectsSortMode.None);
+                    foreach (var pcharacter in pc)
+                    {
+                        if (pcharacter.playerNumber == PlayerSetting.PlayerNum)
+                        {
+                            playerCharacter = pcharacter;
+                            break;
+                        }
+                    }
+                }
+                
+                foreach (var slot in playerCardUI.slots)
+                {
+                    var slotData = slot.GetCurrentCard();
+                    if (slotData.StatType == PlayerStatType.Special)
+                    {
+                        PlayerSetting.AttackSkillIDs[slotData.AppliedSkillIndex] += 100; // ✅ 스킬 업그레이드
+                    }
+                }
+                
+                playerCharacter.CmdSetCharacterData(
+                    PlayerSetting.PlayerCharacterClass,
+                    PlayerSetting.MoveSkill,
+                    PlayerSetting.AttackSkillIDs
+                );
             }
         }
     }

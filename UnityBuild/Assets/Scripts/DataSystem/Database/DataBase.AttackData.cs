@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Mirror;
 using UnityEngine;
 
 namespace DataSystem.Database
@@ -82,12 +83,12 @@ namespace DataSystem.Database
             public string Name;
             public string DisplayName; // ✅ 스킬의 한글 이름
             public string Description; // ✅ 스킬 설명
-            public float Speed;
-            public float Range;
-            public float Radius;
-            public float Damage;
-            public float KnockbackForce;
-            public float Cooldown;
+            [SyncVar]  public float Speed;
+            [SyncVar]  public float Range;
+            [SyncVar]  public float Radius;
+            [SyncVar]  public float Damage;
+            [SyncVar]  public float KnockbackForce;
+            [SyncVar]  public float Cooldown;
     
             public AttackConfig config; // ✅ 공격 설정을 ScriptableObject로 참조
             public Sprite Icon;
