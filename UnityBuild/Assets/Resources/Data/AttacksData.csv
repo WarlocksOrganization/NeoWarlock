@@ -12,3 +12,4 @@ ID,Name,Speed,Range,Radius,Damage,KnockbackForce,Cooldown
 21,Slash,1,2,2,5,2,2
 22,PowerBody,0,1,1,0,0,15
 23,Charge,0,10,1,0,0,10
+230,ChargeAttack,1,2,2,1,1,0

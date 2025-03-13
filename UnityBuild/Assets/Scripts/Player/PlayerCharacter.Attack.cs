@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using DataSystem;
 using DataSystem.Database;
 using Interfaces;
@@ -21,7 +22,7 @@ namespace Player
         private IAttack currentAttack;
         
         public IAttack[] availableAttacks = new IAttack[5];
-
+        private Dictionary<int, IAttack> certainAttacks = new Dictionary<int, IAttack>();
         private void UpdateAttack()
         {
             if (Input.GetKeyDown(KeyCode.Alpha1)) SetAttackType(1);
@@ -309,6 +310,28 @@ namespace Player
             
             availableAttacks[nextAttckIndex]?.Execute(attackPosition, 
                 attackTransform.position + availableAttacks[nextAttckIndex].GetAttackData().Radius* 1f*direction, gameObject);
+        }
+
+        [Command]
+        public void CmdCertainAttack(Vector3 attackPosition, int skillId, bool originPosition)  
+        {
+            Vector3 direction = (attackPosition - transform.position).normalized;
+            if (!certainAttacks.ContainsKey(skillId))
+            {
+                var attackData = Database.GetAttackData(skillId);
+                if (attackData != null)
+                {
+                    IAttack attackInstance = CreateAttackInstance(attackData);
+                    certainAttacks.Add(skillId, attackInstance);
+                }
+            }
+
+            if (certainAttacks.ContainsKey(skillId))
+            {
+                Vector3 firePosition = originPosition ? attackTransform.position : attackTransform.position + certainAttacks[skillId].GetAttackData().Radius * 1f * direction;
+                certainAttacks[skillId].Execute(attackPosition, 
+                    firePosition, gameObject);
+            }
         }
     }
 }

@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using DataSystem;
 using Mirror;
-using Mono.Cecil;
+//using Mono.Cecil;
 using Player;
 using Player.Combat;
 using Unity.Mathematics;
@@ -59,21 +59,14 @@ public class BuffSystem : NetworkBehaviour
             StartCoroutine(TickDamage(buffData));
         }
 
+        // ✅ 강제 이동 실행
         if (buffData.moveDirection != Vector3.zero)
         {
-            StartCoroutine(ForcedMove(buffData));
+            RpcForcedMove(buffData);
         }
 
-        // ✅ 부가 효과 함수 실행
-        switch (buffData.BuffType)
-        {
-            case Constants.BuffType.Charge:
-                StartCoroutine(Charge(buffData));
-                break;
-            case Constants.BuffType.PowerBody:
-                StartCoroutine(PowerBody(buffData));
-                break;
-        }
+        // ✅ 부가 효과 실행
+        RpcSideEffect(buffData);
 
         yield return new WaitForSeconds(buffData.duration);
 
@@ -136,6 +129,12 @@ public class BuffSystem : NetworkBehaviour
             elapsedTime += 0.5f;
         }
     }
+    
+    [ClientRpc]
+    private void RpcForcedMove(BuffData buffData)
+    {
+        StartCoroutine(ForcedMove(buffData));
+    }
 
     private IEnumerator ForcedMove(BuffData buffData)
     {
@@ -157,14 +156,33 @@ public class BuffSystem : NetworkBehaviour
             elapsedTime += 0.016f;
         }
     }
+    
     // 부가 효과 함수 구현
+    [ClientRpc]
+    private void RpcSideEffect(BuffData buffData)
+    {
+        switch (buffData.BuffType)
+        {
+            case Constants.BuffType.Charge:
+                StartCoroutine(Charge(buffData));
+                break;
+            case Constants.BuffType.PowerBody:
+                StartCoroutine(PowerBody(buffData));
+                break;
+        }
+    }
     private IEnumerator Charge(BuffData buffData)
     {
         Debug.Log($"Charge: {buffData.duration}초 동안 부가 효과 적용");
         float elapsedTime = 0f;
+        int tick = 0;
         while (elapsedTime < buffData.duration)
         {
             yield return new WaitForSeconds(0.016f);
+            if (++tick % 5 == 0)
+            {
+                playerCharacter.CmdCertainAttack(playerCharacter.transform.position, 230, true); // ✅ 돌진 공격 실행
+            }
             elapsedTime += 0.016f;
         }
     }
