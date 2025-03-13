@@ -13,7 +13,6 @@ public class ClassSelectionUI : MonoBehaviour
     private void Start()
     {
         FindPlayerCharacter();
-        ChangeClass(0);
     }
 
     private void FindPlayerCharacter()
