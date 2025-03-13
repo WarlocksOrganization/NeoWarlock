@@ -26,6 +26,7 @@ namespace Player
 
             if (isOwned)
             {
+                CmdSetPlayerNumber(PlayerSetting.PlayerNum);
                 CmdSetNickname(PlayerSetting.Nickname);
                 if (PlayerSetting.PlayerCharacterClass != Constants.CharacterClass.None)
                 {
@@ -61,9 +62,15 @@ namespace Player
         }
         
         [Command]
+        public void CmdSetPlayerNumber(int PlayerNum)
+        {
+            LobbyPlayer.playerNumber = PlayerNum;
+        }
+        
+        [Command]
         public void CmdSetClss(Constants.CharacterClass characterClass)
         {
-            LobbyPlayer.SetCharacterClass(characterClass);
+            //LobbyPlayer.SetCharacterClass(characterClass);
         }
     }
 }

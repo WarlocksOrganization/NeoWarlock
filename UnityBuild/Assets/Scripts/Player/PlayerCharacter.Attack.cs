@@ -23,12 +23,15 @@ namespace Player
         
         public IAttack[] availableAttacks = new IAttack[5];
         private Dictionary<int, IAttack> certainAttacks = new Dictionary<int, IAttack>();
+        
+        private Dictionary<int, AttackBase> activeAttacks = new Dictionary<int, AttackBase>(); // ✅ 캐싱용 딕셔너리
+
+        
         private void UpdateAttack()
         {
             if (Input.GetKeyDown(KeyCode.Alpha1)) SetAttackType(1);
             if (Input.GetKeyDown(KeyCode.Alpha2)) SetAttackType(2);
             if (Input.GetKeyDown(KeyCode.Alpha3)) SetAttackType(3);
-            if (Input.GetKeyDown(KeyCode.Alpha4)) SetAttackType(4);
             
             if (Input.GetKeyDown(KeyCode.Escape))
             {
@@ -88,11 +91,29 @@ namespace Player
         
         public void SetAvailableAttack(int index, int skillId)
         {
-            var attackData = Database.GetAttackData(skillId);
+            var originalAttackData = Database.GetAttackData(skillId);
 
-            if (attackData != null)
+            if (originalAttackData != null)
             {
-                IAttack attackInstance = CreateAttackInstance(attackData);
+                // ✅ 원본 AttackData를 복사하여 개별적인 인스턴스를 생성
+                var playerAttackData = new Database.AttackData()
+                {
+                    ID = originalAttackData.ID,
+                    Name = originalAttackData.Name,
+                    DisplayName = originalAttackData.DisplayName,
+                    Description = originalAttackData.Description,
+                    Speed = originalAttackData.Speed,
+                    Range = originalAttackData.Range,
+                    Radius = originalAttackData.Radius,
+                    Damage = originalAttackData.Damage,
+                    KnockbackForce = originalAttackData.KnockbackForce,
+                    Cooldown = originalAttackData.Cooldown,
+                    config = originalAttackData.config,
+                    Icon = originalAttackData.Icon
+                };
+
+                // ✅ 개별 AttackData를 기반으로 스킬 인스턴스 생성
+                IAttack attackInstance = CreateAttackInstance(playerAttackData);
                 availableAttacks[index] = attackInstance;
 
                 if (isOwned && playerUI == null)
@@ -101,21 +122,19 @@ namespace Player
                 }
                 if (playerUI != null)
                 {
-                    // ✅ ScriptableObject 데이터 활용
-                    playerUI.SetQuickSlotData(index, attackData.Icon, attackData.Cooldown);
+                    playerUI.SetQuickSlotData(index, playerAttackData.Icon, playerAttackData.Cooldown);
                 }
-                else
-                {
-                    Debug.Log("playUI없음");
-                }
+
+                Debug.Log($"[스킬 설정] {playerAttackData.Name}({playerAttackData.ID}) 적용 완료");
             }
             else
             {
-                Debug.LogWarning("공격 데이터를 가져오지 못했습니다.");
+                Debug.LogWarning($"[SetAvailableAttack] 공격 데이터를 가져오지 못했습니다. (SkillID: {skillId})");
             }
 
             CmdSetAvailableAttack(index, skillId);
         }
+
 
         
         private AttackBase CreateAttackInstance(Database.AttackData data)
@@ -158,7 +177,9 @@ namespace Player
                     Debug.LogError($"알 수 없는 공격 타입: {data.config.attackType}");
                     return null;
             }
-
+            
+            attackInstance.transform.SetParent(transform);
+            
             // ✅ 공통 속성 설정
             attackInstance.projectilePrefab = data.config.Prefab;
             attackInstance.Initialize(data);

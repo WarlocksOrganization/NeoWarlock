@@ -37,10 +37,6 @@ namespace DataSystem.Database
                 {
                     movementSkillDictionary.Add(skill.skillType, skill);
                 }
-                else
-                {
-                    Debug.LogWarning($"이미 등록된 스킬입니다: {skill.skillType}");
-                }
             }
 
             Debug.Log($"총 {movementSkillDictionary.Count}개의 이동 스킬 데이터를 로드했습니다.");

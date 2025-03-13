@@ -12,9 +12,9 @@ namespace Player
         [SerializeField] private PlayerHUD playerHUD;
 
         [SyncVar(hook = nameof(OnHpChanged))] // ✅ Hook 추가
-        private int curHp = 100;
+        private int curHp = 500;
 
-        [SyncVar] private int maxHp = 100;
+        [SyncVar] private int maxHp = 500;
         
         public void takeDamage(int damage, Vector3 attackTran, float knockbackForce, AttackConfig attackConfig)
         {
@@ -22,12 +22,7 @@ namespace Player
 
             DecreaseHp(damage);
 
-            if (curHp == 0)
-            {
-                isDead = true;
-                RpcTriggerAnimation("isDead"); // 클라이언트에도 애니메이션 트리거 전송
-            }
-            else
+            if (curHp > 0)
             {
                 Vector3 direction = transform.position - attackTran;
                 direction.y = 0;
@@ -50,6 +45,11 @@ namespace Player
         {
             curHp -= damage;
             curHp = Mathf.Clamp(curHp, 0, maxHp);
+            if (curHp == 0)
+            {
+                SetIsDead(true);
+                RpcTriggerAnimation("isDead"); // 클라이언트에도 애니메이션 트리거 전송
+            }
         }
         
         private void ApplyBuffFromAttack(BuffData buffData)
