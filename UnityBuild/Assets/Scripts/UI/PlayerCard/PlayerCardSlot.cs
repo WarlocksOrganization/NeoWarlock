@@ -8,10 +8,14 @@ using UnityEngine.UI;
 public class PlayerCardSlot : MonoBehaviour
 {
     [SerializeField] private TMP_Text cardTypeText;
-    [SerializeField] private Image carIconImage;
+    [SerializeField] private Image skillIconImage;
+    [SerializeField] private Image cardIconImage;
     [SerializeField] private TMP_Text cardNameText;
     [SerializeField] private TMP_Text cardDetailText;
     [SerializeField] private Button reRollButton;
+    
+    [SerializeField] private Sprite healthIcon;
+    [SerializeField] private Sprite speedIcon;
 
     private Database.PlayerCardData currentCard;
     private Database.AttackData[] SkillData;
@@ -39,6 +43,8 @@ public class PlayerCardSlot : MonoBehaviour
     {
         Initialize();
         currentCard = cardData;
+        
+        cardIconImage.sprite = Database.GetCardIcon(cardData.StatType);
 
         // 카드 타입에 따른 처리
         switch (cardData.StatType)
@@ -46,63 +52,65 @@ public class PlayerCardSlot : MonoBehaviour
             //기본 스탯
             case PlayerStatType.Health:
                 cardTypeText.text = "스탯 강화";
-                cardNameText.text = "최대 체력 증가";
+                skillIconImage.sprite = healthIcon;
+                cardNameText.text = "최대 체력";
                 cardDetailText.text = $"체력 +{cardData.BonusStat}%";
                 break;
 
             case PlayerStatType.Speed:
                 cardTypeText.text = "스탯 강화";
-                cardNameText.text = "이동 속도 증가";
+                skillIconImage.sprite = speedIcon;
+                cardNameText.text = "이동 속도";
                 cardDetailText.text = $"이동 속도 +{cardData.BonusStat}%";
                 break;
             
             //특정 스킬 강화
             case PlayerStatType.AttackSpeed:
                 cardTypeText.text = "스킬 강화";
-                carIconImage.sprite = SkillData[currentCard.AppliedSkillIndex].Icon;
-                cardNameText.text = $"{SkillData[currentCard.AppliedSkillIndex].DisplayName} 강화";
+                skillIconImage.sprite = SkillData[currentCard.AppliedSkillIndex].Icon;
+                cardNameText.text = $"{SkillData[currentCard.AppliedSkillIndex].DisplayName}";
                 cardDetailText.text = $"투사체 속도 +{cardData.BonusStat}%";
                 break;
 
             case PlayerStatType.Range:
                 cardTypeText.text = "스킬 강화";
-                carIconImage.sprite = SkillData[currentCard.AppliedSkillIndex].Icon;
-                cardNameText.text = $"{SkillData[currentCard.AppliedSkillIndex].DisplayName} 강화";
+                skillIconImage.sprite = SkillData[currentCard.AppliedSkillIndex].Icon;
+                cardNameText.text = $"{SkillData[currentCard.AppliedSkillIndex].DisplayName}";
                 cardDetailText.text = $"최대 거리 +{cardData.BonusStat}%";
                 break;
 
             case PlayerStatType.Radius:
                 cardTypeText.text = "스킬 강화";
-                carIconImage.sprite = SkillData[currentCard.AppliedSkillIndex].Icon;
-                cardNameText.text = $"{SkillData[currentCard.AppliedSkillIndex].DisplayName} 강화";
+                skillIconImage.sprite = SkillData[currentCard.AppliedSkillIndex].Icon;
+                cardNameText.text = $"{SkillData[currentCard.AppliedSkillIndex].DisplayName}";
                 cardDetailText.text = $"타격 범위 +{cardData.BonusStat}%";
                 break;
 
             case PlayerStatType.Damage:
                 cardTypeText.text = "스킬 강화";
-                carIconImage.sprite = SkillData[currentCard.AppliedSkillIndex].Icon;
-                cardNameText.text = $"{SkillData[currentCard.AppliedSkillIndex].DisplayName} 강화";
+                skillIconImage.sprite = SkillData[currentCard.AppliedSkillIndex].Icon;
+                cardNameText.text = $"{SkillData[currentCard.AppliedSkillIndex].DisplayName}";
                 cardDetailText.text = $"데미지 +{cardData.BonusStat}%";
                 break;
 
             case PlayerStatType.KnockbackForce:
                 cardTypeText.text = "스킬 강화";
-                carIconImage.sprite = SkillData[currentCard.AppliedSkillIndex].Icon;
-                cardNameText.text = $"{SkillData[currentCard.AppliedSkillIndex].DisplayName} 강화";
+                skillIconImage.sprite = SkillData[currentCard.AppliedSkillIndex].Icon;
+                cardNameText.text = $"{SkillData[currentCard.AppliedSkillIndex].DisplayName}";
                 cardDetailText.text = $"넉백 거리 +{cardData.BonusStat}%";
                 break;
 
             case PlayerStatType.Cooldown:
                 cardTypeText.text = "스킬 강화";
-                carIconImage.sprite = SkillData[currentCard.AppliedSkillIndex].Icon;
-                cardNameText.text = $"{SkillData[currentCard.AppliedSkillIndex].DisplayName} 강화";
+                skillIconImage.sprite = SkillData[currentCard.AppliedSkillIndex].Icon;
+                cardNameText.text = $"{SkillData[currentCard.AppliedSkillIndex].DisplayName}";
                 cardDetailText.text = $"쿨다운 -{cardData.BonusStat}%";
                 break;
 
             case PlayerStatType.Special:
-                cardTypeText.text = "스킬 진화";
-                carIconImage.sprite =  Database.GetAttackData(currentCard.AppliedSkillIndex+100).Icon;
-                cardNameText.text = $"{SkillData[currentCard.AppliedSkillIndex].DisplayName} 진화";
+                cardTypeText.text = "스킬 승급";
+                skillIconImage.sprite =  Database.GetAttackData(currentCard.AppliedSkillIndex+100).Icon;
+                cardNameText.text = $"{SkillData[currentCard.AppliedSkillIndex].DisplayName} 승급";
                 cardDetailText.text = $"{SkillData[currentCard.AppliedSkillIndex].DisplayName} ->  {Database.GetAttackData(currentCard.AppliedSkillIndex+100).DisplayName}";
                 break;
 

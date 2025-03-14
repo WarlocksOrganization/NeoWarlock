@@ -96,6 +96,11 @@ namespace Player
             }
 
             ApplyCardBonuses();
+            
+            if (isOwned && playerUI == null)
+            {
+                playerUI = FindFirstObjectByType<PlayerCharacterUI>();
+            }
         }
 
         private void ActivateCharacterModel(Constants.CharacterClass newClass)

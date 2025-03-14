@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df90348267cf8264a9dedab5a56b461f, type: 3}
+  m_Name: ThunderStrormConfig
+  m_EditorClassIdentifier: 
+  attackType: 2
+  attackDelay: 2
+  recoveryTime: 0.5
+  attackDuration: 2.5
+  attackInterval: 0.5
+  animParameter: isAttack3
+  attackTrans: {x: 0, y: 0, z: 0}
+  Prefab: {fileID: 322783647940636695, guid: 5fa1a9a3f42805547b97751442a226c0, type: 3}
+  explosionEffectPrefab: {fileID: 5412338807302183837, guid: fff4532bf2d077e468e39d6999325072, type: 3}
+  skillType: 16
+  appliedBuff: {fileID: 0}

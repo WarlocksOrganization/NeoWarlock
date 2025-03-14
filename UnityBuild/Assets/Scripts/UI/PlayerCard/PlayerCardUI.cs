@@ -14,7 +14,6 @@ public class PlayerCardUI : MonoBehaviour
 
     private Queue<Database.PlayerCardData> selectedCardsQueue = new();
     private float remainingTime = 10f; // 초기 시간 10초
-    private bool isTimerRunning = false;
 
     void Start()
     {
