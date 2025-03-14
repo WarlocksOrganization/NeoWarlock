@@ -107,11 +107,14 @@ namespace Player
             if (!isServer) return;
             if ((layerMask.value & (1 << col.gameObject.layer)) == 0) return;
             // ✅ 근접 공격은 공격자와 동일한 레이어에 속한 대상은 무시
-            if (this.attackConfig.attackType is Constants.AttackType.Melee && col.gameObject == this.owner) return;
-            // ✅ 자기 공격일 경우 자기 자신에게만 영향을 줌
-            if (this.attackConfig.attackType is Constants.AttackType.Self && col.gameObject != this.owner) return;
-            // ✅ 근접 공격 및 자기 공격일 경우 플레이어에게만 영향을 줌
-            if ((this.attackConfig.attackType is Constants.AttackType.Melee || this.attackConfig.attackType is Constants.AttackType.Self) && col.gameObject.GetComponent<CharacterController>() == null) return;
+            if (this.attackConfig.attackType is Constants.AttackType.Self)
+            {
+                if (col.gameObject != this.owner) return;
+            }
+            else
+            {
+                if(col.gameObject == this.owner) return;
+            } 
             Debug.Log("OnCollisionEnter");
             Explode();
         }
@@ -120,13 +123,14 @@ namespace Player
         {
             if (!isServer) return;
             
-            if ((layerMask.value & (1 << col.gameObject.layer)) == 0) return;
-            // ✅ 근접 공격은 공격자와 동일한 레이어에 속한 대상은 무시
-            if (this.attackConfig.attackType is Constants.AttackType.Melee && col.gameObject == this.owner) return;
-            // ✅ 자기 공격일 경우 자기 자신에게만 영향을 줌
-            if (this.attackConfig.attackType is Constants.AttackType.Self && col.gameObject != this.owner) return;
-            // ✅ 근접 공격및 자기 공격일 경우 플레이어에게만 영향을 줌
-            if ((this.attackConfig.attackType is Constants.AttackType.Melee || this.attackConfig.attackType is Constants.AttackType.Self) && col.gameObject.GetComponent<CharacterController>() == null) return;
+            if (this.attackConfig.attackType is Constants.AttackType.Self)
+            {
+                if (col.gameObject != this.owner) return;
+            }
+            else
+            {
+                if(col.gameObject == this.owner) return;
+            }
             Debug.Log("OnTriggerEnter");
             Explode();
         }
@@ -136,7 +140,15 @@ namespace Player
             // ✅ 공격별 파티클 효과 적용
             if (attackConfig != null)
             {
-                GameObject explosion = Instantiate(attackConfig.explosionEffectPrefab, transform.position, Quaternion.identity);
+                // 1️⃣ 레이캐스트를 이용하여 지형이나 충돌 가능한 오브젝트 위에서 폭발 위치 설정
+                Vector3 explosionPosition = transform.position + Vector3.up * 2f; // 기본적으로 살짝 위에서 시작
+                if (Physics.Raycast(transform.position + Vector3.up * 5f, Vector3.down, out RaycastHit hit, 10f, layerMask))
+                {
+                    explosionPosition = hit.point + Vector3.up * 0.1f; // 레이캐스트 충돌 지점 바로 위에서 생성
+                }
+
+                // 2️⃣ 파티클 이펙트 생성
+                GameObject explosion = Instantiate(attackConfig.explosionEffectPrefab, explosionPosition, Quaternion.identity);
                 Explosion explosionComponent = explosion.GetComponent<Explosion>();
 
                 if (explosionComponent != null)
@@ -146,9 +158,10 @@ namespace Player
 
                 NetworkServer.Spawn(explosion);
             }
-            
+
             NetworkServer.Destroy(gameObject);
         }
+
 
         private void OnSkillEffectChanged(Constants.SkillType oldValue, Constants.SkillType newValue)
         {

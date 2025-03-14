@@ -9,6 +9,7 @@ namespace DataSystem
         public static readonly string ConfigPath = "Configs/AttackConfigs/";
         public static readonly string MovementConfigPath = "Configs/MoveSkillConfigs";
         public static readonly string IconPath = "Sprites/AttackIcons/";
+        public static readonly string CardIconPath = "Sprites/CardIcons/";
         
         public enum RoomType
         {
@@ -33,7 +34,7 @@ namespace DataSystem
             Point,
             Area,
             Melee,
-            Self
+            Self,
         }
         
         public enum BuffType
@@ -45,6 +46,8 @@ namespace DataSystem
             Slow,
             Poison,
             Charge,
+            PowerBody,
+            SlowDamage,
         }
 
         public enum SkillType
@@ -65,6 +68,11 @@ namespace DataSystem
             Slash,
             PowerBody,
             Charge,
+            ThunderStorm,
+            FreezeArea,
+            VenomArrow,
+            PoisonSpore,
+            Starfall,
             None = 100,
         }
         
@@ -88,6 +96,7 @@ namespace DataSystem
             public Constants.SkillType skillType;
             public GameObject gObject;
         }
+        
     }
 }
 

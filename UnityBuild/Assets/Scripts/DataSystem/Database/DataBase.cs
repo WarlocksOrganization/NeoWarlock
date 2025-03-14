@@ -6,6 +6,8 @@ namespace DataSystem.Database
         {
             LoadAttackData();
             LoadMovementSkillData();
+            LoadPlayerCardData();
+            LoadCardIcons();
         }
     }
 }

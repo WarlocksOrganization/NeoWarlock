@@ -22,7 +22,7 @@ namespace Player
                     lastMovementSkillTime = Time.time;
                     attackLockTime = movementSkill.endTime;
                     canMove = false;
-                    playerUI?.UseSkill(0);
+                    playerUI?.UseSkill(0, movementSkill.cooldown);
                     CmdTriggerAnimation("isMoveSkill");
                     
                     Vector3 targetPos = Vector3.zero;

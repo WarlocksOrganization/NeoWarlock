@@ -14,7 +14,13 @@ namespace Player
     public partial class PlayerCharacter
     {
         [SyncVar(hook = nameof(OnCharacterClassChanged))]
-        public Constants.CharacterClass PLayerCharacterClass; // ✅ 직업 동기화
+        private Constants.CharacterClass PLayerCharacterClass = Constants.CharacterClass.None; // ✅ 직업 동기화
+
+        [SyncVar(hook = nameof(OnMoveSkillChanged))]
+        private Constants.SkillType MoveSkill = Constants.SkillType.None; // ✅ 이동 스킬 동기화
+
+        [SyncVar(hook = nameof(OnAttackSkillsChanged))]
+        private int[] AttackSkills = null; // ✅ 공격 스킬 동기화
 
         [Header("Character Models")]
         public GameObject[] mageModel;
@@ -38,36 +44,63 @@ namespace Player
             };
         }
 
-        public void SetCharacterClass(Constants.CharacterClass newClass)
+        // 서버에서 동기화된 데이터를 설정
+        [Command]
+        public void CmdSetCharacterData(Constants.CharacterClass newClass, Constants.SkillType newMoveSkill, int[] newAttackSkills)
         {
-            animator.SetFloat("Blend", (int)newClass);
-            if (!isServer)
-            {
-                CmdSetCharacterClass(newClass);
-            }
-            else
-            {
-                ApplyCharacterClass(newClass);
-            }
+            PLayerCharacterClass = newClass;
+            MoveSkill = newMoveSkill;
+            AttackSkills = newAttackSkills;
         }
 
-        [Command]
-        private void CmdSetCharacterClass(Constants.CharacterClass newClass)
+        // 캐릭터 클래스 변경 시 호출될 동기화 함수
+        private void OnCharacterClassChanged(Constants.CharacterClass oldClass, Constants.CharacterClass newClass)
         {
+            if (newClass == Constants.CharacterClass.None)
+            {
+                return;
+            }
+            animator.SetFloat("Blend", (int)newClass);
             ApplyCharacterClass(newClass);
         }
 
         private void ApplyCharacterClass(Constants.CharacterClass newClass)
         {
-            PLayerCharacterClass = newClass;
-            SetClassSkills();
+            if (newClass == Constants.CharacterClass.None)
+            {
+                return;
+            }
             ActivateCharacterModel(newClass);
         }
 
-        private void OnCharacterClassChanged(Constants.CharacterClass oldClass, Constants.CharacterClass newClass)
+        // 이동 스킬 변경 시 호출될 동기화 함수
+        private void OnMoveSkillChanged(Constants.SkillType oldSkill, Constants.SkillType newSkill)
         {
-            SetClassSkills();
-            ActivateCharacterModel(newClass);
+            if (newSkill == Constants.SkillType.None)
+            {
+                return;
+            }
+            SetMovementSkill(newSkill);
+        }
+
+        // 공격 스킬 변경 시 호출될 동기화 함수
+        private void OnAttackSkillsChanged(int[] oldSkills, int[] newSkills)
+        {
+            if (newSkills == null)
+            {
+                return;
+            }
+            for (int i = 1; i <= 3; i++)
+            {
+                SetAvailableAttack(i, newSkills[i]);
+            }
+
+            ApplyCardBonuses();
+            
+            if (isOwned && playerUI == null)
+            {
+                playerUI = FindFirstObjectByType<PlayerCharacterUI>();
+            }
         }
 
         private void ActivateCharacterModel(Constants.CharacterClass newClass)
@@ -83,53 +116,13 @@ namespace Player
 
             if (characterModels.ContainsKey(newClass) && characterModels[newClass] != null)
             {
+                
                 foreach (var model in characterModels[newClass])
                 {
                     model.SetActive(true); // ✅ 해당 직업 모델만 활성화
                 }
                 
             }
-        }
-
-        private void SetClassSkills()
-        {
-            switch (PLayerCharacterClass)
-            {
-                case Constants.CharacterClass.Mage:
-                    SetMovementSkill(Constants.SkillType.TelePort);
-                    SetAvailableAttack(1, 1); // 파이어볼
-                    SetAvailableAttack(2, 2); // 번개
-                    SetAvailableAttack(3, 3); // 얼음
-                    break;
-
-                case Constants.CharacterClass.Archer:
-                    SetMovementSkill(Constants.SkillType.Roll);
-                    SetAvailableAttack(1, 11); // 원거리 화살 공격
-                    SetAvailableAttack(2, 12); // 독화살
-                    SetAvailableAttack(3, 13); // 폭발 화살
-                    break;
-                
-                case Constants.CharacterClass.Warrior:
-                    SetMovementSkill(Constants.SkillType.Roll);
-                    SetAvailableAttack(1, 21); // 베기
-                    SetAvailableAttack(2, 22); // 몸빵 강화
-                    SetAvailableAttack(3, 23); // 돌진
-                    break;
-                case Constants.CharacterClass.Necromancer:
-                    SetMovementSkill(Constants.SkillType.PhantomStep);
-                    SetAvailableAttack(1, 31); // 유령
-                    SetAvailableAttack(2, 32); // 유령2
-                    SetAvailableAttack(3, 33); // 폭발 플라스크
-                    break;
-                case Constants.CharacterClass.Priest:
-                    //SetMovementSkill(new TeleportSkill());
-                    //SetAvailableAttack(1, 31); // 원거리 화살 공격
-                    //SetAvailableAttack(2, 32); // 독화살
-                    //SetAvailableAttack(3, 33); // 폭발 화살
-                    break;
-            }
-
-            //Debug.Log($"[{characterClass}] 직업에 맞게 스킬과 공격을 설정했습니다!");
         }
     }
 }

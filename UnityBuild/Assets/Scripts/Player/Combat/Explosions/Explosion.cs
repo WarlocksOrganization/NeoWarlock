@@ -12,6 +12,9 @@ namespace Player.Combat
         protected float explosionRadius;
         protected float knockbackForce;
         protected float knockbackForceFactor = 20f;
+        protected float explosionDuration = 3f; // 지속 시간
+        protected float explosionInterval = 0.5f; // 폭발 간격
+        
         [SerializeField] protected GameObject explosionEffectPrefab; // ✅ 파티클 프리팹
         protected AttackConfig config;
 
@@ -23,6 +26,8 @@ namespace Player.Combat
             explosionRadius = radius;
             knockbackForce = knockback * knockbackForceFactor;
             this.config = config;
+            explosionDuration = config.attackDuration;
+            explosionInterval = config.attackInterval;
 
             explosionEffectPrefab.transform.localScale = new Vector3(radius, radius, radius);
 
@@ -40,15 +45,16 @@ namespace Player.Combat
         {
             if (!isServer) return; // ✅ 서버에서만 실행
             Collider[] hitColliders = Physics.OverlapSphere(transform.position, explosionRadius);
-
+            // Debug.Log($"Explosion in {transform.position.x}, {transform.position.z} owner is on {owner.transform.position.x}, {owner.transform.position.z}");
             foreach (Collider hit in hitColliders)
             {
                 IDamagable damagable = hit.transform.GetComponent<IDamagable>();
                 if (damagable != null)
                 {   
                     // ✅ 공격 타입에 따라 대상을 구분하여 데미지 적용
-                    if (config.attackType == DataSystem.Constants.AttackType.Melee && hit.transform.gameObject == this.owner) continue;
-                    if (config.attackType == DataSystem.Constants.AttackType.Self && hit.transform.gameObject != this.owner) continue;
+                    if (config.attackType == DataSystem.Constants.AttackType.Melee && hit.transform.gameObject == owner) continue;
+                    if (config.attackType == DataSystem.Constants.AttackType.Self && hit.transform.gameObject != owner) continue;
+                    // Debug.Log($"Damaging {hit.transform.gameObject.name}");
                     damagable.takeDamage((int)explosionDamage, transform.position, knockbackForce, config);
                 }
             }

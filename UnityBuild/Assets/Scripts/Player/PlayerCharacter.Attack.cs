@@ -1,10 +1,12 @@
 using System.Collections;
+using System.Collections.Generic;
 using DataSystem;
 using DataSystem.Database;
 using Interfaces;
 using kcp2k;
 using Mirror;
 using Player.Combat;
+using UI;
 using UnityEngine;
 
 namespace Player
@@ -20,13 +22,16 @@ namespace Player
         private IAttack currentAttack;
         
         public IAttack[] availableAttacks = new IAttack[5];
+        private Dictionary<int, IAttack> certainAttacks = new Dictionary<int, IAttack>();
+        
+        private Dictionary<int, AttackBase> activeAttacks = new Dictionary<int, AttackBase>(); // ✅ 캐싱용 딕셔너리
 
+        
         private void UpdateAttack()
         {
             if (Input.GetKeyDown(KeyCode.Alpha1)) SetAttackType(1);
             if (Input.GetKeyDown(KeyCode.Alpha2)) SetAttackType(2);
             if (Input.GetKeyDown(KeyCode.Alpha3)) SetAttackType(3);
-            if (Input.GetKeyDown(KeyCode.Alpha4)) SetAttackType(4);
             
             if (Input.GetKeyDown(KeyCode.Escape))
             {
@@ -86,26 +91,50 @@ namespace Player
         
         public void SetAvailableAttack(int index, int skillId)
         {
-            var attackData = Database.GetAttackData(skillId);
+            var originalAttackData = Database.GetAttackData(skillId);
 
-            if (attackData != null)
+            if (originalAttackData != null)
             {
-                IAttack attackInstance = CreateAttackInstance(attackData);
+                // ✅ 원본 AttackData를 복사하여 개별적인 인스턴스를 생성
+                var playerAttackData = new Database.AttackData()
+                {
+                    ID = originalAttackData.ID,
+                    Name = originalAttackData.Name,
+                    DisplayName = originalAttackData.DisplayName,
+                    Description = originalAttackData.Description,
+                    Speed = originalAttackData.Speed,
+                    Range = originalAttackData.Range,
+                    Radius = originalAttackData.Radius,
+                    Damage = originalAttackData.Damage,
+                    KnockbackForce = originalAttackData.KnockbackForce,
+                    Cooldown = originalAttackData.Cooldown,
+                    config = originalAttackData.config,
+                    Icon = originalAttackData.Icon
+                };
+
+                // ✅ 개별 AttackData를 기반으로 스킬 인스턴스 생성
+                IAttack attackInstance = CreateAttackInstance(playerAttackData);
                 availableAttacks[index] = attackInstance;
 
+                if (isOwned && playerUI == null)
+                {
+                    playerUI = FindFirstObjectByType<PlayerCharacterUI>();
+                }
                 if (playerUI != null)
                 {
-                    // ✅ ScriptableObject 데이터 활용
-                    playerUI.SetQuickSlotData(index, attackData.Icon, attackData.Cooldown);
+                    playerUI.SetQuickSlotData(index, playerAttackData.Icon, playerAttackData.Cooldown);
                 }
+
+                Debug.Log($"[스킬 설정] {playerAttackData.Name}({playerAttackData.ID}) 적용 완료 {playerAttackData.Radius}");
             }
             else
             {
-                Debug.LogWarning("공격 데이터를 가져오지 못했습니다.");
+                Debug.LogWarning($"[SetAvailableAttack] 공격 데이터를 가져오지 못했습니다. (SkillID: {skillId})");
             }
 
             CmdSetAvailableAttack(index, skillId);
         }
+
 
         
         private AttackBase CreateAttackInstance(Database.AttackData data)
@@ -148,7 +177,9 @@ namespace Player
                     Debug.LogError($"알 수 없는 공격 타입: {data.config.attackType}");
                     return null;
             }
-
+            
+            attackInstance.transform.SetParent(transform);
+            
             // ✅ 공통 속성 설정
             attackInstance.projectilePrefab = data.config.Prefab;
             attackInstance.Initialize(data);
@@ -237,7 +268,7 @@ namespace Player
                 targetPosition = transform.position + direction *(currentAttack.GetAttackData().Range);
             }
 
-            playerUI?.UseSkill(currentAttackIndex);
+            playerUI?.UseSkill(currentAttackIndex, currentAttack.GetAttackData().Cooldown);
 
             float attackDelay = currentAttack.GetAttackData().config.attackDelay;
             float recoveryTime = currentAttack.GetAttackData().config.recoveryTime;
@@ -251,20 +282,7 @@ namespace Player
         private IEnumerator ExecuteAttack(Vector3 targetPosition, float attackDelay)
         {
             // ✅ 애니메이션 실행
-            switch (currentAttack.GetAttackData().config.attackType)
-            {
-                case Constants.AttackType.Projectile:
-                case Constants.AttackType.ProjectileSky:
-                case Constants.AttackType.Point:
-                case Constants.AttackType.Area:
-                case Constants.AttackType.Melee:
-                case Constants.AttackType.Self:
-                    CmdTriggerAnimation(currentAttack.GetAttackData().config.animParameter);
-                    break;
-                default:
-                    Debug.LogError($"알 수 없는 공격 타입: {currentAttack.GetAttackData().config.attackType}");
-                    break;
-            }
+            CmdTriggerAnimation(currentAttack.GetAttackData().config.animParameter);
             currentAttack.LastUsedTime = Time.time;
             int nextAttckIndex = currentAttackIndex;
             
@@ -299,7 +317,29 @@ namespace Player
             Vector3 direction = (attackPosition - transform.position).normalized;
             
             availableAttacks[nextAttckIndex]?.Execute(attackPosition, 
-                attackTransform.position + availableAttacks[nextAttckIndex].GetAttackData().Radius* 1f*direction, gameObject);
+                attackTransform.position + direction, gameObject);
+        }
+
+        [Command]
+        public void CmdCertainAttack(Vector3 attackPosition, int skillId, bool originPosition)  
+        {
+            Vector3 direction = (attackPosition - transform.position).normalized;
+            if (!certainAttacks.ContainsKey(skillId))
+            {
+                var attackData = Database.GetAttackData(skillId);
+                if (attackData != null)
+                {
+                    IAttack attackInstance = CreateAttackInstance(attackData);
+                    certainAttacks.Add(skillId, attackInstance);
+                }
+            }
+
+            if (certainAttacks.ContainsKey(skillId))
+            {
+                Vector3 firePosition = originPosition ? attackTransform.position : attackTransform.position + direction;
+                certainAttacks[skillId].Execute(attackPosition, 
+                    firePosition, gameObject);
+            }
         }
     }
 }

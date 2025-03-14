@@ -14,6 +14,7 @@ namespace Player
         [SyncVar(hook = nameof(SetNickname_Hook))]
         public string nickname;
         [SerializeField] private TMP_Text nicknameText;
+        [SyncVar] public int playerNumber = -1;
         private CharacterController _characterController;
         private CinemachineVirtualCamera virtualCamera;
         private BuffSystem buffSystem;
@@ -22,7 +23,8 @@ namespace Player
         
         [SerializeField] private LayerMask mouseTargetLayer;
         
-        [SyncVar] private bool isDead = false;
+        [SyncVar(hook = nameof(SetIsDead_Hook))]
+        private bool isDead = true;
         
         [SerializeField] private Animator animator;
         
@@ -35,12 +37,12 @@ namespace Player
             _characterController = GetComponent<CharacterController>();
             buffSystem = GetComponent<BuffSystem>();
             effectSystem = GetComponent<EffectSystem>();
+            
+            InitializeCharacterModels();
         }
 
         public virtual void Start()
         {
-            InitializeCharacterModels();
-            ApplyCharacterClass(PLayerCharacterClass);
             
             GameLobbyUI gameLobbyUI = FindFirstObjectByType<GameLobbyUI>();
             if (gameLobbyUI != null)
@@ -107,6 +109,30 @@ namespace Player
         private void RpcTriggerAnimation(string trigger)
         {
             animator.SetTrigger(trigger);
+        }
+
+        public void SetIsDead(bool value)
+        {
+            if (!isServer)
+            {
+                CmdSetIsDead(value);
+            }
+            else
+            {
+                isDead = value;
+            }
+        }
+
+        [Command]
+        private void CmdSetIsDead(bool value)
+        {
+            isDead = value;
+        }
+
+        public void SetIsDead_Hook(bool oldValue, bool newValue)
+        {
+            isDead = newValue;
+            _characterController.enabled = !newValue;
         }
     }
 }

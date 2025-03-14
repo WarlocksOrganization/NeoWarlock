@@ -10,6 +10,7 @@ namespace GameManagement
         [SyncVar] public string roomName = "기본 방 이름"; // 방 이름 동기화
         [SyncVar] public Constants.RoomType roomType = Constants.RoomType.Solo; // 방 유형 동기화
         [SyncVar] public int maxPlayerCount = 4; // 최대 인원 동기화
+        [SyncVar] public int Round = 3;
 
         private void Start()
         {

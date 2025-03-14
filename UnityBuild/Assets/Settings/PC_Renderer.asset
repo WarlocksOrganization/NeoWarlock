@@ -16,11 +16,11 @@ MonoBehaviour:
   m_Settings:
     technique: 0
     maxDrawDistance: 1000
-    decalLayers: 0
+    decalLayers: 1
     dBufferSettings:
       surfaceData: 2
     screenSpaceSettings:
-      normalBlend: 0
+      normalBlend: 1
 --- !u!114 &-4012050853401571173
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -112,7 +112,7 @@ MonoBehaviour:
   m_Name: FastOutline
   m_EditorClassIdentifier: 
   m_Active: 1
-  settings: {fileID: 11400000, guid: 04302ffbc45108e48b1b804d8899e555, type: 2}
+  settings: {fileID: 0}
   shaders:
     mask: {fileID: 4800000, guid: d6efd8a53bb54ff68576b38c066c3134, type: 3}
     outline: {fileID: 4800000, guid: 981392195909457093e91e09efd412a1, type: 3}
