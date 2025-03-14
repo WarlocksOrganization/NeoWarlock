@@ -2,6 +2,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using UnityEngine.EventSystems;
 
 namespace UI
 {
@@ -19,12 +20,22 @@ namespace UI
         private float currentSkillCul;
         private Coroutine fadeCoroutine;
 
+        //private string skillName;  // 슬롯에 장착된 스킬 이름
+        //private string skillDescription;  // 슬롯에 장착된 스킬 설명
+        //private SkillDescriptionUI uiManager;
+
         public void SetQuickSlotData(Sprite icon, float cooldown)
         {
             skinImage.sprite = icon;
             maxSkillCul = cooldown;
             currentSkillCul = 0.1f;
         }
+
+        //public void SetQuickSlotInfo(string name, string description)
+        //{
+        //    skillName = name;
+        //    skillDescription = description;
+        //}
 
         public void SelectSkill(bool isSelected)
         {
@@ -92,5 +103,18 @@ namespace UI
             // 최종적으로 완전 투명하게 설정
             skillCulImage3.color = new Color(1, 1, 1, 0);
         }
+        //public void OnPointerEnter(PointerEventData eventData)
+        //{
+        //    if (!string.IsNullOrEmpty(skillName))
+        //    {
+        //        uiManager.ShowSkillDetail(skillName, skillDescription, transform.position);
+        //    }
+        //}
+
+        //// 마우스를 벗어났을 때 상세 정보 숨김
+        //public void OnPointerExit(PointerEventData eventData)
+        //{
+        //    uiManager.CloseSkillDetail();
+        //}
     }
 }
