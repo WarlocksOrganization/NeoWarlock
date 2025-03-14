@@ -125,7 +125,7 @@ namespace Player
                     playerUI.SetQuickSlotData(index, playerAttackData.Icon, playerAttackData.Cooldown);
                 }
 
-                Debug.Log($"[스킬 설정] {playerAttackData.Name}({playerAttackData.ID}) 적용 완료");
+                Debug.Log($"[스킬 설정] {playerAttackData.Name}({playerAttackData.ID}) 적용 완료 {playerAttackData.Radius}");
             }
             else
             {
@@ -268,7 +268,7 @@ namespace Player
                 targetPosition = transform.position + direction *(currentAttack.GetAttackData().Range);
             }
 
-            playerUI?.UseSkill(currentAttackIndex);
+            playerUI?.UseSkill(currentAttackIndex, currentAttack.GetAttackData().Cooldown);
 
             float attackDelay = currentAttack.GetAttackData().config.attackDelay;
             float recoveryTime = currentAttack.GetAttackData().config.recoveryTime;
@@ -282,20 +282,7 @@ namespace Player
         private IEnumerator ExecuteAttack(Vector3 targetPosition, float attackDelay)
         {
             // ✅ 애니메이션 실행
-            switch (currentAttack.GetAttackData().config.attackType)
-            {
-                case Constants.AttackType.Projectile:
-                case Constants.AttackType.ProjectileSky:
-                case Constants.AttackType.Point:
-                case Constants.AttackType.Area:
-                case Constants.AttackType.Melee:
-                case Constants.AttackType.Self:
-                    CmdTriggerAnimation(currentAttack.GetAttackData().config.animParameter);
-                    break;
-                default:
-                    Debug.LogError($"알 수 없는 공격 타입: {currentAttack.GetAttackData().config.attackType}");
-                    break;
-            }
+            CmdTriggerAnimation(currentAttack.GetAttackData().config.animParameter);
             currentAttack.LastUsedTime = Time.time;
             int nextAttckIndex = currentAttackIndex;
             
@@ -330,7 +317,7 @@ namespace Player
             Vector3 direction = (attackPosition - transform.position).normalized;
             
             availableAttacks[nextAttckIndex]?.Execute(attackPosition, 
-                attackTransform.position + availableAttacks[nextAttckIndex].GetAttackData().Radius* 1f*direction, gameObject);
+                attackTransform.position + direction, gameObject);
         }
 
         [Command]
@@ -349,7 +336,7 @@ namespace Player
 
             if (certainAttacks.ContainsKey(skillId))
             {
-                Vector3 firePosition = originPosition ? attackTransform.position : attackTransform.position + certainAttacks[skillId].GetAttackData().Radius * 1f * direction;
+                Vector3 firePosition = originPosition ? attackTransform.position : attackTransform.position + direction;
                 certainAttacks[skillId].Execute(attackPosition, 
                     firePosition, gameObject);
             }

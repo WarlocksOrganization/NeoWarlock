@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using DataSystem.Database;
 using Mirror;
+using UI;
 using UnityEngine;
 
 namespace Player
@@ -103,6 +104,7 @@ namespace Player
                    attackData.Cooldown *= cooldownMultiplier; 
     
                    if (attackData.Cooldown < 0.5f) attackData.Cooldown = 0.5f; // ✅ 최소 쿨다운 제한
+                   
                    break;
 
                default:

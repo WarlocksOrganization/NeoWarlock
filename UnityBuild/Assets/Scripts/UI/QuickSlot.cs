@@ -23,6 +23,7 @@ namespace UI
         {
             skinImage.sprite = icon;
             maxSkillCul = cooldown;
+            currentSkillCul = 0.1f;
         }
 
         public void SelectSkill(bool isSelected)
@@ -30,8 +31,9 @@ namespace UI
             isSelectedImage.SetActive(isSelected);
         }
 
-        public void UseSkill()
+        public void UseSkill(float cooldown)
         {
+            maxSkillCul = cooldown;
             currentSkillCul = maxSkillCul;
             skillCulImage2.fillAmount = 1;
             SelectSkill(false);

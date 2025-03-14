@@ -15,9 +15,9 @@ namespace UI
             quickSlots[index].SetQuickSlotData(icon, cooldown);
         }
     
-        public void UseSkill(int index)
+        public void UseSkill(int index, float cooldown)
         {
-            quickSlots[index].UseSkill();
+            quickSlots[index].UseSkill(cooldown);
         }
 
         public void SelectSkill(int index, bool selected)
