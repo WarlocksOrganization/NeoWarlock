@@ -29,7 +29,8 @@ namespace Player.Combat
                     attackData.Range,
                     5f, // ✅ 항상 5초로 고정
                     attackData.KnockbackForce,
-                    attackData.config
+                    attackData.config,
+                    owner
                 );
 
                 NetworkServer.Spawn(projectile);

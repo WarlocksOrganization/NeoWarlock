@@ -100,6 +100,7 @@ namespace Player
             if (isOwned && playerUI == null)
             {
                 playerUI = FindFirstObjectByType<PlayerCharacterUI>();
+                lastMovementSkillTime = -Mathf.Infinity;
             }
         }
 

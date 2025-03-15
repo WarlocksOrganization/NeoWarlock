@@ -110,8 +110,8 @@ public class PlayerCardSlot : MonoBehaviour
             case PlayerStatType.Special:
                 cardTypeText.text = "스킬 승급";
                 skillIconImage.sprite =  Database.GetAttackData(currentCard.AppliedSkillIndex+100).Icon;
-                cardNameText.text = $"{SkillData[currentCard.AppliedSkillIndex].DisplayName} 승급";
-                cardDetailText.text = $"{SkillData[currentCard.AppliedSkillIndex].DisplayName} ->  {Database.GetAttackData(currentCard.AppliedSkillIndex+100).DisplayName}";
+                cardNameText.text = $"{SkillData[currentCard.AppliedSkillIndex].DisplayName}";
+                cardDetailText.text = $"{SkillData[currentCard.AppliedSkillIndex].DisplayName} \n->  {Database.GetAttackData(currentCard.AppliedSkillIndex+100).DisplayName}";
                 break;
 
             default:

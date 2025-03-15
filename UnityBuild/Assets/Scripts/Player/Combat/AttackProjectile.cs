@@ -29,8 +29,9 @@ namespace Player
         private Dictionary<Constants.SkillType, GameObject> skillEffects;
 
         [SyncVar] private GameObject owner;
+        private bool isExplode = false;
 
-        public void SetProjectileData(float damage, float speed, float radius, float range, float lifeTime, float knockback, AttackConfig config, GameObject owner = null)
+        public void SetProjectileData(float damage, float speed, float radius, float range, float lifeTime, float knockback, AttackConfig config, GameObject owner)
         {
             this.damage = damage;
             this.speed = speed;
@@ -102,23 +103,6 @@ namespace Player
             }
         }
 
-        protected void OnCollisionEnter(Collision col)
-        {
-            if (!isServer) return;
-            if ((layerMask.value & (1 << col.gameObject.layer)) == 0) return;
-            // ✅ 근접 공격은 공격자와 동일한 레이어에 속한 대상은 무시
-            if (this.attackConfig.attackType is Constants.AttackType.Self)
-            {
-                if (col.gameObject != this.owner) return;
-            }
-            else
-            {
-                if(col.gameObject == this.owner) return;
-            } 
-            Debug.Log("OnCollisionEnter");
-            Explode();
-        }
-
         protected void OnTriggerEnter(Collider col)
         {
             if (!isServer) return;
@@ -129,10 +113,14 @@ namespace Player
             }
             else
             {
+                if ((layerMask & (1 << col.gameObject.layer)) == 0) return;
                 if(col.gameObject == this.owner) return;
             }
-            Debug.Log("OnTriggerEnter");
-            Explode();
+            if (!isExplode)
+            {
+                isExplode = true;
+                Explode();
+            }
         }
 
         protected void Explode()

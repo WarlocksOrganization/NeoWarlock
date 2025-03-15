@@ -26,7 +26,8 @@ namespace Player.Combat
                     attackData.Range,
                     attackData.Range / Math.Abs(attackData.Speed),
                     attackData.KnockbackForce,
-                    attackData.config
+                    attackData.config,
+                    owner
                 );
 
 

@@ -5,15 +5,9 @@ using UnityEngine;
 
 namespace Player.Combat
 {
-    public class ContinuousRandomExplosion : Explosion
+    public class ContinuousRandomExplosion : ContinuousExplosion
     {
-        public override void OnStartServer()
-        {
-            CreateParticleEffect();
-            StartCoroutine(ExplodeContinuously());
-        }
-
-        private IEnumerator ExplodeContinuously()
+        protected override IEnumerator ExplodeContinuously()
         {
             float elapsedTime = 0f;
 
@@ -27,7 +21,7 @@ namespace Player.Combat
                 // 폭발을 해당 위치에서 실행
                 ExplodeAt(randomPosition);
                 
-                elapsedTime += explosionInterval;
+                elapsedTime += base.explosionInterval;
             }
 
             StartCoroutine(AutoDestroy());

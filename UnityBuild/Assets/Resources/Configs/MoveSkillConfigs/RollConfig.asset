@@ -16,6 +16,6 @@ MonoBehaviour:
   cooldown: 7.5
   castTime: 0
   moveDuration: 0.5
-  endTime: 0.5
+  endTime: 0.25
   maxDistance: 7.5
   skillIcon: {fileID: 21300000, guid: 7e3af7f7219875f498bd0a3de0a655ed, type: 3}

@@ -89,8 +89,6 @@ namespace Player
 
             transform.position = targetPosition;
 
-            yield return new WaitForSeconds(endLag);
-
             _characterController.enabled = true;
             canMove = true;
         }

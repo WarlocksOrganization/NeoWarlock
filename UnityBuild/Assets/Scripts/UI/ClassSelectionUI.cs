@@ -41,6 +41,11 @@ public class ClassSelectionUI : MonoBehaviour
             playerSelectArea.SelectCharacter(characterClass);
         }
     }
+
+    public void RollClass(int changeAmount)
+    {
+        ChangeClass((int)characterClass + changeAmount);
+    }
     
     public void SelectClass()
     {

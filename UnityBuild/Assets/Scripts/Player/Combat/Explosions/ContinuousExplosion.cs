@@ -13,7 +13,7 @@ namespace Player.Combat
             StartCoroutine(ExplodeContinuously());
         }
 
-        private IEnumerator ExplodeContinuously()
+        protected virtual IEnumerator ExplodeContinuously()
         {
             float elapsedTime = 0f;
 
