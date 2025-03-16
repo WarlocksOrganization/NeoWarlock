@@ -255,6 +255,8 @@ namespace Player
         {
             if (Time.time < attackLockTime) return; // ✅ 공격 중일 때 중복 실행 방지
 
+            _targetPosition = transform.position;
+
             // ✅ 현재 마우스 위치와 플레이어(또는 fireTransform) 위치 간 거리 계산
             float distance = Vector3.Distance(transform.position, targetPosition);
 

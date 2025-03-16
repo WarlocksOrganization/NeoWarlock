@@ -1,15 +1,15 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using DataSystem;
 using TMPro;
+using DataSystem.Database;
 
 public class CharacterSelectionManager : MonoBehaviour
 {
     public Transform skillIconContainer;
     public GameObject skillButtonPrefab;
     public SkillDescriptionUI skillDescriptionUI;
-    public CharacterDetailLoader characterDetailLoader;
-    public SkillDetailLoader skillLoader;
 
     public TextMeshProUGUI characterName;
     public TextMeshProUGUI characterLine;
@@ -18,63 +18,74 @@ public class CharacterSelectionManager : MonoBehaviour
     public TextMeshProUGUI characterSpeed;
     public TextMeshProUGUI characterKnock;
 
-    private List<GameObject> currentSkillIcons = new List<GameObject>();
-    public void SelectCharacter(string characterClass)
+    private SkillButton[] skillButtons;
+    
+    private void Awake()
     {
-        if (skillLoader == null)
+        InitializeSkillButtons();
+    }
+
+    private void InitializeSkillButtons()
+    {
+        skillButtons = new SkillButton[skillIconContainer.childCount];
+        for (int i = 0; i < skillIconContainer.childCount; i++)
         {
-            Debug.LogError("❌ skillLoader가 null입니다! CharacterSelectionManager의 Inspector에서 SkillLoader를 연결하세요.");
-            return;
+            skillButtons[i] = skillIconContainer.GetChild(i).GetComponent<SkillButton>();
         }
+    }
 
-        // ✅ 기존 스킬 UI 제거 대신 버튼 재사용 (Clone 생성 방지)
-        ResetSkillIcons();
-
-        CharacterDetail detail = characterDetailLoader.GetCharacterDetail(characterClass);
+    public void SelectCharacter(Constants.CharacterClass characterClass)
+    {
+        Database.CharacterClassData detail = Database.GetCharacterClassData(characterClass);
         if (detail != null)
         {
-            characterName.text = detail.characterName;
-            characterLine.text = detail.characterLine;
-            characterAtk.text = detail.characterAtk;
-            characterHp.text = detail.characterHp;
-            characterSpeed.text = detail.characterSpeed;
-            characterKnock.text = detail.characterKnock;
+            characterName.text = detail.CharacterName;
+            characterLine.text = detail.CharacterDescription;
+            characterAtk.text = new string('★', detail.CharacterAtk);
+            characterHp.text = new string('★', detail.CharacterHp);
+            characterSpeed.text = new string('★', detail.CharacterSpeed);
+            characterKnock.text = new string('★', detail.CharacterKnock);
         }
         else
         {
             Debug.LogWarning($"⚠️ {characterClass}의 설명 데이터를 찾을 수 없습니다.");
-        }
-
-        List<SkillData> skills = skillLoader.GetSkillsForCharacter(characterClass);
-        if (skills == null || skills.Count == 0)
-        {
-            Debug.LogWarning($"⚠️ {characterClass}의 스킬 데이터를 찾을 수 없습니다.");
             return;
         }
+        
+        ResetSkillIcons();
+        LoadCharacterSkills(detail);
+    }
 
-        // ✅ 기존에 존재하는 버튼을 재사용
-        for (int i = 0; i < skills.Count; i++)
+    private void LoadCharacterSkills(Database.CharacterClassData characterData)
+    {
+        int index = 0;
+        
+        for (int i = 0; i < characterData.AttackSkillIds.Count && index < skillButtons.Length; i++, index++)
         {
-            if (i < skillIconContainer.childCount)
+            Database.AttackData attackData = Database.GetAttackData(characterData.AttackSkillIds[i]);
+            if (attackData != null)
             {
-                GameObject skillButton = skillIconContainer.GetChild(i).gameObject;
-                skillButton.SetActive(true);
-                skillButton.GetComponent<Image>().sprite = skills[i].skillIcon;
-
-                // ✅ SkillButton 스크립트에서 이름과 설명 설정
-                SkillButton skillButtonComponent = skillButton.GetComponent<SkillButton>();
-                skillButtonComponent.skillName = skills[i].skillName;
-                skillButtonComponent.skillDescription = skills[i].skillDescription;
+                skillButtons[index].SetUp(attackData.DisplayName, attackData.Description, attackData.Icon);
+                skillButtons[index].gameObject.SetActive(true);
+            }
+        }
+        
+        if (index < skillButtons.Length)
+        {
+            MovementSkillConfig movementSkill = Database.GetMovementSkillData(characterData.MovementSkillType);
+            if (movementSkill != null)
+            {
+                skillButtons[index].SetUp(movementSkill.skillName, movementSkill.Description, movementSkill.skillIcon);
+                skillButtons[index].gameObject.SetActive(true);
             }
         }
     }
 
     private void ResetSkillIcons()
     {   
-        foreach (Transform child in skillIconContainer)
+        foreach (SkillButton button in skillButtons)
         {
-            child.gameObject.SetActive(false); // ✅ 기존 버튼들을 숨김
+            button.gameObject.SetActive(false);
         }
     }
-
 }

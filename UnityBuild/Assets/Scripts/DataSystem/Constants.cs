@@ -70,9 +70,10 @@ namespace DataSystem
             Charge,
             ThunderStorm,
             FreezeArea,
-            VenomArrow,
+            IceArrow,
             PoisonSpore,
             Starfall,
+            Dash,
             None = 100,
         }
         

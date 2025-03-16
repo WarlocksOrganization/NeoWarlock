@@ -19,7 +19,7 @@ MonoBehaviour:
   attackInterval: 0.5
   animParameter: isAttack2
   attackTrans: {x: 0, y: 3, z: 0}
-  Prefab: {fileID: 322783647940636695, guid: 0bc3aa79cdf75474792eabbf250360a0, type: 3}
+  Prefab: {fileID: 322783647940636695, guid: 37f2acf25e527df43a982a902e47a741, type: 3}
   explosionEffectPrefab: {fileID: 5412338807302183837, guid: 49b0b289a6b5c634c81eb0bfb7c92e6c, type: 3}
   skillType: 11
   appliedBuff: {fileID: 0}

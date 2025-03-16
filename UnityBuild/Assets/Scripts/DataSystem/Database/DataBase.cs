@@ -8,6 +8,7 @@ namespace DataSystem.Database
             LoadMovementSkillData();
             LoadPlayerCardData();
             LoadCardIcons();
+            LoadCharacterClassData();
         }
     }
 }

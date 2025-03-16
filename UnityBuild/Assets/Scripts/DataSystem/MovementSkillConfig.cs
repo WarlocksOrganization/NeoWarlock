@@ -11,6 +11,8 @@ public class MovementSkillConfig : ScriptableObject
     public float endTime;
     public float maxDistance;
     public Sprite skillIcon;
+    public string skillName;
+    public string Description;
     
 
     public virtual Vector3 GetTargetPosition(Vector3 playerPosition, Vector3 targetPosition)

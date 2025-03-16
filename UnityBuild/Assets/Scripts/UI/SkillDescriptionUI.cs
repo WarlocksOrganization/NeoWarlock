@@ -4,9 +4,9 @@ using TMPro;
 
 public class SkillDescriptionUI : MonoBehaviour
 {
-    public GameObject skillDetailPanel;  // »ó¼¼Á¤º¸ ÆÐ³Î
-    public TextMeshProUGUI skillNameText; // ½ºÅ³ ÀÌ¸§ Ç¥½Ã
-    public TextMeshProUGUI skillDescriptionText; // ½ºÅ³ ¼³¸í Ç¥½Ã
+    public GameObject skillDetailPanel;  // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ð³ï¿½
+    public TextMeshProUGUI skillNameText; // ï¿½ï¿½Å³ ï¿½Ì¸ï¿½ Ç¥ï¿½ï¿½
+    public TextMeshProUGUI skillDescriptionText; // ï¿½ï¿½Å³ ï¿½ï¿½ï¿½ï¿½ Ç¥ï¿½ï¿½
 
     void Start()
     {
@@ -27,68 +27,4 @@ public class SkillDescriptionUI : MonoBehaviour
     {
         skillDetailPanel.SetActive(false);
     }
-
-    //void Update()
-    //{
-    //    // ESC Å°¸¦ ´©¸£¸é ÆÐ³Î ´Ý±â
-    //    if (isPanelOpen && Input.GetKeyDown(KeyCode.Escape))
-    //    {
-    //        CloseSkillDetail();
-    //    }
-    //}
 }
-
-
-//using UnityEngine;
-//using UnityEngine.UI;
-//using TMPro;
-
-//public class SkillDescriptionUI : MonoBehaviour
-//{
-//    public GameObject skillDetailPanel;  // »ó¼¼Á¤º¸ ÆÐ³Î
-//    public GameObject clickDetectorPanel; // Å¬¸¯°¨½Ã ÆÐ³Î
-//    public TextMeshProUGUI skillNameText; // ½ºÅ³ ÀÌ¸§ Ç¥½Ã
-//    public TextMeshProUGUI skillDescriptionText; // ½ºÅ³ ¼³¸í Ç¥½Ã
-//    //private RectTransform detailPanelRect; // »ó¼¼Á¤º¸ ÆÐ³Î RectTransform
-
-//    private bool isPanelOpen = false;
-
-
-//    void Start()
-//    {
-//        skillDetailPanel.SetActive(false);
-//        clickDetectorPanel.SetActive(false); // Ã³À½¿£ ¼û±è
-
-//        // ¹öÆ° Å¬¸¯ ½Ã ÆÐ³Î ´Ý±â
-//        Button clickButton = clickDetectorPanel.GetComponent<Button>();
-//        clickButton.onClick.AddListener(CloseSkillDetail);
-//    }
-
-//    public void ShowSkillDetail(string skillName, string skillDescription, Vector3 buttonPosition)
-//    {
-//        skillNameText.text = skillName;
-//        skillDescriptionText.text = skillDescription;
-
-//        skillDetailPanel.transform.position = buttonPosition + new Vector3(480, 0, 0);
-
-//        skillDetailPanel.SetActive(true);
-//        clickDetectorPanel.SetActive(true); // Å¬¸¯ °¨Áö ÆÐ³Î È°¼ºÈ­
-//        isPanelOpen = true;
-//    }
-
-//    public void CloseSkillDetail()
-//    {
-//        skillDetailPanel.SetActive(false);
-//        clickDetectorPanel.SetActive(false); // °¨Áö ÆÐ³Îµµ ¼û±è
-//        isPanelOpen = false;
-//    }
-
-//    void Update()
-//    {
-//        // ESC Å°¸¦ ´©¸£¸é ÆÐ³Î ´Ý±â
-//        if (isPanelOpen && Input.GetKeyDown(KeyCode.Escape))
-//        {
-//            CloseSkillDetail();
-//        }
-//    }
-//}

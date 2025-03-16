@@ -44,7 +44,7 @@ public class ClassSelectionUI : MonoBehaviour
 
     public void RollClass(int changeAmount)
     {
-        ChangeClass((int)characterClass + changeAmount);
+        ChangeClass(((int)characterClass + changeAmount+5)%5);
     }
     
     public void SelectClass()

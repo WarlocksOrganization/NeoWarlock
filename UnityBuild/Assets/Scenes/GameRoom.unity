@@ -4841,8 +4841,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c83349a02f406e249a8ef606e04ef862, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  skillName: 
-  skillDescription: 
 --- !u!1001 &505568466
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6493,8 +6491,8 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 2010861537}
   - {fileID: 1205326386}
+  - {fileID: 2010861537}
   - {fileID: 1255582796}
   m_Father: {fileID: 881502417}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -6957,8 +6955,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c83349a02f406e249a8ef606e04ef862, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  skillName: 
-  skillDescription: 
 --- !u!114 &721502840
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8407,8 +8403,6 @@ MonoBehaviour:
   skillIconContainer: {fileID: 40884473}
   skillButtonPrefab: {fileID: 0}
   skillDescriptionUI: {fileID: 30079184}
-  characterDetailLoader: {fileID: 881502421}
-  skillLoader: {fileID: 881502420}
   characterName: {fileID: 1205326387}
   characterLine: {fileID: 2010861538}
   characterAtk: {fileID: 1251312435}
@@ -10503,8 +10497,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c83349a02f406e249a8ef606e04ef862, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  skillName: 
-  skillDescription: 
 --- !u!1 &1182638632
 GameObject:
   m_ObjectHideFlags: 0
@@ -10887,7 +10879,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 637, y: 348}
+  m_AnchoredPosition: {x: 637, y: 481}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1205326387
@@ -10910,7 +10902,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uCE90\uB9AD\uD130"
+  m_text: "\uB9C8\uBC95\uC0AC"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 402b6704ec910ac498580b7561efd295, type: 2}
   m_sharedMaterial: {fileID: 2100000, guid: a382f4dac5060a840bf02c5c3034c00a, type: 2}
@@ -11168,8 +11160,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: -340, y: -468.6892}
-  m_SizeDelta: {x: 124.9048, y: 429.6837}
+  m_AnchoredPosition: {x: -300, y: -468.6892}
+  m_SizeDelta: {x: 250, y: 429.6837}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1211824253
 MonoBehaviour:
@@ -11234,13 +11226,13 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1211824251}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -11740,8 +11732,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 9, y: -468.6892}
-  m_SizeDelta: {x: 124.9048, y: 429.68372}
+  m_AnchoredPosition: {x: 300, y: -468.6892}
+  m_SizeDelta: {x: 250, y: 429.6837}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1274639594
 MonoBehaviour:
@@ -11806,13 +11798,13 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1274639592}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -12649,8 +12641,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c83349a02f406e249a8ef606e04ef862, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  skillName: 
-  skillDescription: 
 --- !u!114 &1409315970
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14441,8 +14431,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c83349a02f406e249a8ef606e04ef862, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  skillName: 
-  skillDescription: 
 --- !u!1 &1785859617
 GameObject:
   m_ObjectHideFlags: 0
@@ -15740,7 +15728,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uCE90\uB9AD\uD130 \uD55C\uC904 \uC124\uBA85!"
+  m_text: "\uC6D0\uAC70\uB9AC\uC5D0\uC11C \uAC15\uB825\uD55C \uB9C8\uBC95\uC744 \\n\uC0AC\uC6A9\uD558\uC5EC
+    \uC801\uC744 \uC81C\uC555\uD558\uB294 \uD074\uB798\uC2A4"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 402b6704ec910ac498580b7561efd295, type: 2}
   m_sharedMaterial: {fileID: 2100000, guid: a382f4dac5060a840bf02c5c3034c00a, type: 2}
@@ -15775,7 +15764,7 @@ MonoBehaviour:
   m_fontSizeMax: 72
   m_fontStyle: 0
   m_HorizontalAlignment: 1
-  m_VerticalAlignment: 512
+  m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_wordSpacing: 0
@@ -15805,7 +15794,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: -247.43741, w: 0}
+  m_margin: {x: 0, y: 0, z: -247.43741, w: -72.6275}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0

@@ -62320,6 +62320,7 @@ MonoBehaviour:
   MoveSpeed: 5
   KnockbackDamping: 5
   KnockbackFactor: 1
+  moveIndicatorPrefab: {fileID: 3744133877081091469, guid: fb52422b677d6854fbb50e37433fd5bb, type: 3}
 --- !u!114 &330592031979261645
 MonoBehaviour:
   m_ObjectHideFlags: 0
