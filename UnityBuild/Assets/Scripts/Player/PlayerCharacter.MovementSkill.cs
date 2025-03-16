@@ -2,6 +2,7 @@ using System.Collections;
 using DataSystem;
 using DataSystem.Database;
 using Interfaces;
+using kcp2k;
 using Mirror;
 using UnityEngine;
 
@@ -24,7 +25,7 @@ namespace Player
                     canMove = false;
                     playerUI?.UseSkill(0, movementSkill.cooldown);
                     CmdTriggerAnimation("isMoveSkill");
-                    
+
                     Vector3 targetPos = Vector3.zero;
                     if (moveKeyboard.magnitude > 0.1f)
                     {
@@ -37,7 +38,7 @@ namespace Player
                         float moveDistance = Mathf.Min(distanceToTarget, movementSkill.maxDistance);
                         targetPos = transform.position + direction * moveDistance;
                     }
-
+                    
                     CmdUseMovementSkill(targetPos);
                 }
             }
@@ -79,7 +80,7 @@ namespace Player
 
             float elapsed = 0f;
             Vector3 startPosition = transform.position;
-
+            
             while (elapsed < moveDuration)
             {
                 elapsed += Time.deltaTime;

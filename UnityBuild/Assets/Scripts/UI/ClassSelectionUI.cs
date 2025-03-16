@@ -3,6 +3,7 @@ using DataSystem;
 using DataSystem.Database;
 using GameManagement;
 using Player;
+using Mirror;
 
 public class ClassSelectionUI : MonoBehaviour
 {
