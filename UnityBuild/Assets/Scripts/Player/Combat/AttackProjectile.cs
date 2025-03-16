@@ -28,7 +28,7 @@ namespace Player
         [SerializeField] private List<Constants.SkillEffectGameObjectEntry> skilleffectList = new List<Constants.SkillEffectGameObjectEntry>();
         private Dictionary<Constants.SkillType, GameObject> skillEffects;
 
-        [SyncVar] private GameObject owner;
+        [SyncVar] protected GameObject owner;
         private bool isExplode = false;
 
         public void SetProjectileData(float damage, float speed, float radius, float range, float lifeTime, float knockback, AttackConfig config, GameObject owner)
@@ -103,7 +103,7 @@ namespace Player
             }
         }
 
-        protected void OnTriggerEnter(Collider col)
+        protected virtual void OnTriggerEnter(Collider col)
         {
             if (!isServer) return;
             
@@ -123,7 +123,7 @@ namespace Player
             }
         }
 
-        protected void Explode()
+        protected virtual void Explode()
         {
             // ✅ 공격별 파티클 효과 적용
             if (attackConfig != null)
