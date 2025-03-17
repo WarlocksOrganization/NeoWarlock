@@ -1,5 +1,6 @@
 using DataSystem;
 using DataSystem.Database;
+using GameManagement;
 using Player;
 using TMPro;
 using UnityEngine;
@@ -9,6 +10,7 @@ public class PlayerPanel : MonoBehaviour
 {
     [SerializeField] private Image playerImage;
     [SerializeField] private TMP_Text playerName;
+    [SerializeField] private Image backGround;
     public void Setup(PlayerCharacter playerCharacter)
     {
         if (playerCharacter.PLayerCharacterClass != Constants.CharacterClass.None)
@@ -16,6 +18,7 @@ public class PlayerPanel : MonoBehaviour
             playerImage.sprite = Database.GetCharacterClassData(playerCharacter.PLayerCharacterClass).CharacterIcon;
         }
         playerName.text = playerCharacter.nickname;
+        playerName.color = PlayerSetting.PlayerNum == playerCharacter.playerNumber ? Color.yellow : Color.white;
         playerImage.color = playerCharacter.isDead ? new Color(1,0,0,0.5f) : Color.white;
     }
 }

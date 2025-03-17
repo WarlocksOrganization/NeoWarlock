@@ -143,7 +143,7 @@ namespace Networking
             }
 
             Debug.Log("[RoomManager] 모든 플레이어가 준비되었습니다. 게임을 시작합니다!");
-            ServerChangeScene(GameplayScene);
+            //ServerChangeScene(GameplayScene);
         }
     }
 }
