@@ -11,10 +11,10 @@ using UnityEngine.UI;
 public class GameLobbyUI : MonoBehaviour
 {
     public TMP_Text RoomNameText;
-    [SerializeField] private TMP_Text PlayerInRoonText;
-    [SerializeField] private GameObject PlayerSelection;
-    [SerializeField] private Button StartGameButton; // ✅ 게임 시작 버튼
-    [SerializeField] private PlayerStatusUI PlayerStatusUI;
+    [SerializeField] protected TMP_Text PlayerInRoonText;
+    [SerializeField] protected GameObject PlayerSelection;
+    [SerializeField] protected Button StartGameButton; // ✅ 게임 시작 버튼
+    [SerializeField] protected PlayerStatusUI playerStatusUI;
 
     public GameObject[] PlayerCharacters;
 
@@ -35,13 +35,14 @@ public class GameLobbyUI : MonoBehaviour
     public virtual void UpdatePlayerInRoon()
     {
         // ✅ 현재 씬에서 모든 PlayerCharacter 찾기
-        PlayerCharacter[] foundCharacters = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None);
-
-        // ✅ netId 기준으로 정렬
-        PlayerCharacters = foundCharacters
+        PlayerCharacter[] foundCharacters = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None)
             .OrderBy(player => player.GetComponent<NetworkIdentity>().netId)
+            .ToArray();
+        
+        PlayerCharacters = foundCharacters
             .Select(player => player.gameObject) // GameObject만 배열에 저장
             .ToArray();
+
 
         // ✅ 본인의 플레이어 번호 찾기
         var myPlayer = foundCharacters.FirstOrDefault(p => p.isOwned);
@@ -60,7 +61,7 @@ public class GameLobbyUI : MonoBehaviour
             PlayerInRoonText.text = $"현재 인원 {PlayerCharacters.Length} / {maxPlayers}";
         }
         
-        PlayerStatusUI.Setup(foundCharacters);
+        playerStatusUI.Setup(foundCharacters);
     }
     
     // ✅ 방장인지 확인 후 버튼 활성화

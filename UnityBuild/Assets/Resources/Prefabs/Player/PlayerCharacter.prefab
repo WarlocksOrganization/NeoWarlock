@@ -72079,6 +72079,7 @@ MonoBehaviour:
   cameraOffset: 0.5
   maxCameraDistance: 3
   playerModel: {fileID: 8923555865260731763}
+  PLayerCharacterClass: 100
   mageModel:
   - {fileID: 7575407196124798075}
   - {fileID: 4828674198463670580}
@@ -72121,9 +72122,11 @@ MonoBehaviour:
   mouseTargetLayer:
     serializedVersion: 2
     m_Bits: 8
+  isDead: 1
   animator: {fileID: 5766581736010466980}
   attackTransform: {fileID: 2138096227263670792}
   playerHUD: {fileID: 7880346224794796878}
+  floatingDamageTextPrefab: {fileID: 7419919620569818252, guid: e91df33ee3e256a4d80b9260a3d087e4, type: 3}
   MaxSpeed: 5
   MoveSpeed: 5
   KnockbackDamping: 5

@@ -10,6 +10,7 @@ namespace Player
     public partial class PlayerCharacter : IDamagable
     {
         [SerializeField] private PlayerHUD playerHUD;
+        [SerializeField] private GameObject floatingDamageTextPrefab;
 
         [SyncVar(hook = nameof(OnHpChanged))] // ✅ Hook 추가
         private int curHp = 300;
@@ -43,6 +44,7 @@ namespace Player
 
         public void DecreaseHp(int damage)
         {
+            if(curHp <= 0) return;
             curHp -= damage;
             curHp = Mathf.Clamp(curHp, 0, maxHp);
             if (curHp == 0)
@@ -70,11 +72,20 @@ namespace Player
         // ✅ SyncVar Hook을 사용하여 UI 자동 업데이트
         private void OnHpChanged(int oldHp, int newHp)
         {
+            ShowFloatingDamageText(oldHp-newHp);
             playerHUD.SetHpBar((float)newHp / maxHp);
             if (newHp == 0)
             {
                 playerHUD.GetComponent<CanvasGroup>().alpha = 0;
             }
+        }
+        
+        private void ShowFloatingDamageText(int damage)
+        {
+            if (floatingDamageTextPrefab == null) return;
+
+            GameObject damageTextInstance = Instantiate(floatingDamageTextPrefab, transform.position, Quaternion.identity);
+            damageTextInstance.GetComponent<FloatingDamageText>().SetDamageText(damage);
         }
         
         [ClientRpc]

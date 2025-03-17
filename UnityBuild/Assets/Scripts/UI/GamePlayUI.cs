@@ -8,7 +8,6 @@ using UnityEngine;
 
 public class GamePlayUI : GameLobbyUI
 {
-    [SerializeField] private TMP_Text PlayerInRoonText; 
     public override void UpdatePlayerInRoon()
     {
         // ✅ 현재 씬에서 모든 PlayerCharacter 찾기
@@ -16,7 +15,7 @@ public class GamePlayUI : GameLobbyUI
 
         // ✅ netId 기준으로 정렬
         PlayerCharacters = foundCharacters
-            .OrderBy(player => player.playerNumber)
+            .OrderBy(player => player.GetComponent<NetworkIdentity>().netId)
             .Select(player => player.gameObject) // GameObject만 배열에 저장
             .ToArray();
 
@@ -36,5 +35,7 @@ public class GamePlayUI : GameLobbyUI
             int maxPlayers = gameRoomData.maxPlayerCount; // ✅ 최대 인원 가져오기
             PlayerInRoonText.text = $"현재 인원 {PlayerCharacters.Length} / {maxPlayers}";
         }
+        
+        playerStatusUI.Setup(foundCharacters);
     }
 }
