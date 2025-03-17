@@ -17,6 +17,8 @@ public class GameLobbyUI : MonoBehaviour
 
     public GameObject[] PlayerCharacters;
 
+    private int hostNum = 0;
+
     private void Start()
     {
         if (NetworkClient.active)
@@ -58,12 +60,15 @@ public class GameLobbyUI : MonoBehaviour
             int maxPlayers = gameRoomData.maxPlayerCount; // ✅ 최대 인원 가져오기
             PlayerInRoonText.text = $"현재 인원 {PlayerCharacters.Length} / {maxPlayers}";
         }
+
+        // ✅ 방장인지 확인 후 버튼 활성화
+        CheckIfHost(PlayerSetting.PlayerNum);
     }
     
     // ✅ 방장인지 확인 후 버튼 활성화
-    private void CheckIfHost()
-    {
-        if (NetworkServer.active) // ✅ 방장인지 확인
+    private void CheckIfHost(int playerNum = -1)
+    {   
+        if (NetworkServer.active || playerNum == hostNum) // ✅ 방장인지 확인
         {
             StartGameButton.gameObject.SetActive(true);
             StartGameButton.onClick.AddListener(StartGame); // ✅ 버튼 클릭 이벤트 추가
@@ -82,5 +87,5 @@ public class GameLobbyUI : MonoBehaviour
             (NetworkManager.singleton as RoomManager).StartGame();
         }
     }
-
+    
 }

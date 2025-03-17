@@ -203,7 +203,7 @@ public class BuffSystem : NetworkBehaviour
     }
     private IEnumerator PowerBody(BuffData buffData)
     {
-        Debug.Log($"PowerBody: {buffData.duration}초 동안 부가 효과과 적용");
+        Debug.Log($"PowerBody: {buffData.duration}초 동안 부가 효과 적용");
         float elapsedTime = 0f;
         playerCharacter.KnockbackFactor -= 0.6f; // ✅ 넉백 감소
 
