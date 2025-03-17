@@ -12,14 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: df90348267cf8264a9dedab5a56b461f, type: 3}
   m_Name: InfernalFlaskConfig
   m_EditorClassIdentifier: 
-  attackType: 6
+  attackType: 1
   attackDelay: 0.5
   recoveryTime: 1
   attackDuration: 3
   attackInterval: 0.5
   animParameter: isAttack2
   attackTrans: {x: 0, y: 3, z: 0}
-  Prefab: {fileID: 322783647940636695, guid: 9e7978660a321064494a558c90f17597, type: 3}
+  Prefab: {fileID: 322783647940636695, guid: 37f2acf25e527df43a982a902e47a741, type: 3}
   explosionEffectPrefab: {fileID: 5412338807302183837, guid: 49b0b289a6b5c634c81eb0bfb7c92e6c, type: 3}
   skillType: 11
-  appliedBuff: {fileID: 0}
+  appliedBuff: {fileID: 11400000, guid: 3eff55e79ffb3084182b47098b4fea47, type: 2}

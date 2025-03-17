@@ -14,7 +14,7 @@ namespace Player
     public partial class PlayerCharacter
     {
         [SyncVar(hook = nameof(OnCharacterClassChanged))]
-        private Constants.CharacterClass PLayerCharacterClass = Constants.CharacterClass.None; // ✅ 직업 동기화
+        public Constants.CharacterClass PLayerCharacterClass = Constants.CharacterClass.None; // ✅ 직업 동기화
 
         [SyncVar(hook = nameof(OnMoveSkillChanged))]
         private Constants.SkillType MoveSkill = Constants.SkillType.None; // ✅ 이동 스킬 동기화
@@ -48,6 +48,12 @@ namespace Player
         [Command]
         public void CmdSetCharacterData(Constants.CharacterClass newClass, Constants.SkillType newMoveSkill, int[] newAttackSkills)
         {
+            if (!NetworkClient.active)
+            {
+                OnCharacterClassChanged(PLayerCharacterClass, newClass);
+                OnMoveSkillChanged(MoveSkill, newMoveSkill);
+                OnAttackSkillsChanged(AttackSkills, newAttackSkills);
+            }
             PLayerCharacterClass = newClass;
             MoveSkill = newMoveSkill;
             AttackSkills = newAttackSkills;
@@ -62,6 +68,7 @@ namespace Player
             }
             animator.SetFloat("Blend", (int)newClass);
             ApplyCharacterClass(newClass);
+            UpdateCount();
         }
 
         private void ApplyCharacterClass(Constants.CharacterClass newClass)
@@ -100,6 +107,7 @@ namespace Player
             if (isOwned && playerUI == null)
             {
                 playerUI = FindFirstObjectByType<PlayerCharacterUI>();
+                lastMovementSkillTime = -Mathf.Infinity;
             }
         }
 

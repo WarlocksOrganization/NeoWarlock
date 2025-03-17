@@ -91,11 +91,17 @@ namespace Player.Combat
 
             else if (currentAttack is ProjectileAttack || currentAttack is SelfAttack)
             {
+                
                 distance = currentAttack.GetAttackData().Range;
                 decalProjector.material = arrowMaterial;
 
+                if (distance <= 1f)
+                {
+                    CloseProjectile();
+                }
+
                 // Projector 크기 설정 (Y축 길이를 distance에 맞춰 동적으로 변경)
-                decalProjector.size = new Vector3(1f, distance, 3f);
+                decalProjector.size = new Vector3(currentAttack.GetAttackData().Radius, distance, 3f);
 
                 if (arrowMaterial != null)
                 {

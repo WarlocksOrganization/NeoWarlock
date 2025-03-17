@@ -28,9 +28,10 @@ namespace Player
         [SerializeField] private List<Constants.SkillEffectGameObjectEntry> skilleffectList = new List<Constants.SkillEffectGameObjectEntry>();
         private Dictionary<Constants.SkillType, GameObject> skillEffects;
 
-        [SyncVar] private GameObject owner;
+        [SyncVar] protected GameObject owner;
+        private bool isExplode = false;
 
-        public void SetProjectileData(float damage, float speed, float radius, float range, float lifeTime, float knockback, AttackConfig config, GameObject owner = null)
+        public void SetProjectileData(float damage, float speed, float radius, float range, float lifeTime, float knockback, AttackConfig config, GameObject owner)
         {
             this.damage = damage;
             this.speed = speed;
@@ -80,6 +81,26 @@ namespace Player
             Invoke(nameof(DestroySelf), lifeTime);
         }
 
+        public override void OnStartServer()
+        {
+            base.OnStartServer();
+    
+            if (NetworkClient.active)
+            {
+                return; // 호스트 모드라면 종료
+            }
+
+            moveDirection = transform.forward;
+            rb = GetComponent<Rigidbody>();
+
+            if (rb != null)
+            {
+                StartCoroutine(MoveProjectile()); // ✅ MovePosition을 이용한 이동 처리
+            }
+            
+            Invoke(nameof(DestroySelf), lifeTime);
+        } 
+
         protected System.Collections.IEnumerator MoveProjectile()
         {
             while (true)
@@ -102,24 +123,7 @@ namespace Player
             }
         }
 
-        protected void OnCollisionEnter(Collision col)
-        {
-            if (!isServer) return;
-            if ((layerMask.value & (1 << col.gameObject.layer)) == 0) return;
-            // ✅ 근접 공격은 공격자와 동일한 레이어에 속한 대상은 무시
-            if (this.attackConfig.attackType is Constants.AttackType.Self)
-            {
-                if (col.gameObject != this.owner) return;
-            }
-            else
-            {
-                if(col.gameObject == this.owner) return;
-            } 
-            Debug.Log("OnCollisionEnter");
-            Explode();
-        }
-
-        protected void OnTriggerEnter(Collider col)
+        protected virtual void OnTriggerEnter(Collider col)
         {
             if (!isServer) return;
             
@@ -129,20 +133,29 @@ namespace Player
             }
             else
             {
+                if ((layerMask & (1 << col.gameObject.layer)) == 0) return;
                 if(col.gameObject == this.owner) return;
             }
-            Debug.Log("OnTriggerEnter");
-            Explode();
+            if (!isExplode)
+            {
+                isExplode = true;
+                Explode();
+            }
         }
 
-        protected void Explode()
+        protected virtual void Explode()
         {
             // ✅ 공격별 파티클 효과 적용
             if (attackConfig != null)
             {
                 // 1️⃣ 레이캐스트를 이용하여 지형이나 충돌 가능한 오브젝트 위에서 폭발 위치 설정
+
                 Vector3 explosionPosition = transform.position + Vector3.up * 2f; // 기본적으로 살짝 위에서 시작
-                if (Physics.Raycast(transform.position + Vector3.up * 5f, Vector3.down, out RaycastHit hit, 10f, layerMask))
+                if (attackConfig.attackType == Constants.AttackType.Self || attackConfig.attackType == Constants.AttackType.Melee)
+                {
+                    explosionPosition.y -= 2f; // 근접 및 자기 공격은 발사 지점 고수
+                }
+                else if (Physics.Raycast(transform.position + Vector3.up * 5f, Vector3.down, out RaycastHit hit, 10f, layerMask))
                 {
                     explosionPosition = hit.point + Vector3.up * 0.1f; // 레이캐스트 충돌 지점 바로 위에서 생성
                 }

@@ -19,3 +19,5 @@ MonoBehaviour:
   endTime: 0.75
   maxDistance: 10
   skillIcon: {fileID: 21300000, guid: 001427cc48283e648822f2955d95f361, type: 3}
+  skillName: "\uC21C\uAC04\uC774\uB3D9"
+  Description: "\uC9E7\uC740 \uAC70\uB9AC\uB85C \uC21C\uAC04\uC774\uB3D9\uD569\uB2C8\uB2E4."

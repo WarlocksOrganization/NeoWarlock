@@ -114,7 +114,7 @@ public class PlayerSelectArea : MonoBehaviour
         // 추가 : 캐릭터 별 스킬 정보 전달
         if (characterSelectionManager != null)
         {
-            characterSelectionManager.SelectCharacter(selectedClass.ToString());
+            characterSelectionManager.SelectCharacter(selectedClass);
         }
         else
         {

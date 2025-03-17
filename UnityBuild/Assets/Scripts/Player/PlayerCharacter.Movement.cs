@@ -26,6 +26,8 @@ namespace Player
         
         private Vector3 gravityVelocity = Vector3.zero; // ✅ 중력 가속도를 저장할 변수
         private float gravity = -9.81f; // ✅ Unity 기본 중력 값
+        
+        public GameObject moveIndicatorPrefab; // ✅ 이동 위치를 표시할 이펙트 프리팹
 
         public void Move()
         {
@@ -35,11 +37,11 @@ namespace Player
             ApplyKnockbackMovement(); // ✅ 넉백 감속 유지
             finalMove += _knockbackDirection;
 
+            HandleMouseMovement();
             // ✅ 캐릭터 이동만 차단, 넉백은 계속 적용됨
             if (attackLockTime <= 0 && canMove)
             {
                 HandleKeyboardMovement();
-                HandleMouseMovement();
                 finalMove += _moveDirection;
             }
 
@@ -108,10 +110,12 @@ namespace Player
                 {
                     _targetPosition = hit.point;
                     isMovingToTarget = true;
+                    
+                    // ✅ 이동 위치 이펙트 표시
+                    ShowMoveIndicator(_targetPosition);
                 }
             }
-
-            if (isMovingToTarget)
+            if (isMovingToTarget && attackLockTime <= 0 && canMove)
             {
                 MoveTowardsTarget();
             }
@@ -165,6 +169,17 @@ namespace Player
         private void OnMoveSpeedChanged(float oldValue, float newValue)
         {
             MoveSpeed = newValue;
+        }
+        
+        // ✅ 이동 위치 이펙트 생성 함수
+        private void ShowMoveIndicator(Vector3 position)
+        {
+            if (moveIndicatorPrefab == null) return; // 프리팹이 없으면 실행 X
+
+            GameObject moveIndicatorInstance = Instantiate(moveIndicatorPrefab, position + Vector3.up * 0.1f, Quaternion.identity);
+
+            // ✅ 1초 후 자동 삭제 (파티클을 사용하면 따로 제거할 필요 없음)
+            Destroy(moveIndicatorInstance, 1f);
         }
     }
 }

@@ -60,7 +60,7 @@ namespace Player.Combat
             }
         }
 
-        protected void CreateParticleEffect()
+        protected virtual GameObject CreateParticleEffect()
         {
             // ✅ 서버에서 파티클 효과 생성
             if (explosionEffectPrefab != null)
@@ -68,7 +68,10 @@ namespace Player.Combat
                 GameObject effect = Instantiate(explosionEffectPrefab, transform.position, Quaternion.identity);
                 effect.GetComponent<AttackParticle>().SetAttackParticleData(config.skillType);
                 NetworkServer.Spawn(effect); // ✅ 네트워크에 동기화
+                return effect;
             }
+
+            return null;
         }
 
         protected IEnumerator AutoDestroy()

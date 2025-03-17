@@ -11,15 +11,19 @@ using UnityEngine.UI;
 public class GameLobbyUI : MonoBehaviour
 {
     public TMP_Text RoomNameText;
-    public TMP_Text PlayerInRoonText;
-    [SerializeField] private GameObject PlayerSelection;
-    [SerializeField] private Button StartGameButton; // ✅ 게임 시작 버튼
+    [SerializeField] protected TMP_Text PlayerInRoonText;
+    [SerializeField] protected GameObject PlayerSelection;
+    [SerializeField] protected Button StartGameButton; // ✅ 게임 시작 버튼
+    [SerializeField] protected PlayerStatusUI playerStatusUI;
 
     public GameObject[] PlayerCharacters;
 
     private void Start()
     {
-        PlayerSelection.SetActive(true);
+        if (NetworkClient.active)
+        {
+            PlayerSelection.SetActive(true);
+        }
         CheckIfHost();
     }
 
@@ -28,16 +32,17 @@ public class GameLobbyUI : MonoBehaviour
         PlayerSelection.SetActive(true);
     }
 
-    public void UpdatePlayerInRoon()
+    public virtual void UpdatePlayerInRoon()
     {
         // ✅ 현재 씬에서 모든 PlayerCharacter 찾기
-        PlayerCharacter[] foundCharacters = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None);
-
-        // ✅ netId 기준으로 정렬
-        PlayerCharacters = foundCharacters
+        PlayerCharacter[] foundCharacters = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None)
             .OrderBy(player => player.GetComponent<NetworkIdentity>().netId)
+            .ToArray();
+        
+        PlayerCharacters = foundCharacters
             .Select(player => player.gameObject) // GameObject만 배열에 저장
             .ToArray();
+
 
         // ✅ 본인의 플레이어 번호 찾기
         var myPlayer = foundCharacters.FirstOrDefault(p => p.isOwned);
@@ -55,6 +60,8 @@ public class GameLobbyUI : MonoBehaviour
             int maxPlayers = gameRoomData.maxPlayerCount; // ✅ 최대 인원 가져오기
             PlayerInRoonText.text = $"현재 인원 {PlayerCharacters.Length} / {maxPlayers}";
         }
+        
+        playerStatusUI.Setup(foundCharacters);
     }
     
     // ✅ 방장인지 확인 후 버튼 활성화
@@ -72,7 +79,7 @@ public class GameLobbyUI : MonoBehaviour
     }
 
     // ✅ 방장이 게임 시작 버튼을 클릭하면 실행
-    public void StartGame()
+    private void StartGame()
     {
         if (NetworkServer.active) // ✅ 방장인지 확인
         {

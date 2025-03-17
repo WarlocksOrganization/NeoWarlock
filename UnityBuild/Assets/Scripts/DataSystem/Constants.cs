@@ -9,6 +9,7 @@ namespace DataSystem
         public static readonly string ConfigPath = "Configs/AttackConfigs/";
         public static readonly string MovementConfigPath = "Configs/MoveSkillConfigs";
         public static readonly string IconPath = "Sprites/AttackIcons/";
+        public static readonly string ClassIconPath = "Sprites/ClassIcons/";
         public static readonly string CardIconPath = "Sprites/CardIcons/";
         
         public enum RoomType
@@ -70,9 +71,10 @@ namespace DataSystem
             Charge,
             ThunderStorm,
             FreezeArea,
-            VenomArrow,
+            IceArrow,
             PoisonSpore,
             Starfall,
+            Dash,
             None = 100,
         }
         
