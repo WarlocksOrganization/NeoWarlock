@@ -46,13 +46,14 @@ namespace DataSystem.Database
                 string characterName = columns[5];
                 string characterDescription = columns[6];
                 int characterAtk = int.Parse(columns[7]);
-                int characterHp =int.Parse(columns[8]);
+                int characterHp = int.Parse(columns[8]);
                 int characterSpeed = int.Parse(columns[9]);
                 int characterKnock = int.Parse(columns[10]);
 
                 CharacterClassData data = new()
                 {
                     CharacterClass = characterClass,
+                    CharacterIcon = Resources.Load<Sprite>(Constants.ClassIconPath + characterClass + "_icon"),
                     AttackSkillIds = new List<int> { skill1, skill2, skill3 },
                     MovementSkillType = movementSkill,
                     CharacterName = characterName,
@@ -72,6 +73,7 @@ namespace DataSystem.Database
         public class CharacterClassData
         {
             public Constants.CharacterClass CharacterClass;
+            public Sprite CharacterIcon; // 자동 생성된 아이콘 필드
             public List<int> AttackSkillIds = new();
             public Constants.SkillType MovementSkillType;
             public string CharacterName;

@@ -14,7 +14,7 @@ namespace Player
     public partial class PlayerCharacter
     {
         [SyncVar(hook = nameof(OnCharacterClassChanged))]
-        private Constants.CharacterClass PLayerCharacterClass = Constants.CharacterClass.None; // ✅ 직업 동기화
+        public Constants.CharacterClass PLayerCharacterClass = Constants.CharacterClass.None; // ✅ 직업 동기화
 
         [SyncVar(hook = nameof(OnMoveSkillChanged))]
         private Constants.SkillType MoveSkill = Constants.SkillType.None; // ✅ 이동 스킬 동기화
@@ -68,6 +68,7 @@ namespace Player
             }
             animator.SetFloat("Blend", (int)newClass);
             ApplyCharacterClass(newClass);
+            UpdateCount();
         }
 
         private void ApplyCharacterClass(Constants.CharacterClass newClass)
