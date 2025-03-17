@@ -35,7 +35,7 @@ namespace Player
                     RpcTriggerAnimation("isHit"); 
                 }
 
-                if (attackConfig.appliedBuff != null)
+                if (attackConfig != null && attackConfig.appliedBuff != null)
                 {
                     ApplyBuffFromAttack(attackConfig.appliedBuff);
                 }
