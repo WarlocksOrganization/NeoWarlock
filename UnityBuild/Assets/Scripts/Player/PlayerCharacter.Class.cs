@@ -48,6 +48,12 @@ namespace Player
         [Command]
         public void CmdSetCharacterData(Constants.CharacterClass newClass, Constants.SkillType newMoveSkill, int[] newAttackSkills)
         {
+            if (!NetworkClient.active)
+            {
+                OnCharacterClassChanged(PLayerCharacterClass, newClass);
+                OnMoveSkillChanged(MoveSkill, newMoveSkill);
+                OnAttackSkillsChanged(AttackSkills, newAttackSkills);
+            }
             PLayerCharacterClass = newClass;
             MoveSkill = newMoveSkill;
             AttackSkills = newAttackSkills;

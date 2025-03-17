@@ -56,7 +56,14 @@ namespace Player
         {
             if (buffSystem != null)
             {
-                buffSystem.CmdApplyBuff(buffData);
+                if (NetworkServer.active)
+                {
+                    buffSystem.ServerApplyBuff(buffData);
+                }
+                else
+                {
+                    buffSystem.CmdApplyBuff(buffData);
+                }
             }
         }
 

@@ -19,7 +19,10 @@ public class GameLobbyUI : MonoBehaviour
 
     private void Start()
     {
-        PlayerSelection.SetActive(true);
+        if (NetworkClient.active)
+        {
+            PlayerSelection.SetActive(true);
+        }
         CheckIfHost();
     }
 

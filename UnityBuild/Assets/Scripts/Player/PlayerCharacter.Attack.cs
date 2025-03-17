@@ -132,7 +132,10 @@ namespace Player
                 Debug.LogWarning($"[SetAvailableAttack] 공격 데이터를 가져오지 못했습니다. (SkillID: {skillId})");
             }
 
-            CmdSetAvailableAttack(index, skillId);
+            if (NetworkClient.active)
+            {
+                CmdSetAvailableAttack(index, skillId);
+            }
         }
 
 

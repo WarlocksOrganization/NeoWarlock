@@ -33,7 +33,29 @@ namespace Networking
                 Debug.Log($"[RoomManager] 방 생성: {roomName}, 유형: {roomType}, 최대 인원: {maxConnections}");
             }
         }
-        
+
+        public override void OnRoomStartServer()
+        {
+            base.OnRoomStartServer();
+
+            if (NetworkClient.active)
+            {
+                return; // 호스트 모드라면 종료
+            }
+
+            if (roomDataInstance == null && gameRoomDataPrefab != null)
+            {
+                roomDataInstance = Instantiate(gameRoomDataPrefab);
+                NetworkServer.Spawn(roomDataInstance.gameObject);
+
+                // 방 데이터 초기화
+                roomDataInstance.SetRoomData(roomName, roomType, maxPlayerCount);
+                maxConnections = maxPlayerCount;
+
+                Debug.Log($"[RoomManager] 방 생성: {roomName}, 유형: {roomType}, 최대 인원: {maxConnections}");
+            }
+        }
+
         public void StartGame()
         {
             if (roomSlots.Count < 1)

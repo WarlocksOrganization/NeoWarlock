@@ -40,6 +40,21 @@ public class BuffSystem : NetworkBehaviour
         activeBuffs[buffData.BuffType] = buffCoroutine;
     }
 
+    public void ServerApplyBuff(BuffData buffData)
+    {
+        if (activeBuffs.ContainsKey(buffData.BuffType))
+        {
+            StopCoroutine(activeBuffs[buffData.BuffType]);
+            activeBuffs.Remove(buffData.BuffType);
+        }
+
+        // ✅ 클라이언트에서 버프 이펙트 실행
+        RpcPlayBuffEffect(buffData.BuffType, true);
+
+        Coroutine buffCoroutine = StartCoroutine(ApplyBuff(buffData));
+        activeBuffs[buffData.BuffType] = buffCoroutine;
+    }
+
     [ClientRpc]
     private void RpcPlayBuffEffect(Constants.BuffType buffType, bool isActive)
     {
