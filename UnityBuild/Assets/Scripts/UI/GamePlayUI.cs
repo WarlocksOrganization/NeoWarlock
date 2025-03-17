@@ -4,10 +4,15 @@ using GameManagement;
 using Mirror;
 using Player;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class GamePlayUI : GameLobbyUI
 {
+    private new  void Start()
+    {
+        
+    }
     public override void UpdatePlayerInRoon()
     {
         // ✅ 현재 씬에서 모든 PlayerCharacter 찾기
