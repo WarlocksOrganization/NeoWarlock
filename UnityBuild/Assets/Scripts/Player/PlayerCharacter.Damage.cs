@@ -12,9 +12,9 @@ namespace Player
         [SerializeField] private PlayerHUD playerHUD;
 
         [SyncVar(hook = nameof(OnHpChanged))] // ✅ Hook 추가
-        private int curHp = 500;
+        private int curHp = 300;
 
-        [SyncVar] private int maxHp = 500;
+        [SyncVar] private int maxHp = 300;
         
         public void takeDamage(int damage, Vector3 attackTran, float knockbackForce, AttackConfig attackConfig)
         {

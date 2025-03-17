@@ -14,7 +14,7 @@ namespace Player
         [SyncVar(hook = nameof(SetNickname_Hook))]
         public string nickname;
         [SerializeField] private TMP_Text nicknameText;
-        [SyncVar] public int playerNumber = -1;
+        [SyncVar(hook = nameof(UpdatePlayerNumber))] public int playerNumber = -1;
         private CharacterController _characterController;
         private CinemachineVirtualCamera virtualCamera;
         private BuffSystem buffSystem;
@@ -24,7 +24,7 @@ namespace Player
         [SerializeField] private LayerMask mouseTargetLayer;
         
         [SyncVar(hook = nameof(SetIsDead_Hook))]
-        private bool isDead = true;
+        public bool isDead = true;
         
         [SerializeField] private Animator animator;
         
@@ -43,12 +43,8 @@ namespace Player
 
         public virtual void Start()
         {
-            
-            GameLobbyUI gameLobbyUI = FindFirstObjectByType<GameLobbyUI>();
-            if (gameLobbyUI != null)
-            {
-                gameLobbyUI.UpdatePlayerInRoon();
-            }
+
+            UpdateCount();
             
             if (isOwned)
             {
@@ -63,6 +59,25 @@ namespace Player
                 {
                     Debug.Log("playerUI가 없음");
                 }
+            }
+        }
+
+        private void OnDestroy()
+        {
+            UpdateCount();
+        }
+
+        private void UpdatePlayerNumber(int oldValue, int newValue)
+        {
+            UpdateCount();
+        }
+
+        private void UpdateCount()
+        {
+            GameLobbyUI gameLobbyUI = FindFirstObjectByType<GameLobbyUI>();
+            if (gameLobbyUI != null)
+            {
+                gameLobbyUI.UpdatePlayerInRoon();
             }
         }
 
@@ -133,6 +148,7 @@ namespace Player
         {
             isDead = newValue;
             _characterController.enabled = !newValue;
+            UpdateCount();
         }
     }
 }

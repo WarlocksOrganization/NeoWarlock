@@ -11,9 +11,10 @@ using UnityEngine.UI;
 public class GameLobbyUI : MonoBehaviour
 {
     public TMP_Text RoomNameText;
-    public TMP_Text PlayerInRoonText;
+    [SerializeField] private TMP_Text PlayerInRoonText;
     [SerializeField] private GameObject PlayerSelection;
     [SerializeField] private Button StartGameButton; // ✅ 게임 시작 버튼
+    [SerializeField] private PlayerStatusUI PlayerStatusUI;
 
     public GameObject[] PlayerCharacters;
 
@@ -31,7 +32,7 @@ public class GameLobbyUI : MonoBehaviour
         PlayerSelection.SetActive(true);
     }
 
-    public void UpdatePlayerInRoon()
+    public virtual void UpdatePlayerInRoon()
     {
         // ✅ 현재 씬에서 모든 PlayerCharacter 찾기
         PlayerCharacter[] foundCharacters = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None);
@@ -58,6 +59,8 @@ public class GameLobbyUI : MonoBehaviour
             int maxPlayers = gameRoomData.maxPlayerCount; // ✅ 최대 인원 가져오기
             PlayerInRoonText.text = $"현재 인원 {PlayerCharacters.Length} / {maxPlayers}";
         }
+        
+        PlayerStatusUI.Setup(foundCharacters);
     }
     
     // ✅ 방장인지 확인 후 버튼 활성화
@@ -75,7 +78,7 @@ public class GameLobbyUI : MonoBehaviour
     }
 
     // ✅ 방장이 게임 시작 버튼을 클릭하면 실행
-    public void StartGame()
+    private void StartGame()
     {
         if (NetworkServer.active) // ✅ 방장인지 확인
         {
