@@ -77,8 +77,8 @@ namespace UI
             manager.roomType = roomData.roomType;
             manager.maxPlayerCount = roomData.maxPlayerCount;
 
-            //manager.StartHost(); // 새로운 방 생성
-            manager.StartServer(); // (Debug) 새로운 서버 생성
+            manager.StartHost(); // 새로운 방 생성
+            //manager.StartServer(); // (Debug) 새로운 서버 생성
     
             Debug.Log($"방 생성 완료: {roomData.roomName}, 유형: {roomData.roomType}, 최대 인원: {roomData.maxPlayerCount}");
         }
