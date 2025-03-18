@@ -8558,7 +8558,7 @@ MonoBehaviour:
   onlineScene: Assets/Scenes/GameRoom.unity
   offlineSceneLoadDelay: 0
   transport: {fileID: 638222529}
-  networkAddress: localhost
+  networkAddress: j12a509.p.ssafy.io
   maxConnections: 100
   disconnectInactiveConnections: 0
   disconnectInactiveTimeout: 60
@@ -8631,7 +8631,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b0fecffa3f624585964b0d0eb21b18e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  port: 7777
+  port: 40000
   DualMode: 1
   NoDelay: 1
   Interval: 10
