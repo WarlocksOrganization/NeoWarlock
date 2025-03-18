@@ -13,9 +13,9 @@ namespace Player
         [SerializeField] private GameObject floatingDamageTextPrefab;
 
         [SyncVar(hook = nameof(OnHpChanged))] // ✅ Hook 추가
-        private int curHp = 100;
+        private int curHp = 150;
 
-        [SyncVar] private int maxHp = 100;
+        [SyncVar] private int maxHp = 150;
 
         [SyncVar] private int attackPlayersId = -1;
         
