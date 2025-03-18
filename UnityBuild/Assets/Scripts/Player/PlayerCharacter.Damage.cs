@@ -44,9 +44,19 @@ namespace Player
 
         public void DecreaseHp(int damage)
         {
-            if(curHp <= 0) return;
-            curHp -= damage;
-            curHp = Mathf.Clamp(curHp, 0, maxHp);
+            if (curHp <= 0) return;
+
+            if (damage > 0) // 🔹 체력 감소 (데미지 입음)
+            {
+                damage = Mathf.Min(damage, curHp); // 현재 체력보다 큰 데미지는 curHp만큼 감소
+            }
+            else if (damage < 0) // 🔹 체력 회복 (음수 데미지)
+            {
+                damage = Mathf.Max(damage, -(maxHp - curHp)); // maxHp 초과 회복 방지
+            }
+
+            curHp -= damage; // 🔹 체력 변경
+
             if (curHp == 0)
             {
                 SetIsDead(true);
