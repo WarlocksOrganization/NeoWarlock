@@ -14,13 +14,16 @@ namespace Player.Combat
         protected float knockbackForceFactor = 20f;
         protected float explosionDuration = 3f; // 지속 시간
         protected float explosionInterval = 0.5f; // 폭발 간격
+
+        protected int playerid;
+        protected int skillid;
         
         [SerializeField] protected GameObject explosionEffectPrefab; // ✅ 파티클 프리팹
         protected AttackConfig config;
 
         protected GameObject owner;
 
-        public void Initialize(float damage, float radius, float knockback, AttackConfig config, GameObject owner = null)
+        public void Initialize(float damage, float radius, float knockback, AttackConfig config, GameObject owner, int playerid, int skillid)
         {
             explosionDamage = damage;
             explosionRadius = radius;
@@ -32,6 +35,9 @@ namespace Player.Combat
             explosionEffectPrefab.transform.localScale = new Vector3(radius, radius, radius);
 
             this.owner = owner;
+            
+            this.playerid = playerid;
+            this.skillid = skillid;
         }
 
         public override void OnStartServer()
@@ -55,7 +61,7 @@ namespace Player.Combat
                     if (config.attackType == DataSystem.Constants.AttackType.Melee && hit.transform.gameObject == owner) continue;
                     if (config.attackType == DataSystem.Constants.AttackType.Self && hit.transform.gameObject != owner) continue;
                     // Debug.Log($"Damaging {hit.transform.gameObject.name}");
-                    damagable.takeDamage((int)explosionDamage, transform.position, knockbackForce, config);
+                    damagable.takeDamage((int)explosionDamage, transform.position, knockbackForce, config, playerid, skillid);
                 }
             }
         }

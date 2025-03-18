@@ -16,13 +16,14 @@ public class GamePlayUI : GameLobbyUI
     public override void UpdatePlayerInRoon()
     {
         // ✅ 현재 씬에서 모든 PlayerCharacter 찾기
-        PlayerCharacter[] foundCharacters = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None);
-
-        // ✅ netId 기준으로 정렬
-        PlayerCharacters = foundCharacters
+        foundCharacters = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None)
             .OrderBy(player => player.GetComponent<NetworkIdentity>().netId)
+            .ToArray();
+        
+        PlayerCharacters = foundCharacters
             .Select(player => player.gameObject) // GameObject만 배열에 저장
             .ToArray();
+
 
         // ✅ 본인의 플레이어 번호 찾기
         var myPlayer = foundCharacters.FirstOrDefault(p => p.isOwned);
@@ -38,7 +39,7 @@ public class GamePlayUI : GameLobbyUI
         if (gameRoomData != null)
         {
             int maxPlayers = gameRoomData.maxPlayerCount; // ✅ 최대 인원 가져오기
-            PlayerInRoonText.text = $"현재 인원 {PlayerCharacters.Length} / {maxPlayers}";
+            //PlayerInRoonText.text = $"현재 인원 {PlayerCharacters.Length} / {maxPlayers}";
         }
         
         playerStatusUI.Setup(foundCharacters);

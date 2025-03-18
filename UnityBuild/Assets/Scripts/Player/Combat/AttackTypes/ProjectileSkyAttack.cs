@@ -12,7 +12,7 @@ namespace Player.Combat
         }
 
         // ✅ lifeTime을 5초로 고정
-        public override void Execute(Vector3 mousePosition, Vector3 firePoint, GameObject owner)
+        public override void Execute(Vector3 mousePosition, Vector3 firePoint, GameObject owner, int playerid, int skillid)
         {
             Vector3 spawnPosition = GetSpawnPosition(firePoint);
             Vector3 direction = (mousePosition - spawnPosition).normalized;
@@ -30,7 +30,9 @@ namespace Player.Combat
                     5f, // ✅ 항상 5초로 고정
                     attackData.KnockbackForce,
                     attackData.config,
-                    owner
+                    owner,
+                    playerid,
+                    skillid
                 );
 
                 NetworkServer.Spawn(projectile);
