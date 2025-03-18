@@ -123,7 +123,7 @@
                 break;
 
                 case PlayerStatType.Special:
-                    cardTypeText.text = "스킬 승급";
+                    cardTypeText.text = $"<color=#FFD700>스킬 승급</color>";
                     skillIconImage.sprite = Database.GetAttackData(currentCard.AppliedSkillIndex+(int)PlayerSetting.PlayerCharacterClass*10+100).Icon;
                     cardIconFrame.sprite = goldIconFrame;
                     cardNameText.text = $"{SkillData[currentCard.AppliedSkillIndex].DisplayName}";
