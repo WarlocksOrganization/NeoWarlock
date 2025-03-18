@@ -15,6 +15,8 @@ namespace UI
         [SerializeField] private GameObject isSelectedImage;
         [SerializeField] private TMP_Text culText;
         [SerializeField] private Image frameImage; // 스킬버튼 프레임 이미지
+        
+        [SerializeField] private SkillButton skillButton;
 
         private float maxSkillCul;
         private float currentSkillCul;
@@ -24,11 +26,13 @@ namespace UI
         //private string skillDescription;  // 슬롯에 장착된 스킬 설명
         //private SkillDescriptionUI uiManager;
 
-        public void SetQuickSlotData(Sprite icon, float cooldown)
+        public void SetQuickSlotData(Sprite icon, float cooldown, string name, string description)
         {
             skinImage.sprite = icon;
             maxSkillCul = cooldown;
             currentSkillCul = 0.1f;
+            
+            skillButton.SetUp(name, description, icon);
         }
 
         //public void SetQuickSlotInfo(string name, string description)
@@ -103,18 +107,5 @@ namespace UI
             // 최종적으로 완전 투명하게 설정
             skillCulImage3.color = new Color(1, 1, 1, 0);
         }
-        //public void OnPointerEnter(PointerEventData eventData)
-        //{
-        //    if (!string.IsNullOrEmpty(skillName))
-        //    {
-        //        uiManager.ShowSkillDetail(skillName, skillDescription, transform.position);
-        //    }
-        //}
-
-        //// 마우스를 벗어났을 때 상세 정보 숨김
-        //public void OnPointerExit(PointerEventData eventData)
-        //{
-        //    uiManager.CloseSkillDetail();
-        //}
     }
 }

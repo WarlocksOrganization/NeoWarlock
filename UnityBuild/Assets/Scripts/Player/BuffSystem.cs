@@ -25,7 +25,7 @@ public class BuffSystem : NetworkBehaviour
     }
 
     [Command(requiresAuthority = false)]
-    public void CmdApplyBuff(BuffData buffData)
+    public void CmdApplyBuff(BuffData buffData, int attackPlayerId, int attackskillid)
     {
         if (activeBuffs.ContainsKey(buffData.BuffType))
         {
@@ -36,11 +36,11 @@ public class BuffSystem : NetworkBehaviour
         // ✅ 클라이언트에서 버프 이펙트 실행
         RpcPlayBuffEffect(buffData.BuffType, true);
 
-        Coroutine buffCoroutine = StartCoroutine(ApplyBuff(buffData));
+        Coroutine buffCoroutine = StartCoroutine(ApplyBuff(buffData, attackPlayerId, attackskillid));
         activeBuffs[buffData.BuffType] = buffCoroutine;
     }
 
-    public void ServerApplyBuff(BuffData buffData)
+    public void ServerApplyBuff(BuffData buffData, int attackPlayerId, int attackskillid)
     {
         if (activeBuffs.ContainsKey(buffData.BuffType))
         {
@@ -51,7 +51,7 @@ public class BuffSystem : NetworkBehaviour
         // ✅ 클라이언트에서 버프 이펙트 실행
         RpcPlayBuffEffect(buffData.BuffType, true);
 
-        Coroutine buffCoroutine = StartCoroutine(ApplyBuff(buffData));
+        Coroutine buffCoroutine = StartCoroutine(ApplyBuff(buffData, attackPlayerId, attackskillid));
         activeBuffs[buffData.BuffType] = buffCoroutine;
     }
 
@@ -64,14 +64,14 @@ public class BuffSystem : NetworkBehaviour
         }
     }
 
-    private IEnumerator ApplyBuff(BuffData buffData)
+    private IEnumerator ApplyBuff(BuffData buffData, int attackPlayerId, int attackskillid)
     {
         ApplyBuffEffect(buffData);
 
         // ✅ 지속 피해(DoT) 실행
         if (buffData.tickDamage > 0)
         {
-            StartCoroutine(TickDamage(buffData));
+            StartCoroutine(TickDamage(buffData, attackPlayerId, attackskillid));
         }
 
         // ✅ 강제 이동 실행
@@ -128,7 +128,7 @@ public class BuffSystem : NetworkBehaviour
         }
     }
 
-    private IEnumerator TickDamage(BuffData buffData)
+    private IEnumerator TickDamage(BuffData buffData, int attackPlayerId, int attackskillid)
     {
         float elapsedTime = 0f;
 
@@ -138,7 +138,7 @@ public class BuffSystem : NetworkBehaviour
 
             if (playerCharacter != null)
             {
-                playerCharacter.DecreaseHp(buffData.tickDamage); // ✅ 0.5초마다 지속 피해 적용
+                playerCharacter.DecreaseHp(buffData.tickDamage, attackPlayerId, attackskillid); // ✅ 0.5초마다 지속 피해 적용
             }
 
             elapsedTime += 0.5f;
@@ -210,7 +210,7 @@ public class BuffSystem : NetworkBehaviour
         while (elapsedTime < buffData.duration)
         {
             yield return new WaitForSeconds(0.5f);
-            playerCharacter.DecreaseHp(buffData.tickDamage); // ✅ 0.5초마다 체력 회복
+            playerCharacter.DecreaseHp(buffData.tickDamage, -1, -1); // ✅ 0.5초마다 체력 회복
             elapsedTime += 0.5f;
         }
 

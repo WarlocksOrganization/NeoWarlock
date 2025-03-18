@@ -4,27 +4,25 @@ using TMPro;
 
 public class SkillDescriptionUI : MonoBehaviour
 {
-    public GameObject skillDetailPanel;  // ������ �г�
-    public TextMeshProUGUI skillNameText; // ��ų �̸� ǥ��
-    public TextMeshProUGUI skillDescriptionText; // ��ų ���� ǥ��
+    public TextMeshProUGUI skillNameText;
+    public TextMeshProUGUI skillDescriptionText; 
+    public Image skillIcon;
 
-    void Start()
+    public void Setup(Sprite icon, string skillName, string skillDescription)
     {
-        skillDetailPanel.SetActive(false);
-    }
-
-    public void ShowSkillDetail(string skillName, string skillDescription, Vector3 buttonPosition)
-    {
+        skillIcon.sprite = icon;
         skillNameText.text = skillName;
         skillDescriptionText.text = skillDescription;
+    }
 
-        skillDetailPanel.transform.position = buttonPosition + new Vector3(480, 0, 0);
-
-        skillDetailPanel.SetActive(true);
+    public void ShowSkillDetail()
+    {
+        //transform.position = buttonPosition;
+        gameObject.SetActive(true);
     }
 
     public void CloseSkillDetail()
     {
-        skillDetailPanel.SetActive(false);
+        gameObject.SetActive(false);
     }
 }

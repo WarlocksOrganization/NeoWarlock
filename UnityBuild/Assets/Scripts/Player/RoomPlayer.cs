@@ -64,7 +64,7 @@ namespace Player
         [Command]
         public void CmdSetPlayerNumber(int PlayerNum)
         {
-            LobbyPlayer.playerNumber = PlayerNum;
+            LobbyPlayer.playerId = PlayerNum;
         }
         
         [Command]

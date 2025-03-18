@@ -16,7 +16,7 @@ namespace Player.Combat
             attackData = data;
         }
 
-        public virtual void Execute(Vector3 mousePosition, Vector3 firePoint, GameObject owner)
+        public virtual void Execute(Vector3 mousePosition, Vector3 firePoint, GameObject owner, int playerid, int skillid)
         {
             Debug.Log($"{attackData.Name} 공격 실행!");
         }

@@ -8,7 +8,6 @@ using DataSystem.Database;
 public class CharacterSelectionManager : MonoBehaviour
 {
     public Transform skillIconContainer;
-    public GameObject skillButtonPrefab;
 
     public TextMeshProUGUI characterName;
     public TextMeshProUGUI characterLine;

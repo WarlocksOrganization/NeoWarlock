@@ -65,6 +65,15 @@ public class PlayerSelectArea : MonoBehaviour
             activeCharacter.GetComponent<Animator>().SetBool("isSelect", false);
             SetLayerRecursively(activeCharacter.transform, defaultLayer); // 기존 캐릭터의 모든 자식 Layer 복구
         }
+        
+        if (characterSelectionManager != null)
+        {
+            characterSelectionManager.SelectCharacter(selectedClass);
+        }
+        else
+        {
+            Debug.LogError("❌ CharacterSelectionManager가 null입니다! PlayerSelectArea의 Inspector에서 연결했는지 확인하세요.");
+        }
 
         // ✅ 선택된 캐릭터 찾기
         if (characterModelDict.TryGetValue(selectedClass, out GameObject character))
@@ -111,15 +120,6 @@ public class PlayerSelectArea : MonoBehaviour
 
         // ✅ 최종 보정
         targetTransform.rotation = Quaternion.Euler(0, finalTargetAngle, 0);
-        // 추가 : 캐릭터 별 스킬 정보 전달
-        if (characterSelectionManager != null)
-        {
-            characterSelectionManager.SelectCharacter(selectedClass);
-        }
-        else
-        {
-            Debug.LogError("❌ CharacterSelectionManager가 null입니다! PlayerSelectArea의 Inspector에서 연결했는지 확인하세요.");
-        }
     }
 
 

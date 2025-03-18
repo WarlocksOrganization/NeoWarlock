@@ -17,8 +17,11 @@ public class GameLobbyUI : MonoBehaviour
     [SerializeField] protected PlayerStatusUI playerStatusUI;
 
     public GameObject[] PlayerCharacters;
+    protected PlayerCharacter[] foundCharacters;
 
     private int hostNum = 0;
+    
+    [SerializeField] protected KillLogUI killLogUI;
 
     private void Start()
     {
@@ -37,7 +40,7 @@ public class GameLobbyUI : MonoBehaviour
     public virtual void UpdatePlayerInRoon()
     {
         // ✅ 현재 씬에서 모든 PlayerCharacter 찾기
-        PlayerCharacter[] foundCharacters = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None)
+        foundCharacters = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None)
             .OrderBy(player => player.GetComponent<NetworkIdentity>().netId)
             .ToArray();
         
@@ -90,6 +93,16 @@ public class GameLobbyUI : MonoBehaviour
         {
             (NetworkManager.singleton as RoomManager).StartGame();
         }
+    }
+
+    public void UpdateKillLog(int deadId, int skillid, int killerId)
+    {
+        Debug.Log($"{deadId}, {skillid}, {killerId}, {foundCharacters}");
+        if (killerId < 0)
+        {
+            killerId = deadId;
+        }
+        killLogUI?.AddKillLog(foundCharacters[killerId], foundCharacters[deadId], skillid);
     }
     
 }

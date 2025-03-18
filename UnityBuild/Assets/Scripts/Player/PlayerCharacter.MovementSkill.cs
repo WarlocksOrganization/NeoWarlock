@@ -48,7 +48,7 @@ namespace Player
         public void SetMovementSkill(Constants.SkillType skillType)
         {
             movementSkill = Database.GetMovementSkillData(skillType);
-            playerUI?.SetQuickSlotData(0, movementSkill.skillIcon, movementSkill.cooldown);
+            playerUI?.SetQuickSlotData(0, movementSkill.skillIcon, movementSkill.cooldown, movementSkill.skillName, movementSkill.Description);
         }
 
         [Command]
