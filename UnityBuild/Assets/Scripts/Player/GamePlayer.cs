@@ -55,7 +55,7 @@ namespace Player
         [Command]
         public void CmdSetPlayerNumber(int playerNum)
         {
-            playerCharacter.playerNumber = playerNum;
+            playerCharacter.playerId = playerNum;
         }
         
         private IEnumerator CardSelectionTimer()
@@ -93,7 +93,7 @@ namespace Player
                         FindObjectsByType<LobbyPlayerCharacter>(sortMode: FindObjectsSortMode.None);
                     foreach (var pcharacter in pc)
                     {
-                        if (pcharacter.playerNumber == PlayerSetting.PlayerNum)
+                        if (pcharacter.playerId == PlayerSetting.PlayerNum)
                         {
                             playerCharacter = pcharacter;
                             break;

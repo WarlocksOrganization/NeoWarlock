@@ -18,7 +18,7 @@ public class PlayerPanel : MonoBehaviour
             playerImage.sprite = Database.GetCharacterClassData(playerCharacter.PLayerCharacterClass).CharacterIcon;
         }
         playerName.text = playerCharacter.nickname;
-        playerName.color = PlayerSetting.PlayerNum == playerCharacter.playerNumber ? Color.yellow : Color.white;
+        playerName.color = PlayerSetting.PlayerNum == playerCharacter.playerId ? Color.yellow : Color.white;
         playerImage.color = playerCharacter.isDead ? new Color(1,0,0,0.5f) : Color.white;
     }
 }

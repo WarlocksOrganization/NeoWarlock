@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using DataSystem;
 using DataSystem.Database;
+using GameManagement;
 using Interfaces;
 using kcp2k;
 using Mirror;
@@ -297,7 +298,7 @@ namespace Player
 
             yield return new WaitForSeconds(attackDelay); // ✅ 공격 딜레이 적용
 
-            CmdAttack(targetPosition, nextAttckIndex);
+            CmdAttack(targetPosition, nextAttckIndex, playerId, PlayerSetting.AttackSkillIDs[nextAttckIndex]);
         }
         
         [Command]
@@ -317,12 +318,12 @@ namespace Player
 
 
         [Command]
-        public void CmdAttack(Vector3 attackPosition, int nextAttckIndex)
+        public void CmdAttack(Vector3 attackPosition, int nextAttckIndex, int id, int skillId)
         {
             Vector3 direction = (attackPosition - transform.position).normalized;
             
             availableAttacks[nextAttckIndex]?.Execute(attackPosition, 
-                attackTransform.position + direction, gameObject);
+                attackTransform.position + direction, gameObject, id, skillId);
         }
 
         [Command]
@@ -343,7 +344,7 @@ namespace Player
             {
                 Vector3 firePosition = originPosition ? attackTransform.position : attackTransform.position + direction;
                 certainAttacks[skillId].Execute(attackPosition, 
-                    firePosition, gameObject);
+                    firePosition, gameObject, playerId, skillId);
             }
         }
     }

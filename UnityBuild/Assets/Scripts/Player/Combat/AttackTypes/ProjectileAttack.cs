@@ -6,7 +6,7 @@ namespace Player.Combat
 {
     public class ProjectileAttack : AttackBase
     {
-        public override void Execute(Vector3 mousePosition, Vector3 firePoint, GameObject owner)
+        public override void Execute(Vector3 mousePosition, Vector3 firePoint, GameObject owner, int playerid, int skillid)
         {
             // ✅ 공통 로직: 발사 위치 결정
             Vector3 spawnPosition = GetSpawnPosition(firePoint);
@@ -27,7 +27,9 @@ namespace Player.Combat
                     attackData.Range / Math.Abs(attackData.Speed),
                     attackData.KnockbackForce,
                     attackData.config,
-                    owner
+                    owner,
+                    playerid,
+                    skillid
                 );
 
 

@@ -13,15 +13,21 @@ namespace Player
         [SerializeField] private GameObject floatingDamageTextPrefab;
 
         [SyncVar(hook = nameof(OnHpChanged))] // ✅ Hook 추가
-        private int curHp = 300;
+        private int curHp = 100;
 
-        [SyncVar] private int maxHp = 300;
+        [SyncVar] private int maxHp = 100;
+
+        [SyncVar] private int attackPlayersId = -1;
         
-        public void takeDamage(int damage, Vector3 attackTran, float knockbackForce, AttackConfig attackConfig)
+        public void takeDamage(int damage, Vector3 attackTran, float knockbackForce, AttackConfig attackConfig, int attackPlayerId, int attackskillid)
         {
             if (curHp <= 0) return;
 
-            DecreaseHp(damage);
+            if (damage > 0 && attackPlayerId >= 0 && playerId != attackPlayerId)
+            {
+                this.attackPlayersId = attackPlayerId;
+            }
+            DecreaseHp(damage, attackPlayerId, attackskillid);
 
             if (curHp > 0)
             {
@@ -37,12 +43,12 @@ namespace Player
 
                 if (attackConfig != null && attackConfig.appliedBuff != null)
                 {
-                    ApplyBuffFromAttack(attackConfig.appliedBuff);
+                    ApplyBuffFromAttack(attackConfig.appliedBuff, attackPlayerId, attackskillid);
                 }
             }
         }
 
-        public void DecreaseHp(int damage)
+        public void DecreaseHp(int damage, int attackPlayerId, int skillid)
         {
             if (curHp <= 0) return;
 
@@ -61,20 +67,21 @@ namespace Player
             {
                 SetIsDead(true);
                 RpcTriggerAnimation("isDead"); // 클라이언트에도 애니메이션 트리거 전송
+                RpcTransmitKillLog(attackPlayerId, skillid);
             }
         }
         
-        private void ApplyBuffFromAttack(BuffData buffData)
+        private void ApplyBuffFromAttack(BuffData buffData, int attackPlayerId, int attackskillid)
         {
             if (buffSystem != null)
             {
                 if (NetworkServer.active)
                 {
-                    buffSystem.ServerApplyBuff(buffData);
+                    buffSystem.ServerApplyBuff(buffData, attackPlayerId, attackskillid);
                 }
                 else
                 {
-                    buffSystem.CmdApplyBuff(buffData);
+                    buffSystem.CmdApplyBuff(buffData, attackPlayerId, attackskillid);
                 }
             }
         }
@@ -102,6 +109,19 @@ namespace Player
         private void RpcApplyKnockback(Vector3 force)
         {
             ApplyKnockback(force); // ✅ 넉백 적용 함수 호출
+        }
+
+        [ClientRpc]
+        private void RpcTransmitKillLog(int killID, int skillid)
+        {
+            if (playerId == killID || killID < 0)
+            {
+                gameLobbyUI?.UpdateKillLog(playerId, skillid, attackPlayersId);
+            }
+            else
+            {
+                gameLobbyUI?.UpdateKillLog(playerId, skillid, killID);
+            }
         }
     }
 }

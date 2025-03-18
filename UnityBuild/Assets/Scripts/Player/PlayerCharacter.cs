@@ -14,7 +14,7 @@ namespace Player
         [SyncVar(hook = nameof(SetNickname_Hook))]
         public string nickname;
         [SerializeField] private TMP_Text nicknameText;
-        [SyncVar(hook = nameof(UpdatePlayerNumber))] public int playerNumber = -1;
+        [SyncVar(hook = nameof(UpdatePlayerId))] public int playerId = -1;
         private CharacterController _characterController;
         private CinemachineVirtualCamera virtualCamera;
         private BuffSystem buffSystem;
@@ -31,6 +31,8 @@ namespace Player
         private float attackLockTime = 0f;
 
         [SerializeField] private Transform attackTransform;
+
+        private GameLobbyUI gameLobbyUI;
 
         private void Awake()
         {
@@ -67,18 +69,18 @@ namespace Player
             UpdateCount();
         }
 
-        private void UpdatePlayerNumber(int oldValue, int newValue)
+        private void UpdatePlayerId(int oldValue, int newValue)
         {
             UpdateCount();
         }
 
         private void UpdateCount()
         {
-            GameLobbyUI gameLobbyUI = FindFirstObjectByType<GameLobbyUI>();
-            if (gameLobbyUI != null)
+            if (gameLobbyUI == null)
             {
-                gameLobbyUI.UpdatePlayerInRoon();
+                gameLobbyUI = FindFirstObjectByType<GameLobbyUI>();
             }
+            gameLobbyUI?.UpdatePlayerInRoon();
         }
 
         void Update()

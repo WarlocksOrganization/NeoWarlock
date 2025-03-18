@@ -25,7 +25,7 @@ namespace Player
 
                 if (explosionComponent != null)
                 {
-                    explosionComponent.Initialize(damage, radius, knockbackForce, attackConfig, this.owner);
+                    explosionComponent.Initialize(damage, radius, knockbackForce, attackConfig, this.owner, playerid, skillid);
                 }
 
                 NetworkServer.Spawn(explosion);

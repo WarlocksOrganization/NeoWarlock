@@ -55,7 +55,7 @@ namespace Player.Combat
                     if (config.attackType == DataSystem.Constants.AttackType.Melee && hit.transform.gameObject == owner) continue;
                     if (config.attackType == DataSystem.Constants.AttackType.Self && hit.transform.gameObject != owner) continue;
 
-                    damagable.takeDamage((int)explosionDamage, position, knockbackForce, config);
+                    damagable.takeDamage((int)explosionDamage, position, knockbackForce, config,playerid, skillid);
                     hasHit = true;
                 }
             }

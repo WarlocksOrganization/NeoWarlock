@@ -20,6 +20,9 @@ namespace Player
         [SyncVar(hook = nameof(OnSkillEffectChanged))] 
         protected Constants.SkillType skillType = Constants.SkillType.None;
 
+        [SyncVar] protected int playerid;
+        [SyncVar] protected int skillid;
+
         protected Vector3 moveDirection;
         protected Rigidbody rb;
         protected AttackConfig attackConfig; // ✅ 공격별 설정값 저장
@@ -31,7 +34,7 @@ namespace Player
         [SyncVar] protected GameObject owner;
         private bool isExplode = false;
 
-        public void SetProjectileData(float damage, float speed, float radius, float range, float lifeTime, float knockback, AttackConfig config, GameObject owner)
+        public void SetProjectileData(float damage, float speed, float radius, float range, float lifeTime, float knockback, AttackConfig config, GameObject owner, int playerid, int skillid)
         {
             this.damage = damage;
             this.speed = speed;
@@ -39,6 +42,9 @@ namespace Player
             this.range = range;
             this.lifeTime = lifeTime;
             this.knockbackForce = knockback;
+            
+            this.playerid = playerid;
+            this.skillid = skillid;
 
             attackConfig = config; // ✅ 인스턴스 내에서 참조
             transform.localScale = new Vector3(radius, radius, radius);
@@ -166,7 +172,7 @@ namespace Player
 
                 if (explosionComponent != null)
                 {
-                    explosionComponent.Initialize(damage, radius, knockbackForce, attackConfig, this.owner);
+                    explosionComponent.Initialize(damage, radius, knockbackForce, attackConfig, this.owner, playerid, skillid);
                 }
 
                 NetworkServer.Spawn(explosion);
