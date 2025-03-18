@@ -26,10 +26,6 @@ namespace DataSystem.Database
                 {
                     iconDictionary[statType] = icon;
                 }
-                else
-                {
-                    Debug.LogWarning($"[PlayerCardIconManager] {icon.name}은(는) PlayerStatType과 매칭되지 않습니다.");
-                }
             }
 
             Debug.Log($"총 {iconDictionary.Count}개의 아이콘을 로드했습니다.");

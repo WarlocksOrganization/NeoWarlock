@@ -280,6 +280,7 @@ namespace Player
             float recoveryTime = currentAttack.GetAttackData().config.recoveryTime;
 
             attackLockTime = recoveryTime; // ✅ 행동 불가 시간 설정
+            isMovingToTarget = false;
             playerProjector.CloseProjectile();
     
             StartCoroutine(ExecuteAttack(targetPosition, attackDelay));

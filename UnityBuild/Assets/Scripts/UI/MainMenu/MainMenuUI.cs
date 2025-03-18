@@ -11,6 +11,7 @@ namespace UI
     {
         [SerializeField] private TMP_InputField nicknameInputField;
         [SerializeField] private GameObject onlineUI;
+        [SerializeField] private GameObject lanUI;
 
         public void OnClickGameStartButtion()
         {
@@ -26,14 +27,14 @@ namespace UI
 
         public void OnClickLANButtion()
         {
-            NetworkManager.singleton.networkAddress = "localhost";
-                
-            if (NetworkManager.singleton.transport is kcp2k.KcpTransport kcp)
+            PlayerSetting.Nickname = nicknameInputField.text;
+            
+            if (nicknameInputField.text == "")
             {
-                kcp.Port = 7777; // ✅ KCP Transport의 포트 설정
+                PlayerSetting.Nickname = "Player" + Random.Range(1000, 9999);
             }
-
-            OnClickGameStartButtion();
+            lanUI.SetActive(true);
+            gameObject.SetActive(false);
         }
     }
 }
