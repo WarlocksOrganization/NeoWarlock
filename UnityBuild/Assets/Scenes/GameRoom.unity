@@ -6767,7 +6767,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 799.7, y: 388}
-  m_SizeDelta: {x: 200, y: 200}
+  m_SizeDelta: {x: 150, y: 150}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &754519937
 MonoBehaviour:
@@ -8645,7 +8645,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 800, y: 387.4}
-  m_SizeDelta: {x: 200, y: 200}
+  m_SizeDelta: {x: 150, y: 150}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &998934764
 MonoBehaviour:
@@ -14753,8 +14753,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\uB2EB\uAE30 (Esc)"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 83af34bc23c26e040b52c89782ef6ad1, type: 2}
-  m_sharedMaterial: {fileID: 2100000, guid: b4474a0cefa3e714d8b913c589f358da, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 402b6704ec910ac498580b7561efd295, type: 2}
+  m_sharedMaterial: {fileID: -2906016847121852773, guid: 402b6704ec910ac498580b7561efd295, type: 2}
   m_fontSharedMaterials:
   - {fileID: 8301500676003178282, guid: 83af34bc23c26e040b52c89782ef6ad1, type: 2}
   m_fontMaterial: {fileID: 0}
@@ -14820,7 +14820,7 @@ MonoBehaviour:
   m_margin: {x: 0, y: -14.652181, z: -290.73938, w: 71.31175}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 0
+  m_hasFontAssetChanged: 1
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!222 &1991355178
