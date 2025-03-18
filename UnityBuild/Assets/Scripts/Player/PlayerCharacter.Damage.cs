@@ -114,6 +114,7 @@ namespace Player
         [ClientRpc]
         private void RpcTransmitKillLog(int killID, int skillid)
         {
+            playerProjector?.CloseProjectile();
             if (playerId == killID || killID < 0)
             {
                 gameLobbyUI?.UpdateKillLog(playerId, skillid, attackPlayersId);

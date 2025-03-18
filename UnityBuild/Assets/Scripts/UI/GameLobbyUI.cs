@@ -17,7 +17,7 @@ public class GameLobbyUI : MonoBehaviour
     [SerializeField] protected PlayerStatusUI playerStatusUI;
 
     public GameObject[] PlayerCharacters;
-    private PlayerCharacter[] foundCharacters;
+    protected PlayerCharacter[] foundCharacters;
 
     private int hostNum = 0;
     
@@ -97,6 +97,7 @@ public class GameLobbyUI : MonoBehaviour
 
     public void UpdateKillLog(int deadId, int skillid, int killerId)
     {
+        Debug.Log($"{deadId}, {skillid}, {killerId}, {foundCharacters}");
         if (killerId < 0)
         {
             killerId = deadId;

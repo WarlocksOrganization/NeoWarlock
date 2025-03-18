@@ -150,10 +150,8 @@ namespace Player
         public void ApplyKnockback(Vector3 force)
         {
             _knockbackDirection = force;
-            Debug.Log($"Knockback Direction: {_knockbackDirection}");
             _knockbackDirection.x *= KnockbackFactor;
             _knockbackDirection.z *= KnockbackFactor;
-            Debug.Log($"Knockback Direction: {_knockbackDirection}");
             isMovingToTarget = false; // 넉백 중에는 마우스 이동 중단
         }
         
