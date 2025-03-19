@@ -12,6 +12,10 @@ public class KillLogItem : MonoBehaviour
     [SerializeField] private Image killerIcon;
     [SerializeField] private Image victimIcon;
     [SerializeField] private Image skillIcon;
+    [SerializeField] private Image killIcon;
+    
+    [SerializeField] private Sprite killSprite;
+    [SerializeField] private Sprite fallSprite;
     private CanvasGroup canvasGroup;
 
     private void Awake()
@@ -20,13 +24,30 @@ public class KillLogItem : MonoBehaviour
     }
 
     // 🔹 킬 로그 설정 (닉네임, 아이콘, 스킬)
-    public void SetKillLog(PlayerCharacter killer, PlayerCharacter victim, int skillId)
+    public void SetKillLog(PlayerCharacter killer, PlayerCharacter victim, int skillId, bool isFall)
     {
         killerNameText.text = killer.nickname;
         victimNameText.text = victim.nickname;
         killerIcon.sprite = Database.GetCharacterClassData(killer.PLayerCharacterClass).CharacterIcon;
         victimIcon.sprite = Database.GetCharacterClassData(victim.PLayerCharacterClass).CharacterIcon;
-        skillIcon.sprite = Database.GetAttackData(skillId).Icon;
+        if (skillId > 0)
+        {
+            skillIcon.sprite = Database.GetAttackData(skillId).Icon;
+            skillIcon.color = Color.white;
+        }
+        else
+        {
+            skillIcon.color = Color.clear;
+        }
+
+        if (isFall)
+        {
+            killIcon.sprite = fallSprite;
+        }
+        else
+        {
+            killIcon.sprite = killSprite;
+        }
 
         StartCoroutine(FadeInAndOut());
     }

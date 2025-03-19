@@ -8,6 +8,7 @@ public class BuffData : ScriptableObject
     public float moveSpeedModifier;   // 이동 속도 변경 값
     public float attackDamageModifier;// 공격력 변경 값
     public float defenseModifier;     // 방어력 변경 값
+    public float knonkbackModifier;     // 넉백 변경 값
     public int tickDamage;          // ✅ 0.5초마다 입히는 지속 데미지
     public Vector3 moveDirection;     // 강제 이동 방향
 

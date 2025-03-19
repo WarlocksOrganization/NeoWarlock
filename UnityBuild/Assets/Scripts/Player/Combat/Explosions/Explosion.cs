@@ -17,6 +17,7 @@ namespace Player.Combat
 
         protected int playerid;
         protected int skillid;
+        protected float radius;
         
         [SerializeField] protected GameObject explosionEffectPrefab; // ✅ 파티클 프리팹
         protected AttackConfig config;
@@ -31,6 +32,7 @@ namespace Player.Combat
             this.config = config;
             explosionDuration = config.attackDuration;
             explosionInterval = config.attackInterval;
+            this.radius = radius;
 
             explosionEffectPrefab.transform.localScale = new Vector3(radius, radius, radius);
 
@@ -50,8 +52,14 @@ namespace Player.Combat
         protected void Explode()
         {
             if (!isServer) return; // ✅ 서버에서만 실행
-            Collider[] hitColliders = Physics.OverlapSphere(transform.position, explosionRadius);
-            // Debug.Log($"Explosion in {transform.position.x}, {transform.position.z} owner is on {owner.transform.position.x}, {owner.transform.position.z}");
+
+            // ✅ 원기둥(캡슐) 충돌 범위 설정
+            Vector3 bottom = transform.position + Vector3.down * 0.5f;  // 바닥 위치
+            Vector3 top = transform.position + Vector3.up * 2.0f;       // 원기둥 높이 조절
+            float radius = explosionRadius; // 원기둥 반지름 (기존의 반지름 유지)
+
+            Collider[] hitColliders = Physics.OverlapCapsule(bottom, top, radius);
+    
             foreach (Collider hit in hitColliders)
             {
                 IDamagable damagable = hit.transform.GetComponent<IDamagable>();
@@ -60,7 +68,7 @@ namespace Player.Combat
                     // ✅ 공격 타입에 따라 대상을 구분하여 데미지 적용
                     if (config.attackType == DataSystem.Constants.AttackType.Melee && hit.transform.gameObject == owner) continue;
                     if (config.attackType == DataSystem.Constants.AttackType.Self && hit.transform.gameObject != owner) continue;
-                    // Debug.Log($"Damaging {hit.transform.gameObject.name}");
+
                     damagable.takeDamage((int)explosionDamage, transform.position, knockbackForce, config, playerid, skillid);
                 }
             }
@@ -72,6 +80,7 @@ namespace Player.Combat
             if (explosionEffectPrefab != null)
             {
                 GameObject effect = Instantiate(explosionEffectPrefab, transform.position, Quaternion.identity);
+                effect.transform.localScale = new Vector3(radius, radius, radius);  // ✅ 프리팹 인스턴스에서만 변경
                 effect.GetComponent<AttackParticle>().SetAttackParticleData(config.skillType);
                 NetworkServer.Spawn(effect); // ✅ 네트워크에 동기화
                 return effect;

@@ -12,9 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe25a225da670384e89deb818f013fd8, type: 3}
   m_Name: HolyShildBuffConfig
   m_EditorClassIdentifier: 
-  buffName: Slow
-  duration: 1
-  moveSpeedModifier: -2.5
+  duration: 3
+  moveSpeedModifier: 0
   attackDamageModifier: 0
-  defenseModifier: 0
-  BuffType: 4
+  defenseModifier: 100
+  knonkbackModifier: -1
+  tickDamage: 0
+  moveDirection: {x: 0, y: 0, z: 0}
+  BuffType: 8

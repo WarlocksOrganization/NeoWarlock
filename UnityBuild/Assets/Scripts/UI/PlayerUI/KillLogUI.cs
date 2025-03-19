@@ -37,7 +37,7 @@ public class KillLogUI : MonoBehaviour
     }
 
     // 🔹 킬 로그 추가
-    public void AddKillLog(PlayerCharacter killer, PlayerCharacter victim, int skillId)
+    public void AddKillLog(PlayerCharacter killer, PlayerCharacter victim, int skillId, bool isFall)
     {
         if (logPool.Count == 0) return; // 사용할 수 있는 로그 아이템이 없으면 리턴
 
@@ -45,7 +45,7 @@ public class KillLogUI : MonoBehaviour
         logItem.gameObject.SetActive(true);
         activeLogs.Add(logItem); // 사용 중인 로그 리스트에 추가
 
-        logItem.SetKillLog(killer, victim, skillId);
+        logItem.SetKillLog(killer, victim, skillId, isFall);
         RepositionLogs(); // ✅ 모든 로그 재배치
     }
 

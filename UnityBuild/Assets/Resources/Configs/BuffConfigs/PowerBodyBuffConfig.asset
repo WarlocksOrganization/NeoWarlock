@@ -12,10 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe25a225da670384e89deb818f013fd8, type: 3}
   m_Name: PowerBodyBuffConfig
   m_EditorClassIdentifier: 
-  duration: 6
+  duration: 5
   moveSpeedModifier: -2
   attackDamageModifier: 0
-  defenseModifier: 0
-  tickDamage: -5
+  defenseModifier: 5
+  knonkbackModifier: -0.5
+  tickDamage: -2
   moveDirection: {x: 0, y: 0, z: 0}
   BuffType: 7

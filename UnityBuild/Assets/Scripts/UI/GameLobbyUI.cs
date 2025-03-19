@@ -95,13 +95,13 @@ public class GameLobbyUI : MonoBehaviour
         }
     }
 
-    public void UpdateKillLog(int deadId, int skillid, int killerId)
+    public void UpdateKillLog(int deadId, int skillid, int killerId, bool isFall)
     {
         if (killerId < 0)
         {
             killerId = deadId;
         }
-        killLogUI?.AddKillLog(foundCharacters[killerId], foundCharacters[deadId], skillid);
+        killLogUI?.AddKillLog(foundCharacters[killerId], foundCharacters[deadId], skillid, isFall);
     }
     
 }

@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using DataSystem;
 using Mirror;
-//using Mono.Cecil;
 using Player;
 using Player.Combat;
 using Unity.Mathematics;
@@ -97,6 +96,16 @@ public class BuffSystem : NetworkBehaviour
     {
         float newBuffValue = buffData.moveSpeedModifier;
         Constants.BuffType buffType = buffData.BuffType;
+        
+        if (buffData.defenseModifier != 0)
+        {
+            playerCharacter.defense += (int)buffData.defenseModifier; // ✅ 방어력 증가
+        }
+
+        if (buffData.knonkbackModifier != 0)
+        {
+            playerCharacter.KnockbackFactor += buffData.knonkbackModifier; // ✅ 넉백 증가
+        }
 
         if (activeBuffValues.ContainsKey(buffType))
         {
@@ -120,6 +129,16 @@ public class BuffSystem : NetworkBehaviour
     private void RemoveBuffEffect(BuffData buffData)
     {
         Constants.BuffType buffType = buffData.BuffType;
+        
+        if (buffData.defenseModifier != 0)
+        {
+            playerCharacter.defense -= (int)buffData.defenseModifier; // ✅ 방어력 감소
+        }
+        
+        if (buffData.knonkbackModifier != 0)
+        {
+            playerCharacter.KnockbackFactor -= buffData.knonkbackModifier; // ✅ 넉백 감소
+        }
 
         if (activeBuffValues.ContainsKey(buffType))
         {
@@ -181,9 +200,6 @@ public class BuffSystem : NetworkBehaviour
             case Constants.BuffType.Charge:
                 StartCoroutine(Charge(buffData));
                 break;
-            case Constants.BuffType.PowerBody:
-                StartCoroutine(PowerBody(buffData));
-                break;
         }
     }
     private IEnumerator Charge(BuffData buffData)
@@ -200,20 +216,5 @@ public class BuffSystem : NetworkBehaviour
             }
             elapsedTime += 0.016f;
         }
-    }
-    private IEnumerator PowerBody(BuffData buffData)
-    {
-        Debug.Log($"PowerBody: {buffData.duration}초 동안 부가 효과 적용");
-        float elapsedTime = 0f;
-        playerCharacter.KnockbackFactor -= 0.6f; // ✅ 넉백 감소
-
-        while (elapsedTime < buffData.duration)
-        {
-            yield return new WaitForSeconds(0.5f);
-            playerCharacter.DecreaseHp(buffData.tickDamage, -1, -1); // ✅ 0.5초마다 체력 회복
-            elapsedTime += 0.5f;
-        }
-
-        playerCharacter.KnockbackFactor += 0.6f; // ✅ 넉백 감소 해제
     }
 }

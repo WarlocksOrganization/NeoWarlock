@@ -13,7 +13,7 @@ namespace Player
         [SyncVar(hook = nameof(OnMoveSpeedChanged))]
         public float MoveSpeed = 5.0f;
         public float KnockbackDamping = 5f;
-        public float KnockbackFactor = 1f;
+        [SyncVar] public float KnockbackFactor = 1f;
         private float animationSpeed;
         
         private Vector3 _moveDirection = Vector3.zero;
