@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   attackType: 5
   attackDelay: 0
-  recoveryTime: 0
+  recoveryTime: 0.01
   attackDuration: 0
   attackInterval: 0
   animParameter: isAttack2
@@ -22,4 +22,4 @@ MonoBehaviour:
   Prefab: {fileID: 322783647940636695, guid: 3debe98b2148b9b4fa96e032065c9777, type: 3}
   explosionEffectPrefab: {fileID: 5412338807302183837, guid: 68a8102c387cfd24583565c4ddfae556, type: 3}
   skillType: 28
-  appliedBuff: {fileID: 11400000, guid: 42be0287a11a1fb418e3690b1b738757, type: 2}
+  appliedBuff: {fileID: 11400000, guid: 3115d195ca64b6e40bf197efbb2444b9, type: 2}

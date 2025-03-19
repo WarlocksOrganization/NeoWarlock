@@ -99,6 +99,10 @@ namespace Player
             {
                 _knockbackDirection = Vector3.Lerp(_knockbackDirection, Vector3.zero, KnockbackDamping * Time.deltaTime);
             }
+            else
+            {
+                _knockbackDirection = Vector3.zero;
+            }
         }
         
         private void HandleMouseMovement()
@@ -126,7 +130,7 @@ namespace Player
             Vector3 direction = (_targetPosition - transform.position).normalized;
             direction.y = 0; // 수직 이동 방지
 
-            if (Vector3.Distance(transform.position, _targetPosition) > 0.1f)
+            if (Vector3.Distance(transform.position, _targetPosition) > 0.5f)
             {
                 _moveDirection = direction * MoveSpeed;
             }
