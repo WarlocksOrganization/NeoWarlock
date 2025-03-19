@@ -23,21 +23,22 @@ public class FloatingDamageText : MonoBehaviour
         // 🔹 크기 조절 (로그 스케일 적용)
         float fontSizeScale = Mathf.Log(Mathf.Abs(damage) + 1, 10) + 1; // 로그 기반 크기 증가
         damageText.fontSize = Mathf.Min(baseFontSize * fontSizeScale, maxFontSize); // 최대 크기 제한
+        float newfadeDuration = fadeDuration*fontSizeScale;
 
         damageText.text = Mathf.Abs(damage).ToString();
-        StartCoroutine(FadeOutAndDestroy());
+        StartCoroutine(FadeOutAndDestroy(newfadeDuration));
     }
 
-    private IEnumerator FadeOutAndDestroy()
+    private IEnumerator FadeOutAndDestroy(float newfadeDuration)
     {
         CanvasGroup canvasGroup = GetComponent<CanvasGroup>();
         Vector3 startPosition = transform.position;
 
         float elapsedTime = 0f;
-        while (elapsedTime < fadeDuration)
+        while (elapsedTime < newfadeDuration)
         {
             transform.position = startPosition + new Vector3(0, elapsedTime * moveSpeed, 0);
-            canvasGroup.alpha = Mathf.Lerp(1, 0, elapsedTime / fadeDuration);
+            canvasGroup.alpha = Mathf.Lerp(1, 0, elapsedTime / newfadeDuration);
             elapsedTime += Time.deltaTime;
             yield return null;
         }

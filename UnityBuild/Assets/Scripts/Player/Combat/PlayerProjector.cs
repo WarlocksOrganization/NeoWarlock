@@ -45,6 +45,9 @@ namespace Player.Combat
         {
             decalProjector.gameObject.SetActive(false);
             rangeDecalProjector.gameObject.SetActive(false);
+            
+            decalProjector.size = new Vector3(1, 1, 1);
+            rangeDecalProjector.size = new Vector3(1, 1, 1);
         }
 
         public void SetDecalProjector(IAttack attack, LayerMask targetLayer, Transform fireTransform)

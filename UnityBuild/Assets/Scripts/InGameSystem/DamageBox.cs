@@ -37,7 +37,7 @@ public class DamageBox : MonoBehaviour
         {
             foreach (var player in playersInRange)
             {
-                player.takeDamage(damagePerTick, transform.position, 0, null, -1, -1); // ✅ 넉백 X, 버프 X
+                player.takeDamage(damagePerTick, transform.position, 0, null, -1, 0); // ✅ 넉백 X, 버프 X
             }
             yield return new WaitForSeconds(damageInterval);
         }

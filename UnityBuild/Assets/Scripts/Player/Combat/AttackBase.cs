@@ -14,6 +14,7 @@ namespace Player.Combat
         public void Initialize(Database.AttackData data)
         {
             attackData = data;
+            LastUsedTime = -9999;
         }
 
         public virtual void Execute(Vector3 mousePosition, Vector3 firePoint, GameObject owner, int playerid, int skillid)

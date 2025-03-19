@@ -48,7 +48,9 @@ namespace DataSystem
             Poison,
             Charge,
             PowerBody,
-            SlowDamage,
+            HolyShhield,
+            PowerPowerBody,
+            PowerCharge,
         }
 
         public enum SkillType
@@ -75,6 +77,13 @@ namespace DataSystem
             PoisonSpore,
             Starfall,
             Dash,
+            HollyAttack,
+            HollyShild,
+            HolyRecovery,
+            HolyTeleport,
+            PowerSlash,
+            PowerPowerBody,
+            PowerCharge,
             None = 100,
         }
         

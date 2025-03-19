@@ -57,6 +57,8 @@ namespace Player
             PLayerCharacterClass = newClass;
             MoveSkill = newMoveSkill;
             AttackSkills = newAttackSkills;
+
+            buffSystem?.CmdClearAllBuffs();
         }
 
         // 캐릭터 클래스 변경 시 호출될 동기화 함수

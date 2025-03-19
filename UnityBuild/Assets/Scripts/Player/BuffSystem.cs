@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using DataSystem;
 using Mirror;
-//using Mono.Cecil;
 using Player;
 using Player.Combat;
 using Unity.Mathematics;
@@ -13,6 +12,7 @@ using UnityEngine.Animations;
 public class BuffSystem : NetworkBehaviour
 {
     private Dictionary<Constants.BuffType, Coroutine> activeBuffs = new Dictionary<Constants.BuffType, Coroutine>();
+    private Dictionary<Constants.BuffType, Coroutine> activeTickDamage = new Dictionary<Constants.BuffType, Coroutine>();
     private Dictionary<Constants.BuffType, float> activeBuffValues = new Dictionary<Constants.BuffType, float>();
 
     private PlayerCharacter playerCharacter;
@@ -30,90 +30,70 @@ public class BuffSystem : NetworkBehaviour
         if (activeBuffs.ContainsKey(buffData.BuffType))
         {
             StopCoroutine(activeBuffs[buffData.BuffType]);
+            RemoveBuffEffect(buffData);
             activeBuffs.Remove(buffData.BuffType);
         }
 
-        // ✅ 클라이언트에서 버프 이펙트 실행
         RpcPlayBuffEffect(buffData.BuffType, true);
 
         Coroutine buffCoroutine = StartCoroutine(ApplyBuff(buffData, attackPlayerId, attackskillid));
         activeBuffs[buffData.BuffType] = buffCoroutine;
-    }
-
-    public void ServerApplyBuff(BuffData buffData, int attackPlayerId, int attackskillid)
-    {
-        if (activeBuffs.ContainsKey(buffData.BuffType))
-        {
-            StopCoroutine(activeBuffs[buffData.BuffType]);
-            activeBuffs.Remove(buffData.BuffType);
-        }
-
-        // ✅ 클라이언트에서 버프 이펙트 실행
-        RpcPlayBuffEffect(buffData.BuffType, true);
-
-        Coroutine buffCoroutine = StartCoroutine(ApplyBuff(buffData, attackPlayerId, attackskillid));
-        activeBuffs[buffData.BuffType] = buffCoroutine;
-    }
-
-    [ClientRpc]
-    private void RpcPlayBuffEffect(Constants.BuffType buffType, bool isActive)
-    {
-        if (effectSystem != null && buffType != Constants.BuffType.None)
-        {
-            effectSystem.PlayBuffEffect(buffType, isActive);
-        }
     }
 
     private IEnumerator ApplyBuff(BuffData buffData, int attackPlayerId, int attackskillid)
     {
         ApplyBuffEffect(buffData);
 
-        // ✅ 지속 피해(DoT) 실행
+        Coroutine tickDamageCoroutine = null;
         if (buffData.tickDamage > 0)
         {
-            StartCoroutine(TickDamage(buffData, attackPlayerId, attackskillid));
+            tickDamageCoroutine = StartCoroutine(TickDamage(buffData, attackPlayerId, attackskillid));
+            activeTickDamage[buffData.BuffType] = tickDamageCoroutine;
         }
 
-        // ✅ 강제 이동 실행
         if (buffData.moveDirection != Vector3.zero)
         {
             RpcForcedMove(buffData);
         }
 
-        // ✅ 부가 효과 실행
         RpcSideEffect(buffData);
 
         yield return new WaitForSeconds(buffData.duration);
 
         RemoveBuffEffect(buffData);
-
-        // ✅ 클라이언트에서 버프 종료 이펙트 제거
         RpcPlayBuffEffect(buffData.BuffType, false);
-
         activeBuffs.Remove(buffData.BuffType);
+
+        if (tickDamageCoroutine != null)
+        {
+            StopCoroutine(tickDamageCoroutine);
+            activeTickDamage.Remove(buffData.BuffType);
+        }
     }
 
     private void ApplyBuffEffect(BuffData buffData)
     {
-        float newBuffValue = buffData.moveSpeedModifier;
         Constants.BuffType buffType = buffData.BuffType;
 
-        if (activeBuffValues.ContainsKey(buffType))
+        if (buffData.defenseModifier != 0)
         {
-            float existingBuffValue = activeBuffValues[buffType];
-
-            // ✅ 더 강한 값이 적용되도록 보장
-            if (Mathf.Abs(newBuffValue) > Mathf.Abs(existingBuffValue))
-            {
-                playerCharacter.MoveSpeed -= existingBuffValue; // 기존 값 제거
-                playerCharacter.MoveSpeed += newBuffValue; // 새 값 적용
-                activeBuffValues[buffType] = newBuffValue; // 업데이트
-            }
+            playerCharacter.defense += (int)buffData.defenseModifier;
         }
-        else
+
+        if (buffData.knonkbackModifier != 0)
         {
-            playerCharacter.MoveSpeed += newBuffValue;
-            activeBuffValues[buffType] = newBuffValue;
+            playerCharacter.KnockbackFactor += buffData.knonkbackModifier;
+        }
+
+        if (buffData.moveSpeedModifier != 0)
+        {
+            if (activeBuffValues.ContainsKey(buffType))
+            {
+                playerCharacter.MoveSpeed -= activeBuffValues[buffType]; // 기존 값 제거
+            }
+
+            playerCharacter.MoveSpeed += buffData.moveSpeedModifier; // 새 값 적용
+            activeBuffValues[buffType] = buffData.moveSpeedModifier;
         }
     }
 
@@ -121,9 +101,19 @@ public class BuffSystem : NetworkBehaviour
     {
         Constants.BuffType buffType = buffData.BuffType;
 
+        if (buffData.defenseModifier != 0)
+        {
+            playerCharacter.defense -= (int)buffData.defenseModifier;
+        }
+
+        if (buffData.knonkbackModifier != 0)
+        {
+            playerCharacter.KnockbackFactor -= buffData.knonkbackModifier;
+        }
+
         if (activeBuffValues.ContainsKey(buffType))
         {
-            playerCharacter.MoveSpeed -= activeBuffValues[buffType]; // 버프 해제
+            playerCharacter.MoveSpeed -= activeBuffValues[buffType];
             activeBuffValues.Remove(buffType);
         }
     }
@@ -138,13 +128,15 @@ public class BuffSystem : NetworkBehaviour
 
             if (playerCharacter != null)
             {
-                playerCharacter.DecreaseHp(buffData.tickDamage, attackPlayerId, attackskillid); // ✅ 0.5초마다 지속 피해 적용
+                playerCharacter.DecreaseHp(buffData.tickDamage, attackPlayerId, attackskillid);
             }
 
             elapsedTime += 0.5f;
         }
+
+        activeTickDamage.Remove(buffData.BuffType);
     }
-    
+
     [ClientRpc]
     private void RpcForcedMove(BuffData buffData)
     {
@@ -154,66 +146,114 @@ public class BuffSystem : NetworkBehaviour
     private IEnumerator ForcedMove(BuffData buffData)
     {
         float elapsedTime = 0f;
-        
         CharacterController characterController = playerCharacter.GetComponent<CharacterController>();
+
         while (elapsedTime < buffData.duration)
         {
             yield return new WaitForSeconds(0.016f);
 
             if (playerCharacter != null)
-            {                
+            {
                 Quaternion quaternion = playerCharacter.gameObject.transform.GetChild(2).rotation;
                 Vector3 moveDirection = quaternion * buffData.moveDirection;
                 moveDirection.y = 0f;
-                characterController.Move(moveDirection * 0.1f); // ✅ 강제 이동 적용
+                characterController.Move(moveDirection * 0.1f);
             }
 
             elapsedTime += 0.016f;
         }
     }
+
+    [Command(requiresAuthority = false)]
+    public void CmdClearAllBuffs()
+    {
+        RpcClearAllBuffs();
+    }
+
+    [ClientRpc]
+    private void RpcClearAllBuffs()
+    {
+        ClearAllBuffs();
+    }
+
+    private void ClearAllBuffs()
+    {
+        foreach (var buffType in new List<Constants.BuffType>(activeBuffs.Keys))
+        {
+            StopCoroutine(activeBuffs[buffType]);
+        }
+        activeBuffs.Clear();
+
+        foreach (var buffType in new List<Constants.BuffType>(activeTickDamage.Keys))
+        {
+            StopCoroutine(activeTickDamage[buffType]);
+        }
+        activeTickDamage.Clear();
+
+        foreach (var buffType in new List<Constants.BuffType>(activeBuffValues.Keys))
+        {
+            RemoveBuffEffect(new BuffData { BuffType = buffType, moveSpeedModifier = activeBuffValues[buffType] });
+        }
+        activeBuffValues.Clear();
+
+        foreach (var buffType in System.Enum.GetValues(typeof(Constants.BuffType)))
+        {
+            if ((Constants.BuffType)buffType != Constants.BuffType.None)
+            {
+                RpcPlayBuffEffect((Constants.BuffType)buffType, false);
+            }
+        }
+    }
     
-    // 부가 효과 함수 구현
+    public void ServerApplyBuff(BuffData buffData, int attackPlayerId, int attackskillid)
+    {
+        if (activeBuffs.ContainsKey(buffData.BuffType))
+        {
+            StopCoroutine(activeBuffs[buffData.BuffType]);
+            activeBuffs.Remove(buffData.BuffType);
+        }
+
+        // ✅ 클라이언트에서 버프 이펙트 실행
+        RpcPlayBuffEffect(buffData.BuffType, true);
+
+        Coroutine buffCoroutine = StartCoroutine(ApplyBuff(buffData, attackPlayerId, attackskillid));
+        activeBuffs[buffData.BuffType] = buffCoroutine;
+    }
+    
+    [ClientRpc]
+    private void RpcPlayBuffEffect(Constants.BuffType buffType, bool isActive)
+    {
+        if (effectSystem != null && buffType != Constants.BuffType.None)
+        {
+            effectSystem.PlayBuffEffect(buffType, isActive);
+        }
+    }
+
     [ClientRpc]
     private void RpcSideEffect(BuffData buffData)
     {
         switch (buffData.BuffType)
         {
             case Constants.BuffType.Charge:
+            case Constants.BuffType.PowerCharge:
                 StartCoroutine(Charge(buffData));
-                break;
-            case Constants.BuffType.PowerBody:
-                StartCoroutine(PowerBody(buffData));
                 break;
         }
     }
+
     private IEnumerator Charge(BuffData buffData)
     {
-        Debug.Log($"Charge: {buffData.duration}초 동안 부가 효과 적용");
         float elapsedTime = 0f;
         int tick = 0;
+
         while (elapsedTime < buffData.duration)
         {
             yield return new WaitForSeconds(0.016f);
             if (++tick % 5 == 0)
             {
-                playerCharacter.CmdCertainAttack(playerCharacter.transform.position, 230, true); // ✅ 돌진 공격 실행
+                playerCharacter.CmdCertainAttack(playerCharacter.transform.position, 230, true);
             }
             elapsedTime += 0.016f;
         }
-    }
-    private IEnumerator PowerBody(BuffData buffData)
-    {
-        Debug.Log($"PowerBody: {buffData.duration}초 동안 부가 효과 적용");
-        float elapsedTime = 0f;
-        playerCharacter.KnockbackFactor -= 0.6f; // ✅ 넉백 감소
-
-        while (elapsedTime < buffData.duration)
-        {
-            yield return new WaitForSeconds(0.5f);
-            playerCharacter.DecreaseHp(buffData.tickDamage, -1, -1); // ✅ 0.5초마다 체력 회복
-            elapsedTime += 0.5f;
-        }
-
-        playerCharacter.KnockbackFactor += 0.6f; // ✅ 넉백 감소 해제
     }
 }
