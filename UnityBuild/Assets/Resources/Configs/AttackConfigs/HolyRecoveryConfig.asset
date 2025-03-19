@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   attackType: 3
   attackDelay: 1
-  recoveryTime: 1
+  recoveryTime: 1.5
   attackDuration: 5
   attackInterval: 1
   animParameter: isAttack2

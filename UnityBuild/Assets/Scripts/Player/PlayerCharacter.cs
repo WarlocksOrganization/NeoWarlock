@@ -119,7 +119,10 @@ namespace Player
         [Command]
         private void CmdTriggerAnimation(string animParameter)
         {
-            RpcTriggerAnimation(animParameter);
+            if (animParameter != "")
+            {
+                RpcTriggerAnimation(animParameter);
+            }
         }
         
         [ClientRpc]

@@ -26,12 +26,6 @@ namespace Player
             if (!isServer) return;
             if (curHp <= 0) return;
 
-            if (damage > 0 && attackPlayerId >= 0 && playerId != attackPlayerId)
-            {
-                this.attackPlayersId = attackPlayerId;
-                this.attackskillid = attackskillid;
-            }
-
             if (damage > 0)
             {
                 damage = Mathf.Max(damage - defense, 0);
@@ -61,6 +55,12 @@ namespace Player
         {
             if (curHp <= 0) return;
             int predamage = damage;
+            
+            if (predamage > 0 && attackPlayerId >= 0 && playerId != attackPlayerId)
+            {
+                this.attackPlayersId = attackPlayerId;
+                this.attackskillid = attackskillid;
+            }
 
             if (damage > 0) // 🔹 체력 감소 (데미지 입음)
             {

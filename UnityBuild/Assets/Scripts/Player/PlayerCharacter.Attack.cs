@@ -204,7 +204,6 @@ namespace Player
                 {
                     IAttack attackInstance = CreateAttackInstance(attackData);
                     availableAttacks[index] = attackInstance;
-                    attackInstance.LastUsedTime = Time.time - attackInstance.CooldownTime;
                 }
 
                 // 클라이언트에게 데이터 동기화
@@ -259,8 +258,6 @@ namespace Player
         {
             if (Time.time < attackLockTime) return; // ✅ 공격 중일 때 중복 실행 방지
 
-            _targetPosition = transform.position;
-
             // ✅ 현재 마우스 위치와 플레이어(또는 fireTransform) 위치 간 거리 계산
             float distance = Vector3.Distance(transform.position, targetPosition);
 
@@ -280,7 +277,12 @@ namespace Player
             float recoveryTime = currentAttack.GetAttackData().config.recoveryTime;
 
             attackLockTime = recoveryTime; // ✅ 행동 불가 시간 설정
-            isMovingToTarget = false;
+            if (recoveryTime > 0)
+            {
+                isMovingToTarget = false;
+                _targetPosition = transform.position;
+            }
+           
             playerProjector.CloseProjectile();
     
             StartCoroutine(ExecuteAttack(targetPosition, attackDelay));

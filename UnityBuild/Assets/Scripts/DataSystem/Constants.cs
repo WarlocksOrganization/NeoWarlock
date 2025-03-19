@@ -49,6 +49,8 @@ namespace DataSystem
             Charge,
             PowerBody,
             HolyShhield,
+            PowerPowerBody,
+            PowerCharge,
         }
 
         public enum SkillType
@@ -79,6 +81,9 @@ namespace DataSystem
             HollyShild,
             HolyRecovery,
             HolyTeleport,
+            PowerSlash,
+            PowerPowerBody,
+            PowerCharge,
             None = 100,
         }
         

@@ -12,10 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe25a225da670384e89deb818f013fd8, type: 3}
   m_Name: ChargeBuffConfig
   m_EditorClassIdentifier: 
-  duration: 1.5
+  duration: 1.2
   moveSpeedModifier: 0
   attackDamageModifier: 0
   defenseModifier: 0
+  knonkbackModifier: 0
   tickDamage: 0
   moveDirection: {x: 0, y: 0, z: 1.5}
   BuffType: 6
