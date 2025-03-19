@@ -12,13 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cb0a8bde4ba25f14690e8f57a3a36958, type: 3}
   m_Name: HolyTeleportConfig
   m_EditorClassIdentifier: 
-  skillType: 12
-  cooldown: 10
+  skillType: 25
+  cooldown: 5
   castTime: 0.5
   moveDuration: 0
   endTime: 0.75
-  maxDistance: 10
-  skillIcon: {fileID: 21300000, guid: 30ce7b2bf56696544a39cadab1ffc3c4, type: 3}
-  skillName: "\uD32C\uD140 \uC2A4\uD15D"
-  Description: "\uC21C\uAC04\uC801\uC73C\uB85C \uD658\uC601\uC744 \uB0A8\uAE30\uBA70
-    \uBE60\uB974\uAC8C \uC774\uB3D9\uD569\uB2C8\uB2E4."
+  maxDistance: 5
+  skillIcon: {fileID: 21300000, guid: b01e84ef7c402714ca5cbf6ffc13c8b5, type: 3}
+  skillName: "\uC2E0\uC131\uC758 \uC810\uBA78"
+  Description: "\uC2E0\uC131\uD55C \uAE30\uC6B4\uC774 \uBAB8\uC744 \uAC10\uC2F8\uBA70
+    \uC21C\uAC04\uC801\uC73C\uB85C \uC9E7\uC740 \uAC70\uB9AC \uC774\uB3D9\uD569\uB2C8\uB2E4."

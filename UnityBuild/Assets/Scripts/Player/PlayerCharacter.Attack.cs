@@ -204,7 +204,6 @@ namespace Player
                 {
                     IAttack attackInstance = CreateAttackInstance(attackData);
                     availableAttacks[index] = attackInstance;
-                    attackInstance.LastUsedTime = Time.time - attackInstance.CooldownTime;
                 }
 
                 // 클라이언트에게 데이터 동기화
