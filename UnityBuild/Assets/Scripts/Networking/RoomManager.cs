@@ -20,6 +20,8 @@ namespace Networking
         public Constants.RoomType roomType;
         public int maxPlayerCount = 6;
 
+        public string matchID = null;
+
         public override void Start()
         {
             var args = System.Environment.GetCommandLineArgs();
@@ -71,7 +73,7 @@ namespace Networking
             }
 
             base.Start();
-            if (Application.isBatchMode)
+            if (Application.platform.Equals(RuntimePlatform.LinuxServer))
             {
                 StartServer();
             }
@@ -131,6 +133,14 @@ namespace Networking
 
         public void StartGame()
         {
+            if (matchID != null)
+            {
+                Debug.LogWarning("[RoomManager] 이미 게임이 시작되었습니다.");
+                return;
+            }
+
+            matchID = Guid.NewGuid().ToString();
+
             if (roomSlots.Count < 1)
             {
                 Debug.LogWarning("[RoomManager] 최소 1명의 플레이어가 필요합니다.");
@@ -142,10 +152,40 @@ namespace Networking
                 player.CmdChangeReadyState(true);
             }
 
-            Debug.Log("[RoomManager] 모든 플레이어가 준비되었습니다. 게임을 시작합니다!");
+            Debug.Log("[RoomManager] 모든 플레이어가 준비되었습니다. 게임을 시작합니다! Match ID: " + matchID);
             if (roomSlots.Count > 1)
             {
                 ServerChangeScene(GameplayScene);
+            }
+        }
+
+    public override void OnServerChangeScene(string newSceneName)
+        {
+            base.OnServerChangeScene(newSceneName);
+            if (newSceneName == GameplayScene)
+            {
+                // 게임 시작
+                Debug.Log("[RoomManager] 게임 시작");
+                GameLobbyUI gameLobbyUI = FindFirstObjectByType<GameLobbyUI>();
+                if (gameLobbyUI != null)
+                {
+                    gameLobbyUI.gameObject.SetActive(false);
+                }
+            }
+            else if (newSceneName == RoomScene)
+            {
+                // 게임 종료
+                if (matchID == null)
+                {
+                    Debug.LogWarning("[RoomManager] 게임이 시작되지 않았습니다.");
+                    return;
+                }
+                Debug.Log("[RoomManager] 게임 종료");
+                matchID = null;
+                foreach (var player in roomSlots)
+                {
+                    player.CmdChangeReadyState(false);
+                }
             }
         }
     }
