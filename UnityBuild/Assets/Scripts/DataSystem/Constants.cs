@@ -87,6 +87,32 @@ namespace DataSystem
             None = 100,
         }
         
+        public enum MatchServerRequestType
+        {
+            register,
+            login,
+            logout,
+            joinRoom,
+            exitRoom,
+            createRoom,
+            listRooms,
+            gameStart,
+            gameEnd,
+        }
+
+        public enum DataServerLogType
+        {
+            joinRoom,
+            exitRoom,
+            createRoom,
+            gameStart,
+            gameEnd,
+            playerReady,
+            skillUse,
+            skillHit,
+            kill,
+        }
+
         [Serializable]
         public class BuffEffectEntry
         {
