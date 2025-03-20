@@ -30,6 +30,13 @@ public class KillLogItem : MonoBehaviour
         victimNameText.text = victim.nickname;
         killerIcon.sprite = Database.GetCharacterClassData(killer.PLayerCharacterClass).CharacterIcon;
         victimIcon.sprite = Database.GetCharacterClassData(victim.PLayerCharacterClass).CharacterIcon;
+        
+        if (killer.playerId == victim.playerId)
+        {
+            killerIcon.color = Color.clear;
+            killerNameText.text = "";
+        }
+        
         if (skillId > 0)
         {
             skillIcon.sprite = Database.GetAttackData(skillId).Icon;
