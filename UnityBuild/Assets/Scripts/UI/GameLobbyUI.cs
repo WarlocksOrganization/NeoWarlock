@@ -66,7 +66,7 @@ public class GameLobbyUI : MonoBehaviour
             PlayerInRoonText.text = $"현재 인원 {PlayerCharacters.Length} / {maxPlayers}";
         }
         
-        playerStatusUI.Setup(foundCharacters);
+        playerStatusUI.Setup(foundCharacters, PlayerSetting.PlayerNum);
 
         // ✅ 방장인지 확인 후 버튼 활성화
         CheckIfHost(PlayerSetting.PlayerNum);

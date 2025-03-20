@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using DataSystem;
 using GameManagement;
 using Mirror;
 using Player;
@@ -9,39 +10,104 @@ using UnityEngine;
 
 public class GamePlayUI : GameLobbyUI
 {
-    private new  void Start()
+    public static GamePlayUI Instance;
+    
+    [SerializeField] private GameObject alamGameObject;
+    [SerializeField] private TextMeshProUGUI alamText;
+    [SerializeField] private TextMeshProUGUI countDownText;
+    
+    private int survivePlayers = -1;
+    private Constants.GameState gameState = Constants.GameState.NotStarted;
+
+    private int maxTime = 10;
+    
+    private void Awake()
     {
-        
+        if (Instance == null)
+            Instance = this;
+    }
+    
+    private void Start()
+    {
+        alamGameObject.SetActive(false);
+        playerStatusUI.ClosePanels();
     }
     public override void UpdatePlayerInRoon()
     {
         // ✅ 현재 씬에서 모든 PlayerCharacter 찾기
         foundCharacters = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None)
-            .OrderBy(player => player.GetComponent<NetworkIdentity>().netId)
-            .ToArray();
-        
-        PlayerCharacters = foundCharacters
-            .Select(player => player.gameObject) // GameObject만 배열에 저장
+            .OrderBy(player => player.playerId)
             .ToArray();
 
+        // ✅ 최대 playerId 값을 기준으로 배열 크기 결정
+        int maxPlayerId = foundCharacters.Length > 0 ? foundCharacters.Max(p => p.playerId) : 0;
+        PlayerCharacters = new GameObject[maxPlayerId + 1]; // ✅ playerId가 배열 인덱스가 되도록 크기 지정
 
-        // ✅ 본인의 플레이어 번호 찾기
-        var myPlayer = foundCharacters.FirstOrDefault(p => p.isOwned);
-        if (myPlayer != null)
+        // ✅ 각 playerId 위치에 해당하는 PlayerCharacter 저장
+        foreach (var player in foundCharacters)
         {
-            int myIndex = Array.IndexOf(PlayerCharacters, myPlayer.gameObject);
-            PlayerSetting.PlayerNum = myIndex;
-            //Debug.Log($"[GameLobbyUI] 내 PlayerNum: {PlayerSetting.PlayerNum}");
+            if (player.playerId >= 0 && player.playerId < PlayerCharacters.Length)
+            {
+                PlayerCharacters[player.playerId] = player.gameObject; // ✅ playerId 위치에 저장
+            }
         }
 
-        // ✅ 게임 방 인원 수 업데이트
-        GameRoomData gameRoomData = FindFirstObjectByType<GameRoomData>();
-        if (gameRoomData != null)
+        survivePlayers = 0;
+
+        foreach (PlayerCharacter playerCharacter in foundCharacters)
         {
-            int maxPlayers = gameRoomData.maxPlayerCount; // ✅ 최대 인원 가져오기
-            //PlayerInRoonText.text = $"현재 인원 {PlayerCharacters.Length} / {maxPlayers}";
+            Debug.Log(playerCharacter.playerId + ",  " + playerCharacter.isDead);
+            if (!playerCharacter.isDead)
+            {
+                survivePlayers += 1;
+            }
+
+            if (playerCharacter.State == Constants.PlayerState.Ready && gameState == Constants.GameState.NotStarted)
+            {
+                gameState = Constants.GameState.Counting;
+                GameStart();
+            }
+        }
+
+        PlayerInRoonText.text = $"남은 인원 :  {survivePlayers} / {PlayerCharacters.Length}";
+
+        playerStatusUI.Setup(foundCharacters, PlayerSetting.PlayerNum);
+    }
+
+
+    private void GameStart()
+    {
+        playerStatusUI.OpenPanels();
+        alamGameObject.SetActive(true);
+
+        NetworkTimer.Instance.StartCountdown(3);
+    }
+
+    public void UpdateCountdownUI(int time)
+    {
+        if (gameState == Constants.GameState.Start)
+        {
+            alamText.text = $"{time}초";
+            if (time == 0)
+            {
+                NetworkTimer.Instance.StartCountdown(maxTime);
+            }
         }
         
-        playerStatusUI.Setup(foundCharacters);
+        else if (gameState == Constants.GameState.Counting)
+        {
+            countDownText.text = time.ToString();
+            
+            if (time == 0)
+            {
+                foreach (var player in foundCharacters)
+                {
+                    player.SetState(Constants.PlayerState.Start);
+                }
+                countDownText.gameObject.SetActive(false);
+                gameState = Constants.GameState.Start;
+                UpdatePlayerInRoon();
+            }
+        }
     }
 }

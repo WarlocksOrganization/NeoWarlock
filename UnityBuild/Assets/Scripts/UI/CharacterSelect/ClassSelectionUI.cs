@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using DataSystem;
 using DataSystem.Database;
@@ -10,6 +11,14 @@ public class ClassSelectionUI : MonoBehaviour
     [SerializeField] private PlayerSelectArea playerSelectArea;
     private PlayerCharacter playerCharacter;
     private Constants.CharacterClass characterClass = Constants.CharacterClass.Mage;
+
+    private void OnEnable()
+    {
+        if (playerCharacter != null)
+        {
+            playerCharacter.SetState(Constants.PlayerState.NotReady);
+        }
+    }
 
     private void Start()
     {
@@ -72,7 +81,7 @@ public class ClassSelectionUI : MonoBehaviour
                 PlayerSetting.MoveSkill,
                 PlayerSetting.AttackSkillIDs
             );
-            playerCharacter.SetIsDead(false);
+            playerCharacter.SetState(Constants.PlayerState.Start);
 
             gameObject.SetActive(false);
         }

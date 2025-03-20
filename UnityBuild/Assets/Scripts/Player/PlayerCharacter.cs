@@ -1,5 +1,6 @@
 using System;
 using Cinemachine;
+using DataSystem;
 using Mirror;
 using TMPro;
 using UI;
@@ -24,7 +25,12 @@ namespace Player
         [SerializeField] private LayerMask mouseTargetLayer;
         
         [SyncVar(hook = nameof(SetIsDead_Hook))]
-        public bool isDead = true;
+        public bool isDead  = false;
+
+        [SyncVar(hook = nameof(SetState_Hook))]
+        public Constants.PlayerState State = Constants.PlayerState.NotReady;
+         
+        
         
         [SerializeField] private Animator animator;
         
@@ -71,6 +77,7 @@ namespace Player
 
         private void UpdatePlayerId(int oldValue, int newValue)
         {
+            playerId = newValue;
             UpdateCount();
         }
 
@@ -87,7 +94,7 @@ namespace Player
         {
             if (!isOwned) return;
 
-            if (isDead) return;
+            if (isDead || State != Constants.PlayerState.Start) return;
             
             if (!_characterController.isGrounded)
             {
@@ -154,6 +161,29 @@ namespace Player
             isDead = newValue;
             _characterController.enabled = !newValue;
             UpdateCount();
+        }
+        
+        public void SetState(Constants.PlayerState value)
+        {
+            if (!isServer)
+            {
+                CmdSetState(value);
+            }
+            else
+            {
+                State = value;
+            }
+        }
+
+        [Command]
+        private void CmdSetState(Constants.PlayerState value)
+        {
+            State = value;
+        }
+
+        public void SetState_Hook(Constants.PlayerState oldValue, Constants.PlayerState newValue)
+        {
+            State = newValue;
         }
     }
 }
