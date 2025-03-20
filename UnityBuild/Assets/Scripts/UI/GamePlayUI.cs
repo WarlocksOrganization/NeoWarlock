@@ -10,8 +10,6 @@ using UnityEngine;
 
 public class GamePlayUI : GameLobbyUI
 {
-    public static GamePlayUI Instance;
-    
     [SerializeField] private GameObject alamGameObject;
     [SerializeField] private TextMeshProUGUI alamText;
     [SerializeField] private TextMeshProUGUI countDownText;
@@ -20,12 +18,6 @@ public class GamePlayUI : GameLobbyUI
     private Constants.GameState gameState = Constants.GameState.NotStarted;
 
     private int maxTime = 10;
-    
-    private void Awake()
-    {
-        if (Instance == null)
-            Instance = this;
-    }
     
     private void Start()
     {
@@ -56,7 +48,7 @@ public class GamePlayUI : GameLobbyUI
 
         foreach (PlayerCharacter playerCharacter in foundCharacters)
         {
-            Debug.Log(playerCharacter.playerId + ",  " + playerCharacter.isDead);
+            Debug.Log(playerCharacter.playerId + ",  " + playerCharacter.isDead + ", " + playerCharacter.curHp);
             if (!playerCharacter.isDead)
             {
                 survivePlayers += 1;
@@ -71,7 +63,7 @@ public class GamePlayUI : GameLobbyUI
 
         PlayerInRoonText.text = $"남은 인원 :  {survivePlayers} / {PlayerCharacters.Length}";
 
-        playerStatusUI.Setup(foundCharacters, PlayerSetting.PlayerNum);
+        playerStatusUI.Setup(foundCharacters, PlayerSetting.PlayerId);
     }
 
 
@@ -80,7 +72,9 @@ public class GamePlayUI : GameLobbyUI
         playerStatusUI.OpenPanels();
         alamGameObject.SetActive(true);
 
-        NetworkTimer.Instance.StartCountdown(3);
+        NetworkTimer networkTimer = FindFirstObjectByType<NetworkTimer>();
+
+        networkTimer.StartCountdown(3);
     }
 
     public void UpdateCountdownUI(int time)
@@ -90,7 +84,8 @@ public class GamePlayUI : GameLobbyUI
             alamText.text = $"{time}초";
             if (time == 0)
             {
-                NetworkTimer.Instance.StartCountdown(maxTime);
+                NetworkTimer networkTimer = FindFirstObjectByType<NetworkTimer>();
+                networkTimer.StartCountdown(maxTime);
             }
         }
         

@@ -35,7 +35,7 @@ namespace Player
             if (isOwned)
             {
                 CmdSetNickname(PlayerSetting.Nickname);
-                CmdSetPlayerNumber(PlayerSetting.PlayerNum);
+                CmdSetPlayerNumber(PlayerSetting.PlayerId);
                 playerCardUI = FindFirstObjectByType<PlayerCardUI>();
             }
         }
@@ -99,7 +99,7 @@ namespace Player
                         FindObjectsByType<LobbyPlayerCharacter>(sortMode: FindObjectsSortMode.None);
                     foreach (var pcharacter in pc)
                     {
-                        if (pcharacter.playerId == PlayerSetting.PlayerNum)
+                        if (pcharacter.playerId == PlayerSetting.PlayerId)
                         {
                             playerCharacter = pcharacter;
                             break;

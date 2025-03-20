@@ -17,18 +17,27 @@ public class PlayerPanel : MonoBehaviour
         {
             playerImage.sprite = Database.GetCharacterClassData(playerCharacter.PLayerCharacterClass).CharacterIcon;
         }
+    
         playerName.text = playerCharacter.nickname;
         playerName.color = playerCharacter.playerId == playerid ? Color.yellow : Color.white;
-        if (playerCharacter.curHp <= 0)
+    
+        // ✅ 강제 UI 업데이트
+        UpdateIsDeadImage(playerCharacter.isDead);
+
+        Debug.Log($"[PlayerPanel] {PlayerSetting.PlayerId} 플레이어 {playerCharacter.playerId} 체력: {playerCharacter.curHp}, isDead: {playerCharacter.isDead}");
+    }
+
+    private void UpdateIsDeadImage(bool isDead)
+    {
+        if (isDead)
         {
-            //playerImage.color = new Color(0.5f, 0.5f, 0.5f, 0.5f);
             if (isDeadImage != null) isDeadImage.gameObject.SetActive(true);
         }
         else
         {
-            //playerImage.color = Color.white;
             if (isDeadImage != null) isDeadImage.gameObject.SetActive(false);
         }
     }
+
 }
 

@@ -54,7 +54,7 @@ public class GameLobbyUI : MonoBehaviour
         if (myPlayer != null)
         {
             int myIndex = Array.IndexOf(PlayerCharacters, myPlayer.gameObject);
-            PlayerSetting.PlayerNum = myIndex;
+            PlayerSetting.PlayerId = myIndex;
             //Debug.Log($"[GameLobbyUI] 내 PlayerNum: {PlayerSetting.PlayerNum}");
         }
 
@@ -66,10 +66,10 @@ public class GameLobbyUI : MonoBehaviour
             PlayerInRoonText.text = $"현재 인원 {PlayerCharacters.Length} / {maxPlayers}";
         }
         
-        playerStatusUI.Setup(foundCharacters, PlayerSetting.PlayerNum);
+        playerStatusUI.Setup(foundCharacters, PlayerSetting.PlayerId);
 
         // ✅ 방장인지 확인 후 버튼 활성화
-        CheckIfHost(PlayerSetting.PlayerNum);
+        CheckIfHost(PlayerSetting.PlayerId);
     }
     
     // ✅ 방장인지 확인 후 버튼 활성화
@@ -102,6 +102,8 @@ public class GameLobbyUI : MonoBehaviour
             killerId = deadId;
         }
         killLogUI?.AddKillLog(foundCharacters[killerId], foundCharacters[deadId], skillid, isFall);
+
+        UpdatePlayerInRoon();
     }
     
 }

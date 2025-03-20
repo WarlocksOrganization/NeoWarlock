@@ -8,6 +8,7 @@ public class DamageBox : MonoBehaviour
     [SerializeField] private int damagePerTick = 10; // ✅ 0.5초마다 줄 데미지
     [SerializeField] private float damageInterval = 0.5f; // ✅ 데미지 간격 (0.5초)
     private HashSet<PlayerCharacter> playersInRange = new HashSet<PlayerCharacter>(); // ✅ 감지된 플레이어 저장
+    private Coroutine damageCoroutine; // ✅ 개별 데미지 코루틴 추적
 
     private void OnTriggerEnter(Collider other)
     {
@@ -15,8 +16,16 @@ public class DamageBox : MonoBehaviour
         if (player != null)
         {
             playersInRange.Add(player);
-            if (playersInRange.Count == 1) // ✅ 첫 번째 플레이어가 들어오면 코루틴 시작
-                StartCoroutine(DamageOverTime());
+
+            // ✅ 새로운 플레이어가 감지되면 즉시 데미지 적용
+            player.takeDamage(damagePerTick, transform.position, 0, null, -1, 0);
+            Debug.Log($"[DamageBox] 플레이어 {player.playerId} 감지됨. 현재 감지된 플레이어 수: {playersInRange.Count}");
+
+            // ✅ 기존 코루틴이 실행 중이 아니면 실행
+            if (damageCoroutine == null)
+            {
+                damageCoroutine = StartCoroutine(DamageOverTime());
+            }
         }
     }
 
@@ -26,20 +35,32 @@ public class DamageBox : MonoBehaviour
         if (player != null)
         {
             playersInRange.Remove(player);
-            if (playersInRange.Count == 0) // ✅ 플레이어가 없으면 코루틴 중지
-                StopCoroutine(DamageOverTime());
+            Debug.Log($"[DamageBox] 플레이어 {player.playerId} 나감. 남은 플레이어 수: {playersInRange.Count}");
+
+            // ✅ 모든 플레이어가 나가면 코루틴 종료
+            if (playersInRange.Count == 0 && damageCoroutine != null)
+            {
+                StopCoroutine(damageCoroutine);
+                damageCoroutine = null;
+            }
         }
     }
 
     private IEnumerator DamageOverTime()
     {
-        while (playersInRange.Count > 0)
+        while (playersInRange.Count > 0) // ✅ 실시간 업데이트 반영
         {
-            foreach (var player in playersInRange)
+            foreach (var player in playersInRange) // ✅ 리스트 복사본 없이 직접 참조
             {
-                player.takeDamage(damagePerTick, transform.position, 0, null, -1, 0); // ✅ 넉백 X, 버프 X
+                player.takeDamage(damagePerTick, transform.position, 0, null, -1, 0);
             }
+
+            Debug.Log($"[DamageBox] 현재 감지된 플레이어 수: {playersInRange.Count}");
+
             yield return new WaitForSeconds(damageInterval);
         }
+
+        // ✅ 모든 플레이어가 나가면 코루틴 종료
+        damageCoroutine = null;
     }
 }

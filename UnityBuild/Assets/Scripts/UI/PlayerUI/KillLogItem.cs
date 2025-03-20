@@ -28,9 +28,9 @@ public class KillLogItem : MonoBehaviour
     public void SetKillLog(PlayerCharacter killer, PlayerCharacter victim, int skillId, bool isFall)
     {
         killerNameText.text = killer.nickname;
-        killerNameText.color = killer.playerId == PlayerSetting.PlayerNum ? Color.yellow : Color.white;
+        killerNameText.color = killer.playerId == PlayerSetting.PlayerId ? Color.yellow : Color.white;
         victimNameText.text = victim.nickname;
-        victimNameText.color = victim.playerId == PlayerSetting.PlayerNum ? Color.yellow : Color.white;
+        victimNameText.color = victim.playerId == PlayerSetting.PlayerId ? Color.yellow : Color.white;
         killerIcon.sprite = Database.GetCharacterClassData(killer.PLayerCharacterClass).CharacterIcon;
         victimIcon.sprite = Database.GetCharacterClassData(victim.PLayerCharacterClass).CharacterIcon;
         

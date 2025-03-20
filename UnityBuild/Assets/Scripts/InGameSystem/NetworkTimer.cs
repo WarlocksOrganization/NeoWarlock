@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using Mirror;
 using UnityEngine;
@@ -7,12 +8,11 @@ public class NetworkTimer : NetworkBehaviour
     [SyncVar(hook = nameof(OnTimeChanged))] // ✅ 모든 클라이언트와 시간 동기화
     public int currentTime = 10;
 
-    public static NetworkTimer Instance; // ✅ 싱글톤 패턴으로 접근
+    private GamePlayUI gamePlayUI;
 
     private void Awake()
     {
-        if (Instance == null)
-            Instance = this;
+        gamePlayUI = FindFirstObjectByType<GamePlayUI>();
     }
 
     [Server] // ✅ 서버에서만 실행
@@ -39,7 +39,7 @@ public class NetworkTimer : NetworkBehaviour
 
     private void OnTimeChanged(int oldTime, int newTime)
     {
-        GamePlayUI.Instance.UpdateCountdownUI(newTime);
+        gamePlayUI.UpdateCountdownUI(newTime);
     }
     
     [Server] // ✅ 서버에서만 실행
@@ -51,7 +51,7 @@ public class NetworkTimer : NetworkBehaviour
     [ClientRpc]
     private void RpcStartEvent()
     {
-        GamePlayUI.Instance.UpdateCountdownUI(0);
+        gamePlayUI.UpdateCountdownUI(0);
         GameSystemManager.Instance.StartEvent();
     }
 }

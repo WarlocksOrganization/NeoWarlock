@@ -125,8 +125,6 @@ namespace Player
                 {
                     playerUI.SetQuickSlotData(index, playerAttackData.Icon, playerAttackData.Cooldown, playerAttackData.DisplayName, playerAttackData.Description);
                 }
-
-                Debug.Log($"[스킬 설정] {playerAttackData.Name}({playerAttackData.ID}) 적용 완료 {playerAttackData.Radius}");
             }
             else
             {
