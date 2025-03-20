@@ -1,5 +1,7 @@
 using System;
 using Cinemachine;
+using DataSystem;
+using GameManagement;
 using Mirror;
 using TMPro;
 using UI;
@@ -24,7 +26,12 @@ namespace Player
         [SerializeField] private LayerMask mouseTargetLayer;
         
         [SyncVar(hook = nameof(SetIsDead_Hook))]
-        public bool isDead = true;
+        public bool isDead  = false;
+
+        [SyncVar(hook = nameof(SetState_Hook))]
+        public Constants.PlayerState State = Constants.PlayerState.NotReady;
+         
+        
         
         [SerializeField] private Animator animator;
         
@@ -66,11 +73,14 @@ namespace Player
 
         private void OnDestroy()
         {
-            UpdateCount();
+            //UpdateCount();
         }
 
         private void UpdatePlayerId(int oldValue, int newValue)
         {
+            if (isServer) return; // 서버에서는 직접 할당되므로 클라이언트에서만 실행
+
+            playerId = newValue;
             UpdateCount();
         }
 
@@ -80,14 +90,14 @@ namespace Player
             {
                 gameLobbyUI = FindFirstObjectByType<GameLobbyUI>();
             }
-            gameLobbyUI?.UpdatePlayerInRoon();
+            gameLobbyUI.UpdatePlayerInRoon();
         }
 
         void Update()
         {
             if (!isOwned) return;
 
-            if (isDead) return;
+            if (isDead || State != Constants.PlayerState.Start) return;
             
             if (!_characterController.isGrounded)
             {
@@ -140,6 +150,7 @@ namespace Player
             else
             {
                 isDead = value;
+                RpcUpdatePlayerStatus(connectionToClient); // ✅ 서버에서 실행 시 TargetRpc 호출
             }
         }
 
@@ -147,13 +158,54 @@ namespace Player
         private void CmdSetIsDead(bool value)
         {
             isDead = value;
+    
+            // ✅ 서버에서 클라이언트에게 UI 업데이트 전송
+            RpcUpdatePlayerStatus(connectionToClient);
         }
 
         public void SetIsDead_Hook(bool oldValue, bool newValue)
         {
             isDead = newValue;
             _characterController.enabled = !newValue;
+
+            Debug.Log($"[SetIsDead_Hook] {PlayerSetting.PlayerId} 플레이어 {playerId} isDead 값 변경됨: {newValue}");
+
+            // ✅ UI 강제 업데이트
             UpdateCount();
+        }
+
+        [TargetRpc]
+        private void RpcUpdatePlayerStatus(NetworkConnection target)
+        {
+            if (gameLobbyUI == null)
+            {
+                gameLobbyUI = FindFirstObjectByType<GameLobbyUI>();
+            }
+
+            gameLobbyUI.UpdatePlayerInRoon();
+        }
+        
+        public void SetState(Constants.PlayerState value)
+        {
+            if (!isServer)
+            {
+                CmdSetState(value);
+            }
+            else
+            {
+                State = value;
+            }
+        }
+
+        [Command]
+        private void CmdSetState(Constants.PlayerState value)
+        {
+            State = value;
+        }
+
+        public void SetState_Hook(Constants.PlayerState oldValue, Constants.PlayerState newValue)
+        {
+            State = newValue;
         }
     }
 }

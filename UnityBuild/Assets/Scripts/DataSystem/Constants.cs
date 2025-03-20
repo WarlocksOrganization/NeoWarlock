@@ -17,6 +17,20 @@ namespace DataSystem
             Solo = 0,           // 개인전
             Team = 1,           // 팀전
         }
+
+        public enum PlayerState
+        {
+            NotReady = 0,
+            Ready = 1,
+            Start = 2,
+        }
+
+        public enum GameState
+        {
+            NotStarted = 0,
+            Counting = 1,
+            Start = 2,
+        }
         
         public enum CharacterClass
         {

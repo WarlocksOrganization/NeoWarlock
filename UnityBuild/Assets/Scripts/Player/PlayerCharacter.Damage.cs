@@ -13,7 +13,7 @@ namespace Player
         [SerializeField] private GameObject floatingDamageTextPrefab;
 
         [SyncVar(hook = nameof(OnHpChanged))] // ✅ Hook 추가
-        private int curHp = 150;
+        public int curHp = 150;
 
         [SyncVar] private int maxHp = 150;
 
@@ -23,7 +23,7 @@ namespace Player
         
         public void takeDamage(int damage, Vector3 attackTran, float knockbackForce, AttackConfig attackConfig, int attackPlayerId, int attackskillid)
         {
-            if (!isServer) return;
+            if (!isServer || State == Constants.PlayerState.NotReady) return;
             if (curHp <= 0) return;
 
             if (damage > 0)

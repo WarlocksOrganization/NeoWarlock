@@ -20,6 +20,8 @@ namespace Player
 
         public LobbyPlayerCharacter playerCharacter;
 
+        [SerializeField] private GameObject gamePlayObject;
+
         public override void Start()
         {
             base.Start();
@@ -33,7 +35,7 @@ namespace Player
             if (isOwned)
             {
                 CmdSetNickname(PlayerSetting.Nickname);
-                CmdSetPlayerNumber(PlayerSetting.PlayerNum);
+                CmdSetPlayerNumber(PlayerSetting.PlayerId);
                 playerCardUI = FindFirstObjectByType<PlayerCardUI>();
             }
         }
@@ -43,6 +45,12 @@ namespace Player
             Vector3 spawnPos = FindFirstObjectByType<SpawnPosition>().GetSpawnPosition();
             playerCharacter = Instantiate((NetworkRoomManager.singleton as RoomManager).spawnPrefabs[0], spawnPos, Quaternion.identity).GetComponent<LobbyPlayerCharacter>();
             NetworkServer.Spawn(playerCharacter.gameObject, connectionToClient);
+
+            if (isServer)
+            {
+                GameObject gameObj = Instantiate(gamePlayObject, Vector3.zero, Quaternion.identity);
+                NetworkServer.Spawn(gameObj, connectionToClient);
+            }
         }
 
         [Command]
@@ -68,8 +76,6 @@ namespace Player
             }
 
             RpcUpdateTimer(0); // ✅ 0초일 때 최종 업데이트
-            
-            playerCharacter.SetIsDead(false);
         }
 
         // ✅ 서버 -> 클라이언트 타이머 동기화
@@ -93,13 +99,15 @@ namespace Player
                         FindObjectsByType<LobbyPlayerCharacter>(sortMode: FindObjectsSortMode.None);
                     foreach (var pcharacter in pc)
                     {
-                        if (pcharacter.playerId == PlayerSetting.PlayerNum)
+                        if (pcharacter.playerId == PlayerSetting.PlayerId)
                         {
                             playerCharacter = pcharacter;
                             break;
                         }
                     }
                 }
+                
+                playerCharacter.State = Constants.PlayerState.Ready;
                 
                 foreach (var slot in playerCardUI.slots)
                 {

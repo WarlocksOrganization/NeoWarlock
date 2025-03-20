@@ -12,7 +12,7 @@ namespace GameManagement
         public static Constants.SkillType MoveSkill = Constants.SkillType.None;
         public static int[] AttackSkillIDs = {0,1,2,3};
         
-        public static int PlayerNum;
+        public static int PlayerId;
         
         public static List<Database.PlayerCardData> PlayerCards = new List<Database.PlayerCardData>();
     }

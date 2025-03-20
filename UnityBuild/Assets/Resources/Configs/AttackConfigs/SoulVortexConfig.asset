@@ -17,7 +17,7 @@ MonoBehaviour:
   recoveryTime: 1.25
   attackDuration: 3
   attackInterval: 0.5
-  animParameter: isAttack4
+  animParameter: isAttack3
   attackTrans: {x: 0, y: 0, z: 0}
   Prefab: {fileID: 322783647940636695, guid: 0bc3aa79cdf75474792eabbf250360a0, type: 3}
   explosionEffectPrefab: {fileID: 5412338807302183837, guid: 49b0b289a6b5c634c81eb0bfb7c92e6c, type: 3}

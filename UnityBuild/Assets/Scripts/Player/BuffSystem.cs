@@ -45,7 +45,7 @@ public class BuffSystem : NetworkBehaviour
         ApplyBuffEffect(buffData);
 
         Coroutine tickDamageCoroutine = null;
-        if (buffData.tickDamage > 0)
+        if (buffData.tickDamage != 0)
         {
             tickDamageCoroutine = StartCoroutine(TickDamage(buffData, attackPlayerId, attackskillid));
             activeTickDamage[buffData.BuffType] = tickDamageCoroutine;
@@ -148,21 +148,31 @@ public class BuffSystem : NetworkBehaviour
         float elapsedTime = 0f;
         CharacterController characterController = playerCharacter.GetComponent<CharacterController>();
 
+        if (characterController == null)
+        {
+            Debug.LogError("[BuffSystem] CharacterController가 없음! 이동 불가능!");
+            yield break;
+        }
+
         while (elapsedTime < buffData.duration)
         {
-            yield return new WaitForSeconds(0.016f);
+            yield return null; // ✅ 매 프레임 실행
 
             if (playerCharacter != null)
             {
                 Quaternion quaternion = playerCharacter.gameObject.transform.GetChild(2).rotation;
                 Vector3 moveDirection = quaternion * buffData.moveDirection;
                 moveDirection.y = 0f;
-                characterController.Move(moveDirection * 0.1f);
+                
+                characterController.Move(moveDirection * Time.deltaTime);
             }
 
-            elapsedTime += 0.016f;
+            elapsedTime += Time.deltaTime; // ✅ Time.deltaTime을 사용하여 정확한 시간 측정
         }
+
+        Debug.Log("[ForcedMove] 종료됨");
     }
+
 
     [Command(requiresAuthority = false)]
     public void CmdClearAllBuffs()
@@ -200,13 +210,21 @@ public class BuffSystem : NetworkBehaviour
         {
             if ((Constants.BuffType)buffType != Constants.BuffType.None)
             {
-                RpcPlayBuffEffect((Constants.BuffType)buffType, false);
+                if (isServer) // ✅ 서버에서만 실행하도록 변경
+                {
+                    RpcPlayBuffEffect((Constants.BuffType)buffType, false);
+                }
             }
         }
     }
     
     public void ServerApplyBuff(BuffData buffData, int attackPlayerId, int attackskillid)
     {
+        if (!isServer)
+        {
+            return;
+        }
+
         if (activeBuffs.ContainsKey(buffData.BuffType))
         {
             StopCoroutine(activeBuffs[buffData.BuffType]);

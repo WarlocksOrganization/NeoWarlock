@@ -59,7 +59,7 @@ public class EffectSystem : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning($"BuffType {type}에 대한 이펙트가 등록되지 않았습니다!");
+            //Debug.LogWarning($"BuffType {type}에 대한 이펙트가 등록되지 않았습니다!");
         }
     }
     
@@ -71,7 +71,7 @@ public class EffectSystem : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning($"SkillType {type}에 대한 이펙트가 등록되지 않았습니다!");
+            //Debug.LogWarning($"SkillType {type}에 대한 이펙트가 등록되지 않았습니다!");
         }
     }
 
