@@ -6,13 +6,13 @@ namespace UI
     {
         [SerializeField] private QuickSlot[] quickSlots;
 
-        public void SetQuickSlotData(int index, Sprite icon, float cooldown, string name, string description)
+        public void SetQuickSlotData(int index, Sprite icon, float cooldown, string name, string description, Sprite upgradeIcon = null)
         {
             if (index > quickSlots.Length)
             {
                 return;
             }
-            quickSlots[index].SetQuickSlotData(icon, cooldown, name, description);
+            quickSlots[index].SetQuickSlotData(icon, cooldown, name, description, upgradeIcon);
         }
     
         public void UseSkill(int index, float cooldown)

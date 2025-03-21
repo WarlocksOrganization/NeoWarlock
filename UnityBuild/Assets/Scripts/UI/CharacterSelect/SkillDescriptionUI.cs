@@ -18,7 +18,9 @@ public class SkillDescriptionUI : MonoBehaviour
     public void ShowSkillDetail()
     {
         //transform.position = buttonPosition;
-        gameObject.SetActive(true);
+        if (skillNameText.text != "") {
+            gameObject.SetActive(true);
+        }
     }
 
     public void CloseSkillDetail()
