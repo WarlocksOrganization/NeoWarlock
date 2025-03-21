@@ -98,6 +98,10 @@ namespace DataSystem
             PowerSlash,
             PowerPowerBody,
             PowerCharge,
+            PhantomSmart,
+            SoulSwamp,
+            InfernalPoison,
+            
             None = 100,
         }
         

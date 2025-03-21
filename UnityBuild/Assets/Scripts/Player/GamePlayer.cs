@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using DataSystem;
 using DataSystem.Database;
@@ -42,15 +43,13 @@ namespace Player
 
         protected void SpawnLobbyPlayerCharacter()
         {
+            GameObject gameObj = Instantiate(gamePlayObject, Vector3.zero, Quaternion.identity);
+            NetworkServer.Spawn(gameObj, connectionToClient);
+            
             Vector3 spawnPos = FindFirstObjectByType<SpawnPosition>().GetSpawnPosition();
             playerCharacter = Instantiate((NetworkRoomManager.singleton as RoomManager).spawnPrefabs[0], spawnPos, Quaternion.identity).GetComponent<LobbyPlayerCharacter>();
             NetworkServer.Spawn(playerCharacter.gameObject, connectionToClient);
-
-            if (isServer)
-            {
-                GameObject gameObj = Instantiate(gamePlayObject, Vector3.zero, Quaternion.identity);
-                NetworkServer.Spawn(gameObj, connectionToClient);
-            }
+            
         }
 
         [Command]
@@ -124,6 +123,13 @@ namespace Player
                     PlayerSetting.AttackSkillIDs
                 );
             }
+        }
+
+        private void OnDestroy()
+        {
+            GameLobbyUI gameLobbyUI = FindFirstObjectByType<GameLobbyUI>();
+
+            gameLobbyUI?.UpdatePlayerInRoon();
         }
     }
 }
