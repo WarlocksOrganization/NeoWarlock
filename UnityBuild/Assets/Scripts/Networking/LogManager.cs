@@ -8,12 +8,13 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Threading;
 using System.Text.RegularExpressions;
+using GameManagement;
+using DataSystem;
 
 namespace Networking
 { 
     public class LogManager : MonoBehaviour
     {
-        public string logFilepath = "/.config/unity3d/warlocks/smashup/Logs/room.log";
         public string logServerIP = "logs";
         public int logServerPort = 7878;
         public int Port = 7777;
@@ -58,18 +59,8 @@ namespace Networking
                 }
                 else if (args[i].StartsWith("-logFilepath="))
                 {
-                    logFilepath = args[i].Substring(14);
-                    Regex pathRegex = new Regex(@"^\/.*");
-                    
-                    if (!pathRegex.IsMatch(logFilepath))
-                    {
-                        Debug.LogWarning($"[LogManager] 로그 파일 경로 변경 실패: {logFilepath}");
-                        logFilepath = "/.config/unity3d/warlocks/smashup/Logs/room.log";
-                    }
-                    else
-                    {
-                        Debug.Log($"[LogManager] 로그 파일 경로 변경: {logFilepath}");
-                    }
+                    Constants.LogFilepath = args[i].Substring(14);
+                    Debug.Log($"[LogManager] 로그 파일 경로 변경: {Constants.LogFilepath}");
                 }
                 else if (args[i].StartsWith("-port="))
                 {
@@ -116,7 +107,7 @@ namespace Networking
             }
 
             // 로그 파일 읽기
-            string logPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + logFilepath;
+            string logPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + Constants.LogFilepath;
             if (!File.Exists(logPath))
             {
                 Debug.LogWarning("[LogManager] 로그 파일이 존재하지 않습니다.");

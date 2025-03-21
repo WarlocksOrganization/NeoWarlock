@@ -46,7 +46,8 @@ namespace GameManagement
             #else
             // 로그 파일에 기록
             try{
-                File.AppendAllText(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + LogManager.singleton.logFilepath +, json + "," + Environment.NewLine);
+                string logPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + Constants.LogFilepath;
+                File.AppendAllText(logPath, json + "," + Environment.NewLine);
             }
             catch (Exception ex)
             {

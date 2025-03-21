@@ -14739,7 +14739,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bad97db35902ace47bca25c558e84f37, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  logFilepath: /.config/unity3d/warlocks/smashup/Logs/room.log
   logServerIP: logs
   logServerPort: 7878
   Port: 7777

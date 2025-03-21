@@ -11,6 +11,8 @@ namespace DataSystem
         public static readonly string IconPath = "Sprites/AttackIcons/";
         public static readonly string ClassIconPath = "Sprites/ClassIcons/";
         public static readonly string CardIconPath = "Sprites/CardIcons/";
+
+        public static string LogFilepath = "/.config/unity3d/warlocks/smashup/Logs/room.log";
         
         public enum RoomType
         {
