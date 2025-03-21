@@ -50,8 +50,10 @@ public class GameSystemManager : MonoBehaviour
                 //Debug.LogError($"❌ 이벤트 {eventnum}: 선택된 FallGround가 존재하지 않습니다!");
             }
         }
-
-        // ✅ 다음 이벤트의 FallGround 자식 찾기 및 NextFall() 실행
+    }
+    public void NetEvent()
+    {
+    // ✅ 다음 이벤트의 FallGround 자식 찾기 및 NextFall() 실행
         int nextEvent = eventnum + 1;
         if (nextEvent < FallGrounds.Length)
         {
@@ -71,9 +73,6 @@ public class GameSystemManager : MonoBehaviour
                 }
             }
         }
-
-        Debug.Log($"✅ 이벤트 {eventnum} 실행 완료!");
-
         eventnum++; // 다음 이벤트로 이동
     }
 }

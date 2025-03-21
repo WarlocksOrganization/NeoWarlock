@@ -48,7 +48,7 @@ public class GamePlayUI : GameLobbyUI
 
         foreach (PlayerCharacter playerCharacter in foundCharacters)
         {
-            Debug.Log(playerCharacter.playerId + ",  " + playerCharacter.isDead + ", " + playerCharacter.curHp);
+            //Debug.Log(playerCharacter.playerId + ",  " + playerCharacter.isDead + ", " + playerCharacter.curHp);
             if (!playerCharacter.isDead)
             {
                 survivePlayers += 1;
@@ -61,7 +61,7 @@ public class GamePlayUI : GameLobbyUI
             }
         }
 
-        PlayerInRoonText.text = $"남은 인원 :  {survivePlayers} / {PlayerCharacters.Length}";
+        PlayerInRoonText.text = $"남은 인원 : {survivePlayers} 명";
 
         playerStatusUI.Setup(foundCharacters, PlayerSetting.PlayerId);
     }
@@ -81,6 +81,11 @@ public class GamePlayUI : GameLobbyUI
     {
         if (gameState == Constants.GameState.Start)
         {
+            alamText.color = Color.white;
+            if (time <= 5)
+            {
+                alamText.color = new Color(0.8f, 0, 0);
+            }
             alamText.text = $"{time}초";
             if (time == 0)
             {
