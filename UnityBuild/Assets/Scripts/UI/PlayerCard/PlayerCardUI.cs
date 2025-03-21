@@ -6,6 +6,7 @@ using GameManagement;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.UI;
 
 public class PlayerCardUI : MonoBehaviour
 {
@@ -13,12 +14,38 @@ public class PlayerCardUI : MonoBehaviour
     [SerializeField] private TMP_Text timerText; // 남은 시간 표시
 
     private Queue<Database.PlayerCardData> selectedCardsQueue = new();
-    private float remainingTime = 10f; // 초기 시간 10초
+    public float maxTime = 10f;
+    private float remainingTime;
+    private float targetValue = 10f;
+    private float lerpSpeed = 0.5f;
+    public Slider timerSlider;
+    private bool isRunning = true;
 
     void Start()
     {
         LoadRandomPlayerCards();
         DisplayTopThreeCards();
+        remainingTime = maxTime;
+        timerSlider.maxValue = 1f;
+        timerSlider.value = 1f;
+    }
+
+    void Update()
+    {
+        if (!isRunning) return;
+
+        remainingTime -= Time.deltaTime;
+        remainingTime = Mathf.Clamp(remainingTime, 0f, maxTime);
+
+        timerSlider.value = Mathf.Lerp(timerSlider.value, remainingTime / maxTime, Time.deltaTime * 10f);
+        //fillImage.color = Color.Lerp(endColor, startColor, ratio);
+        timerText.text = $"남은 시간: {Mathf.Ceil(remainingTime)}초";
+
+        if (remainingTime <= 0f)
+        {
+            isRunning = false;
+            ConfirmSelectedCards();
+        }
     }
 
     private void LoadRandomPlayerCards()
@@ -68,14 +95,20 @@ public class PlayerCardUI : MonoBehaviour
     }
 
     // ⏳ 서버에서 호출하여 클라이언트 UI 업데이트
-    public void UpdateTimer(float time)
+    public void UpdateTimer(float serverTime)
     {
-        remainingTime = time;
-        timerText.text = $"남은 시간: {Mathf.Ceil(remainingTime)}초";
+        float timeDiff = Mathf.Abs(remainingTime - serverTime);
 
-        if (remainingTime <= 0)
+        if (timeDiff > 1f)
         {
-            ConfirmSelectedCards();
+            // 큰 차이는 바로 보정
+            remainingTime = serverTime;
+        }
+        else
+        {
+            // 부드럽게 동기화 (클라이언트 기준 시간 보정)
+            float smoothFactor = 0.3f;
+            remainingTime = Mathf.Lerp(remainingTime, serverTime, smoothFactor);
         }
     }
 
