@@ -7,7 +7,6 @@ using UnityEngine;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using UnityEditor;
-using Unity.Android.Gradle;
 
 namespace Networking
 {
