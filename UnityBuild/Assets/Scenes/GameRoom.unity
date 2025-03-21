@@ -311,7 +311,7 @@ Transform:
   m_GameObject: {fileID: 21461760}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 18.99, y: 0, z: 22.79}
+  m_LocalPosition: {x: -5.7, y: 0, z: 15.9}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6611,7 +6611,7 @@ Transform:
   m_GameObject: {fileID: 767301560}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 10.13, y: 0, z: 1.18}
+  m_LocalPosition: {x: 11.7, y: 0, z: -9.4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -7001,6 +7001,37 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 806581128}
   m_CullTransparentMesh: 1
+--- !u!1 &813037816
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 813037817}
+  m_Layer: 0
+  m_Name: SpawnPos (4)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &813037817
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 813037816}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 11.2, y: 0, z: -12.8}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2021060040}
+  m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
 --- !u!1 &846459493
 GameObject:
   m_ObjectHideFlags: 0
@@ -10976,6 +11007,37 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.029330034, y: 0.029317316, z: 0.00019547553}
   m_Center: {x: 0.004810162, y: -0.011086946, z: 0.000097737764}
+--- !u!1 &1381698731
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1381698732}
+  m_Layer: 0
+  m_Name: SpawnPos (5)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1381698732
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1381698731}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: -12.2, y: 0, z: -11}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2021060040}
+  m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
 --- !u!1 &1382809607
 GameObject:
   m_ObjectHideFlags: 0
@@ -14372,6 +14434,8 @@ Transform:
   - {fileID: 767301561}
   - {fileID: 18239043}
   - {fileID: 21461761}
+  - {fileID: 813037817}
+  - {fileID: 1381698732}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2036964101
@@ -33579,6 +33643,10 @@ PrefabInstance:
     - target: {fileID: 1446899003667595082, guid: b6cb1d78110e6f541ae77640eda49016, type: 3}
       propertyPath: m_Name
       value: KillLogUI
+      objectReference: {fileID: 0}
+    - target: {fileID: 1446899003667595082, guid: b6cb1d78110e6f541ae77640eda49016, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3504389966966622312, guid: b6cb1d78110e6f541ae77640eda49016, type: 3}
       propertyPath: m_AnchorMax.y
@@ -109950,6 +110018,10 @@ PrefabInstance:
     - target: {fileID: 875491090339862744, guid: 4cb9160ea12e6ef4d8abb8fa21de4506, type: 3}
       propertyPath: m_Name
       value: PlayerStatusUI
+      objectReference: {fileID: 0}
+    - target: {fileID: 875491090339862744, guid: 4cb9160ea12e6ef4d8abb8fa21de4506, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1222919657147402508, guid: 4cb9160ea12e6ef4d8abb8fa21de4506, type: 3}
       propertyPath: m_AnchorMax.y

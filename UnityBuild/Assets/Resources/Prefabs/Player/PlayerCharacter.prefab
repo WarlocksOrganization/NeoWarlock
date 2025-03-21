@@ -96421,6 +96421,7 @@ MonoBehaviour:
   State: 0
   animator: {fileID: 5766581736010466980}
   attackTransform: {fileID: 2138096227263670792}
+  ghostPrefab: {fileID: 6925654504224896694, guid: b0d3bfde8f4a99945a3507bc4b4ecfd3, type: 3}
   playerHUD: {fileID: 7880346224794796878}
   floatingDamageTextPrefab: {fileID: 7419919620569818252, guid: e91df33ee3e256a4d80b9260a3d087e4, type: 3}
   curHp: 150

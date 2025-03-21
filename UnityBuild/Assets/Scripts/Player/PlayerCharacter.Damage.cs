@@ -116,6 +116,11 @@ namespace Player
             {
                 playerHUD.GetComponent<CanvasGroup>().alpha = 0;
             }
+
+            if (isOwned)
+            {
+                playerUI.SetDamageEffect(1f-(float)newHp / maxHp);
+            }
         }
         
         [ClientRpc]

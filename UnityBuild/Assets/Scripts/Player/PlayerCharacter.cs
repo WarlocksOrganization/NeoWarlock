@@ -40,6 +40,11 @@ namespace Player
         [SerializeField] private Transform attackTransform;
 
         private GameLobbyUI gameLobbyUI;
+        
+        [Header("Ghost Settings")]
+        [SerializeField] private GameObject ghostPrefab; // ✅ 유령 프리팹
+        private GameObject ghostInstance;
+        private bool isGhost = false;
 
         private void Awake()
         {
@@ -150,6 +155,7 @@ namespace Player
             else
             {
                 isDead = value;
+                if (value) SpawnGhost();
                 RpcUpdatePlayerStatus(connectionToClient); // ✅ 서버에서 실행 시 TargetRpc 호출
             }
         }
@@ -207,5 +213,26 @@ namespace Player
         {
             State = newValue;
         }
+        
+        private void SpawnGhost()
+        {
+            if (!isServer) return; // 서버에서만 실행
+
+            GameObject ghost = Instantiate(ghostPrefab, transform.position, Quaternion.identity);
+            NetworkServer.Spawn(ghost, connectionToClient); // 클라이언트와 동기화
+            ghostInstance = ghost;
+
+            RpcSetupGhost(ghost);
+        }
+        
+        [ClientRpc]
+        private void RpcSetupGhost(GameObject ghost)
+        {
+            if (ghost == null) return;
+
+            isGhost = true;
+        }
+
+
     }
 }
