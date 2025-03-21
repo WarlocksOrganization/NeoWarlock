@@ -24,6 +24,9 @@
         [SerializeField] private Sprite purpleIconFrame;
         [SerializeField] private Sprite goldIconFrame;
 
+        [SerializeField] private GameObject glowImage;
+        private Coroutine glowCoroutine;
+
         private Database.PlayerCardData currentCard;
         private Database.AttackData[] SkillData;
         private PlayerCardUI playerCardUI;
@@ -49,6 +52,16 @@
         public void SetCardData(Database.PlayerCardData cardData)
         {
             Initialize();
+            if (glowCoroutine != null)
+            {
+                StopCoroutine(glowCoroutine);
+                glowCoroutine = null;
+            }
+            if (glowImage != null)
+            {
+                glowImage.SetActive(false);
+                glowImage.transform.localScale = Vector3.one;
+            }
             currentCard = cardData;
         
             cardIconImage.sprite = Database.GetCardIcon(cardData.StatType);
@@ -129,16 +142,57 @@
                     cardNameText.text = $"{SkillData[currentCard.AppliedSkillIndex].DisplayName}";
                     cardDetailText.text = ApplyColorAfterArrow($"{SkillData[currentCard.AppliedSkillIndex].DisplayName} \n->  " +
                                           $"{Database.GetAttackData(currentCard.AppliedSkillIndex+(int)PlayerSetting.PlayerCharacterClass*10+100).DisplayName}", "#FFD700");
-                break;
+                    glowImage.SetActive(true);
+                
+                    if (glowCoroutine != null)
+                        StopCoroutine(glowCoroutine);
+                    glowCoroutine = StartCoroutine(AnimateGlowScale());
+
+                    break;
 
                 default:
                     cardTypeText.text = "알 수 없는 카드";
                     cardDetailText.text = "효과 없음";
+
+                    glowImage.SetActive(false);
+                    if (glowCoroutine != null)
+                    {
+                        StopCoroutine(glowCoroutine);
+                        glowCoroutine = null;
+                    }
+
+                    glowImage.transform.localScale = Vector3.one;
                     break;
             }
         }
 
-        private string ApplyColorToNumber(string text, string pColor, string mColor)
+        private IEnumerator AnimateGlowScale()
+        {
+            float time = 0f;
+            float speed = 4f;
+            Image glowImg = glowImage.GetComponent<Image>();
+            Color baseColor = new Color(1f, 0.84f, 0f);
+            Color pulseColor = new Color(1f, 0.55f, 0f);
+
+            while (true)
+            {
+
+                float cycleTime = 0.8f;
+                float pingPong = Mathf.PingPong(time, cycleTime) / cycleTime;
+                float scale = Mathf.Lerp(1f, 1.5f, pingPong);
+                float alpha = Mathf.Lerp(0.4f, 1f, pingPong);
+                glowImage.transform.localScale = new Vector3(scale, scale, 1f);
+                if (glowImg != null)
+                    {
+                        Color pulse = Color.Lerp(baseColor, pulseColor, pingPong);
+                        glowImg.color = new Color(pulse.r, pulse.g, pulse.b, alpha);
+                    }
+                time += Time.deltaTime;
+                yield return null;
+            }
+        }
+
+    private string ApplyColorToNumber(string text, string pColor, string mColor)
         {
             string[] words = text.Split(' '); // 공백 기준으로 단어 분리
             if (words.Length < 2) return text; // 단어가 2개 미만이면 변경할 필요 없음

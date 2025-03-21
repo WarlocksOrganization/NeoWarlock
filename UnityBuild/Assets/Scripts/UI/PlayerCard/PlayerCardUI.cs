@@ -16,8 +16,8 @@ public class PlayerCardUI : MonoBehaviour
     private Queue<Database.PlayerCardData> selectedCardsQueue = new();
     public float maxTime = 10f;
     private float remainingTime;
-    private float targetValue = 10f;
-    private float lerpSpeed = 0.5f;
+    //private float targetValue = 10f;
+    //private float lerpSpeed = 0.5f;
     public Slider timerSlider;
     private bool isRunning = true;
 
