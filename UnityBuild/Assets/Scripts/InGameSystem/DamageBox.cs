@@ -19,7 +19,7 @@ public class DamageBox : MonoBehaviour
 
             // ✅ 새로운 플레이어가 감지되면 즉시 데미지 적용
             player.takeDamage(damagePerTick, transform.position, 0, null, -1, 0);
-            Debug.Log($"[DamageBox] 플레이어 {player.playerId} 감지됨. 현재 감지된 플레이어 수: {playersInRange.Count}");
+           // Debug.Log($"[DamageBox] 플레이어 {player.playerId} 감지됨. 현재 감지된 플레이어 수: {playersInRange.Count}");
 
             // ✅ 기존 코루틴이 실행 중이 아니면 실행
             if (damageCoroutine == null)
@@ -55,7 +55,7 @@ public class DamageBox : MonoBehaviour
                 player.takeDamage(damagePerTick, transform.position, 0, null, -1, 0);
             }
 
-            Debug.Log($"[DamageBox] 현재 감지된 플레이어 수: {playersInRange.Count}");
+           // Debug.Log($"[DamageBox] 현재 감지된 플레이어 수: {playersInRange.Count}");
 
             yield return new WaitForSeconds(damageInterval);
         }

@@ -60,10 +60,6 @@ namespace Player.Combat
                 }
             }
 
-            // ✅ 디버깅용 로그 추가
-            if (!hasHit)
-                Debug.LogWarning($"[ExplodeAt] No damage applied at {position}");
-
             // ✅ 폭발 이펙트 생성 및 네트워크 동기화
             if (explosionEffectPrefab != null)
             {

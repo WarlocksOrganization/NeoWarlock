@@ -96417,6 +96417,7 @@ MonoBehaviour:
   mouseTargetLayer:
     serializedVersion: 2
     m_Bits: 8
+  isDead: 0
   State: 0
   animator: {fileID: 5766581736010466980}
   attackTransform: {fileID: 2138096227263670792}
@@ -109388,6 +109389,10 @@ PrefabInstance:
     - target: {fileID: 123484231663323174, guid: 62177c2dba0887c4fadf8f5e0e1e1cc3, type: 3}
       propertyPath: m_Name
       value: ProjectorPrefab
+      objectReference: {fileID: 0}
+    - target: {fileID: 123484231663323174, guid: 62177c2dba0887c4fadf8f5e0e1e1cc3, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1859959548977202512, guid: 62177c2dba0887c4fadf8f5e0e1e1cc3, type: 3}
       propertyPath: m_LocalPosition.x
