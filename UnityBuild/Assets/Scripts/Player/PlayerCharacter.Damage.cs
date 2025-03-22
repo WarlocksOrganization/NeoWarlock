@@ -25,7 +25,7 @@ namespace Player
         {
             if (!isServer || State == Constants.PlayerState.NotReady) return;
             if (curHp <= 0) return;
-
+            
             if (damage > 0)
             {
                 damage = Mathf.Max(damage - defense, 0);
@@ -128,7 +128,7 @@ namespace Player
         {
             if (floatingDamageTextPrefab == null) return;
 
-            GameObject damageTextInstance = Instantiate(floatingDamageTextPrefab, transform.position, Quaternion.identity);
+            GameObject damageTextInstance = Instantiate(floatingDamageTextPrefab, transform.position + Vector3.up, Quaternion.identity);
             damageTextInstance.GetComponent<FloatingDamageText>().SetDamageText(damage);
         }
         

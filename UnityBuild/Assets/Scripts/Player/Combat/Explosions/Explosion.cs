@@ -29,9 +29,12 @@ namespace Player.Combat
             explosionDamage = damage;
             explosionRadius = radius;
             knockbackForce = knockback * knockbackForceFactor;
-            this.config = config;
-            explosionDuration = config.attackDuration;
-            explosionInterval = config.attackInterval;
+            if (config != null)
+            {
+                this.config = config;
+                explosionDuration = config.attackDuration;
+                explosionInterval = config.attackInterval;
+            }
             this.radius = radius;
 
             explosionEffectPrefab.transform.localScale = new Vector3(radius, radius, radius);
@@ -64,10 +67,13 @@ namespace Player.Combat
             {
                 IDamagable damagable = hit.transform.GetComponent<IDamagable>();
                 if (damagable != null)
-                {   
-                    // ✅ 공격 타입에 따라 대상을 구분하여 데미지 적용
-                    if (config.attackType == DataSystem.Constants.AttackType.Melee && hit.transform.gameObject == owner) continue;
-                    if (config.attackType == DataSystem.Constants.AttackType.Self && hit.transform.gameObject != owner) continue;
+                {
+                    if (config != null)
+                    {
+                        // ✅ 공격 타입에 따라 대상을 구분하여 데미지 적용
+                        if (config.attackType == DataSystem.Constants.AttackType.Melee && hit.transform.gameObject == owner) continue;
+                        if (config.attackType == DataSystem.Constants.AttackType.Self && hit.transform.gameObject != owner) continue;
+                    }
 
                     damagable.takeDamage((int)explosionDamage, transform.position, knockbackForce, config, playerid, skillid);
                 }
@@ -77,7 +83,7 @@ namespace Player.Combat
         protected virtual GameObject CreateParticleEffect()
         {
             // ✅ 서버에서 파티클 효과 생성
-            if (explosionEffectPrefab != null)
+            if (explosionEffectPrefab != null && this.config != null)
             {
                 GameObject effect = Instantiate(explosionEffectPrefab, transform.position, Quaternion.identity);
                 effect.transform.localScale = new Vector3(radius, radius, radius);  // ✅ 프리팹 인스턴스에서만 변경

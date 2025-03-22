@@ -174,7 +174,7 @@ namespace Player
             isDead = newValue;
             _characterController.enabled = !newValue;
 
-            Debug.Log($"[SetIsDead_Hook] {PlayerSetting.PlayerId} 플레이어 {playerId} isDead 값 변경됨: {newValue}");
+            //Debug.Log($"[SetIsDead_Hook] {PlayerSetting.PlayerId} 플레이어 {playerId} isDead 값 변경됨: {newValue}");
 
             // ✅ UI 강제 업데이트
             UpdateCount();
