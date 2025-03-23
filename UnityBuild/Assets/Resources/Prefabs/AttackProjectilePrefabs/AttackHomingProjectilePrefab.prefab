@@ -164,7 +164,7 @@ MonoBehaviour:
   syncInterval: 0
   layerMask:
     serializedVersion: 2
-    m_Bits: 192
+    m_Bits: 128
   skilleffectList:
   - skillType: 29
     gObject: {fileID: 5863195115566073810}
