@@ -1,4 +1,5 @@
 using DataSystem;
+using GameManagement;
 using Interfaces;
 using Mirror;
 using UI;
@@ -60,6 +61,12 @@ namespace Player
             {
                 this.attackPlayersId = attackPlayerId;
                 this.attackskillid = attackskillid;
+                
+                var gameplayUI = FindAnyObjectByType<GamePlayUI>();
+                if (gameplayUI != null)
+                {
+                    GameManager.Instance.RecordDamage(attackPlayerId, damage);
+                }
             }
 
             if (damage > 0) // 🔹 체력 감소 (데미지 입음)
@@ -82,6 +89,20 @@ namespace Player
             {
                 SetIsDead(true);
                 RpcTriggerAnimation("isDead"); // 클라이언트에도 애니메이션 트리거 전송
+                
+                var gameplayUI = FindAnyObjectByType<GamePlayUI>();
+                if (gameplayUI != null)
+                {
+                    bool isOutKill = attackskillid == 0;
+                    GameManager.Instance.RecordKill(isOutKill ? playerId : attackPlayerId, isOutKill);
+                }
+                
+                var gp = NetworkClient.connection.identity.GetComponent<GamePlayer>();
+                if (gp != null && isServer)
+                {
+                    gp.CheckGameOver();
+                }
+                
                 if (attackskillid == 0)
                 {
                     RpcTransmitKillLog(attackPlayerId, this.attackskillid, true);

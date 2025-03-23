@@ -21,6 +21,9 @@ public class GamePlayUI : GameLobbyUI
     
     [SerializeField] private GameObject StartCube; // 발판
     
+    [SerializeField] private ScoreBoardUI scoreBoardUI;
+
+    
     private void Start()
     {
         alamGameObject.SetActive(false);
@@ -112,5 +115,10 @@ public class GamePlayUI : GameLobbyUI
                 UpdatePlayerInRoon();
             }
         }
+    }
+    
+    public void ShowFinalScoreBoard(Constants.PlayerStats[] stats)
+    {
+        scoreBoardUI.ShowScoreBoard(stats); // 모든 클라이언트에서 실행
     }
 }

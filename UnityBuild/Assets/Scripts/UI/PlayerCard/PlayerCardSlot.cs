@@ -9,7 +9,7 @@
     public class PlayerCardSlot : MonoBehaviour
     {
         [SerializeField] private TMP_Text cardTypeText;
-        [SerializeField] private Image skillIconImage;
+        [SerializeField] private SkillButton skillIconButton;
         [SerializeField] private Image cardIconImage;
         [SerializeField] private TMP_Text cardNameText;
         [SerializeField] private TMP_Text cardDetailText;
@@ -59,7 +59,7 @@
                 //기본 스탯
                 case PlayerStatType.Health:
                     cardTypeText.text = "스탯 강화";
-                    skillIconImage.sprite = healthIcon;
+                    skillIconButton.SetUp($"최대 체력", $"플레이어 캐릭터의 최대 체력입니다.", healthIcon);
                     cardIconFrame.sprite = blackIconFrame;
                     cardNameText.text = "최대 체력";
                     cardDetailText.text = ApplyColorToNumber($"체력 +{cardData.BonusStat}%", "#FF3535", "#008CFF");
@@ -67,7 +67,7 @@
 
                 case PlayerStatType.Speed:
                     cardTypeText.text = "스탯 강화";
-                    skillIconImage.sprite = speedIcon;
+                    skillIconButton.SetUp($"이동 속도", $"플레이어 캐릭터의 이동 속도입니다.", speedIcon);
                     cardIconFrame.sprite = blackIconFrame;
                     cardNameText.text = "이동 속도";
                     cardDetailText.text = ApplyColorToNumber($"이동 속도 +{cardData.BonusStat}%", "#FF3535", "#008CFF");
@@ -76,7 +76,7 @@
                 //특정 스킬 강화
                 case PlayerStatType.AttackSpeed:
                     cardTypeText.text = "스킬 강화";
-                    skillIconImage.sprite = SkillData[currentCard.AppliedSkillIndex].Icon;
+                    skillIconButton.SetUp(SkillData[currentCard.AppliedSkillIndex].DisplayName, SkillData[currentCard.AppliedSkillIndex].Description, SkillData[currentCard.AppliedSkillIndex].Icon);
                     cardIconFrame.sprite = blueIconFrame;
                     cardNameText.text = $"{SkillData[currentCard.AppliedSkillIndex].DisplayName}";
                     cardDetailText.text = ApplyColorToNumber($"투사체 속도 +{cardData.BonusStat}%", "#FF3535", "#008CFF");
@@ -84,7 +84,7 @@
 
                 case PlayerStatType.Range:
                     cardTypeText.text = "스킬 강화";
-                    skillIconImage.sprite = SkillData[currentCard.AppliedSkillIndex].Icon;
+                    skillIconButton.SetUp(SkillData[currentCard.AppliedSkillIndex].DisplayName, SkillData[currentCard.AppliedSkillIndex].Description, SkillData[currentCard.AppliedSkillIndex].Icon);
                     cardIconFrame.sprite = blueIconFrame;
                     cardNameText.text = $"{SkillData[currentCard.AppliedSkillIndex].DisplayName}";
                     cardDetailText.text = ApplyColorToNumber($"최대 거리 +{cardData.BonusStat}%", "#FF3535", "#008CFF");
@@ -92,7 +92,7 @@
 
                 case PlayerStatType.Radius:
                     cardTypeText.text = "스킬 강화";
-                    skillIconImage.sprite = SkillData[currentCard.AppliedSkillIndex].Icon;
+                    skillIconButton.SetUp(SkillData[currentCard.AppliedSkillIndex].DisplayName, SkillData[currentCard.AppliedSkillIndex].Description, SkillData[currentCard.AppliedSkillIndex].Icon);
                     cardIconFrame.sprite = purpleIconFrame;
                     cardNameText.text = $"{SkillData[currentCard.AppliedSkillIndex].DisplayName}";
                     cardDetailText.text = ApplyColorToNumber($"타격 범위 +{cardData.BonusStat}%", "#FF3535", "#008CFF");
@@ -100,7 +100,7 @@
 
                 case PlayerStatType.Damage:
                     cardTypeText.text = "스킬 강화";
-                    skillIconImage.sprite = SkillData[currentCard.AppliedSkillIndex].Icon;
+                    skillIconButton.SetUp(SkillData[currentCard.AppliedSkillIndex].DisplayName, SkillData[currentCard.AppliedSkillIndex].Description, SkillData[currentCard.AppliedSkillIndex].Icon);
                     cardIconFrame.sprite = blueIconFrame;
                     cardNameText.text = $"{SkillData[currentCard.AppliedSkillIndex].DisplayName}";
                     cardDetailText.text = ApplyColorToNumber($"데미지 +{cardData.BonusStat}%", "#FF3535", "#008CFF");
@@ -108,7 +108,7 @@
 
                 case PlayerStatType.KnockbackForce:
                     cardTypeText.text = "스킬 강화";
-                    skillIconImage.sprite = SkillData[currentCard.AppliedSkillIndex].Icon;
+                    skillIconButton.SetUp(SkillData[currentCard.AppliedSkillIndex].DisplayName, SkillData[currentCard.AppliedSkillIndex].Description, SkillData[currentCard.AppliedSkillIndex].Icon);
                     cardIconFrame.sprite = purpleIconFrame;
                     cardNameText.text = $"{SkillData[currentCard.AppliedSkillIndex].DisplayName}";
                     cardDetailText.text = ApplyColorToNumber($"넉백 거리 +{cardData.BonusStat}%", "#FF3535", "#008CFF");
@@ -116,7 +116,7 @@
 
                 case PlayerStatType.Cooldown:
                     cardTypeText.text = "스킬 강화";
-                    skillIconImage.sprite = SkillData[currentCard.AppliedSkillIndex].Icon;
+                    skillIconButton.SetUp(SkillData[currentCard.AppliedSkillIndex].DisplayName, SkillData[currentCard.AppliedSkillIndex].Description, SkillData[currentCard.AppliedSkillIndex].Icon);
                     cardIconFrame.sprite = purpleIconFrame;
                     cardNameText.text = $"{SkillData[currentCard.AppliedSkillIndex].DisplayName}";
                     cardDetailText.text = ApplyColorToNumber($"쿨다운 -{cardData.BonusStat}%", "#FF3535", "#008CFF");
@@ -124,7 +124,7 @@
 
                 case PlayerStatType.Special:
                     cardTypeText.text = $"<color=#FFD700>스킬 승급</color>";
-                    skillIconImage.sprite = Database.GetAttackData(currentCard.AppliedSkillIndex+(int)PlayerSetting.PlayerCharacterClass*10+100).Icon;
+                    skillIconButton.SetUp(Database.GetAttackData(currentCard.AppliedSkillIndex+(int)PlayerSetting.PlayerCharacterClass*10+100).DisplayName, Database.GetAttackData(currentCard.AppliedSkillIndex+(int)PlayerSetting.PlayerCharacterClass*10+100).Description, Database.GetAttackData(currentCard.AppliedSkillIndex+(int)PlayerSetting.PlayerCharacterClass*10+100).Icon);
                     cardIconFrame.sprite = goldIconFrame;
                     cardNameText.text = $"{SkillData[currentCard.AppliedSkillIndex].DisplayName}";
                     cardDetailText.text = ApplyColorAfterArrow($"{SkillData[currentCard.AppliedSkillIndex].DisplayName} \n->  " +

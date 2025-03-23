@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace DataSystem
@@ -124,6 +125,20 @@ namespace DataSystem
         {
             public Constants.SkillType skillType;
             public GameObject gObject;
+        }
+        
+        [Serializable]
+        public class PlayerStats
+        {
+            public int playerId;
+            public Constants.CharacterClass characterClass;
+            public string nickname;
+
+            public List<int> roundRanks = new List<int>();
+            public int kills = 0;
+            public int outKills = 0;
+            public int damageDone = 0;
+            public int totalScore = 0;
         }
         
     }

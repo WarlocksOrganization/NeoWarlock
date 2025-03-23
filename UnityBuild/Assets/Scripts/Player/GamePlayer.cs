@@ -6,6 +6,7 @@ using GameManagement;
 using Mirror;
 using Networking;
 using UnityEngine;
+using System.Linq;
 
 namespace Player
 {
@@ -22,6 +23,13 @@ namespace Player
         public LobbyPlayerCharacter playerCharacter;
 
         [SerializeField] private GameObject gamePlayObject;
+
+        private GamePlayUI gameplayUI;
+
+        private void Awake()
+        {
+            gameplayUI = FindFirstObjectByType<GamePlayUI>();
+        }
 
         public override void Start()
         {
@@ -130,6 +138,31 @@ namespace Player
             GameLobbyUI gameLobbyUI = FindFirstObjectByType<GameLobbyUI>();
 
             gameLobbyUI?.UpdatePlayerInRoon();
+        }
+        
+        [ClientRpc]
+        public void RpcSendFinalScore(Constants.PlayerStats[] sortedStats)
+        {
+            gameplayUI = FindFirstObjectByType<GamePlayUI>();
+            if (gameplayUI != null)
+            {
+                gameplayUI.ShowFinalScoreBoard(sortedStats);
+            }
+        }
+        
+        public void CheckGameOver()
+        {
+            var allPlayers = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None);
+            int aliveCount = allPlayers.Count(p => !p.isDead);
+
+            if (aliveCount <= 1 && isServer)
+            {
+                GameManager.Instance.CalculateTotalScores();
+
+                var sortedStats = GameManager.Instance.GetSortedPlayerStats(); // 새로 만들 메서드
+
+                RpcSendFinalScore(sortedStats);
+            }
         }
     }
 }
