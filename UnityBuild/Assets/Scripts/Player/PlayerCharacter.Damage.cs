@@ -94,8 +94,16 @@ namespace Player
                 if (gameplayUI != null)
                 {
                     bool isOutKill = attackskillid == 0;
-                    GameManager.Instance.RecordKill(isOutKill ? playerId : attackPlayerId, isOutKill);
+                    if (!isOutKill && attackPlayerId >= 0)
+                    {
+                        GameManager.Instance.RecordKill(attackPlayerId, false);
+                    }
+                    else if (isOutKill && attackPlayersId >= 0)
+                    {
+                        GameManager.Instance.RecordKill(attackPlayersId, isOutKill);
+                    }
                 }
+                GameManager.Instance.RecordDeath(playerId);
                 
                 var gp = NetworkClient.connection.identity.GetComponent<GamePlayer>();
                 if (gp != null && isServer)

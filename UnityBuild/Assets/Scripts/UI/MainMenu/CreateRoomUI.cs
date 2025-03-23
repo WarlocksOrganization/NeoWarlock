@@ -1,5 +1,7 @@
+using System.Collections;
 using DataSystem;
 using GameManagement;
+using Mirror;
 using Networking;
 using TMPro;
 using UnityEngine;
@@ -63,25 +65,49 @@ namespace UI
                 return;
             }
 
-            roomData.roomName = roomNameInput.text; // UI 입력값을 roomData에 저장
+            roomData.roomName = roomNameInput.text;
 
             var manager = RoomManager.singleton as RoomManager;
 
             if (manager.isNetworkActive)
             {
-                manager.StopHost(); // 기존 연결 초기화
+                StartCoroutine(RestartHostWithDelay(manager));
+            }
+            else
+            {
+                StartHost(manager);
+            }
+        }
+
+        private IEnumerator RestartHostWithDelay(RoomManager manager)
+        {
+            if (NetworkServer.active)
+            {
+                // 연결된 클라이언트 강제 종료 전에 대기
+                NetworkServer.DisconnectAll(); // 연결 끊기
+                yield return new WaitForSeconds(0.3f);
             }
 
-            // 방 데이터를 RoomManager에 설정
+            if (NetworkClient.isConnected)
+            {
+                NetworkClient.Disconnect();
+                yield return new WaitForSeconds(0.3f);
+            }
+
+            manager.StopHost();
+            yield return new WaitForSeconds(0.5f);
+
+            StartHost(manager);
+        }
+
+        private void StartHost(RoomManager manager)
+        {
             manager.roomName = roomData.roomName;
             manager.roomType = roomData.roomType;
             manager.maxPlayerCount = roomData.maxPlayerCount;
 
-            manager.StartHost(); // 새로운 방 생성
-            //manager.StartServer(); // (Debug) 새로운 서버 생성
-    
+            manager.StartHost();
             Debug.Log($"방 생성 완료: {roomData.roomName}, 유형: {roomData.roomType}, 최대 인원: {roomData.maxPlayerCount}");
         }
-
     }
 }

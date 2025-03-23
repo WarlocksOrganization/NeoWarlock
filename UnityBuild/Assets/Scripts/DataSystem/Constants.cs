@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using GameManagement;
 using UnityEngine;
 
 namespace DataSystem
@@ -12,11 +13,11 @@ namespace DataSystem
         public static readonly string IconPath = "Sprites/AttackIcons/";
         public static readonly string ClassIconPath = "Sprites/ClassIcons/";
         public static readonly string CardIconPath = "Sprites/CardIcons/";
-        
+
         public enum RoomType
         {
-            Solo = 0,           // 개인전
-            Team = 1,           // 팀전
+            Solo = 0,
+            Team = 1,
         }
 
         public enum PlayerState
@@ -32,17 +33,17 @@ namespace DataSystem
             Counting = 1,
             Start = 2,
         }
-        
+
         public enum CharacterClass
         {
-            Mage,   // 마법사
-            Archer, // 궁수
-            Warrior, // 전사
+            Mage,
+            Archer,
+            Warrior,
             Necromancer,
             Priest,
             None = 100,
         }
-        
+
         public enum AttackType
         {
             Projectile,
@@ -52,7 +53,7 @@ namespace DataSystem
             Melee,
             Self,
         }
-        
+
         public enum BuffType
         {
             None,
@@ -102,31 +103,30 @@ namespace DataSystem
             PhantomSmart,
             SoulSwamp,
             InfernalPoison,
-            
             None = 100,
         }
-        
+
         [Serializable]
         public class BuffEffectEntry
         {
             public Constants.BuffType buffType;
             public ParticleSystem effect;
         }
-        
+
         [Serializable]
         public class SkillEffectEntry
         {
             public Constants.SkillType skillType;
             public ParticleSystem effect;
         }
-        
+
         [Serializable]
         public class SkillEffectGameObjectEntry
         {
             public Constants.SkillType skillType;
             public GameObject gObject;
         }
-        
+
         [Serializable]
         public class PlayerStats
         {
@@ -139,8 +139,55 @@ namespace DataSystem
             public int outKills = 0;
             public int damageDone = 0;
             public int totalScore = 0;
+
+            // 추가 필드
+            public bool isDead = false;
+            public int curHp = 0;
+            public bool isMVP = false;
+
+            public void Reset()
+            {
+                roundRanks.Clear();
+                kills = 0;
+                outKills = 0;
+                damageDone = 0;
+                totalScore = 0;
+                isDead = false;
+                curHp = 0;
+                isMVP = false;
+            }
         }
         
+        [Serializable]
+        public class RoundStats
+        {
+            public int kills;
+            public int outKills;
+            public int damageDone;
+            public int rank;
+        }
+
+        public class PlayerRecord
+        {
+            public int playerId;
+            public string nickname;
+            public Constants.CharacterClass characterClass;
+            public List<RoundStats> roundStatsList = new();
+
+            public int GetScoreAtRound(int roundIndex)
+            {
+                if (roundIndex >= roundStatsList.Count) return 0;
+                var r = roundStatsList[roundIndex];
+                return r.kills * 200 + r.outKills * 300 + r.damageDone + GameManager.Instance.GetRankBonus(r.rank);
+            }
+
+            public int GetTotalScoreUpToRound(int roundInclusive)
+            {
+                int score = 0;
+                for (int i = 0; i <= roundInclusive && i < roundStatsList.Count; i++)
+                    score += GetScoreAtRound(i);
+                return score;
+            }
+        }
     }
 }
-

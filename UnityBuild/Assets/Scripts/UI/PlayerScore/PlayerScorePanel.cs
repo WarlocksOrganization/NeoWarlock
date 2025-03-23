@@ -16,19 +16,17 @@ public class PlayerScorePanel : MonoBehaviour
     [SerializeField] private TMP_Text killText;
     [SerializeField] private TMP_Text outKillText;
     [SerializeField] private TMP_Text damageText;
-    [SerializeField] private TMP_Text totalScoreText;
+    [SerializeField] public TMP_Text totalScoreText;
 
-    public void Setup(Constants.PlayerStats stats)
+    public void SetupWithScore(Constants.PlayerRecord record, int score)
     {
-        id = stats.playerId;
-        classIcon.sprite = Database.GetCharacterClassData(stats.characterClass).CharacterIcon;
-        nicknameText.text = stats.nickname;
-        killText.text = stats.kills.ToString();
-        outKillText.text = stats.outKills.ToString();
-        damageText.text = stats.damageDone.ToString();
-        totalScoreText.text = stats.totalScore.ToString();
+        id = record.playerId;
+        nicknameText.text = record.nickname;
+        classIcon.sprite = Database.GetCharacterClassData(record.characterClass).CharacterIcon;
+        totalScoreText.text = score.ToString();
 
-        SetRoundRanks(stats.roundRanks);
+        var ranks = record.roundStatsList.Select(r => r.rank).ToList();
+        SetRoundRanks(ranks);
     }
 
     public void SetRoundRanks(List<int> roundRanks)
@@ -38,8 +36,6 @@ public class PlayerScorePanel : MonoBehaviour
             rankText.text = "-";
             return;
         }
-
-        // 예: [1, 2, 1] → "1-2-1"
         rankText.text = string.Join("-", roundRanks.Select(r => r.ToString()));
     }
 
@@ -62,5 +58,23 @@ public class PlayerScorePanel : MonoBehaviour
         }
 
         rectTransform.anchoredPosition = targetAnchoredPos;
+    }
+
+    public void AnimateScore(int from, int to, float duration = 1f)
+    {
+        StartCoroutine(AnimateScoreRoutine(from, to, duration));
+    }
+
+    private IEnumerator AnimateScoreRoutine(int from, int to, float duration)
+    {
+        float time = 0f;
+        while (time < duration)
+        {
+            float t = time / duration;
+            totalScoreText.text = Mathf.Lerp(from, to, t).ToString("F0");
+            time += Time.deltaTime;
+            yield return null;
+        }
+        totalScoreText.text = to.ToString();
     }
 }

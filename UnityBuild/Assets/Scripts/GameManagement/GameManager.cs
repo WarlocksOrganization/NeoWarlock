@@ -1,3 +1,5 @@
+// ✅ GameManager.cs - 전체 재작성
+using System.Collections.Generic;
 using System.Linq;
 using DataSystem;
 using DataSystem.Database;
@@ -8,107 +10,177 @@ namespace GameManagement
 {
     public class GameManager : MonoBehaviour
     {
-        #region Singleton
-        private static GameManager instance;
-
-        public static GameManager Instance
-        {
-            get
-            {
-                if (instance == null)
-                {
-                    // 새로운 GameObject를 생성하고 GameManager 컴포넌트를 추가
-                    GameObject go = new GameObject("GameManager");
-                    instance = go.AddComponent<GameManager>();
-                    DontDestroyOnLoad(go);
-                }
-                return instance;
-            }
-        }
+        public static GameManager Instance { get; private set; }
 
         private void Awake()
         {
-            if (instance == null)
+            if (Instance == null)
             {
-                instance = this;
+                Instance = this;
                 DontDestroyOnLoad(gameObject);
+                Database.LoadDataBase();
             }
             else
             {
                 Destroy(gameObject);
             }
-
-            OnAwake();
         }
-        #endregion
 
-        void OnAwake()
-        {
-            Database.LoadDataBase();
-        }
-        
-        public Constants.PlayerStats[] PlayerStatsArray { get; private set; }
-        
+        private Constants.PlayerStats[] playerStatsArray;
+        private List<int> deathOrder = new();
+        private Dictionary<int, Constants.PlayerRecord> playerRecords = new();
+        private int currentRound = 0;
+        public int CurrentRound => currentRound;
+
         public void Init(PlayerCharacter[] characters)
         {
-            PlayerStatsArray = new Constants.PlayerStats[characters.Length];
+            playerStatsArray = new Constants.PlayerStats[characters.Length];
+            playerRecords = new();
+
             for (int i = 0; i < characters.Length; i++)
             {
                 var pc = characters[i];
-                PlayerStatsArray[i] = new Constants.PlayerStats
+                playerStatsArray[i] = new Constants.PlayerStats
                 {
                     playerId = pc.playerId,
                     characterClass = pc.PLayerCharacterClass,
                     nickname = pc.nickname
                 };
+
+                playerRecords[pc.playerId] = new Constants.PlayerRecord
+                {
+                    playerId = pc.playerId,
+                    nickname = pc.nickname,
+                    characterClass = pc.PLayerCharacterClass
+                };
             }
+
+            deathOrder.Clear();
+            currentRound = 0;
         }
 
         public void RecordDamage(int attackerId, int damage)
         {
-            var stats = PlayerStatsArray.FirstOrDefault(p => p.playerId == attackerId);
+            var stats = playerStatsArray.FirstOrDefault(p => p.playerId == attackerId);
             if (stats != null)
-            {
                 stats.damageDone += damage;
-            }
         }
-        
-        
+
         public void RecordKill(int attackerId, bool isOutKill)
         {
-            var stats = PlayerStatsArray.FirstOrDefault(p => p.playerId == attackerId);
+            var stats = playerStatsArray.FirstOrDefault(p => p.playerId == attackerId);
             if (stats != null)
             {
-                if (isOutKill)
-                    stats.outKills += 1;
-                else
-                    stats.kills += 1;
+                if (isOutKill) stats.outKills++;
+                else stats.kills++;
+            }
+        }
+
+        public void RecordDeath(int playerId)
+        {
+            if (!deathOrder.Contains(playerId))
+                deathOrder.Add(playerId);
+        }
+
+        public List<(int playerId, int rank)> GetCurrentRoundRanks()
+        {
+            var result = new List<(int playerId, int rank)>();
+            int totalPlayers = playerStatsArray.Length;
+            int rank = totalPlayers;
+
+            foreach (var id in deathOrder)
+            {
+                result.Add((id, rank));
+                rank--;
             }
 
-            Debug.Log(11111);
+            foreach (var stats in playerStatsArray)
+            {
+                if (!deathOrder.Contains(stats.playerId))
+                    result.Add((stats.playerId, 1));
+            }
+
+            return result.OrderBy(r => r.rank).ToList();
+        }
+
+        public void AddRoundResult(List<(int playerId, int kills, int outKills, int damageDone, int rank)> roundData)
+        {
+            foreach (var d in roundData)
+            {
+                var record = playerRecords[d.playerId];
+                var roundStats = new Constants.RoundStats
+                {
+                    kills = d.kills,
+                    outKills = d.outKills,
+                    damageDone = d.damageDone,
+                    rank = d.rank
+                };
+                record.roundStatsList.Add(roundStats);
+            }
+            currentRound++;
+        }
+
+        public int GetScoreAtRound(Constants.PlayerRecord record, int roundIndex)
+        {
+            if (record == null || roundIndex >= record.roundStatsList.Count) return 0;
+            var r = record.roundStatsList[roundIndex];
+            return r.kills * 200 + r.outKills * 300 + r.damageDone + GetRankBonus(r.rank);
+        }
+
+        public int GetRankBonus(int rank) => rank switch
+        {
+            1 => 600,
+            2 => 500,
+            3 => 400,
+            4 => 300,
+            5 => 200,
+            6 => 100,
+            _ => 0
+        };
+
+        public List<Constants.PlayerRecord> GetSortedRecords(int roundInclusive)
+        {
+            return playerRecords.Values
+                .OrderByDescending(p => p.GetTotalScoreUpToRound(roundInclusive))
+                .ThenBy(p => p.playerId)
+                .ToList();
+        }
+
+        public List<Constants.PlayerRecord> GetRoundOnlySortedRecords(int roundIndex)
+        {
+            return playerRecords.Values
+                .Where(p => p.roundStatsList.Count > roundIndex)
+                .OrderByDescending(p => GetScoreAtRound(p, roundIndex))
+                .ThenBy(p => p.playerId)
+                .ToList();
+        }
+
+        public Constants.PlayerRecord GetPlayerRecord(int playerId) => playerRecords[playerId];
+
+        public void NextRound() => currentRound++;
+        public void ResetRound() => currentRound = 0;
+
+        public void Reset()
+        {
+            foreach (var stats in playerStatsArray)
+            {
+                stats.kills = 0;
+                stats.outKills = 0;
+                stats.damageDone = 0;
+                stats.totalScore = 0;
+                stats.roundRanks.Clear();
+            }
+            deathOrder.Clear();
         }
         
-        public void CalculateTotalScores()
-        {
-            foreach (var stats in PlayerStatsArray)
-            {
-                // 예시 점수 기준
-                stats.totalScore = stats.kills * 100 + stats.outKills * 200 + stats.damageDone;
-
-                // 순위별 가산점 (예: 1등 = 30, 2등 = 20, 3등 = 10)
-                for (int i = 0; i < stats.roundRanks.Count; i++)
-                {
-                    int rank = stats.roundRanks[i];
-                    if (rank == 1) stats.totalScore += 300;
-                    else if (rank == 2) stats.totalScore += 200;
-                    else if (rank == 3) stats.totalScore += 100;
-                }
-            }
-        }
-
         public Constants.PlayerStats[] GetSortedPlayerStats()
         {
-            return PlayerStatsArray;
+            return playerStatsArray.OrderByDescending(p => p.totalScore).ToArray();
+        }
+
+        public Constants.PlayerStats GetPlayerStats(int playerId)
+        {
+            return playerStatsArray.First(p => p.playerId == playerId);
         }
     }
 }

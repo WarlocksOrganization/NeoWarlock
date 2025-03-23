@@ -119,6 +119,6 @@ public class GamePlayUI : GameLobbyUI
     
     public void ShowFinalScoreBoard(Constants.PlayerStats[] stats)
     {
-        scoreBoardUI.ShowScoreBoard(stats); // 모든 클라이언트에서 실행
+        scoreBoardUI.ShowScoreBoard(); // 모든 클라이언트에서 실행
     }
 }
