@@ -1,4 +1,5 @@
 using DataSystem;
+using GameManagement;
 using Interfaces;
 using Mirror;
 using UI;
@@ -25,7 +26,7 @@ namespace Player
         {
             if (!isServer || State == Constants.PlayerState.NotReady) return;
             if (curHp <= 0) return;
-
+            
             if (damage > 0)
             {
                 damage = Mathf.Max(damage - defense, 0);
@@ -60,6 +61,12 @@ namespace Player
             {
                 this.attackPlayersId = attackPlayerId;
                 this.attackskillid = attackskillid;
+                
+                var gameplayUI = FindAnyObjectByType<GamePlayUI>();
+                if (gameplayUI != null)
+                {
+                    GameManager.Instance.RecordDamage(attackPlayerId, damage);
+                }
             }
 
             if (damage > 0) // 🔹 체력 감소 (데미지 입음)
@@ -82,6 +89,28 @@ namespace Player
             {
                 SetIsDead(true);
                 RpcTriggerAnimation("isDead"); // 클라이언트에도 애니메이션 트리거 전송
+                
+                var gameplayUI = FindAnyObjectByType<GamePlayUI>();
+                if (gameplayUI != null)
+                {
+                    bool isOutKill = attackskillid == 0;
+                    if (!isOutKill && attackPlayerId >= 0)
+                    {
+                        GameManager.Instance.RecordKill(attackPlayerId, false);
+                    }
+                    else if (isOutKill && attackPlayersId >= 0)
+                    {
+                        GameManager.Instance.RecordKill(attackPlayersId, isOutKill);
+                    }
+                }
+                GameManager.Instance.RecordDeath(playerId);
+                
+                var gp = NetworkClient.connection.identity.GetComponent<GamePlayer>();
+                if (gp != null && isServer)
+                {
+                    gp.CheckGameOver();
+                }
+                
                 if (attackskillid == 0)
                 {
                     RpcTransmitKillLog(attackPlayerId, this.attackskillid, true);
@@ -116,6 +145,11 @@ namespace Player
             {
                 playerHUD.GetComponent<CanvasGroup>().alpha = 0;
             }
+
+            if (isOwned)
+            {
+                playerUI.SetDamageEffect(1f-(float)newHp / maxHp);
+            }
         }
         
         [ClientRpc]
@@ -123,7 +157,7 @@ namespace Player
         {
             if (floatingDamageTextPrefab == null) return;
 
-            GameObject damageTextInstance = Instantiate(floatingDamageTextPrefab, transform.position, Quaternion.identity);
+            GameObject damageTextInstance = Instantiate(floatingDamageTextPrefab, transform.position + Vector3.up, Quaternion.identity);
             damageTextInstance.GetComponent<FloatingDamageText>().SetDamageText(damage);
         }
         

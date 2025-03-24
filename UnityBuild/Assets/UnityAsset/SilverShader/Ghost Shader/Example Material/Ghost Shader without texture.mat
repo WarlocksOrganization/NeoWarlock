@@ -44,7 +44,7 @@ Material:
     m_Floats:
     - _BUILTIN_QueueControl: 0
     - _BUILTIN_QueueOffset: 0
-    - _Outline: 1.788
+    - _Outline: 2
     - _QueueControl: 0
     - _QueueOffset: 0
     - _Transparency: 0

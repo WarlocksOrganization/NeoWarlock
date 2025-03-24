@@ -14,7 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   attackType: 1
   attackDelay: 1
-  recoveryTime: 1
+  recoveryTime: 1.5
+  attackDuration: 0
+  attackInterval: 0
   animParameter: isAttack2
   attackTrans: {x: 0, y: 20, z: 0}
   Prefab: {fileID: 322783647940636695, guid: 37f2acf25e527df43a982a902e47a741, type: 3}

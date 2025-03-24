@@ -169,8 +169,6 @@ public class BuffSystem : NetworkBehaviour
 
             elapsedTime += Time.deltaTime; // ✅ Time.deltaTime을 사용하여 정확한 시간 측정
         }
-
-        Debug.Log("[ForcedMove] 종료됨");
     }
 
 

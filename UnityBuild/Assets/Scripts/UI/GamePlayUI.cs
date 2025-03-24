@@ -19,6 +19,11 @@ public class GamePlayUI : GameLobbyUI
 
     private int maxTime = 10;
     
+    [SerializeField] private GameObject StartCube; // 발판
+    
+    [SerializeField] private ScoreBoardUI scoreBoardUI;
+
+    
     private void Start()
     {
         alamGameObject.SetActive(false);
@@ -71,6 +76,7 @@ public class GamePlayUI : GameLobbyUI
     {
         playerStatusUI.OpenPanels();
         alamGameObject.SetActive(true);
+        StartCube.SetActive(false);
 
         NetworkTimer networkTimer = FindFirstObjectByType<NetworkTimer>();
 
@@ -109,5 +115,10 @@ public class GamePlayUI : GameLobbyUI
                 UpdatePlayerInRoon();
             }
         }
+    }
+    
+    public void ShowFinalScoreBoard(Constants.PlayerRecord[] records, int roundIndex)
+    {
+        scoreBoardUI.ShowScoreBoard(records, roundIndex);
     }
 }
