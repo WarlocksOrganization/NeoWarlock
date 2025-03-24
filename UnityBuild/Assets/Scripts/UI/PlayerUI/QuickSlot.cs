@@ -26,13 +26,13 @@ namespace UI
         //private string skillDescription;  // 슬롯에 장착된 스킬 설명
         //private SkillDescriptionUI uiManager;
 
-        public void SetQuickSlotData(Sprite icon, float cooldown, string name, string description, Sprite upgradeIcon)
+        public void SetQuickSlotData(Sprite icon, float cooldown, string name, string description)
         {
             skinImage.sprite = icon;
             maxSkillCul = cooldown;
             currentSkillCul = 0.1f;
             
-            skillButton.SetUp(name, description, icon, name, description, upgradeIcon);
+            skillButton.SetUp(name, description, icon);
         }
 
         //public void SetQuickSlotInfo(string name, string description)

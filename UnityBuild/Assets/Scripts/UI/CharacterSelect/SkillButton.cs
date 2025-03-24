@@ -8,47 +8,27 @@ public class SkillButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 {
     private string skillName;
     private string skillDescription;
-    private string upgradeSkillName;
-    private string upgradeSkillDescription;
     private Coroutine fadeCoroutine;
     [SerializeField] private SkillDescriptionUI skillDescriptionUI;
-    [SerializeField] private SkillDescriptionUI upgradeSkillDescriptionUI;
-
     [SerializeField] private Image skillImage;
-    //[SerializeField] private Image upgradeSkillImage;
     [SerializeField] private Image selecttImage;
 
-    public void SetUp(string name, string description, Sprite icon, string upgradeName, string upgradeDescription, Sprite upgradeIcon)
+    public void SetUp(string name, string description, Sprite icon)
     {
         skillName = name;
         skillDescription = description;
         skillImage.sprite = icon;
         skillDescriptionUI.Setup(icon, skillName, skillDescription);
-
-        if (upgradeName != "" && upgradeName != name)
-        {
-            upgradeSkillName = upgradeName;
-            upgradeSkillDescription = upgradeDescription;
-            upgradeSkillDescriptionUI.Setup(upgradeIcon ?? upgradeIcon, upgradeSkillName, upgradeSkillDescription);
-        }
-        else
-        {
-            upgradeSkillDescriptionUI.gameObject.SetActive(false);
-        }
-
-
+        
         gameObject.SetActive(true);
         if (fadeCoroutine != null)
             StopCoroutine(fadeCoroutine);
         fadeCoroutine = StartCoroutine(FadeOutEffectCoroutine());
     }
-
+    
     public void OnPointerEnter(PointerEventData eventData)
     {
         skillDescriptionUI.gameObject.SetActive(true);
-        if (!string.IsNullOrEmpty(upgradeSkillName) && upgradeSkillName != skillName) {
-            upgradeSkillDescriptionUI.gameObject.SetActive(true);
-        }
     }
 
     public void OnPointerExit(PointerEventData eventData)
@@ -56,10 +36,9 @@ public class SkillButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         if (skillDescriptionUI != null)
         {
             skillDescriptionUI.gameObject.SetActive(false);
-            upgradeSkillDescriptionUI.gameObject.SetActive(false);
         }
     }
-
+    
     private IEnumerator FadeOutEffectCoroutine()
     {
         selecttImage.color = Color.white;
@@ -71,7 +50,7 @@ public class SkillButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         {
             elapsed += Time.deltaTime;
             float alpha = Mathf.Lerp(1, 0, elapsed / duration);
-            selecttImage.color = new Color(1, 1, 1, alpha);
+            selecttImage.color = new Color(1,1, 1, alpha);
             yield return null;
         }
 

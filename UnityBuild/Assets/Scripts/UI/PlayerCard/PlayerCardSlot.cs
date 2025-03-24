@@ -136,14 +136,14 @@
                     cardDetailText.text = ApplyColorToNumber($"쿨다운 -{cardData.BonusStat}%", "#FF3535", "#008CFF");
                 break;
 
-                case PlayerStatType.Special:
-                    cardTypeText.text = $"<color=#FFD700>스킬 승급</color>";
-                    skillIconButton.SetUp(Database.GetAttackData(currentCard.AppliedSkillIndex+(int)PlayerSetting.PlayerCharacterClass*10+100).DisplayName, Database.GetAttackData(currentCard.AppliedSkillIndex+(int)PlayerSetting.PlayerCharacterClass*10+100).Description, Database.GetAttackData(currentCard.AppliedSkillIndex+(int)PlayerSetting.PlayerCharacterClass*10+100).Icon);
-                    cardIconFrame.sprite = goldIconFrame;
-                    cardNameText.text = $"{SkillData[currentCard.AppliedSkillIndex].DisplayName}";
-                    cardDetailText.text = ApplyColorAfterArrow($"{SkillData[currentCard.AppliedSkillIndex].DisplayName} \n->  " +
-                                          $"{Database.GetAttackData(currentCard.AppliedSkillIndex+(int)PlayerSetting.PlayerCharacterClass*10+100).DisplayName}", "#FFD700");
-                    glowImage.SetActive(true);
+            case PlayerStatType.Special:
+                cardTypeText.text = $"<color=#FFD700>스킬 승급</color>";
+                skillIconButton.SetUp(Database.GetAttackData(currentCard.AppliedSkillIndex + (int)PlayerSetting.PlayerCharacterClass * 10 + 100).DisplayName, Database.GetAttackData(currentCard.AppliedSkillIndex + (int)PlayerSetting.PlayerCharacterClass * 10 + 100).Description, Database.GetAttackData(currentCard.AppliedSkillIndex + (int)PlayerSetting.PlayerCharacterClass * 10 + 100).Icon);
+                cardIconFrame.sprite = goldIconFrame;
+                cardNameText.text = $"{SkillData[currentCard.AppliedSkillIndex].DisplayName}";
+                cardDetailText.text = ApplyColorAfterArrow($"{SkillData[currentCard.AppliedSkillIndex].DisplayName} \n->  " +
+                                      $"{Database.GetAttackData(currentCard.AppliedSkillIndex + (int)PlayerSetting.PlayerCharacterClass * 10 + 100).DisplayName}", "#FFD700");
+                glowImage.SetActive(true);
 
                     if (glowCoroutine != null)
                         StopCoroutine(glowCoroutine);
@@ -222,7 +222,7 @@
 
                 float cycleTime = 0.8f;
                 float pingPong = Mathf.PingPong(time, cycleTime) / cycleTime;
-                float scale = Mathf.Lerp(1f, 1.3f, pingPong);
+                float scale = Mathf.Lerp(1f, 1.2f, pingPong);
                 float alpha = Mathf.Lerp(0.5f, 1f, pingPong);
                 glowImage.transform.localScale = new Vector3(scale, scale, 1f);
                 if (glowImg != null)
