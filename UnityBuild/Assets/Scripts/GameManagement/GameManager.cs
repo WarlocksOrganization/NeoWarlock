@@ -196,6 +196,14 @@ namespace GameManagement
         {
             return playerRecords.Values.ToArray();
         }
+        
+        public List<int> GetAlivePlayers()
+        {
+            return playerStatsArray
+                .Where(p => !deathOrder.Contains(p.playerId))
+                .Select(p => p.playerId)
+                .ToList();
+        }
     }
 
 }

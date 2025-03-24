@@ -131,22 +131,17 @@ namespace Networking
 
         public void StartGame()
         {
-            if (roomSlots.Count < 1)
+            var players = FindObjectsOfType<PlayerCharacter>();
+            bool allReady = players.All(p => p.State == Constants.PlayerState.Start);
+
+            if (!allReady)
             {
-                Debug.LogWarning("[RoomManager] 최소 1명의 플레이어가 필요합니다.");
+                Debug.LogWarning("[RoomManager] 아직 준비되지 않은 플레이어가 있어 게임을 시작할 수 없습니다.");
                 return;
             }
 
-            foreach (var player in roomSlots)
-            {
-                player.CmdChangeReadyState(true);
-            }
-
             Debug.Log("[RoomManager] 모든 플레이어가 준비되었습니다. 게임을 시작합니다!");
-            if (roomSlots.Count > 1)
-            {
-                ServerChangeScene(GameplayScene);
-            }
+            ServerChangeScene(GameplayScene);
         }
     }
 }

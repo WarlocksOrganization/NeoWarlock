@@ -58,6 +58,7 @@ namespace Player
         [Command]
         public void CmdSetNickname(string nickname)
         {
+            Debug.Log(PlayerSetting.Nickname);
             PlayerNickname = nickname;
             LobbyPlayer.nickname = PlayerNickname;
         }

@@ -4,6 +4,7 @@ using System.Linq;
 using DataSystem.Database;
 using GameManagement;
 using TMPro;
+using UI;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -15,10 +16,14 @@ public class PlayerCardUI : MonoBehaviour
     private Queue<Database.PlayerCardData> selectedCardsQueue = new();
     private float remainingTime = 10f; // 초기 시간 10초
 
+    private PlayerCharacterUI playerCharacterUI;
+
     void Start()
     {
         LoadRandomPlayerCards();
         DisplayTopThreeCards();
+        playerCharacterUI = FindFirstObjectByType<PlayerCharacterUI>();
+        playerCharacterUI.GetComponent<CanvasGroup>().alpha = 0f;
     }
 
     private void LoadRandomPlayerCards()
@@ -82,6 +87,7 @@ public class PlayerCardUI : MonoBehaviour
     // ✅ 카드 선택 확정 및 UI 비활성화
     private void ConfirmSelectedCards()
     {
+        playerCharacterUI.GetComponent<CanvasGroup>().alpha = 1f;
         PlayerSetting.PlayerCards.AddRange(slots.Select(slot => slot.GetCurrentCard()));
         gameObject.SetActive(false);
     }
