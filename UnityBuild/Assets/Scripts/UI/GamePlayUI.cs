@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Linq;
 using DataSystem;
 using GameManagement;
@@ -103,20 +104,61 @@ public class GamePlayUI : GameLobbyUI
         else if (gameState == Constants.GameState.Counting)
         {
             countDownText.text = time.ToString();
+            StartCoroutine(PunchScale(countDownText.transform));
             
             if (time == 0)
-            {
+            {   
+                countDownText.text = "SMASH!";
                 foreach (var player in foundCharacters)
                 {
                     player.SetState(Constants.PlayerState.Start);
                 }
-                countDownText.gameObject.SetActive(false);
+
+                StartCoroutine(HideAfterDelay(countDownText.gameObject, 0.8f));
                 gameState = Constants.GameState.Start;
                 UpdatePlayerInRoon();
             }
         }
     }
     
+    IEnumerator PunchScale(Transform target, float upScale = 1.1f, float downScale = 0.5f, float totalDuration = 0.3f)
+    {
+        Vector3 original = Vector3.one;
+        Vector3 overshoot = original * upScale;
+        Vector3 undershoot = original * downScale;
+
+        float halfDuration = totalDuration / 2f;
+        float t = 0f;
+
+        // 1️⃣ 커짐: original → overshoot
+        while (t < halfDuration)
+        {
+            float ratio = t / halfDuration;
+            target.localScale = Vector3.Lerp(original, overshoot, Mathf.SmoothStep(0f, 1f, ratio));
+            t += Time.deltaTime;
+            yield return null;
+        }
+
+        t = 0f;
+
+        // 2️⃣ 작아짐: overshoot → undershoot
+        while (t < halfDuration)
+        {
+            float ratio = t / halfDuration;
+            target.localScale = Vector3.Lerp(overshoot, undershoot, Mathf.SmoothStep(0f, 1f, ratio));
+            t += Time.deltaTime;
+            yield return null;
+        }
+
+        // 끝난 후 undershoot 상태 유지
+        target.localScale = undershoot;
+    }
+
+    IEnumerator HideAfterDelay(GameObject target, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        target.SetActive(false);
+    }
     public void ShowFinalScoreBoard(Constants.PlayerRecord[] records, int roundIndex)
     {
         scoreBoardUI.ShowScoreBoard(records, roundIndex);

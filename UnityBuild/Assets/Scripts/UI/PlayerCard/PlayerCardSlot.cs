@@ -220,9 +220,9 @@
             while (true)
             {
 
-                float cycleTime = 1.5f;
+                float cycleTime = 1.2f;
                 float pingPong = Mathf.PingPong(time, cycleTime) / cycleTime;
-                float scale = Mathf.Lerp(1f, 1.2f, pingPong);
+                float scale = Mathf.Lerp(1.2f, 1.25f, pingPong);
                 float alpha = Mathf.Lerp(0.5f, 1f, pingPong);
                 glowImage.transform.localScale = new Vector3(scale, scale, 1f);
                 if (glowImg != null)
