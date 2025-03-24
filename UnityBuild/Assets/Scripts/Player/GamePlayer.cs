@@ -17,7 +17,6 @@
             public PlayerGameStats stats;
             
             private PlayerCardUI playerCardUI;
-            private float cardSelectionTime = 10f;
 
             [SyncVar]
             public string PlayerNickname;
@@ -77,6 +76,7 @@
             
             private IEnumerator CardSelectionTimer()
             {
+                int cardSelectionTime = Constants.CardSelectionTime;
                 while (cardSelectionTime > 0)
                 {
                     RpcUpdateTimer(cardSelectionTime);
@@ -159,7 +159,7 @@
             
             private IEnumerator HandleRoundTransition()
             {
-                yield return new WaitForSeconds(12f); // 점수판 5초 보여줌
+                yield return new WaitForSeconds(Constants.ScoreBoardTime); // 점수판 5초 보여줌
 
                 int currentRound = GameManager.Instance.CurrentRound;
 
@@ -169,22 +169,22 @@
                     {
                         // ✅ 동일 씬 다시 로드 (예: Gameplay 씬)
                         NetworkManager.singleton.ServerChangeScene(SceneManager.GetActiveScene().name);
-                        gameObject.SetActive(false);
+                        //gameObject.SetActive(false);
                     }
                 }
                 else
                 {
-                    // ✅ 3라운드면 방으로 돌아가기 버튼 활성화
-                    if (isServer)
-                    {
-                        ScoreBoardUI scoreBoardUI = FindFirstObjectByType<ScoreBoardUI>();
-                        scoreBoardUI.ShowReturnToLobbyButton(); // → UI에 버튼 활성화 함수
-                    }
+                    ScoreBoardUI scoreBoardUI = FindFirstObjectByType<ScoreBoardUI>();
+                    scoreBoardUI.ShowReturnToLobbyButton(); // → UI에 버튼 활성화 함수
                 }
             }
             
             public void CheckGameOver()
             {
+                var alivePlayers = GameManager.Instance.GetAlivePlayers();
+                if (alivePlayers.Count > 1)
+                    return;
+                
                 var roundRanks = GameManager.Instance.GetCurrentRoundRanks();
 
                 // ✅ roundData 생성
@@ -200,16 +200,6 @@
                 // ✅ 올바른 타입의 데이터 전송
                 var allRecords = GameManager.Instance.GetAllPlayerRecords(); // ← 이게 핵심
                 RpcSendFinalScore(allRecords, GameManager.Instance.CurrentRound - 1);
-            }
-            
-            [Command]
-            public void CmdRequestReturnToLobby()
-            {
-                if (isServer)
-                {
-                    // 서버에서 전체 플레이어를 로비 씬으로 이동
-                    NetworkManager.singleton.ServerChangeScene("GameRoom"); // 여기에 실제 로비 씬 이름
-                }
             }
 
         }

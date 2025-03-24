@@ -112,8 +112,14 @@ private IEnumerator ShowRankingFlow(Constants.PlayerRecord[] records, int roundI
 
     private void OnClickReturnToLobby()
     {
-        var player = NetworkClient.connection.identity.GetComponent<GamePlayer>();
-        player.CmdRequestReturnToLobby();
+        if (NetworkServer.active && NetworkClient.isConnected)
+        {
+            NetworkManager.singleton.StopHost(); // 서버와 클라이언트 모두 종료
+        }
+        else if (NetworkClient.isConnected)
+        {
+            NetworkManager.singleton.StopClient(); // 클라이언트만 종료
+        }
     }
     
     private IEnumerator FadeCanvasGroup(CanvasGroup cg, float from, float to, float duration)
