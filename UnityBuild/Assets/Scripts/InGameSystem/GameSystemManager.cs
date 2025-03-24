@@ -1,3 +1,7 @@
+using System.Collections;
+using System.Linq;
+using Mirror;
+using Player;
 using UnityEngine;
 
 public class GameSystemManager : MonoBehaviour
@@ -5,6 +9,7 @@ public class GameSystemManager : MonoBehaviour
     public static GameSystemManager Instance;
 
     [SerializeField] private GameObject[] FallGrounds;
+    private GameHand gameHand;
     private int eventnum = 0;
 
     private void Awake()
@@ -17,44 +22,59 @@ public class GameSystemManager : MonoBehaviour
 
     public void StartEvent()
     {
-        if (FallGrounds == null || FallGrounds.Length == 0)
-        {
-            //Debug.LogError("❌ FallGrounds가 설정되지 않았습니다!");
-            return;
-        }
+        if (FallGrounds == null || FallGrounds.Length == 0) return;
 
-        // ✅ 현재 이벤트의 FallGround 자식 찾기 및 실행
         if (eventnum < FallGrounds.Length)
         {
             GameObject selectedGround = FallGrounds[eventnum];
 
+            // 🔹 서버에서만 실행되도록 확인
+            if (!NetworkServer.active) return;
+
+            NetEvent();
+
             if (selectedGround != null)
             {
-                // ✅ 현재 FallGround의 모든 자식 오브젝트에 Fall() 실행
-                FallGround[] fallGrounds = selectedGround.GetComponentsInChildren<FallGround>();
+                // 🔹 살아있는 플레이어 중 랜덤 타겟 선정
+                var allPlayers = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None)
+                    .Where(p => !p.isDead)
+                    .ToList();
 
-                if (fallGrounds.Length > 0)
-                {
-                    foreach (var fallGround in fallGrounds)
-                    {
-                        fallGround.Fall();
-                    }
-                }
-                else
-                {
-                    //Debug.LogWarning($"⚠️ 이벤트 {eventnum}: 자식 FallGround가 없습니다.");
-                }
+                if (allPlayers.Count == 0) return;
+
+                var target = allPlayers[Random.Range(0, allPlayers.Count)];
+
+                // 🔹 GameHand 생성 및 초기화
+                Vector3 spawnPos = target.transform.position;
+                spawnPos.y = 0;
+
+                gameHand = FindFirstObjectByType<GameHand>();
+                gameHand.Initialize();
             }
-            else
+            
+            // 🔹 5초 뒤 지형 파괴 실행 (Coroutine 사용)
+            StartCoroutine(DelayedFall(selectedGround, 4f));
+        }
+    }
+
+// 🔹 Coroutine으로 5초 후 지형 파괴
+    private IEnumerator DelayedFall(GameObject groundGroup, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+
+        if (groundGroup != null)
+        {
+            FallGround[] fallGrounds = groundGroup.GetComponentsInChildren<FallGround>();
+            foreach (var fallGround in fallGrounds)
             {
-                //Debug.LogError($"❌ 이벤트 {eventnum}: 선택된 FallGround가 존재하지 않습니다!");
+                fallGround.Fall();
             }
         }
     }
     public void NetEvent()
     {
     // ✅ 다음 이벤트의 FallGround 자식 찾기 및 NextFall() 실행
-        int nextEvent = eventnum + 1;
+        int nextEvent = eventnum ;
         if (nextEvent < FallGrounds.Length)
         {
             GameObject nextGround = FallGrounds[nextEvent];

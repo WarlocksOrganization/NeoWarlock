@@ -33,10 +33,6 @@ public class NetworkTimer : NetworkBehaviour
             {
                 StartEvent();
             }
-            if (currentTime == 6)
-            {
-                NextEvent();
-            }
             currentTime--;
         }
     }
@@ -57,17 +53,5 @@ public class NetworkTimer : NetworkBehaviour
     {
         gamePlayUI.UpdateCountdownUI(0);
         GameSystemManager.Instance.StartEvent();
-    }
-    
-    [Server] // ✅ 서버에서만 실행
-    public void NextEvent()
-    {
-        RpcNextEvent();
-    }
-
-    [ClientRpc]
-    private void RpcNextEvent()
-    {
-        GameSystemManager.Instance.NetEvent();
     }
 }

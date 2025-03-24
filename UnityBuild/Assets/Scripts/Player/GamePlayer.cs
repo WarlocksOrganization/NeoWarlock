@@ -24,6 +24,7 @@
             public LobbyPlayerCharacter playerCharacter;
 
             [SerializeField] private GameObject gamePlayObject;
+            [SerializeField] private GameObject gamePlayHand;
 
             private GamePlayUI gameplayUI;
 
@@ -54,6 +55,9 @@
             {
                 GameObject gameObj = Instantiate(gamePlayObject, Vector3.zero, Quaternion.identity);
                 NetworkServer.Spawn(gameObj, connectionToClient);
+                
+                GameObject gamePlayobj = Instantiate(gamePlayHand, Vector3.zero, Quaternion.identity);
+                NetworkServer.Spawn(gamePlayobj, connectionToClient);
                 
                 Vector3 spawnPos = FindFirstObjectByType<SpawnPosition>().GetSpawnPosition();
                 playerCharacter = Instantiate((NetworkRoomManager.singleton as RoomManager).spawnPrefabs[0], spawnPos, Quaternion.identity).GetComponent<LobbyPlayerCharacter>();
