@@ -28,12 +28,9 @@ public class GameSystemManager : MonoBehaviour
         {
             GameObject selectedGround = FallGrounds[eventnum];
 
-            // 🔹 서버에서만 실행되도록 확인
-            if (!NetworkServer.active) return;
-
             NetEvent();
 
-            if (selectedGround != null)
+            if (selectedGround != null && NetworkServer.active)
             {
                 // 🔹 살아있는 플레이어 중 랜덤 타겟 선정
                 var allPlayers = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None)

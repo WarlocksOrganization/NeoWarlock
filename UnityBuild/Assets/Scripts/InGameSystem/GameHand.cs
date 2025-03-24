@@ -8,6 +8,9 @@ using Cinemachine;
 
 public class GameHand : NetworkBehaviour
 {
+    public static GameHand Instance;
+    
+    
     [SerializeField] private Animator animator;
     [SerializeField] private GameObject explosionPrefab;
 
@@ -25,6 +28,14 @@ public class GameHand : NetworkBehaviour
     
     private CinemachineVirtualCamera virtualCamera;
     private Coroutine shakeCoroutine;
+    
+    private void Awake()
+    {
+        if (Instance == null)
+            Instance = this;
+        else
+            Destroy(gameObject); // ✅ 중복된 Instance 제거
+    }
 
     [ServerCallback]
     private void Start()
