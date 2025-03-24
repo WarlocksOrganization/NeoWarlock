@@ -25,6 +25,7 @@
         [SerializeField] private Sprite goldIconFrame;
 
         [SerializeField] private GameObject glowImage;
+        [SerializeField] private Image explosionImage;
         private Coroutine glowCoroutine;
 
         private Database.PlayerCardData currentCard;
@@ -143,14 +144,14 @@
                     cardDetailText.text = ApplyColorAfterArrow($"{SkillData[currentCard.AppliedSkillIndex].DisplayName} \n->  " +
                                           $"{Database.GetAttackData(currentCard.AppliedSkillIndex+(int)PlayerSetting.PlayerCharacterClass*10+100).DisplayName}", "#FFD700");
                     glowImage.SetActive(true);
-                
+
                     if (glowCoroutine != null)
                         StopCoroutine(glowCoroutine);
-                    glowCoroutine = StartCoroutine(AnimateGlowScale());
 
+                    glowCoroutine = StartCoroutine(PlayGlowSequence());
                     break;
 
-                default:
+            default:
                     cardTypeText.text = "알 수 없는 카드";
                     cardDetailText.text = "효과 없음";
 
@@ -166,7 +167,49 @@
             }
         }
 
-        private IEnumerator AnimateGlowScale()
+    public IEnumerator PlayExplosionEffect(Image effectImage)
+    {
+        float duration = 0.4f;
+        float time = 0f;
+
+        Vector3 startScale = Vector3.one * 0.3f;
+        Vector3 endScale = Vector3.one * 1.8f;
+
+        Color startColor = new Color(1f, 0.64f, 0f, 1f); // 주황색
+        Color endColor = new Color(1f, 1f, 0.8f, 0f);    // 연한 노란색, 알파 0
+
+        effectImage.gameObject.SetActive(true);
+        effectImage.transform.localScale = startScale;
+        effectImage.color = startColor;
+
+        while (time < duration)
+        {
+            float t = time / duration;
+            float eased = Mathf.SmoothStep(0f, 1f, t);
+            effectImage.transform.localScale = Vector3.Lerp(startScale, endScale, eased);
+            effectImage.color = Color.Lerp(startColor, endColor, eased);
+
+            time += Time.deltaTime;
+            yield return null;
+        }
+
+        yield return new WaitForSeconds(0.1f);
+
+        effectImage.gameObject.SetActive(false);
+    }
+
+    private IEnumerator PlayGlowSequence()
+    {
+        // 폭발 효과 먼저 재생
+        Debug.Log("ExplodeEffect");
+        yield return StartCoroutine(PlayExplosionEffect(explosionImage));
+
+        // 그 다음 숨쉬기 glow 시작
+        Debug.Log("GlowEffect");
+        glowCoroutine = StartCoroutine(AnimateGlowScale());
+    }
+
+    private IEnumerator AnimateGlowScale()
         {
             float time = 0f;
             float speed = 4f;
@@ -179,8 +222,8 @@
 
                 float cycleTime = 0.8f;
                 float pingPong = Mathf.PingPong(time, cycleTime) / cycleTime;
-                float scale = Mathf.Lerp(1f, 1.5f, pingPong);
-                float alpha = Mathf.Lerp(0.4f, 1f, pingPong);
+                float scale = Mathf.Lerp(1f, 1.3f, pingPong);
+                float alpha = Mathf.Lerp(0.5f, 1f, pingPong);
                 glowImage.transform.localScale = new Vector3(scale, scale, 1f);
                 if (glowImg != null)
                     {
@@ -194,36 +237,35 @@
 
     private string ApplyColorToNumber(string text, string pColor, string mColor)
         {
-            string[] words = text.Split(' '); // 공백 기준으로 단어 분리
+            string[] words = text.Split(' ');
             if (words.Length < 2) return text; // 단어가 2개 미만이면 변경할 필요 없음
 
             string lastWord = words[words.Length - 1]; // 마지막 단어 (숫자 + %)
 
-            if (lastWord.Contains("+")) // %가 포함된 경우 숫자로 판단
+            if (lastWord.Contains("+"))
             {
                 words[words.Length - 1] = $"<color={pColor}>{lastWord}</color>";
             }
             
-            else if (lastWord.Contains("-")) // %가 포함된 경우 숫자로 판단
+            else if (lastWord.Contains("-"))
             {
                 words[words.Length - 1] = $"<color={mColor}>{lastWord}</color>";
             }
 
-        return string.Join(" ", words); // 다시 문자열로 합치기
+        return string.Join(" ", words);
         }
 
         private string ApplyColorAfterArrow(string text, string colorCode)
         {
-            int arrowIndex = text.IndexOf("->"); // 화살표 위치 찾기
-            if (arrowIndex == -1) return text; // 화살표가 없으면 원본 반환
+            int arrowIndex = text.IndexOf("->");
+            if (arrowIndex == -1) return text;
 
-            string beforeArrow = text.Substring(0, arrowIndex + 2); // "->" 포함 앞부분
+            string beforeArrow = text.Substring(0, arrowIndex + 2);
             string afterArrow = text.Substring(arrowIndex + 2).Trim(); // 화살표 이후 텍스트
 
-            return $"{beforeArrow} <color={colorCode}>{afterArrow}</color>"; // 색상 적용 후 결합
+            return $"{beforeArrow} <color={colorCode}>{afterArrow}</color>";
         }
 
-        // ✅ 현재 카드 데이터를 반환
         public Database.PlayerCardData GetCurrentCard()
         {
             return currentCard;
@@ -233,7 +275,7 @@
         {
             if (playerCardUI.TryGetNewCard(out Database.PlayerCardData newCard))
             {
-                reRollButton.gameObject.SetActive(false); // ✅ 버튼 비활성화
+                reRollButton.gameObject.SetActive(false); // 리롤 버튼 비활성화
                 StartCoroutine(CardRotation(newCard));
             }
         }
