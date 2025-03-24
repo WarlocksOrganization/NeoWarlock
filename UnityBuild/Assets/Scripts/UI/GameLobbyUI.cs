@@ -89,8 +89,15 @@ public class GameLobbyUI : MonoBehaviour
     // ✅ 방장이 게임 시작 버튼을 클릭하면 실행
     private void StartGame()
     {
-        if (NetworkServer.active) // ✅ 방장인지 확인
+        if (NetworkServer.active)
         {
+            // ✅ 게임 시작 전에 플레이어 정보로 Stats 초기화
+            var allPlayers = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None);
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.Init(allPlayers);
+            }
+
             (NetworkManager.singleton as RoomManager).StartGame();
         }
     }

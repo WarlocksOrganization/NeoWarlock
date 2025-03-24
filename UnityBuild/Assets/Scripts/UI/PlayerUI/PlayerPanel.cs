@@ -24,7 +24,7 @@ public class PlayerPanel : MonoBehaviour
         // ✅ 강제 UI 업데이트
         UpdateIsDeadImage(playerCharacter.isDead);
 
-        Debug.Log($"[PlayerPanel] {PlayerSetting.PlayerId} 플레이어 {playerCharacter.playerId} 체력: {playerCharacter.curHp}, isDead: {playerCharacter.isDead}");
+        //Debug.Log($"[PlayerPanel] {PlayerSetting.PlayerId} 플레이어 {playerCharacter.playerId} 체력: {playerCharacter.curHp}, isDead: {playerCharacter.isDead}");
     }
 
     private void UpdateIsDeadImage(bool isDead)

@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using DataSystem;
 using Mirror;
@@ -107,7 +108,7 @@ namespace Player
             Invoke(nameof(DestroySelf), lifeTime);
         } 
 
-        protected System.Collections.IEnumerator MoveProjectile()
+        protected virtual IEnumerator MoveProjectile()
         {
             while (true)
             {

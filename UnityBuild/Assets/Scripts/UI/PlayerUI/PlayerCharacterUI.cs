@@ -1,12 +1,18 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace UI
 {
     public class PlayerCharacterUI : MonoBehaviour
     {
         [SerializeField] private QuickSlot[] quickSlots;
+        [SerializeField] private Image DamageImage;
+        [SerializeField] private GameObject QuickSlotUI;
 
-        public void SetQuickSlotData(int index, Sprite icon, float cooldown, string name, string description, Sprite upgradeIcon = null)
+        [SerializeField] private GameObject ghostQuickUI;
+        [SerializeField] private QuickSlot ghostQuickSlots;
+        
+        public void SetQuickSlotData(int index, Sprite icon, float cooldown, string name, string description)
         {
             if (index > quickSlots.Length)
             {
@@ -18,6 +24,11 @@ namespace UI
         public void UseSkill(int index, float cooldown)
         {
             quickSlots[index].UseSkill(cooldown);
+        }
+        
+        public void UseGhostSkill(float cooldown)
+        {
+            ghostQuickSlots.UseSkill(cooldown);
         }
 
         public void SelectSkill(int index, bool selected)
@@ -31,6 +42,19 @@ namespace UI
                 quickSlots[index].SelectSkill(selected);
             }
         }
-    
+
+        public void SetDamageEffect(float hpPercent)
+        {
+            if (hpPercent > 0.5f)
+            {
+                DamageImage.color = new Color(1, 1, 1, hpPercent - 0.5f);
+            }
+            if (hpPercent == 1)
+            {
+                DamageImage.color = new Color(0, 0, 0, 1);
+                QuickSlotUI.SetActive(false);
+                ghostQuickUI.SetActive(true);
+            }
+        }
     }
 }
