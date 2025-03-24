@@ -8,24 +8,23 @@ namespace UI
         [SerializeField] private QuickSlot[] quickSlots;
         [SerializeField] private Image DamageImage;
         [SerializeField] private GameObject QuickSlotUI;
-
         [SerializeField] private GameObject ghostQuickUI;
         [SerializeField] private QuickSlot ghostQuickSlots;
 
-        public void SetQuickSlotData(int index, Sprite icon, float cooldown, string name, string description)
+        public void SetQuickSlotData(int index, Sprite icon, float cooldown, string name, string description, Sprite upgradeIcon = null)
         {
             if (index > quickSlots.Length)
             {
                 return;
             }
-            quickSlots[index].SetQuickSlotData(icon, cooldown, name, description);
+            quickSlots[index].SetQuickSlotData(icon, cooldown, name, description, upgradeIcon);
         }
-
+    
         public void UseSkill(int index, float cooldown)
         {
             quickSlots[index].UseSkill(cooldown);
         }
-
+        
         public void UseGhostSkill(float cooldown)
         {
             ghostQuickSlots.UseSkill(cooldown);
