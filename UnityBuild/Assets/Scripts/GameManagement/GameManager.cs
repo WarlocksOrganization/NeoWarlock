@@ -118,6 +118,16 @@ namespace GameManagement
                 record.roundStatsList.Add(roundStats);
             }
             currentRound++;
+            
+            // ✅ 라운드 종료 후 stats 초기화
+            foreach (var stats in playerStatsArray)
+            {
+                stats.kills = 0;
+                stats.outKills = 0;
+                stats.damageDone = 0;
+            }
+
+            deathOrder.Clear();
         }
 
         public int GetScoreAtRound(Constants.PlayerRecord record, int roundIndex)
@@ -156,8 +166,7 @@ namespace GameManagement
         }
 
         public Constants.PlayerRecord GetPlayerRecord(int playerId) => playerRecords[playerId];
-
-        public void NextRound() => currentRound++;
+        
         public void ResetRound() => currentRound = 0;
 
         public void Reset()
@@ -182,5 +191,11 @@ namespace GameManagement
         {
             return playerStatsArray.First(p => p.playerId == playerId);
         }
+        
+        public Constants.PlayerRecord[] GetAllPlayerRecords()
+        {
+            return playerRecords.Values.ToArray();
+        }
     }
+
 }

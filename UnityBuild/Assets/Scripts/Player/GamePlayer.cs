@@ -143,23 +143,23 @@
             }
             
             [ClientRpc]
-            public void RpcSendFinalScore(Constants.PlayerStats[] sortedStats)
+            public void RpcSendFinalScore(Constants.PlayerRecord[] allRecords, int roundIndex)
             {
                 if (gameplayUI == null)
                     gameplayUI = FindFirstObjectByType<GamePlayUI>();
 
                 if (gameplayUI != null)
                 {
-                    gameplayUI.ShowFinalScoreBoard(sortedStats); // 점수판 띄우기
+                    gameplayUI.ShowFinalScoreBoard(allRecords, roundIndex);
 
-                    // ✅ 현재 라운드에 따라 다음 행동 결정
-                    StartCoroutine(HandleRoundTransition());
+                    // ✅ 점수표 보여준 후 다음 라운드로 넘어가는 흐름
+                    StartCoroutine(HandleRoundTransition()); // ← 여기가 빠져있었음
                 }
             }
             
             private IEnumerator HandleRoundTransition()
             {
-                yield return new WaitForSeconds(15f); // 점수판 5초 보여줌
+                yield return new WaitForSeconds(12f); // 점수판 5초 보여줌
 
                 int currentRound = GameManager.Instance.CurrentRound;
 
@@ -167,10 +167,9 @@
                 {
                     if (isServer)
                     {
-                        GameManager.Instance.NextRound();
-
                         // ✅ 동일 씬 다시 로드 (예: Gameplay 씬)
                         NetworkManager.singleton.ServerChangeScene(SceneManager.GetActiveScene().name);
+                        gameObject.SetActive(false);
                     }
                 }
                 else
@@ -188,22 +187,20 @@
             {
                 var roundRanks = GameManager.Instance.GetCurrentRoundRanks();
 
-                // ✅ 여기서 roundData 생성
+                // ✅ roundData 생성
                 List<(int playerId, int kills, int outKills, int damageDone, int rank)> roundData = new();
                 foreach (var (playerId, rank) in roundRanks)
                 {
-                    var stats = GameManager.Instance.GetPlayerStats(playerId); // PlayerStats 가져오기
+                    var stats = GameManager.Instance.GetPlayerStats(playerId);
                     roundData.Add((playerId, stats.kills, stats.outKills, stats.damageDone, rank));
                 }
 
-
-                // ✅ 반드시 이걸 호출해야 record.roundStatsList에 반영됨
                 GameManager.Instance.AddRoundResult(roundData);
 
-                var sortedStats = GameManager.Instance.GetSortedPlayerStats();
-                RpcSendFinalScore(sortedStats);
+                // ✅ 올바른 타입의 데이터 전송
+                var allRecords = GameManager.Instance.GetAllPlayerRecords(); // ← 이게 핵심
+                RpcSendFinalScore(allRecords, GameManager.Instance.CurrentRound - 1);
             }
-
             
             [Command]
             public void CmdRequestReturnToLobby()
@@ -214,5 +211,6 @@
                     NetworkManager.singleton.ServerChangeScene("GameRoom"); // 여기에 실제 로비 씬 이름
                 }
             }
+
         }
     }
