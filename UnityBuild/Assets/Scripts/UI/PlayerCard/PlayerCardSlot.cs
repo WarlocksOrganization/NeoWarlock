@@ -9,7 +9,7 @@
     public class PlayerCardSlot : MonoBehaviour
     {
         [SerializeField] private TMP_Text cardTypeText;
-        [SerializeField] private SkillButton skillIconButton;
+        [SerializeField] private Image skillIconImage;
         [SerializeField] private Image cardIconImage;
         [SerializeField] private TMP_Text cardNameText;
         [SerializeField] private TMP_Text cardDetailText;
@@ -23,6 +23,10 @@
         [SerializeField] private Sprite blueIconFrame;
         [SerializeField] private Sprite purpleIconFrame;
         [SerializeField] private Sprite goldIconFrame;
+
+        [SerializeField] private GameObject glowImage;
+        [SerializeField] private Image explosionImage;
+        private Coroutine glowCoroutine;
 
         private Database.PlayerCardData currentCard;
         private Database.AttackData[] SkillData;
@@ -49,6 +53,16 @@
         public void SetCardData(Database.PlayerCardData cardData)
         {
             Initialize();
+            if (glowCoroutine != null)
+            {
+                StopCoroutine(glowCoroutine);
+                glowCoroutine = null;
+            }
+            if (glowImage != null)
+            {
+                glowImage.SetActive(false);
+                glowImage.transform.localScale = Vector3.one;
+            }
             currentCard = cardData;
         
             cardIconImage.sprite = Database.GetCardIcon(cardData.StatType);
@@ -59,7 +73,7 @@
                 //기본 스탯
                 case PlayerStatType.Health:
                     cardTypeText.text = "스탯 강화";
-                    skillIconButton.SetUp($"최대 체력", $"플레이어 캐릭터의 최대 체력입니다.", healthIcon);
+                    skillIconImage.sprite = healthIcon;
                     cardIconFrame.sprite = blackIconFrame;
                     cardNameText.text = "최대 체력";
                     cardDetailText.text = ApplyColorToNumber($"체력 +{cardData.BonusStat}%", "#FF3535", "#008CFF");
@@ -67,7 +81,7 @@
 
                 case PlayerStatType.Speed:
                     cardTypeText.text = "스탯 강화";
-                    skillIconButton.SetUp($"이동 속도", $"플레이어 캐릭터의 이동 속도입니다.", speedIcon);
+                    skillIconImage.sprite = speedIcon;
                     cardIconFrame.sprite = blackIconFrame;
                     cardNameText.text = "이동 속도";
                     cardDetailText.text = ApplyColorToNumber($"이동 속도 +{cardData.BonusStat}%", "#FF3535", "#008CFF");
@@ -76,7 +90,7 @@
                 //특정 스킬 강화
                 case PlayerStatType.AttackSpeed:
                     cardTypeText.text = "스킬 강화";
-                    skillIconButton.SetUp(SkillData[currentCard.AppliedSkillIndex].DisplayName, SkillData[currentCard.AppliedSkillIndex].Description, SkillData[currentCard.AppliedSkillIndex].Icon);
+                    skillIconImage.sprite = SkillData[currentCard.AppliedSkillIndex].Icon;
                     cardIconFrame.sprite = blueIconFrame;
                     cardNameText.text = $"{SkillData[currentCard.AppliedSkillIndex].DisplayName}";
                     cardDetailText.text = ApplyColorToNumber($"투사체 속도 +{cardData.BonusStat}%", "#FF3535", "#008CFF");
@@ -84,7 +98,7 @@
 
                 case PlayerStatType.Range:
                     cardTypeText.text = "스킬 강화";
-                    skillIconButton.SetUp(SkillData[currentCard.AppliedSkillIndex].DisplayName, SkillData[currentCard.AppliedSkillIndex].Description, SkillData[currentCard.AppliedSkillIndex].Icon);
+                    skillIconImage.sprite = SkillData[currentCard.AppliedSkillIndex].Icon;
                     cardIconFrame.sprite = blueIconFrame;
                     cardNameText.text = $"{SkillData[currentCard.AppliedSkillIndex].DisplayName}";
                     cardDetailText.text = ApplyColorToNumber($"최대 거리 +{cardData.BonusStat}%", "#FF3535", "#008CFF");
@@ -92,7 +106,7 @@
 
                 case PlayerStatType.Radius:
                     cardTypeText.text = "스킬 강화";
-                    skillIconButton.SetUp(SkillData[currentCard.AppliedSkillIndex].DisplayName, SkillData[currentCard.AppliedSkillIndex].Description, SkillData[currentCard.AppliedSkillIndex].Icon);
+                    skillIconImage.sprite = SkillData[currentCard.AppliedSkillIndex].Icon;
                     cardIconFrame.sprite = purpleIconFrame;
                     cardNameText.text = $"{SkillData[currentCard.AppliedSkillIndex].DisplayName}";
                     cardDetailText.text = ApplyColorToNumber($"타격 범위 +{cardData.BonusStat}%", "#FF3535", "#008CFF");
@@ -100,7 +114,7 @@
 
                 case PlayerStatType.Damage:
                     cardTypeText.text = "스킬 강화";
-                    skillIconButton.SetUp(SkillData[currentCard.AppliedSkillIndex].DisplayName, SkillData[currentCard.AppliedSkillIndex].Description, SkillData[currentCard.AppliedSkillIndex].Icon);
+                    skillIconImage.sprite = SkillData[currentCard.AppliedSkillIndex].Icon;
                     cardIconFrame.sprite = blueIconFrame;
                     cardNameText.text = $"{SkillData[currentCard.AppliedSkillIndex].DisplayName}";
                     cardDetailText.text = ApplyColorToNumber($"데미지 +{cardData.BonusStat}%", "#FF3535", "#008CFF");
@@ -108,7 +122,7 @@
 
                 case PlayerStatType.KnockbackForce:
                     cardTypeText.text = "스킬 강화";
-                    skillIconButton.SetUp(SkillData[currentCard.AppliedSkillIndex].DisplayName, SkillData[currentCard.AppliedSkillIndex].Description, SkillData[currentCard.AppliedSkillIndex].Icon);
+                    skillIconImage.sprite = SkillData[currentCard.AppliedSkillIndex].Icon;
                     cardIconFrame.sprite = purpleIconFrame;
                     cardNameText.text = $"{SkillData[currentCard.AppliedSkillIndex].DisplayName}";
                     cardDetailText.text = ApplyColorToNumber($"넉백 거리 +{cardData.BonusStat}%", "#FF3535", "#008CFF");
@@ -116,7 +130,7 @@
 
                 case PlayerStatType.Cooldown:
                     cardTypeText.text = "스킬 강화";
-                    skillIconButton.SetUp(SkillData[currentCard.AppliedSkillIndex].DisplayName, SkillData[currentCard.AppliedSkillIndex].Description, SkillData[currentCard.AppliedSkillIndex].Icon);
+                    skillIconImage.sprite = SkillData[currentCard.AppliedSkillIndex].Icon;
                     cardIconFrame.sprite = purpleIconFrame;
                     cardNameText.text = $"{SkillData[currentCard.AppliedSkillIndex].DisplayName}";
                     cardDetailText.text = ApplyColorToNumber($"쿨다운 -{cardData.BonusStat}%", "#FF3535", "#008CFF");
@@ -124,52 +138,134 @@
 
                 case PlayerStatType.Special:
                     cardTypeText.text = $"<color=#FFD700>스킬 승급</color>";
-                    skillIconButton.SetUp(Database.GetAttackData(currentCard.AppliedSkillIndex+(int)PlayerSetting.PlayerCharacterClass*10+100).DisplayName, Database.GetAttackData(currentCard.AppliedSkillIndex+(int)PlayerSetting.PlayerCharacterClass*10+100).Description, Database.GetAttackData(currentCard.AppliedSkillIndex+(int)PlayerSetting.PlayerCharacterClass*10+100).Icon);
+                    skillIconImage.sprite = Database.GetAttackData(currentCard.AppliedSkillIndex+(int)PlayerSetting.PlayerCharacterClass*10+100).Icon;
                     cardIconFrame.sprite = goldIconFrame;
                     cardNameText.text = $"{SkillData[currentCard.AppliedSkillIndex].DisplayName}";
                     cardDetailText.text = ApplyColorAfterArrow($"{SkillData[currentCard.AppliedSkillIndex].DisplayName} \n->  " +
                                           $"{Database.GetAttackData(currentCard.AppliedSkillIndex+(int)PlayerSetting.PlayerCharacterClass*10+100).DisplayName}", "#FFD700");
-                break;
+                                    glowImage.SetActive(true);
 
-                default:
+                    if (glowCoroutine != null)
+                        StopCoroutine(glowCoroutine);
+
+                    glowCoroutine = StartCoroutine(PlayGlowSequence());
+                    break;
+
+            default:
                     cardTypeText.text = "알 수 없는 카드";
                     cardDetailText.text = "효과 없음";
+
+                    glowImage.SetActive(false);
+                    if (glowCoroutine != null)
+                    {
+                        StopCoroutine(glowCoroutine);
+                        glowCoroutine = null;
+                    }
+
+                    glowImage.transform.localScale = Vector3.one;
                     break;
             }
         }
 
-        private string ApplyColorToNumber(string text, string pColor, string mColor)
+    public IEnumerator PlayExplosionEffect(Image effectImage)
+    {
+        float duration = 0.4f;
+        float time = 0f;
+
+        Vector3 startScale = Vector3.one * 0.8f;
+        Vector3 endScale = Vector3.one * 1.8f;
+
+        Color startColor = new Color(1f, 0.64f, 0f, 1f); // 주황색
+        Color endColor = new Color(1f, 1f, 0.8f, 0f);    // 연한 노란색, 알파 0
+
+        effectImage.gameObject.SetActive(true);
+        effectImage.transform.localScale = startScale;
+        effectImage.color = startColor;
+
+        while (time < duration)
         {
-            string[] words = text.Split(' '); // 공백 기준으로 단어 분리
+            float t = time / duration;
+            float eased = Mathf.SmoothStep(0f, 1f, t);
+            effectImage.transform.localScale = Vector3.Lerp(startScale, endScale, eased);
+            effectImage.color = Color.Lerp(startColor, endColor, eased);
+
+            time += Time.deltaTime;
+            yield return null;
+        }
+
+        yield return new WaitForSeconds(0.1f);
+
+        effectImage.gameObject.SetActive(false);
+    }
+
+    private IEnumerator PlayGlowSequence()
+    {
+        // 폭발 효과 먼저 재생
+        Debug.Log("ExplodeEffect");
+        yield return StartCoroutine(PlayExplosionEffect(explosionImage));
+
+        // 그 다음 숨쉬기 glow 시작
+        Debug.Log("GlowEffect");
+        glowCoroutine = StartCoroutine(AnimateGlowScale());
+    }
+
+    private IEnumerator AnimateGlowScale()
+        {
+            float time = 0f;
+            float speed = 4f;
+            Image glowImg = glowImage.GetComponent<Image>();
+            Color baseColor = new Color(1f, 0.84f, 0f);
+            Color pulseColor = new Color(1f, 0.55f, 0f);
+
+            while (true)
+            {
+
+                float cycleTime = 1.2f;
+                float pingPong = Mathf.PingPong(time, cycleTime) / cycleTime;
+                float scale = Mathf.Lerp(1.2f, 1.25f, pingPong);
+                float alpha = Mathf.Lerp(0.5f, 1f, pingPong);
+                glowImage.transform.localScale = new Vector3(scale, scale, 1f);
+                if (glowImg != null)
+                    {
+                        Color pulse = Color.Lerp(baseColor, pulseColor, pingPong);
+                        glowImg.color = new Color(pulse.r, pulse.g, pulse.b, alpha);
+                    }
+                time += Time.deltaTime;
+                yield return null;
+            }
+        }
+
+    private string ApplyColorToNumber(string text, string pColor, string mColor)
+        {
+            string[] words = text.Split(' ');
             if (words.Length < 2) return text; // 단어가 2개 미만이면 변경할 필요 없음
 
             string lastWord = words[words.Length - 1]; // 마지막 단어 (숫자 + %)
 
-            if (lastWord.Contains("+")) // %가 포함된 경우 숫자로 판단
+            if (lastWord.Contains("+"))
             {
                 words[words.Length - 1] = $"<color={pColor}>{lastWord}</color>";
             }
             
-            else if (lastWord.Contains("-")) // %가 포함된 경우 숫자로 판단
+            else if (lastWord.Contains("-"))
             {
                 words[words.Length - 1] = $"<color={mColor}>{lastWord}</color>";
             }
 
-        return string.Join(" ", words); // 다시 문자열로 합치기
+        return string.Join(" ", words);
         }
 
         private string ApplyColorAfterArrow(string text, string colorCode)
         {
-            int arrowIndex = text.IndexOf("->"); // 화살표 위치 찾기
-            if (arrowIndex == -1) return text; // 화살표가 없으면 원본 반환
+            int arrowIndex = text.IndexOf("->");
+            if (arrowIndex == -1) return text;
 
-            string beforeArrow = text.Substring(0, arrowIndex + 2); // "->" 포함 앞부분
+            string beforeArrow = text.Substring(0, arrowIndex + 2);
             string afterArrow = text.Substring(arrowIndex + 2).Trim(); // 화살표 이후 텍스트
 
-            return $"{beforeArrow} <color={colorCode}>{afterArrow}</color>"; // 색상 적용 후 결합
+            return $"{beforeArrow} <color={colorCode}>{afterArrow}</color>";
         }
 
-        // ✅ 현재 카드 데이터를 반환
         public Database.PlayerCardData GetCurrentCard()
         {
             return currentCard;
@@ -179,7 +275,7 @@
         {
             if (playerCardUI.TryGetNewCard(out Database.PlayerCardData newCard))
             {
-                reRollButton.gameObject.SetActive(false); // ✅ 버튼 비활성화
+                reRollButton.gameObject.SetActive(false); // 리롤 버튼 비활성화
                 StartCoroutine(CardRotation(newCard));
             }
         }

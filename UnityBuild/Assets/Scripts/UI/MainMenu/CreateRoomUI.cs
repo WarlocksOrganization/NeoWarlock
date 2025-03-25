@@ -17,7 +17,8 @@ namespace UI
         [SerializeField] private Button[] maxPlayerCountButtons;
 
         private const int MIN_PLAYER = 2;
-
+        Color blackWithAlpha = new Color(0f, 0f, 0f, 200f / 255f);
+        Color whiteWithAlpha = new Color(1f, 1f, 1f, 200f / 255f);
         void Start()
         {
             // GameRoomData를 새로운 GameObject에 추가
@@ -41,7 +42,7 @@ namespace UI
         {
             for (int i = 0; i < roomTypeButtons.Length; i++)
             {
-                roomTypeButtons[i].gameObject.GetComponent<Image>().color = (i == index) ? Color.black : Color.white;
+                roomTypeButtons[i].gameObject.GetComponent<Image>().color = (i == index) ? blackWithAlpha : whiteWithAlpha;
             }
 
             roomData.roomType = (Constants.RoomType)index;
@@ -51,7 +52,7 @@ namespace UI
         {
             for (int i = 0; i < maxPlayerCountButtons.Length; i++)
             {
-                maxPlayerCountButtons[i].gameObject.GetComponent<Image>().color = (i == index) ? Color.black : Color.white;
+                maxPlayerCountButtons[i].gameObject.GetComponent<Image>().color = (i == index) ? blackWithAlpha : whiteWithAlpha;
             }
 
             roomData.maxPlayerCount = index + MIN_PLAYER;

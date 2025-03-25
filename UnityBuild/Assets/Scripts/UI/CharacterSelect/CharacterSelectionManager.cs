@@ -60,10 +60,16 @@ public class CharacterSelectionManager : MonoBehaviour
         
         for (int i = 0; i < characterData.AttackSkillIds.Count && index < skillButtons.Length; i++, index++)
         {
+            int skillId = characterData.AttackSkillIds[i];
             Database.AttackData attackData = Database.GetAttackData(characterData.AttackSkillIds[i]);
+            Database.AttackData upgradeData = Database.GetAttackData(skillId + 100);
+            string upgradeName = upgradeData != null ? upgradeData.DisplayName : "";
+            string upgradeDescription = upgradeData != null ? upgradeData.Description : "";
+            Sprite upgradeIcon = upgradeData != null ? upgradeData.Icon : null;
+
             if (attackData != null)
             {
-                skillButtons[index].SetUp(attackData.DisplayName, attackData.Description, attackData.Icon);
+                skillButtons[index].SetUp(attackData.DisplayName, attackData.Description, attackData.Icon, upgradeName, upgradeDescription, upgradeIcon);
                 skillButtons[index].gameObject.SetActive(true);
             }
         }
@@ -73,7 +79,7 @@ public class CharacterSelectionManager : MonoBehaviour
             MovementSkillConfig movementSkill = Database.GetMovementSkillData(characterData.MovementSkillType);
             if (movementSkill != null)
             {
-                skillButtons[index].SetUp(movementSkill.skillName, movementSkill.Description, movementSkill.skillIcon);
+                skillButtons[index].SetUp(movementSkill.skillName, movementSkill.Description, movementSkill.skillIcon, movementSkill.skillName, movementSkill.Description, movementSkill.skillIcon);
                 skillButtons[index].gameObject.SetActive(true);
             }
         }
