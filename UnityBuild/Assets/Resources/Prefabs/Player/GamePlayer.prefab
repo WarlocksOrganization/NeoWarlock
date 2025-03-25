@@ -62,6 +62,7 @@ MonoBehaviour:
   PlayerNickname: 
   playerCharacter: {fileID: 0}
   gamePlayObject: {fileID: 5686090464823823962, guid: 7bcca793a489720468df764893e84697, type: 3}
+  gamePlayHand: {fileID: 3982144661890126659, guid: f90b978d18b4de54dbbf4c1b08378f14, type: 3}
 --- !u!114 &6368749677994769231
 MonoBehaviour:
   m_ObjectHideFlags: 0

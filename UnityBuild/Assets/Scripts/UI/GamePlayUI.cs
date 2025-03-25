@@ -17,8 +17,6 @@ public class GamePlayUI : GameLobbyUI
     
     private int survivePlayers = -1;
     private Constants.GameState gameState = Constants.GameState.NotStarted;
-
-    private int maxTime = 10;
     
     [SerializeField] private GameObject StartCube; // 발판
     
@@ -97,7 +95,7 @@ public class GamePlayUI : GameLobbyUI
             if (time == 0)
             {
                 NetworkTimer networkTimer = FindFirstObjectByType<NetworkTimer>();
-                networkTimer.StartCountdown(maxTime);
+                networkTimer.StartCountdown(Constants.MaxGameEventTime);
             }
         }
         
