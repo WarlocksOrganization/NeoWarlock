@@ -119,6 +119,7 @@ MonoBehaviour:
   shakeDuration: 0.5
   shakeIntensity: 5
   frequencyIntensity: 10
+  skillItemPickupPrefab: {fileID: 3622867063374222405, guid: ab7c75548118a3d468ad99e1b58b764f, type: 3}
 --- !u!114 &9158056081737257125
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -418,6 +419,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3490806449183265780, guid: 6863ce4e345ba8947ad4e877ee1d1fc4, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3919154365031349049, guid: 6863ce4e345ba8947ad4e877ee1d1fc4, type: 3}
       propertyPath: m_LocalScale.x
       value: 3
@@ -537,6 +542,14 @@ PrefabInstance:
     - target: {fileID: 5749666378001062604, guid: 6863ce4e345ba8947ad4e877ee1d1fc4, type: 3}
       propertyPath: m_LocalScale.z
       value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 5750003618440004882, guid: 6863ce4e345ba8947ad4e877ee1d1fc4, type: 3}
+      propertyPath: lengthInSec
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5750003618440004882, guid: 6863ce4e345ba8947ad4e877ee1d1fc4, type: 3}
+      propertyPath: InitialModule.startLifetime.scalar
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 5840508399325865694, guid: 6863ce4e345ba8947ad4e877ee1d1fc4, type: 3}
       propertyPath: m_LocalScale.x
@@ -888,6 +901,10 @@ PrefabInstance:
       propertyPath: playOnAwake
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 143499873378033513, guid: bcd6d8f376ba4bf4880bb4e67a3de49c, type: 3}
+      propertyPath: InitialModule.startColor.maxColor.g
+      value: 0.97397166
+      objectReference: {fileID: 0}
     - target: {fileID: 613698757181617577, guid: bcd6d8f376ba4bf4880bb4e67a3de49c, type: 3}
       propertyPath: playOnAwake
       value: 1
@@ -895,6 +912,10 @@ PrefabInstance:
     - target: {fileID: 613698757181617577, guid: bcd6d8f376ba4bf4880bb4e67a3de49c, type: 3}
       propertyPath: scalingMode
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 613698757181617577, guid: bcd6d8f376ba4bf4880bb4e67a3de49c, type: 3}
+      propertyPath: InitialModule.startColor.maxColor.g
+      value: 0.9282908
       objectReference: {fileID: 0}
     - target: {fileID: 1702961094059150594, guid: bcd6d8f376ba4bf4880bb4e67a3de49c, type: 3}
       propertyPath: m_LocalRotation.w
@@ -1002,11 +1023,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4942015926802870689, guid: bcd6d8f376ba4bf4880bb4e67a3de49c, type: 3}
       propertyPath: InitialModule.startColor.maxColor.g
-      value: 0.049105775
+      value: 0.75686276
       objectReference: {fileID: 0}
     - target: {fileID: 4942015926802870689, guid: bcd6d8f376ba4bf4880bb4e67a3de49c, type: 3}
       propertyPath: InitialModule.startColor.maxColor.r
-      value: 0.7584905
+      value: 0.7486774
       objectReference: {fileID: 0}
     - target: {fileID: 5165867980697615261, guid: bcd6d8f376ba4bf4880bb4e67a3de49c, type: 3}
       propertyPath: playOnAwake
@@ -1072,6 +1093,10 @@ PrefabInstance:
       propertyPath: playOnAwake
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 7904035062763519220, guid: bcd6d8f376ba4bf4880bb4e67a3de49c, type: 3}
+      propertyPath: InitialModule.startColor.maxColor.g
+      value: 0.97381866
+      objectReference: {fileID: 0}
     - target: {fileID: 8002536080749590197, guid: bcd6d8f376ba4bf4880bb4e67a3de49c, type: 3}
       propertyPath: playOnAwake
       value: 1
@@ -1083,6 +1108,10 @@ PrefabInstance:
     - target: {fileID: 8635931734998390194, guid: bcd6d8f376ba4bf4880bb4e67a3de49c, type: 3}
       propertyPath: scalingMode
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8635931734998390194, guid: bcd6d8f376ba4bf4880bb4e67a3de49c, type: 3}
+      propertyPath: InitialModule.startColor.maxColor.g
+      value: 0.79848874
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

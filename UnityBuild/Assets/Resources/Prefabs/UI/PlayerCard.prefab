@@ -939,7 +939,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 3, y: -0.0000076294}
+  m_AnchoredPosition: {x: 3, y: -42}
   m_SizeDelta: {x: 792.2354, y: 867.1007}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8313888017842597744
@@ -1095,6 +1095,7 @@ RectTransform:
   - {fileID: 3370595537297385229}
   - {fileID: 443064610549486411}
   - {fileID: 2428832333190061649}
+  - {fileID: 8464858797669163491}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -1123,20 +1124,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cardTypeText: {fileID: 3060054401712757450}
-  skillIconButton: {fileID: 4899469671778279755}
+  skillButton: {fileID: 4899469671778279755}
   cardIconImage: {fileID: 8579172069539677446}
   cardNameText: {fileID: 7282050617376391949}
   cardDetailText: {fileID: 6404047277990728099}
   reRollButton: {fileID: 1383915518405291278}
   healthIcon: {fileID: 21300000, guid: 611904aa2c96e294b8d74db081ee2983, type: 3}
   speedIcon: {fileID: 21300000, guid: 9600ee30898ab0f4fa01939b6c00bbda, type: 3}
+  attackIcon: {fileID: 21300000, guid: 9cd13430dbb619146a3beccd96d45ed7, type: 3}
   cardIconFrame: {fileID: 1721042761333709435}
   blackIconFrame: {fileID: 21300000, guid: 85a9361efa6cbe543a2229c4b922760d, type: 3}
   blueIconFrame: {fileID: 21300000, guid: c3538050dea04ab4fbb63e13dbf9451c, type: 3}
   purpleIconFrame: {fileID: 21300000, guid: 698408b746a12a04982ae16b17b3b044, type: 3}
   goldIconFrame: {fileID: 21300000, guid: 8f19a1e795d1ed14a947e655ccffd3d1, type: 3}
   glowImage: {fileID: 5698436070690375742}
-  explosionImage: {fileID: 0}
+  explosionImage: {fileID: 1082006083292134699}
 --- !u!1 &6923886645781408972
 GameObject:
   m_ObjectHideFlags: 0
@@ -1154,7 +1156,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &2428832333190061649
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1164,7 +1166,7 @@ RectTransform:
   m_GameObject: {fileID: 6923886645781408972}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.1635, y: 1.1635, z: 1.1635}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1689144296933990738}
@@ -1229,7 +1231,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &8464858797669163491
 RectTransform:
   m_ObjectHideFlags: 0

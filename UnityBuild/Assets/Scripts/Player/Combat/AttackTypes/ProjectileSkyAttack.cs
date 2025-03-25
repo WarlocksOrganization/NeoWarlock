@@ -12,7 +12,7 @@ namespace Player.Combat
         }
 
         // ✅ lifeTime을 5초로 고정
-        public override void Execute(Vector3 mousePosition, Vector3 firePoint, GameObject owner, int playerid, int skillid)
+        public override void Execute(Vector3 mousePosition, Vector3 firePoint, GameObject owner, int playerid, int skillid, float attackPower)
         {
             Vector3 spawnPosition = GetSpawnPosition(firePoint);
             Vector3 direction = (mousePosition - spawnPosition).normalized;
@@ -23,7 +23,7 @@ namespace Player.Combat
             if (bullet != null)
             {
                 bullet.SetProjectileData(
-                    attackData.Damage,
+                    attackData.Damage*attackPower,
                     attackData.Speed,
                     attackData.Radius,
                     attackData.Range,

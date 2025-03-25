@@ -9,6 +9,6 @@ namespace Player.Combat
         float LastUsedTime { get; set; }
         bool IsReady();
         Database.AttackData GetAttackData();
-        void Execute(Vector3 mousePosition, Vector3 firePoint, GameObject owner, int playerid, int skillid);
+        void Execute(Vector3 mousePosition, Vector3 firePoint, GameObject owner, int playerid, int skillid, float attackPower);
     }
 }

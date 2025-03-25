@@ -169,7 +169,7 @@
 
                 if (gameplayUI != null)
                 {
-                    gameplayUI.ShowFinalScoreBoard(allRecords, roundIndex);
+                    gameplayUI.ShowGameOverTextAndScore(allRecords, roundIndex);
 
                     // ✅ 점수표 보여준 후 다음 라운드로 넘어가는 흐름
                     StartCoroutine(HandleRoundTransition()); // ← 여기가 빠져있었음

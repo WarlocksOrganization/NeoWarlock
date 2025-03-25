@@ -18,7 +18,7 @@ public class SkillButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     //[SerializeField] private Image upgradeSkillImage;
     [SerializeField] private Image selecttImage;
 
-    public void SetUp(string name, string description, Sprite icon, string upgradeName, string upgradeDescription, Sprite upgradeIcon)
+    public void SetUp(string name, string description, Sprite icon, string upgradeName = "", string upgradeDescription = "", Sprite upgradeIcon = null)
     {
         skillName = name;
         skillDescription = description;
@@ -46,7 +46,7 @@ public class SkillButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     public void OnPointerEnter(PointerEventData eventData)
     {
         skillDescriptionUI.gameObject.SetActive(true);
-        if (!string.IsNullOrEmpty(upgradeSkillName) && upgradeSkillName != skillName) {
+        if (!string.IsNullOrEmpty(upgradeSkillName) && upgradeSkillName != skillName && upgradeSkillDescriptionUI) {
             upgradeSkillDescriptionUI.gameObject.SetActive(true);
         }
     }
@@ -56,7 +56,10 @@ public class SkillButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         if (skillDescriptionUI != null)
         {
             skillDescriptionUI.gameObject.SetActive(false);
-            upgradeSkillDescriptionUI.gameObject.SetActive(false);
+            if (upgradeSkillDescriptionUI)
+            {
+                 upgradeSkillDescriptionUI.gameObject.SetActive(false);
+            }
         }
     }
 

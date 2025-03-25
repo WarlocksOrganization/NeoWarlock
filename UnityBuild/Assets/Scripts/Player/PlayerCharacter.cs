@@ -102,7 +102,9 @@ namespace Player
         {
             if (!isOwned) return;
 
-            if (isDead || State != Constants.PlayerState.Start) return;
+            if (isDead) return;
+            
+            if (State == Constants.PlayerState.NotReady || State == Constants.PlayerState.Ready) return;
             
             if (!_characterController.isGrounded)
             {
@@ -121,6 +123,8 @@ namespace Player
                 attackLockTime-=Time.deltaTime;
                 return;
             }
+            
+            if (State != Constants.PlayerState.Start) return;
             
             UpdateAttack();
         }

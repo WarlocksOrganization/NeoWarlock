@@ -14,9 +14,10 @@ namespace DataSystem
         public static readonly string ClassIconPath = "Sprites/ClassIcons/";
         public static readonly string CardIconPath = "Sprites/CardIcons/";
 
-        public static readonly int MaxGameEventTime = 15  ; // 오브젝트 이벤트 시간
-        public static readonly int ScoreBoardTime = 12; // 스코어보드 보는 시간
-        public static readonly int CardSelectionTime = 10; //카드 선택 시간
+        public static readonly int MaxGameEventTime = 15; // 오브젝트 이벤트 시간 15
+        public static readonly int ScoreBoardTime = 15; // 스코어보드 보는 시간 12
+        public static readonly int CardSelectionTime = 1; //카드 선택 시간 10
+        public static readonly int CountTime = 1; // 카운트타임 5
 
         public enum RoomType
         {
@@ -29,6 +30,7 @@ namespace DataSystem
             NotReady = 0,
             Ready = 1,
             Start = 2,
+            Counting = 3,
         }
 
         public enum GameState
@@ -71,6 +73,12 @@ namespace DataSystem
             HolyShhield,
             PowerPowerBody,
             PowerCharge,
+            
+            ItemHP = 100,
+            ItemSpeed = 101,
+            ItemAttack = 102,
+            ItemDefense = 103,
+            ItemBomb = 104,
         }
 
         public enum SkillType
@@ -107,6 +115,14 @@ namespace DataSystem
             PhantomSmart,
             SoulSwamp,
             InfernalPoison,
+            
+            ItemHP = 10001,
+            ItemSpeed = 1002,
+            ItemAttack = 1003,
+            ItemDefense = 1004,
+           
+            ItemBomb = 1011,
+            
             None = 100,
         }
 
@@ -129,6 +145,13 @@ namespace DataSystem
         {
             public Constants.SkillType skillType;
             public GameObject gObject;
+        }
+        
+        [Serializable]
+        public class SkillTypeMeshEntry
+        {
+            public Constants.SkillType skillType;
+            public Mesh mesh;
         }
 
         [Serializable]

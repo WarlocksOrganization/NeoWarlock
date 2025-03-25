@@ -22,6 +22,12 @@ namespace UI
     
         public void UseSkill(int index, float cooldown)
         {
+            if (index == 4)
+            {
+                quickSlots[index].DelSkill();
+                return;
+            }
+            
             quickSlots[index].UseSkill(cooldown);
         }
         
