@@ -233,6 +233,11 @@ namespace Player
             isGhost = true;
         }
 
-
+        [Command]
+        public void CmdStartGame()
+        {
+            var manager = Networking.RoomManager.singleton as Networking.RoomManager;
+            manager.StartGame();
+        }
     }
 }
