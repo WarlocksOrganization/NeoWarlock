@@ -1,9 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using DataSystem;
 using GameManagement;
 using kcp2k;
 using Mirror;
+using Newtonsoft.Json.Linq;
 using Player;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -19,59 +21,64 @@ namespace Networking
         public string roomName;
         public Constants.RoomType roomType;
         public int maxPlayerCount = 6;
+        public bool isRoomOccupied => roomSlots.Count > 0;
 
         public override void Start()
         {
-            var args = System.Environment.GetCommandLineArgs();
-            for (int i = 0; i < args.Length; i++)
+            if (Application.platform.Equals(RuntimePlatform.LinuxServer))
             {
-                if (args[i].StartsWith("-port="))
+                Debug.Log("[RoomManager] 리눅스 서버 모드로 실행 중");
+                var args = System.Environment.GetCommandLineArgs();
+                for (int i = 0; i < args.Length; i++)
                 {
-                    ushort port;
-                    if (ushort.TryParse(args[i].Substring(6), out port))
+                    if (args[i].StartsWith("-port="))
                     {
-                        Debug.Log($"[RoomManager] 포트 변경: {port}");
-                        KcpTransport transport = GetComponent<KcpTransport>();
-                        transport.Port = port;
+                        ushort port;
+                        if (ushort.TryParse(args[i].Substring(6), out port))
+                        {
+                            Debug.Log($"[RoomManager] 포트 변경: {port}");
+                            KcpTransport transport = GetComponent<KcpTransport>();
+                            transport.Port = port;
+                        }
+                        else
+                        {
+                            Debug.LogWarning($"[RoomManager] 포트 변경 실패: {args[i].Substring(6)}");
+                        }
                     }
-                    else
+                    else if (args[i].StartsWith("-roomName="))
                     {
-                        Debug.LogWarning($"[RoomManager] 포트 변경 실패: {args[i].Substring(6)}");
+                        roomName = args[i].Substring(10);
+                        Debug.Log($"[RoomManager] 방 이름 변경: {roomName}");
                     }
-                }
-                else if (args[i].StartsWith("-roomName="))
-                {
-                    roomName = args[i].Substring(10);
-                    Debug.Log($"[RoomManager] 방 이름 변경: {roomName}");
-                }
-                else if (args[i].StartsWith("-roomType="))
-                {
-                    if (Enum.TryParse(args[i].Substring(10), out Constants.RoomType type))
+                    else if (args[i].StartsWith("-roomType="))
                     {
-                        roomType = type;
-                        Debug.Log($"[RoomManager] 방 유형 변경: {roomType}");
+                        if (Enum.TryParse(args[i].Substring(10), out Constants.RoomType type))
+                        {
+                            roomType = type;
+                            Debug.Log($"[RoomManager] 방 유형 변경: {roomType}");
+                        }
+                        else
+                        {
+                            Debug.LogWarning($"[RoomManager] 방 유형 변경 실패: {args[i].Substring(10)}");
+                        }
                     }
-                    else
+                    else if (args[i].StartsWith("-maxPlayerCount="))
                     {
-                        Debug.LogWarning($"[RoomManager] 방 유형 변경 실패: {args[i].Substring(10)}");
-                    }
-                }
-                else if (args[i].StartsWith("-maxPlayerCount="))
-                {
-                    if (int.TryParse(args[i].Substring(16), out int count))
-                    {
-                        maxPlayerCount = count;
-                        Debug.Log($"[RoomManager] 최대 인원 변경: {maxPlayerCount}");
-                    }
-                    else
-                    {
-                        Debug.LogWarning($"[RoomManager] 최대 인원 변경 실패: {args[i].Substring(16)}");
+                        if (int.TryParse(args[i].Substring(16), out int count))
+                        {
+                            maxPlayerCount = count;
+                            Debug.Log($"[RoomManager] 최대 인원 변경: {maxPlayerCount}");
+                        }
+                        else
+                        {
+                            Debug.LogWarning($"[RoomManager] 최대 인원 변경 실패: {args[i].Substring(16)}");
+                        }
                     }
                 }
             }
-
+            
             base.Start();
-            if (Application.isBatchMode)
+            if (Application.platform.Equals(RuntimePlatform.LinuxServer))
             {
                 StartServer();
             }
@@ -98,7 +105,7 @@ namespace Networking
         {
             base.OnRoomStartServer();
 
-            if (NetworkClient.active)
+            if (!UnityEngine.Application.platform.Equals(RuntimePlatform.LinuxServer))
             {
                 return; // 호스트 모드라면 종료
             }
@@ -131,8 +138,44 @@ namespace Networking
 
         public void StartGame()
         {
+            if (roomDataInstance.gameId != null)
+            {
+                Debug.LogWarning("[RoomManager] 이미 게임이 시작되었습니다.");
+                return;
+            }
+
+            var players = FindObjectsOfType<PlayerCharacter>();
+            bool allReady = players.All(p => p.State == Constants.PlayerState.Start);
+
+            if (!allReady)
+            {
+                Debug.LogWarning("[RoomManager] 아직 준비되지 않은 플레이어가 있어 게임을 시작할 수 없습니다.");
+                // return;
+            }
+
             Debug.Log("[RoomManager] 모든 플레이어가 준비되었습니다. 게임을 시작합니다!");
             ServerChangeScene(GameplayScene);
+        }
+        public Dictionary<string, string> GetRoomData()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data["roomName"] = roomDataInstance.roomName;
+            data["roomType"] = roomDataInstance.roomType.ToString();
+            data["maxPlayerCount"] = roomDataInstance.maxPlayerCount.ToString();
+            data["gameId"] = roomDataInstance.gameId;
+            data["roomId"] = roomDataInstance.roomId;
+            return data;
+        }
+
+        public void SetRoomData(Dictionary<string, string> data)
+        {
+            roomDataInstance.SetRoomData(data["roomName"], Constants.RoomType.Solo, int.Parse(data["maxPlayerCount"]), data["gameId"], data["roomId"]);
+        }
+        
+        public override void OnClientDisconnect()
+        {
+            base.OnClientDisconnect();
+            SocketManager.singleton.RequestExitRoom();
         }
     }
 }

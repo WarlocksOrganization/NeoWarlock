@@ -58,7 +58,14 @@ namespace Player
             MoveSkill = newMoveSkill;
             AttackSkills = newAttackSkills;
 
-            buffSystem?.CmdClearAllBuffs();
+            if (NetworkClient.active)
+            {
+                buffSystem?.CmdClearAllBuffs();
+            }
+            else
+            {
+                buffSystem?.ServerClearAllBuffs();
+            }
         }
 
         // 캐릭터 클래스 변경 시 호출될 동기화 함수
