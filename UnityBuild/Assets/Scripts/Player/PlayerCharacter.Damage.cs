@@ -115,9 +115,13 @@ namespace Player
                 {
                     RpcTransmitKillLog(attackPlayerId, this.attackskillid, true);
                 }
-                else
+                else if(attackPlayerId != playerId)
                 {
                     RpcTransmitKillLog(attackPlayerId, attackskillid, false);
+                }
+                else
+                {
+                    RpcTransmitKillLog(-1, -1, false);
                 }
             }
         }

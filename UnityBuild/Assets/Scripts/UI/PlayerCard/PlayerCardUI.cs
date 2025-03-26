@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using DataSystem;
 using DataSystem.Database;
 using GameManagement;
 using TMPro;
@@ -13,6 +14,7 @@ public class PlayerCardUI : MonoBehaviour
 {
     public PlayerCardSlot[] slots; // UI 슬롯 3개
     [SerializeField] private TMP_Text timerText; // 남은 시간 표시
+    [SerializeField] private GameObject LoadingImage;
 
     private Queue<Database.PlayerCardData> selectedCardsQueue = new();
     public float maxTime = 10f;
@@ -21,9 +23,12 @@ public class PlayerCardUI : MonoBehaviour
     private bool isRunning = true;
 
     private PlayerCharacterUI playerCharacterUI;
+    private bool isLoading = true;
+    
 
     void Start()
     {
+        LoadingImage.SetActive(true);
         LoadRandomPlayerCards();
         DisplayTopThreeCards();
         playerCharacterUI = FindFirstObjectByType<PlayerCharacterUI>();
@@ -130,6 +135,12 @@ public class PlayerCardUI : MonoBehaviour
     // ⏳ 서버에서 호출하여 클라이언트 UI 업데이트
     public void UpdateTimer(float serverTime)
     {
+        if (isLoading)
+        {
+            isLoading = false;
+            StartCoroutine(FadeOutLoadingImage());
+            AudioManager.Instance.PlayBGM(Constants.SoundType.BGM_SSAFY_CardSelect);
+        }
         float timeDiff = Mathf.Abs(remainingTime - serverTime);
 
         if (timeDiff > 1f)
@@ -145,6 +156,29 @@ public class PlayerCardUI : MonoBehaviour
         }
     }
 
+    private IEnumerator FadeOutLoadingImage()
+    {
+        CanvasGroup canvasGroup = LoadingImage.GetComponent<CanvasGroup>();
+
+        if (canvasGroup == null)
+        {
+            canvasGroup = LoadingImage.AddComponent<CanvasGroup>();
+        }
+
+        float duration = 0.5f;
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            canvasGroup.alpha = Mathf.Lerp(1f, 0f, elapsed / duration);
+            yield return null;
+        }
+
+        canvasGroup.alpha = 0f;
+        LoadingImage.SetActive(false);
+    }
+    
     // ✅ 카드 선택 확정 및 UI 비활성화
     private void ConfirmSelectedCards()
     {

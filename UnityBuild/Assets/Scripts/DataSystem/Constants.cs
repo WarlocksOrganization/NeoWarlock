@@ -125,6 +125,29 @@ namespace DataSystem
             
             None = 100,
         }
+        
+        public enum SoundType
+        {
+            None,
+            // BGM
+            BGM_MainMenu = 1001,
+            BGM_Lobby = 1002,
+            BGM_SSAFY_CardSelect = 1101,
+            BGM_SSAFY_GameStart = 1102,
+
+            // SFX
+            SFX_Click,
+            SFX_Explosion,
+            SFX_Heal,
+            SFX_Swing
+        }
+        
+        [System.Serializable]
+        public class SoundData
+        {
+            public SoundType type;
+            public AudioClip clip;
+        }
 
         [Serializable]
         public class BuffEffectEntry

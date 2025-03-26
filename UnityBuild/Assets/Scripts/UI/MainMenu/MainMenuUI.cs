@@ -1,3 +1,4 @@
+using DataSystem;
 using GameManagement;
 using kcp2k;
 using Mirror;
@@ -33,6 +34,8 @@ namespace UI
                     break;
             }
             displayModeText.text = displayModeMessage;
+            
+            AudioManager.Instance.PlayBGM(Constants.SoundType.BGM_MainMenu);
         }
         public void OnClickGameStartButtion()
         {

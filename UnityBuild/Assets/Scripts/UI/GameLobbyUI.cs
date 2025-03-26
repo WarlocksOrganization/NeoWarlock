@@ -35,6 +35,7 @@ public class GameLobbyUI : MonoBehaviour
             PlayerSelection.SetActive(true);
         }
         CheckIfHost();
+        AudioManager.Instance.PlayBGM(Constants.SoundType.BGM_Lobby);
     }
 
     public void OpenPlayerSelection()

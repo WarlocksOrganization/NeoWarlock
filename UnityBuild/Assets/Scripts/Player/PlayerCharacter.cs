@@ -226,8 +226,8 @@ namespace Player
         private void SpawnGhost()
         {
             if (!isServer) return; // 서버에서만 실행
-
-            GameObject ghost = Instantiate(ghostPrefab, transform.position, Quaternion.identity);
+            
+            GameObject ghost = Instantiate(ghostPrefab, transform.position + Vector3.up, Quaternion.identity);
             NetworkServer.Spawn(ghost, connectionToClient); // 클라이언트와 동기화
             ghostInstance = ghost;
 

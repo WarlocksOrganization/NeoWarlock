@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using DataSystem;
 using DataSystem.Database;
+using Mirror;
 using Player;
 using UnityEngine;
 
@@ -31,6 +32,8 @@ namespace GameManagement
         private Dictionary<int, Constants.PlayerRecord> playerRecords = new();
         private int currentRound = 0;
         public int CurrentRound => currentRound;
+        
+        private HashSet<NetworkConnectionToClient> readyPlayers = new();
 
         public void Init(PlayerCharacter[] characters)
         {

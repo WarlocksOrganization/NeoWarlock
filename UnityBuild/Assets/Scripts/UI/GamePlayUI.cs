@@ -101,6 +101,7 @@ public class GamePlayUI : GameLobbyUI
         
         else if (gameState == Constants.GameState.Counting)
         {
+            AudioManager.Instance.StopBGM();
             foreach (var player in foundCharacters)
             {
                 player.SetState(Constants.PlayerState.Counting);
@@ -120,6 +121,8 @@ public class GamePlayUI : GameLobbyUI
                 StartCoroutine(HideAfterDelay(countDownText.gameObject, 0.8f));
                 gameState = Constants.GameState.Start;
                 UpdatePlayerInRoon();
+                
+                AudioManager.Instance.PlayBGM(Constants.SoundType.BGM_SSAFY_GameStart);
             }
         }
     }
