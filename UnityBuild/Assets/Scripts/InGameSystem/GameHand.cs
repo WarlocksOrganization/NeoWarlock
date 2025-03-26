@@ -28,6 +28,8 @@ public class GameHand : NetworkBehaviour
     
     [SerializeField] private GameObject skillItemPickupPrefab;
     
+    [SerializeField] private GameObject GhostEnemyPrefab;
+    
     private CinemachineVirtualCamera virtualCamera;
     private Coroutine shakeCoroutine;
     
@@ -137,8 +139,25 @@ public class GameHand : NetworkBehaviour
         if (isFinal && Random.value <= 0.1f)
         {
             RpcTriggerBlackout();
+            
+            // 🎯 정전 시 GameHand 스폰
+            var players = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None)
+                .Where(p => !p.isDead)
+                .ToList();
+
+            foreach (var player in players)
+            {
+                Vector3 randomOffset = Random.onUnitSphere; // 반경 5미터 내 랜덤 위치
+                randomOffset.y = 0f; // 평면상
+                randomOffset = randomOffset.normalized;
+                randomOffset *= 10f;
+                Vector3 spawnPos = player.transform.position + randomOffset;
+
+                GameObject newHand = Instantiate(GhostEnemyPrefab, spawnPos, Quaternion.identity);
+                NetworkServer.Spawn(newHand);
+            }
         }
-        else if (isFinal)
+        else if (isFinal  && Random.value <= 0.5f)
         {
             for (int i = 0; i < 2; i++)
             {

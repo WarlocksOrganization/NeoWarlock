@@ -34,6 +34,7 @@ namespace Player
         
         
         [SerializeField] private Animator animator;
+        [SerializeField] private GameObject playerLight;
         
         private float attackLockTime = 0f;
 
@@ -45,6 +46,8 @@ namespace Player
         [SerializeField] private GameObject ghostPrefab; // ✅ 유령 프리팹
         private GameObject ghostInstance;
         private bool isGhost = false;
+        
+        
 
         private void Awake()
         {
@@ -62,6 +65,8 @@ namespace Player
             
             if (isOwned)
             {
+                playerLight.SetActive(true);
+                
                 virtualCamera = FindFirstObjectByType<CinemachineVirtualCamera>();
                 if (virtualCamera != null)
                 {

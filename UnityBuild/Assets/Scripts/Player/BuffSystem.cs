@@ -79,30 +79,25 @@ public class BuffSystem : NetworkBehaviour
         if (buffData.defenseModifier != 0)
         {
             playerCharacter.defense += (int)buffData.defenseModifier;
+            activeBuffValues[BuffKey(buffType, "def")] = buffData.defenseModifier;
         }
 
         if (buffData.knonkbackModifier != 0)
         {
             playerCharacter.KnockbackFactor += buffData.knonkbackModifier;
+            activeBuffValues[BuffKey(buffType, "knock")] = buffData.knonkbackModifier;
         }
 
         if (buffData.moveSpeedModifier != 0)
         {
-            string moveKey = BuffKey(buffType, "_move");
-
-            if (activeBuffValues.ContainsKey(moveKey))
-            {
-                playerCharacter.MoveSpeed -= activeBuffValues[moveKey];
-            }
-
             playerCharacter.MoveSpeed += buffData.moveSpeedModifier;
-            activeBuffValues[moveKey] = buffData.moveSpeedModifier;
+            activeBuffValues[BuffKey(buffType, "move")] = buffData.moveSpeedModifier;
         }
-        
+
         if (buffData.attackDamageModifier != 0f)
         {
             playerCharacter.AttackPower += buffData.attackDamageModifier;
-            activeBuffValues[buffType + "_atk"] = buffData.attackDamageModifier;
+            activeBuffValues[BuffKey(buffType, "atk")] = buffData.attackDamageModifier;
         }
     }
 
@@ -110,32 +105,33 @@ public class BuffSystem : NetworkBehaviour
     {
         Constants.BuffType buffType = buffData.BuffType;
 
-        if (buffData.defenseModifier != 0)
+        string defKey = BuffKey(buffType, "def");
+        if (activeBuffValues.ContainsKey(defKey))
         {
-            playerCharacter.defense -= (int)buffData.defenseModifier;
+            playerCharacter.defense -= (int)activeBuffValues[defKey];
+            activeBuffValues.Remove(defKey);
         }
 
-        if (buffData.knonkbackModifier != 0)
+        string knockKey = BuffKey(buffType, "knock");
+        if (activeBuffValues.ContainsKey(knockKey))
         {
-            playerCharacter.KnockbackFactor -= buffData.knonkbackModifier;
+            playerCharacter.KnockbackFactor -= activeBuffValues[knockKey];
+            activeBuffValues.Remove(knockKey);
         }
 
-        if (activeBuffValues.ContainsKey(buffType.ToString()))
+        string moveKey = BuffKey(buffType, "move");
+        if (activeBuffValues.ContainsKey(moveKey))
         {
-            playerCharacter.MoveSpeed -= activeBuffValues[buffType.ToString()];
-            activeBuffValues.Remove(buffType.ToString());
-        }
-        
-        if (buffData.attackDamageModifier != 0f)
-        {
-            string atkKey = BuffKey(buffType, "atk");
-            if (activeBuffValues.ContainsKey(atkKey))
-            {
-                playerCharacter.AttackPower -= activeBuffValues[atkKey];
-                activeBuffValues.Remove(atkKey);
-            }
+            playerCharacter.MoveSpeed -= activeBuffValues[moveKey];
+            activeBuffValues.Remove(moveKey);
         }
 
+        string atkKey = BuffKey(buffType, "atk");
+        if (activeBuffValues.ContainsKey(atkKey))
+        {
+            playerCharacter.AttackPower -= activeBuffValues[atkKey];
+            activeBuffValues.Remove(atkKey);
+        }
     }
 
     private IEnumerator TickDamage(BuffData buffData, int attackPlayerId, int attackskillid)

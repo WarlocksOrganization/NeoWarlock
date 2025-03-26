@@ -120,6 +120,7 @@ MonoBehaviour:
   shakeIntensity: 5
   frequencyIntensity: 10
   skillItemPickupPrefab: {fileID: 3622867063374222405, guid: ab7c75548118a3d468ad99e1b58b764f, type: 3}
+  GhostEnemyPrefab: {fileID: 7660543934276581692, guid: 22a40223a46888744b972bec3d9c6e38, type: 3}
 --- !u!114 &9158056081737257125
 MonoBehaviour:
   m_ObjectHideFlags: 0
