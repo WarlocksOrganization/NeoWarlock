@@ -79,7 +79,7 @@ public class GamePlayUI : GameLobbyUI
 
         NetworkTimer networkTimer = FindFirstObjectByType<NetworkTimer>();
 
-        networkTimer.StartCountdown(3);
+        networkTimer.StartCountdown(Constants.CountTime);
     }
 
     public void UpdateCountdownUI(int time)
@@ -101,6 +101,11 @@ public class GamePlayUI : GameLobbyUI
         
         else if (gameState == Constants.GameState.Counting)
         {
+            foreach (var player in foundCharacters)
+            {
+                player.SetState(Constants.PlayerState.Counting);
+            }
+            
             countDownText.text = time.ToString();
             StartCoroutine(PunchScale(countDownText.transform));
             
@@ -160,5 +165,23 @@ public class GamePlayUI : GameLobbyUI
     public void ShowFinalScoreBoard(Constants.PlayerRecord[] records, int roundIndex)
     {
         scoreBoardUI.ShowScoreBoard(records, roundIndex);
+    }
+    
+    public void ShowGameOverTextAndScore(Constants.PlayerRecord[] records, int roundIndex)
+    {
+        StartCoroutine(GameOverSequence(records, roundIndex));
+        StartCoroutine(GameOverSequence(records, roundIndex));
+    }
+    
+    private IEnumerator GameOverSequence(Constants.PlayerRecord[] records, int roundIndex)
+    {
+        countDownText.gameObject.SetActive(true);
+        countDownText.color = Color.green;
+        countDownText.text = "Game Over";
+        StartCoroutine(PunchScale(countDownText.transform));
+        
+        yield return new WaitForSeconds(3f);
+        
+        ShowFinalScoreBoard(records, roundIndex);
     }
 }

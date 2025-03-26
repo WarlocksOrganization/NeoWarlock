@@ -13,13 +13,4 @@ public class MovementSkillConfig : ScriptableObject
     public Sprite skillIcon;
     public string skillName;
     public string Description;
-    
-
-    public virtual Vector3 GetTargetPosition(Vector3 playerPosition, Vector3 targetPosition)
-    {
-        Vector3 direction = (targetPosition - playerPosition).normalized;
-        float distanceToTarget = Vector3.Distance(playerPosition, targetPosition);
-        float moveDistance = Mathf.Min(distanceToTarget, maxDistance);
-        return playerPosition + direction * moveDistance;
-    }
 }

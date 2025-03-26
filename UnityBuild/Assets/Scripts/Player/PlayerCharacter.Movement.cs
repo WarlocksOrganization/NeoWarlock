@@ -9,9 +9,8 @@ namespace Player
     public partial class PlayerCharacter : IMovable
     {
         [Header("Player Movement")]
-        public float MaxSpeed = 5f;
-        [SyncVar(hook = nameof(OnMoveSpeedChanged))]
-        public float MoveSpeed = 5.0f;
+        [SyncVar] public float MaxSpeed = 5f;
+        [SyncVar] public float MoveSpeed = 5.0f;
         public float KnockbackDamping = 5f;
         [SyncVar] public float KnockbackFactor = 1f;
         private float animationSpeed;
@@ -39,7 +38,7 @@ namespace Player
 
             HandleMouseMovement();
             // ✅ 캐릭터 이동만 차단, 넉백은 계속 적용됨
-            if (attackLockTime <= 0 && canMove)
+            if (attackLockTime <= 0 && canMove && MoveSpeed > 0)
             {
                 HandleKeyboardMovement();
                 finalMove += _moveDirection;
@@ -165,12 +164,10 @@ namespace Player
             {
                 animationSpeed = Mathf.Clamp(_moveDirection.magnitude, 0, 1) * MoveSpeed/5f;
                 animator.SetFloat("isMove", animationSpeed); // ✅ 이동 여부에 따라 isMove 설정
+                
+                bool isFalling = !_characterController.isGrounded;
+                animator.SetBool("isFall", isFalling);
             }
-        }
-
-        private void OnMoveSpeedChanged(float oldValue, float newValue)
-        {
-            MoveSpeed = newValue;
         }
         
         // ✅ 이동 위치 이펙트 생성 함수

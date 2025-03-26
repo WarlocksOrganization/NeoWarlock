@@ -1,5 +1,7 @@
 using System;
+using System.Collections;
 using System.Linq;
+using DataSystem;
 using GameManagement;
 using Mirror;
 using Networking;
@@ -23,6 +25,9 @@ public class GameLobbyUI : MonoBehaviour
     private int hostNum = 0;
     
     [SerializeField] protected KillLogUI killLogUI;
+    
+    [SerializeField] private TMP_Text warningText;
+    private Coroutine warningCoroutine;
 
     private void Start()
     {
@@ -98,6 +103,15 @@ public class GameLobbyUI : MonoBehaviour
             {
                 GameManager.Instance.Init(allPlayers);
             }
+            
+            var players = FindObjectsOfType<PlayerCharacter>();
+            bool allReady = players.All(p => p.State == Constants.PlayerState.Start);
+
+            if (!allReady)
+            {
+                ShowWarningMessage("아직 준비되지 않은 플레이어가 있습니다.");
+                return;
+            }
 
             (NetworkManager.singleton as RoomManager).StartGame();
         }
@@ -118,4 +132,32 @@ public class GameLobbyUI : MonoBehaviour
         UpdatePlayerInRoon();
     }
     
+    private void ShowWarningMessage(string message)
+    {
+        if (warningCoroutine != null)
+            StopCoroutine(warningCoroutine);
+
+        warningCoroutine = StartCoroutine(FadeOutWarning(message));
+    }
+    
+    private IEnumerator FadeOutWarning(string message)
+    {
+        warningText.text = message;
+        Color originalColor = warningText.color;
+        originalColor.a = 1f;
+        warningText.color = originalColor;
+
+        float duration = 2.5f; // 사라지는 데 걸리는 시간
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float alpha = Mathf.Lerp(1f, 0f, elapsed / duration);
+            warningText.color = new Color(originalColor.r, originalColor.g, originalColor.b, alpha);
+            yield return null;
+        }
+
+        warningText.text = "";
+    }
 }

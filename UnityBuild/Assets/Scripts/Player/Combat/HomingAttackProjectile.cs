@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using DataSystem;
+using Interfaces;
 using Mirror;
 using Player.Combat;
 using UnityEngine;
@@ -18,14 +19,14 @@ namespace Player
 
             foreach (Collider col in hitColliders)
             {
-                PlayerCharacter player = col.GetComponent<PlayerCharacter>();
-                if (player != null && player.gameObject != owner)
+                IDamagable player = col.GetComponent<IDamagable>();
+                if (player != null && ((MonoBehaviour)player).gameObject != owner)
                 {
-                    float distance = Vector3.Distance(transform.position, player.transform.position);
+                    float distance = Vector3.Distance(transform.position, ((MonoBehaviour)player).transform.position);
                     if (distance < closestDistance)
                     {
                         closestDistance = distance;
-                        target = player.transform;
+                        target = ((MonoBehaviour)player).transform;
                     }
                 }
             }

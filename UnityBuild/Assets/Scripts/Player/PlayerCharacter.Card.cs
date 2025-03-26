@@ -17,6 +17,7 @@ namespace Player
                     // ✅ 기본 스탯 강화 (체력, 이동속도)
                     case PlayerStatType.Health:
                     case PlayerStatType.Speed:
+                    case PlayerStatType.AttackPower:
                         CmdModifyPlayerStat(cardData.StatType, cardData.BonusStat);
                         break;
 
@@ -55,6 +56,10 @@ namespace Player
                 case PlayerStatType.Speed:
                     MaxSpeed *= multiplier;
                     MoveSpeed = MaxSpeed;
+                    break;
+                
+                case PlayerStatType.AttackPower:
+                    AttackPower *= multiplier;
                     break;
 
                 default:

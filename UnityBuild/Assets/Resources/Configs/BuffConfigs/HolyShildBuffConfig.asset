@@ -15,7 +15,7 @@ MonoBehaviour:
   duration: 3
   moveSpeedModifier: 0
   attackDamageModifier: 0
-  defenseModifier: 100
+  defenseModifier: 999
   knonkbackModifier: -1
   tickDamage: 0
   moveDirection: {x: 0, y: 0, z: 0}

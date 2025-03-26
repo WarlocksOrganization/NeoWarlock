@@ -52,7 +52,7 @@ namespace Player.Combat
                 effect.GetComponent<AttackParticle>().SetAttackParticleData(config.skillType);
 
                 // ✅ 초기 크기 설정 (작게 시작)
-                effect.transform.localScale = Vector3.zero;
+                effect.transform.localScale = new Vector3(explosionRadius, explosionRadius, explosionRadius);
 
                 NetworkServer.Spawn(effect); // ✅ 네트워크 동기화
                 return effect;

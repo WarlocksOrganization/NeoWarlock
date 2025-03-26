@@ -69,6 +69,7 @@ namespace DataSystem.Database
         None,
         Health, // 플레이어 체력
         Speed, //플레이어스피드
+        AttackPower, //플레이어 공격력
         
         
         AttackSpeed = 10,  // 스킬 이동 속도 증가

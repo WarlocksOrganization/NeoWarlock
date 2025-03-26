@@ -27,12 +27,18 @@ namespace Player
         
         private Dictionary<int, AttackBase> activeAttacks = new Dictionary<int, AttackBase>(); // ✅ 캐싱용 딕셔너리
 
+        [SyncVar] public float BaseAttackPower = 1;
+        [SyncVar] public float AttackPower = 1;
+        
+        [SyncVar(hook = nameof(OnItemSkillChanged))]
+        public int itemSkillId = -1;
         
         private void UpdateAttack()
         {
             if (Input.GetKeyDown(KeyCode.Alpha1)) SetAttackType(1);
             if (Input.GetKeyDown(KeyCode.Alpha2)) SetAttackType(2);
             if (Input.GetKeyDown(KeyCode.Alpha3)) SetAttackType(3);
+            if (Input.GetKeyDown(KeyCode.Alpha4)) SetAttackType(4);
             
             if (Input.GetKeyDown(KeyCode.Escape))
             {
@@ -88,6 +94,11 @@ namespace Player
 
                 CmdSetAttackType(index);
             }
+        }
+        
+        private void OnItemSkillChanged(int _, int newSkillId)
+        {
+            SetAvailableAttack(4, newSkillId); // UI도 여기서 자동 갱신됨
         }
         
         public void SetAvailableAttack(int index, int skillId)
@@ -226,6 +237,11 @@ namespace Player
                     IAttack attackInstance = CreateAttackInstance(attackData);
                     availableAttacks[index] = attackInstance;
                 }
+
+                if (index == 4 && isOwned)
+                {
+                    PlayerSetting.ItemSkillID = skillId;
+                }
             }
             else
             {
@@ -299,7 +315,14 @@ namespace Player
 
             yield return new WaitForSeconds(attackDelay); // ✅ 공격 딜레이 적용
 
-            CmdAttack(targetPosition, nextAttckIndex, playerId, PlayerSetting.AttackSkillIDs[nextAttckIndex]);
+            if (nextAttckIndex == 4)
+            {
+                CmdAttack(targetPosition, nextAttckIndex, playerId, PlayerSetting.ItemSkillID);
+            }
+            else
+            {
+                CmdAttack(targetPosition, nextAttckIndex, playerId, PlayerSetting.AttackSkillIDs[nextAttckIndex]);
+            }
         }
         
         [Command]
@@ -324,7 +347,7 @@ namespace Player
             Vector3 direction = (attackPosition - transform.position).normalized;
             
             availableAttacks[nextAttckIndex]?.Execute(attackPosition, 
-                attackTransform.position + direction, gameObject, id, skillId);
+                attackTransform.position + direction, gameObject, id, skillId, AttackPower);
         }
 
         [Command]
@@ -345,7 +368,7 @@ namespace Player
             {
                 Vector3 firePosition = originPosition ? attackTransform.position : attackTransform.position + direction;
                 certainAttacks[skillId].Execute(attackPosition, 
-                    firePosition, gameObject, playerId, skillId);
+                    firePosition, gameObject, playerId, skillId, AttackPower);
             }
         }
     }
