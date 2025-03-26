@@ -28,6 +28,8 @@
 
             private GamePlayUI gameplayUI;
             private static bool gameplayObjectSpawned = false;
+            
+            private bool isRoundEnding = false;
 
             private void Awake()
             {
@@ -193,13 +195,27 @@
                 }
                 else
                 {
-                    ScoreBoardUI scoreBoardUI = FindFirstObjectByType<ScoreBoardUI>();
-                    scoreBoardUI.ShowReturnToLobbyButton(); // → UI에 버튼 활성화 함수
+                    if (isServer)
+                    {
+                        RpcShowReturnToLobbyButton();
+                    }
                 }
+            }
+            
+            [ClientRpc]
+            public void RpcShowReturnToLobbyButton()
+            {
+                ScoreBoardUI scoreBoardUI = FindFirstObjectByType<ScoreBoardUI>();
+                scoreBoardUI?.ShowReturnToLobbyButton();
             }
             
             public void CheckGameOver()
             {
+                if (isRoundEnding)
+                    return;
+                
+                isRoundEnding = true;
+                
                 var alivePlayers = GameManager.Instance.GetAlivePlayers();
                 if (alivePlayers.Count > 1)
                     return;
