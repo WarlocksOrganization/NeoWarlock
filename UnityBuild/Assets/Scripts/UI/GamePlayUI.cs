@@ -12,6 +12,7 @@ public class GamePlayUI : GameLobbyUI
     [SerializeField] private GameObject alamGameObject;
     [SerializeField] private TextMeshProUGUI alamText;
     [SerializeField] private TextMeshProUGUI countDownText;
+    [SerializeField] private Animator countDownAnimator;
     [SerializeField] private GameObject StartCube;
     [SerializeField] private ScoreBoardUI scoreBoardUI;
 
@@ -67,82 +68,64 @@ public class GamePlayUI : GameLobbyUI
 
     private IEnumerator UICountdownRoutine(int phase, int seconds)
     {
-        for (int t = seconds; t >= 0; t--)
+        for (int t = seconds; t > 0; t--)
         {
             UpdateCountdownUI(t, phase);
             yield return new WaitForSeconds(1f);
         }
+
+        UpdateCountdownUI(0, phase);
+
+        if (phase == 1)
+        {
+            // ✅ 0 처리 후, 따로 딜레이 코루틴 실행
+            StartCoroutine(DelayedHideCountdown());
+        }
+    }
+
+    private IEnumerator DelayedHideCountdown()
+    {
+        yield return new WaitForSeconds(0.8f);
+        countDownText.gameObject.SetActive(false);
     }
 
     public void UpdateCountdownUI(int time, int phase)
     {
-        if (phase == 1) // Phase1: 게임 시작 전 카운트다운
+        if (phase == 1)
         {
-            if (gameState != Constants.GameState.Counting) return;
+            if (gameState != Constants.GameState.Counting && time > 0) return;
+
+            countDownText.gameObject.SetActive(true);
 
             if (time == 0)
             {
                 countDownText.text = "SMASH!";
+                countDownAnimator.SetTrigger("isStart"); // ✅ 트리거 설정
+
                 foreach (var player in foundCharacters)
                     player.SetState(Constants.PlayerState.Start);
 
                 gameState = Constants.GameState.Start;
                 UpdatePlayerInRoon();
-                StartCoroutine(HideAfterDelay(countDownText.gameObject, 0.8f));
 
                 AudioManager.Instance.PlayBGM(Constants.SoundType.BGM_SSAFY_GameStart);
             }
             else
             {
+                countDownText.text = time.ToString();
+                countDownAnimator.SetTrigger("isCounting"); // ✅ 숫자 카운트 트리거
+
                 AudioManager.Instance.StopBGM();
                 foreach (var player in foundCharacters)
                     player.SetState(Constants.PlayerState.Counting);
-
-                countDownText.gameObject.SetActive(true);
-                countDownText.text = time.ToString();
-                StartCoroutine(PunchScale(countDownText.transform));
             }
         }
-        else if (phase == 2) // Phase2: 이벤트 타이머
+        else if (phase == 2)
         {
             alamText.gameObject.SetActive(true);
             alamText.color = time <= 5 ? new Color(0.8f, 0, 0) : Color.white;
             alamText.text = $"{time}초";
         }
-    }
-
-    IEnumerator PunchScale(Transform target, float upScale = 1.1f, float downScale = 0.5f, float totalDuration = 0.3f)
-    {
-        Vector3 original = Vector3.one;
-        Vector3 overshoot = original * upScale;
-        Vector3 undershoot = original * downScale;
-        float halfDuration = totalDuration / 2f;
-        float t = 0f;
-
-        while (t < halfDuration)
-        {
-            float ratio = t / halfDuration;
-            target.localScale = Vector3.Lerp(original, overshoot, Mathf.SmoothStep(0f, 1f, ratio));
-            t += Time.deltaTime;
-            yield return null;
-        }
-
-        t = 0f;
-        while (t < halfDuration)
-        {
-            float ratio = t / halfDuration;
-            target.localScale = Vector3.Lerp(overshoot, undershoot, Mathf.SmoothStep(0f, 1f, ratio));
-            t += Time.deltaTime;
-            yield return null;
-        }
-
-        target.localScale = undershoot;
-    }
-
-    IEnumerator HideAfterDelay(GameObject target, float delay)
-    {
-        yield return new WaitForSeconds(delay);
-        target.SetActive(false);
     }
 
     public void ShowFinalScoreBoard(Constants.PlayerRecord[] records, int roundIndex)
@@ -160,7 +143,7 @@ public class GamePlayUI : GameLobbyUI
         countDownText.gameObject.SetActive(true);
         countDownText.color = Color.green;
         countDownText.text = "Game Over";
-        StartCoroutine(PunchScale(countDownText.transform));
+        countDownAnimator.SetTrigger("isGameOver");
 
         yield return new WaitForSeconds(3f);
         ShowFinalScoreBoard(records, roundIndex);

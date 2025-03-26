@@ -172,21 +172,34 @@ namespace Player
         [ClientRpc]
         public void RpcSendFinalScore(Constants.PlayerRecord[] allRecords, int roundIndex)
         {
-            if (gameplayUI == null)
+            StartCoroutine(ShowFinalScoreAndNextRound(allRecords, roundIndex));
+        }
+
+        private IEnumerator ShowFinalScoreAndNextRound(Constants.PlayerRecord[] allRecords, int roundIndex)
+        {
+            float timeout = 1f;
+            while (gameplayUI == null && timeout > 0f)
+            {
                 gameplayUI = FindFirstObjectByType<GamePlayUI>();
+                timeout -= Time.deltaTime;
+                yield return null;
+            }
 
             if (gameplayUI != null)
             {
                 gameplayUI.ShowGameOverTextAndScore(allRecords, roundIndex);
-
-                // ✅ 점수표 보여준 후 다음 라운드로 넘어가는 흐름
-                StartCoroutine(HandleRoundTransition()); // ← 여기가 빠져있었음
             }
+            else
+            {
+                Debug.LogWarning("[GamePlayer] gameplayUI를 찾지 못했습니다. 점수판은 생략하고 다음 라운드로 넘어갑니다.");
+            }
+            
+            StartCoroutine(HandleRoundTransition()); // ✅ UI 없더라도 다음 라운드 진행
         }
         
         private IEnumerator HandleRoundTransition()
         {
-            yield return new WaitForSeconds(Constants.ScoreBoardTime); // 점수판 5초 보여줌
+            yield return new WaitForSeconds(Constants.ScoreBoardTime); // 점수판 보여줌
 
             int currentRound = GameManager.Instance.currentRound;
 
@@ -206,10 +219,7 @@ namespace Player
             }
             else
             {
-                if (isServer)
-                {
-                    RpcShowReturnToLobbyButton();
-                }
+                ShowReturnToLobbyButton();
             }
         }
         
@@ -220,11 +230,10 @@ namespace Player
             NetworkManager.singleton.ServerChangeScene(SceneManager.GetActiveScene().name);
         }
         
-        [ClientRpc]
-        public void RpcShowReturnToLobbyButton()
+        public void ShowReturnToLobbyButton()
         {
             ScoreBoardUI scoreBoardUI = FindFirstObjectByType<ScoreBoardUI>();
-            scoreBoardUI?.ShowReturnToLobbyButton();
+            scoreBoardUI.ShowReturnToLobbyButton();
         }
         
         public void CheckGameOver()
@@ -249,6 +258,8 @@ namespace Player
             }
 
             GameManager.Instance.AddRoundResult(roundData);
+            
+            RpcUpdateRound(GameManager.Instance.currentRound);
 
             // ✅ 올바른 타입의 데이터 전송
             var allRecords = GameManager.Instance.GetAllPlayerRecords(); // ← 이게 핵심
@@ -278,13 +289,18 @@ namespace Player
         {
             if (playerCharacter == null)
             {
-                Debug.LogWarning("[GamePlayer] playerCharacter가 아직 없습니다.");
+                playerCharacter = FindObjectsOfType<LobbyPlayerCharacter>()
+                    .FirstOrDefault(pc => pc.playerId == PlayerSetting.PlayerId);
+            }
+
+            if (playerCharacter == null)
+            {
+                Debug.LogWarning("[GamePlayer] playerCharacter를 여전히 찾지 못했습니다.");
                 return;
             }
 
             playerCharacter.State = Constants.PlayerState.Ready;
 
-            // 강화 효과 반영 (이미 처리된 상태일 수 있으므로 서버 강화 재반영 필요 X)
             playerCharacter.CmdSetCharacterData(
                 PlayerSetting.PlayerCharacterClass,
                 PlayerSetting.MoveSkill,
@@ -293,10 +309,17 @@ namespace Player
 
             Debug.Log("[GamePlayer] 카드 선택 완료 및 캐릭터 정보 서버 전송 완료");
         }
+
         
         [Command]
         public void CmdConfirmCardSelected()
         {
+            if (playerCharacter == null)
+            {
+                playerCharacter = FindObjectsOfType<LobbyPlayerCharacter>()
+                    .FirstOrDefault(pc => pc.playerId == PlayerSetting.PlayerId);
+            }
+            
             playerCharacter.State = Constants.PlayerState.Ready;
 
             var allReady = FindObjectsOfType<LobbyPlayerCharacter>()
@@ -323,6 +346,14 @@ namespace Player
                 ui.CallGameStart(); // 👈 GameStart를 public 메서드로 분리
             }
         }
+        
+        [ClientRpc]
+        public void RpcUpdateRound(int round)
+        {
+            GameManager.Instance.currentRound = round;
+            Debug.Log($"[Client] currentRound updated: {round}");
+        }
+
 
     }
 }

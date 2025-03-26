@@ -194,11 +194,13 @@ public class PlayerCardUI : MonoBehaviour
     private void ConfirmSelectedCards()
     {
         playerCharacterUI.GetComponent<CanvasGroup>().alpha = 1f;
-        PlayerSetting.PlayerCards.AddRange(slots.Select(slot => slot.GetCurrentCard()));
+
+        List<Database.PlayerCardData> selected = slots.Select(slot => slot.GetCurrentCard()).ToList();
+        PlayerSetting.PlayerCards.AddRange(selected);
 
         if(!myGamePlayer) myGamePlayer = FindObjectsOfType<GamePlayer>().FirstOrDefault(gp => gp.isOwned);
         myGamePlayer?.OnCardSelectionConfirmed();
-        myGamePlayer?.CmdConfirmCardSelected();
+        myGamePlayer?.CmdConfirmCardSelected(); // ✅ 여기서 리스트 전달
 
         gameObject.SetActive(false);
     }

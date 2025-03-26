@@ -11,39 +11,69 @@ namespace Player
 {
     public partial class PlayerCharacter
     {
-        private void ApplyCardBonuses() 
+        public void ApplyCardBonuses(List<Database.PlayerCardData> cards)
         {
-            foreach (var cardData in GameManagement.PlayerSetting.PlayerCards)
+            foreach (var card in cards)
             {
-                // 클라이언트 → 서버로 보내는 커맨드
-                if (isLocalPlayer || isOwned)
-                {
-                    switch (cardData.StatType)
-                    {
-                        case PlayerStatType.Health:
-                        case PlayerStatType.Speed:
-                        case PlayerStatType.AttackPower:
-                            CmdModifyPlayerStat(cardData.StatType, cardData.BonusStat);
-                            break;
+                float multiplier = 1 + (card.BonusStat / 100f);
 
-                        case PlayerStatType.AttackSpeed:
-                        case PlayerStatType.Range:
-                        case PlayerStatType.Radius:
-                        case PlayerStatType.Damage:
-                        case PlayerStatType.KnockbackForce:
-                        case PlayerStatType.Cooldown:
-                            CmdModifyPlayerAttackStat(cardData.AppliedSkill, cardData.StatType, cardData.BonusStat);
-                            break;
-                    }
-                }
-                // 서버는 직접 처리
-                else if (isServer)
+                switch (card.StatType)
                 {
-                    ApplyStatOnServer(cardData); // 아래에 따로 분리해서 만듦
+                    case PlayerStatType.Health:
+                        maxHp = (int)(maxHp * multiplier);
+                        curHp = maxHp;
+                        break;
+
+                    case PlayerStatType.Speed:
+                        MaxSpeed *= multiplier;
+                        MoveSpeed = MaxSpeed;
+                        break;
+
+                    case PlayerStatType.AttackPower:
+                        AttackPower *= multiplier;
+                        break;
+
+                    case PlayerStatType.AttackSpeed:
+                    case PlayerStatType.Range:
+                    case PlayerStatType.Radius:
+                    case PlayerStatType.Damage:
+                    case PlayerStatType.KnockbackForce:
+                    case PlayerStatType.Cooldown:
+                        int skillIndex = System.Array.IndexOf(PlayerSetting.AttackSkillIDs, card.AppliedSkill);
+                        if (skillIndex == -1 || availableAttacks[skillIndex] == null)
+                            continue;
+
+                        var attackData = availableAttacks[skillIndex].GetAttackData();
+                        if (attackData == null) continue;
+
+                        switch (card.StatType)
+                        {
+                            case PlayerStatType.AttackSpeed:
+                                attackData.Speed *= multiplier;
+                                break;
+                            case PlayerStatType.Range:
+                                attackData.Range *= multiplier;
+                                break;
+                            case PlayerStatType.Radius:
+                                attackData.Radius *= multiplier;
+                                break;
+                            case PlayerStatType.Damage:
+                                attackData.Damage *= multiplier;
+                                break;
+                            case PlayerStatType.KnockbackForce:
+                                attackData.KnockbackForce *= multiplier;
+                                break;
+                            case PlayerStatType.Cooldown:
+                                float cooldownMultiplier = 1 - (card.BonusStat / 100f);
+                                attackData.Cooldown = Mathf.Max(0.5f, attackData.Cooldown * cooldownMultiplier);
+                                break;
+                        }
+
+                        break;
                 }
-            } 
+            }
         }
-        
+
         [Server]
         private void ApplyStatOnServer(Database.PlayerCardData cardData)
         {
