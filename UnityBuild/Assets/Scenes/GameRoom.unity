@@ -13655,8 +13655,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b7be52f861db2d4fa9cfff9c12f1723, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  soundList: []
   bgmSource: {fileID: 0}
-  sfxSource: {fileID: 0}
+  sfxPrefab: {fileID: 0}
+  bgmVolume: 1
+  sfxVolume: 1
 --- !u!1 &1853666905
 GameObject:
   m_ObjectHideFlags: 0

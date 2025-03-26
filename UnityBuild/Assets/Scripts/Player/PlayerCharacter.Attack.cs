@@ -98,7 +98,10 @@ namespace Player
         
         private void OnItemSkillChanged(int _, int newSkillId)
         {
-            SetAvailableAttack(4, newSkillId); // UI도 여기서 자동 갱신됨
+            if (newSkillId > 0)
+            {
+                SetAvailableAttack(4, newSkillId); // UI도 여기서 자동 갱신됨
+            }
         }
         
         public void SetAvailableAttack(int index, int skillId)
@@ -348,6 +351,10 @@ namespace Player
             
             availableAttacks[nextAttckIndex]?.Execute(attackPosition, 
                 attackTransform.position + direction, gameObject, id, skillId, AttackPower);
+            if (nextAttckIndex == 4)
+            {
+                itemSkillId = -1;
+            }
         }
 
         [Command]

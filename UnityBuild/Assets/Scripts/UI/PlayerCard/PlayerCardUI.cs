@@ -1,8 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using DataSystem;
 using DataSystem.Database;
 using GameManagement;
+using Mirror;
+using Player;
 using TMPro;
 using UI;
 using UnityEngine;
@@ -13,6 +16,7 @@ public class PlayerCardUI : MonoBehaviour
 {
     public PlayerCardSlot[] slots; // UI 슬롯 3개
     [SerializeField] private TMP_Text timerText; // 남은 시간 표시
+    [SerializeField] private GameObject LoadingImage;
 
     private Queue<Database.PlayerCardData> selectedCardsQueue = new();
     public float maxTime = 10f;
@@ -21,9 +25,14 @@ public class PlayerCardUI : MonoBehaviour
     private bool isRunning = true;
 
     private PlayerCharacterUI playerCharacterUI;
+    private bool isLoading = true;
+    
+    private GamePlayer myGamePlayer;
+    
 
     void Start()
     {
+        LoadingImage.SetActive(true);
         LoadRandomPlayerCards();
         DisplayTopThreeCards();
         playerCharacterUI = FindFirstObjectByType<PlayerCharacterUI>();
@@ -31,6 +40,13 @@ public class PlayerCardUI : MonoBehaviour
         remainingTime = maxTime;
         timerSlider.maxValue = 1f;
         timerSlider.value = 1f;
+        
+        myGamePlayer = FindObjectsOfType<GamePlayer>().FirstOrDefault(gp => gp.isOwned);
+
+        if (NetworkServer.active)
+        {
+            gameObject.SetActive(false);
+        }
     }
 
     void Update()
@@ -56,7 +72,20 @@ public class PlayerCardUI : MonoBehaviour
         HashSet<int> existingCardIds = new(PlayerSetting.PlayerCards?.Select(card => card.ID) ?? new int[0]);
 
         List<Database.PlayerCardData> availableCards = Database.playerCardDictionary.Values
-            .Where(card => !existingCardIds.Contains(card.ID))
+            .Where(card =>
+            {
+                // 중복 카드 제외
+                if (existingCardIds.Contains(card.ID))
+                    return false;
+
+                // 특수 강화 (스킬 강화 계열)인 경우만 필터링 필요
+                if (IsSkillStat(card.StatType))
+                {
+                    return PlayerSetting.AttackSkillIDs.Contains(card.AppliedSkill);
+                }
+
+                return true; // 기본 스탯은 그대로 허용
+            })
             .ToList();
 
         if (availableCards.Count < 6)
@@ -73,6 +102,14 @@ public class PlayerCardUI : MonoBehaviour
         selectedCardsQueue = new Queue<Database.PlayerCardData>(selectedCards);
     }
 
+    private bool IsSkillStat(PlayerStatType statType)
+    {
+        return statType is PlayerStatType.AttackSpeed or PlayerStatType.Range
+            or PlayerStatType.Radius or PlayerStatType.Damage
+            or PlayerStatType.KnockbackForce or PlayerStatType.Cooldown
+            or PlayerStatType.Special;
+    }
+
     private void DisplayTopThreeCards()
     {
         for (int i = 0; i < slots.Length; i++)
@@ -87,10 +124,19 @@ public class PlayerCardUI : MonoBehaviour
 
     public bool TryGetNewCard(out Database.PlayerCardData newCard)
     {
-        if (selectedCardsQueue.Count > 0)
+        while (selectedCardsQueue.Count > 0)
         {
-            newCard = selectedCardsQueue.Dequeue();
-            return true;
+            var candidate = selectedCardsQueue.Dequeue();
+
+            // 현재 선택된 카드에 중복되는지 확인
+            bool isDuplicate = PlayerSetting.PlayerCards.Any(card => card.ID == candidate.ID) ||
+                               slots.Any(slot => slot.GetCurrentCard().ID == candidate.ID);
+
+            if (!isDuplicate)
+            {
+                newCard = candidate;
+                return true;
+            }
         }
 
         newCard = null;
@@ -100,6 +146,12 @@ public class PlayerCardUI : MonoBehaviour
     // ⏳ 서버에서 호출하여 클라이언트 UI 업데이트
     public void UpdateTimer(float serverTime)
     {
+        if (isLoading)
+        {
+            isLoading = false;
+            StartCoroutine(FadeOutLoadingImage());
+            AudioManager.Instance.PlayBGM(Constants.SoundType.BGM_SSAFY_CardSelect);
+        }
         float timeDiff = Mathf.Abs(remainingTime - serverTime);
 
         if (timeDiff > 1f)
@@ -115,11 +167,41 @@ public class PlayerCardUI : MonoBehaviour
         }
     }
 
+    private IEnumerator FadeOutLoadingImage()
+    {
+        CanvasGroup canvasGroup = LoadingImage.GetComponent<CanvasGroup>();
+
+        if (canvasGroup == null)
+        {
+            canvasGroup = LoadingImage.AddComponent<CanvasGroup>();
+        }
+
+        float duration = 0.5f;
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            canvasGroup.alpha = Mathf.Lerp(1f, 0f, elapsed / duration);
+            yield return null;
+        }
+
+        canvasGroup.alpha = 0f;
+        LoadingImage.SetActive(false);
+    }
+    
     // ✅ 카드 선택 확정 및 UI 비활성화
     private void ConfirmSelectedCards()
     {
         playerCharacterUI.GetComponent<CanvasGroup>().alpha = 1f;
-        PlayerSetting.PlayerCards.AddRange(slots.Select(slot => slot.GetCurrentCard()));
+
+        List<Database.PlayerCardData> selected = slots.Select(slot => slot.GetCurrentCard()).ToList();
+        PlayerSetting.PlayerCards.AddRange(selected);
+
+        if(!myGamePlayer) myGamePlayer = FindObjectsOfType<GamePlayer>().FirstOrDefault(gp => gp.isOwned);
+        myGamePlayer?.OnCardSelectionConfirmed();
+        myGamePlayer?.CmdConfirmCardSelected(); // ✅ 여기서 리스트 전달
+
         gameObject.SetActive(false);
     }
 }

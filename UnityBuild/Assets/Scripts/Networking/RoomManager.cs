@@ -84,20 +84,20 @@ namespace Networking
             }
         }
 
-        public override void OnRoomStartHost()
+        public override void OnStartServer()
         {
-            base.OnRoomStartHost();
-
+            base.OnStartServer();
+    
             if (roomDataInstance == null && gameRoomDataPrefab != null)
             {
                 roomDataInstance = Instantiate(gameRoomDataPrefab);
                 NetworkServer.Spawn(roomDataInstance.gameObject);
+                DontDestroyOnLoad(roomDataInstance.gameObject);
 
-                // 방 데이터 초기화
                 roomDataInstance.SetRoomData(roomName, roomType, maxPlayerCount);
                 maxConnections = maxPlayerCount;
 
-                Debug.Log($"[RoomManager] 방 생성: {roomName}, 유형: {roomType}, 최대 인원: {maxConnections}");
+                Debug.Log("[RoomManager] OnStartServer()에서 방 생성 완료");
             }
         }
 
@@ -126,6 +126,13 @@ namespace Networking
 
         public override void OnServerConnect(NetworkConnectionToClient conn)
         {
+            if (roomDataInstance == null)
+            {
+                Debug.LogWarning("[RoomManager] roomDataInstance가 아직 생성되지 않았습니다. 연결을 종료합니다.");
+                conn.Disconnect();
+                return;
+            }
+
             if (roomDataInstance.maxPlayerCount <= roomSlots.Count)
             {
                 Debug.LogWarning("[RoomManager] 방이 가득 찼습니다.");

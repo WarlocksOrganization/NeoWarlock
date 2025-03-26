@@ -199,7 +199,7 @@ namespace Networking
         public void SendMessageToServer(string message)
         {
             // 서버로 메시지 전송
-            if (_client.Connected && _stream != null)
+            if (_client != null && _client.Connected && _stream != null)
             {
                 // 최대 버퍼 크기만큼 쓰기
                 byte[] data = Encoding.UTF8.GetBytes(message);

@@ -1172,7 +1172,6 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
-  currentTime: 10
 --- !u!114 &5212958882455656510
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1186,7 +1185,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   FallGrounds:
-  - {fileID: 0}
   - {fileID: 1569842325157438632}
   - {fileID: 5417885931365851439}
   - {fileID: 5463535363103142663}

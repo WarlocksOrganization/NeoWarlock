@@ -226,8 +226,8 @@ namespace Player
         private void SpawnGhost()
         {
             if (!isServer) return; // 서버에서만 실행
-
-            GameObject ghost = Instantiate(ghostPrefab, transform.position, Quaternion.identity);
+            
+            GameObject ghost = Instantiate(ghostPrefab, transform.position + Vector3.up, Quaternion.identity);
             NetworkServer.Spawn(ghost, connectionToClient); // 클라이언트와 동기화
             ghostInstance = ghost;
 
@@ -245,6 +245,12 @@ namespace Player
         [Command]
         public void CmdStartGame()
         {
+            var allPlayers = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None);
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.Init(allPlayers);
+            }
+            
             var manager = Networking.RoomManager.singleton as Networking.RoomManager;
             manager.StartGame();
         }

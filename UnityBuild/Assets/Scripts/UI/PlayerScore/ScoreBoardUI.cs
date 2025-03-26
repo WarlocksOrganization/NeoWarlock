@@ -59,7 +59,7 @@ private IEnumerator ShowRankingFlow(Constants.PlayerRecord[] records, int roundI
         panel.GetComponent<RectTransform>().anchoredPosition = panelPositions[i].anchoredPosition;
     }
 
-    yield return new WaitForSeconds(4f);
+    yield return new WaitForSeconds(3f);
     yield return StartCoroutine(FadeCanvasGroup(canvasGroup, 1f, 0f, 0.5f));
 
     // 2. 누적 점수 (반영 전)
@@ -78,7 +78,7 @@ private IEnumerator ShowRankingFlow(Constants.PlayerRecord[] records, int roundI
     }
 
     yield return StartCoroutine(FadeCanvasGroup(canvasGroup, 0f, 1f, 0.5f));
-    yield return new WaitForSeconds(3f);
+    yield return new WaitForSeconds(1f);
 
     var finalSorted = records
         .OrderByDescending(r => r.GetTotalScoreUpToRound(roundIndex))

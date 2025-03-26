@@ -1,27 +1,30 @@
 using UnityEngine;
+using System.Collections.Generic;
+using DataSystem;
 
 public class AudioManager : MonoBehaviour
 {
     public static AudioManager Instance;
 
-    public AudioSource bgmSource; // πË∞Ê¿Ω ø¿µø¿ º“Ω∫
-    public AudioSource sfxSource; // »ø∞˙¿Ω ø¿µø¿ º“Ω∫
+    [Header("Audio Data")]
+    public List<Constants.SoundData> soundList;
+    private Dictionary<Constants.SoundType, AudioClip> soundDict = new();
 
-    private float bgmVolume = 1.0f; // πË∞Ê¿Ω ∫º∑˝
-    private float sfxVolume = 1.0f; // »ø∞˙¿Ω ∫º∑˝
+    [Header("Audio Sources")]
+    [SerializeField] private AudioSource bgmSource;
+    [SerializeField] private AudioSource sfxPrefab;
 
-    void Awake()
+    [Header("Volume Settings")]
+    [Range(0f, 1f)] public float bgmVolume = 1f;
+    [Range(0f, 1f)] public float sfxVolume = 1f;
+
+    private void Awake()
     {
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject); // æ¿ ∫Ø∞Ê Ω√ ¿Ø¡ˆ
-
-            // ¿˙¿Âµ» ∫º∑˝ ∞™ ∫“∑Øø¿±‚
-            bgmVolume = PlayerPrefs.GetFloat("BgmVolume", 1.0f);
-            sfxVolume = PlayerPrefs.GetFloat("SfxVolume", 1.0f);
-
-            //ApplyVolume();
+            DontDestroyOnLoad(gameObject);
+            InitializeSounds();
         }
         else
         {
@@ -29,32 +32,74 @@ public class AudioManager : MonoBehaviour
         }
     }
 
-    public float GetBgmVolume() { return bgmVolume; }
-    public float GetSfxVolume() { return sfxVolume; }
+    private void InitializeSounds()
+    {
+        foreach (var sound in soundList)
+        {
+            if (!soundDict.ContainsKey(sound.type))
+            {
+                soundDict.Add(sound.type, sound.clip);
+            }
+        }
 
-    public void SetBgmVolume(float volume)
+        bgmSource.loop = true;
+        bgmSource.playOnAwake = false;
+    }
+
+    // üéµ BGM Ïû¨ÏÉù
+    public void PlayBGM(Constants.SoundType type)
+    {
+        if (soundDict.TryGetValue(type, out AudioClip clip))
+        {
+            if (bgmSource.clip == clip && bgmSource.isPlaying)
+                return;
+
+            bgmSource.clip = clip;   
+            bgmSource.volume = bgmVolume;
+            bgmSource.Play();
+        }
+        else
+        {
+            Debug.LogWarning($"[AudioManager] BGM SoundType {type} not found.");
+        }
+    }
+
+    public void StopBGM()
+    {
+        bgmSource.Stop();
+    }
+
+    // üîä SFX Ïû¨ÏÉù (3D)
+    public void PlaySFX(Constants.SoundType type, GameObject parent = null)
+    {
+        if (soundDict.TryGetValue(type, out AudioClip clip))
+        {
+            AudioSource sfx = Instantiate(sfxPrefab, parent != null ? parent.transform : null);
+            sfx.clip = clip;
+            sfx.volume = sfxVolume;
+            sfx.spatialBlend = 1f;
+            sfx.rolloffMode = AudioRolloffMode.Linear;
+            sfx.minDistance = 1f;
+            sfx.maxDistance = 20f;
+
+            sfx.Play();
+            Destroy(sfx.gameObject, clip.length + 0.5f);
+        }
+        else
+        {
+            Debug.LogWarning($"[AudioManager] SFX SoundType {type} not found.");
+        }
+    }
+
+    // üéö Î≥ºÎ•® ÏÑ§Ï†ï
+    public void SetBGMVolume(float volume)
     {
         bgmVolume = volume;
-        if (bgmSource != null)
-        {
-            bgmSource.volume = bgmVolume;
-        }
+        bgmSource.volume = volume;
     }
 
-    public void SetSfxVolume(float volume)
+    public void SetSFXVolume(float volume)
     {
         sfxVolume = volume;
-        if (sfxSource != null)
-        {
-            sfxSource.volume = sfxVolume;
-        }
     }
-
-    // ∫Ø∞Êµ» ∫º∑˝ ¿˙¿Â
-    //public void SaveVolumeSettings()
-    //{
-    //    PlayerPrefs.SetFloat("BgmVolume", bgmVolume);
-    //    PlayerPrefs.SetFloat("SfxVolume", sfxVolume);
-    //    PlayerPrefs.Save();
-    //}
 }

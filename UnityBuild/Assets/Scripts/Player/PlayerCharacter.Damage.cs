@@ -105,7 +105,7 @@ namespace Player
                 }
                 GameManager.Instance.RecordDeath(playerId);
                 
-                var gp = NetworkClient.connection.identity.GetComponent<GamePlayer>();
+                var gp = connectionToClient.identity.GetComponent<GamePlayer>();
                 if (gp != null && isServer)
                 {
                     gp.CheckGameOver();
@@ -115,9 +115,13 @@ namespace Player
                 {
                     RpcTransmitKillLog(attackPlayerId, this.attackskillid, true);
                 }
-                else
+                else if(attackPlayerId != playerId)
                 {
                     RpcTransmitKillLog(attackPlayerId, attackskillid, false);
+                }
+                else
+                {
+                    RpcTransmitKillLog(-1, -1, false);
                 }
             }
         }
