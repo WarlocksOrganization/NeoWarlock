@@ -70,6 +70,13 @@ namespace UI
 
             var manager = RoomManager.singleton as RoomManager;
 
+            if (PlayerPrefs.HasKey("sessionToken"))
+            {
+                // 로그인 상태에서 방 생성
+                Networking.SocketManager.singleton.RequestCreateRoom(roomData.roomName, roomData.maxPlayerCount);
+                return;
+            }
+
             if (manager.isNetworkActive)
             {
                 StartCoroutine(RestartHostWithDelay(manager));
@@ -108,6 +115,7 @@ namespace UI
             manager.maxPlayerCount = roomData.maxPlayerCount;
 
             manager.StartHost();
+            // manager.StartServer(); //Debug
             Debug.Log($"방 생성 완료: {roomData.roomName}, 유형: {roomData.roomType}, 최대 인원: {roomData.maxPlayerCount}");
         }
     }

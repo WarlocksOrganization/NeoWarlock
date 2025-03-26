@@ -4,6 +4,7 @@ using GameManagement;
 using Mirror;
 using Networking;
 using Player;
+using Telepathy;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -99,6 +100,10 @@ public class GameLobbyUI : MonoBehaviour
             }
 
             (NetworkManager.singleton as RoomManager).StartGame();
+        }
+        else
+        {
+            PlayerCharacters[0].GetComponent<PlayerCharacter>().CmdStartGame();
         }
     }
 
