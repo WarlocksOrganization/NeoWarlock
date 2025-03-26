@@ -17755,7 +17755,7 @@ Light:
   serializedVersion: 11
   m_Type: 0
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 5
+  m_Intensity: 10
   m_Range: 10
   m_SpotAngle: 90
   m_InnerSpotAngle: 0
@@ -96498,6 +96498,7 @@ MonoBehaviour:
   currentAttackIndex: -1
   BaseAttackPower: 1
   AttackPower: 1
+  itemSkillId: -1
   CinemachineCameraTarget: {fileID: 7304248433194766382}
   cameraOffset: 0.5
   maxCameraDistance: 3

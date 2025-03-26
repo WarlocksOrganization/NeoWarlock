@@ -82,6 +82,8 @@ public class GameHand : NetworkBehaviour
     [Server]
     public void Initialize()
     {
+        if (isAttacking) return;
+        
         animator.SetBool("isReady", false);
         isAttacking = true;
 
@@ -134,9 +136,24 @@ public class GameHand : NetworkBehaviour
 
         NetworkServer.Spawn(explosion);
         RpcShakeCamera(shake, freq);
+        
+        if (isFinal && Random.value <= 0.5f)
+        {
+            for (int i = 0; i < 2; i++)
+            {
+                Vector3 spawnPosition = new Vector3(
+                    Random.Range(-15f, 15f),
+                    Random.Range(30f, 40f),
+                    Random.Range(-15f, 15f)
+                );
 
+                GameObject pickup = Instantiate(skillItemPickupPrefab, transform.position + spawnPosition, Quaternion.identity);
+
+                NetworkServer.Spawn(pickup);
+            }
+        }
         // 정전 확률 10%
-        if (isFinal && Random.value <= 0.1f)
+        else if (isFinal && Random.value <= 0.1f)
         {
             RpcTriggerBlackout();
             
@@ -155,30 +172,6 @@ public class GameHand : NetworkBehaviour
 
                 GameObject newHand = Instantiate(GhostEnemyPrefab, spawnPos, Quaternion.identity);
                 NetworkServer.Spawn(newHand);
-            }
-        }
-        else if (isFinal  && Random.value <= 0.5f)
-        {
-            for (int i = 0; i < 2; i++)
-            {
-                Vector3 spawnPosition = new Vector3(
-                    Random.Range(-15f, 15f),
-                    Random.Range(30f, 40f),
-                    Random.Range(-15f, 15f)
-                );
-
-                GameObject pickup = Instantiate(skillItemPickupPrefab, transform.position + spawnPosition, Quaternion.identity);
-
-                int[] skillIds = { 1001, 1002, 1003, 1004, 1011 };
-                int randomSkillId = skillIds[Random.Range(0, skillIds.Length)];
-
-                SkillItemPickup pickupScript = pickup.GetComponent<SkillItemPickup>();
-                if (pickupScript != null)
-                {
-                    pickupScript.skillId = randomSkillId;
-                }
-
-                NetworkServer.Spawn(pickup);
             }
         }
     }
@@ -261,11 +254,29 @@ public class GameHand : NetworkBehaviour
 
         // 10초 후 복구
         yield return new WaitForSeconds(10f);
-        dirLight.intensity = 1f;
         
-        RenderSettings.ambientLight = Color.white;
+        // 🌅 천천히 빛 복구
+        float recoveryDuration = 3f;
+        float recoveryTime = 0f;
+
+        while (recoveryTime < recoveryDuration)
+        {
+            recoveryTime += Time.deltaTime;
+            float recoveryT = recoveryTime / recoveryDuration;
+
+            dirLight.intensity = Mathf.Lerp(0f, 1f, recoveryT);
+            RenderSettings.ambientIntensity = Mathf.Lerp(0f, 1f, recoveryT);
+            RenderSettings.reflectionIntensity = Mathf.Lerp(0f, 1f, recoveryT);
+            RenderSettings.ambientLight = Color.Lerp(Color.black, Color.white, recoveryT);
+
+            yield return null;
+        }
+
+        // 보정
+        dirLight.intensity = 1f;
         RenderSettings.ambientIntensity = 1f;
         RenderSettings.reflectionIntensity = 1f;
+        RenderSettings.ambientLight = Color.white;
     }
 
 }

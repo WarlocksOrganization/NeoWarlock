@@ -15,9 +15,9 @@ namespace DataSystem
         public static readonly string CardIconPath = "Sprites/CardIcons/";
 
         public static readonly int MaxGameEventTime = 15; // 오브젝트 이벤트 시간 15
-        public static readonly int ScoreBoardTime = 15; // 스코어보드 보는 시간 12
-        public static readonly int CardSelectionTime = 1; //카드 선택 시간 10
-        public static readonly int CountTime = 1; // 카운트타임 5
+        public static readonly int ScoreBoardTime = 20; // 스코어보드 보는 시간 12
+        public static readonly int CardSelectionTime = 10; //카드 선택 시간 10
+        public static readonly int CountTime = 5; // 카운트타임 5
 
         public enum RoomType
         {

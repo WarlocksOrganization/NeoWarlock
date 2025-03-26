@@ -38,7 +38,7 @@ namespace Player
 
             HandleMouseMovement();
             // ✅ 캐릭터 이동만 차단, 넉백은 계속 적용됨
-            if (attackLockTime <= 0 && canMove)
+            if (attackLockTime <= 0 && canMove && MoveSpeed > 0)
             {
                 HandleKeyboardMovement();
                 finalMove += _moveDirection;
