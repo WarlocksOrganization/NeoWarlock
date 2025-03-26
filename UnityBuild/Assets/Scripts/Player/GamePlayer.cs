@@ -119,14 +119,11 @@
 
                 if (time <= 0)
                 {
-                    if (!isOwned)
-                    {
-                        return;
-                    }
+                    if (!isOwned) return;
+
                     if (playerCharacter == null)
                     {
-                        LobbyPlayerCharacter[] pc =
-                            FindObjectsByType<LobbyPlayerCharacter>(sortMode: FindObjectsSortMode.None);
+                        LobbyPlayerCharacter[] pc = FindObjectsByType<LobbyPlayerCharacter>(sortMode: FindObjectsSortMode.None);
                         foreach (var pcharacter in pc)
                         {
                             if (pcharacter.playerId == PlayerSetting.PlayerId)
@@ -136,18 +133,27 @@
                             }
                         }
                     }
-                    
+
                     playerCharacter.State = Constants.PlayerState.Ready;
-                    
+
                     foreach (var slot in playerCardUI.slots)
                     {
                         var slotData = slot.GetCurrentCard();
                         if (slotData.StatType == PlayerStatType.Special)
                         {
-                            PlayerSetting.AttackSkillIDs[slotData.AppliedSkillIndex] += 100; // ✅ 스킬 업그레이드
+                            int skillIdToUpgrade = slotData.AppliedSkill;
+
+                            for (int i = 1; i < PlayerSetting.AttackSkillIDs.Length; i++)
+                            {
+                                if (PlayerSetting.AttackSkillIDs[i] == skillIdToUpgrade)
+                                {
+                                    PlayerSetting.AttackSkillIDs[i] += 100;
+                                    break;
+                                }
+                            }
                         }
                     }
-                    
+
                     playerCharacter.CmdSetCharacterData(
                         PlayerSetting.PlayerCharacterClass,
                         PlayerSetting.MoveSkill,

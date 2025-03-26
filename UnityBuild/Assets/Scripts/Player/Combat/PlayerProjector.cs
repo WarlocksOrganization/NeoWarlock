@@ -89,7 +89,7 @@ namespace Player.Combat
                 attackRange = attackData.Range;
                 decalProjector.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
                 decalProjector.material = circleMaterial;
-                decalProjector.size = new Vector3(attackData.Range*2, attackData.Range*2, 3);
+                decalProjector.size = new Vector3(attackData.Radius*2, attackData.Radius*2, 3);
             }
 
             else if (currentAttack is ProjectileAttack || currentAttack is SelfAttack)

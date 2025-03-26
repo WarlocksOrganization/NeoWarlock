@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using DataSystem.Database;
+using GameManagement;
 using Mirror;
 using UI;
 using UnityEngine;
@@ -28,7 +29,7 @@ namespace Player
                     case PlayerStatType.Damage:
                     case PlayerStatType.KnockbackForce:
                     case PlayerStatType.Cooldown:
-                        CmdModifyPlayerAttackStat(cardData.AppliedSkillIndex, cardData.StatType, cardData.BonusStat);
+                        CmdModifyPlayerAttackStat(cardData.AppliedSkill, cardData.StatType, cardData.BonusStat);
                         break;
 
                     case PlayerStatType.Special:
@@ -71,53 +72,61 @@ namespace Player
         }
 
 
-       [Command]
-       private void CmdModifyPlayerAttackStat(int skillIndex, PlayerStatType statType, float bonusPercentage)
-       {
-           if (skillIndex < 0 || skillIndex >= availableAttacks.Length) return;
-           if (availableAttacks[skillIndex] == null) return;
+        [Command]
+        private void CmdModifyPlayerAttackStat(int skillId, PlayerStatType statType, float bonusPercentage)
+        {
+            // skillId → index 매핑 (플레이어가 들고 있는 스킬 중에서)
+            int skillIndex = -1;
+            for (int i = 0; i < PlayerSetting.AttackSkillIDs.Length; i++)
+            {
+                if (PlayerSetting.AttackSkillIDs[i] == skillId)
+                {
+                    skillIndex = i;
+                    break;
+                }
+            }
 
-           var attackData = availableAttacks[skillIndex].GetAttackData();
-           if (attackData == null) return;
+            if (skillIndex == -1)
+            {
+                Debug.LogWarning($"[강화 무시] 플레이어가 보유하지 않은 스킬 ID: {skillId}");
+                return;
+            }
 
-           float multiplier = 1 + (bonusPercentage / 100f); // ✅ 퍼센트 증가 반영
+            if (skillIndex >= availableAttacks.Length || availableAttacks[skillIndex] == null)
+                return;
 
-           switch (statType)
-           {
-               case PlayerStatType.AttackSpeed:
-                   attackData.Speed *= multiplier;
-                   break;
+            var attackData = availableAttacks[skillIndex].GetAttackData();
+            if (attackData == null) return;
 
-               case PlayerStatType.Range:
-                   attackData.Range *= multiplier;
-                   break;
+            float multiplier = 1 + (bonusPercentage / 100f);
 
-               case PlayerStatType.Radius:
-                   attackData.Radius *= multiplier;
-                   break;
+            switch (statType)
+            {
+                case PlayerStatType.AttackSpeed:
+                    attackData.Speed *= multiplier;
+                    break;
+                case PlayerStatType.Range:
+                    attackData.Range *= multiplier;
+                    break;
+                case PlayerStatType.Radius:
+                    attackData.Radius *= multiplier;
+                    break;
+                case PlayerStatType.Damage:
+                    attackData.Damage *= multiplier;
+                    break;
+                case PlayerStatType.KnockbackForce:
+                    attackData.KnockbackForce *= multiplier;
+                    break;
+                case PlayerStatType.Cooldown:
+                    float cooldownMultiplier = 1 - (bonusPercentage / 100f);
+                    attackData.Cooldown = Mathf.Max(0.5f, attackData.Cooldown * cooldownMultiplier);
+                    break;
+                default:
+                    Debug.LogError($"[CmdModifyPlayerAttackStat] 알 수 없는 스탯: {statType}");
+                    return;
+            }
 
-               case PlayerStatType.Damage:
-                   attackData.Damage *= multiplier;
-                   break;
-
-               case PlayerStatType.KnockbackForce:
-                   attackData.KnockbackForce *= multiplier;
-                   break;
-
-               case PlayerStatType.Cooldown:
-                   float cooldownMultiplier = 1 - (bonusPercentage / 100f); // ✅ 정확한 감소량 적용
-                   attackData.Cooldown *= cooldownMultiplier; 
-    
-                   if (attackData.Cooldown < 0.5f) attackData.Cooldown = 0.5f; // ✅ 최소 쿨다운 제한
-                   
-                   break;
-
-               default:
-                   Debug.LogError($"[CmdModifyPlayerAttackStat] 알 수 없는 스탯: {statType}");
-                   return;
-           }
-
-           Debug.Log($"[서버] {attackData.Name} - {statType} 강화 적용: {bonusPercentage}% 증가");
-       }
+            Debug.Log($"[서버] {attackData.Name} 강화: {statType} +{bonusPercentage}%");
+        }
     }
 }

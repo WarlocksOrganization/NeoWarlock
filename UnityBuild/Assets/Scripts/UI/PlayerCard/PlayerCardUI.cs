@@ -56,7 +56,20 @@ public class PlayerCardUI : MonoBehaviour
         HashSet<int> existingCardIds = new(PlayerSetting.PlayerCards?.Select(card => card.ID) ?? new int[0]);
 
         List<Database.PlayerCardData> availableCards = Database.playerCardDictionary.Values
-            .Where(card => !existingCardIds.Contains(card.ID))
+            .Where(card =>
+            {
+                // 중복 카드 제외
+                if (existingCardIds.Contains(card.ID))
+                    return false;
+
+                // 특수 강화 (스킬 강화 계열)인 경우만 필터링 필요
+                if (IsSkillStat(card.StatType))
+                {
+                    return PlayerSetting.AttackSkillIDs.Contains(card.AppliedSkill);
+                }
+
+                return true; // 기본 스탯은 그대로 허용
+            })
             .ToList();
 
         if (availableCards.Count < 6)
@@ -73,6 +86,14 @@ public class PlayerCardUI : MonoBehaviour
         selectedCardsQueue = new Queue<Database.PlayerCardData>(selectedCards);
     }
 
+    private bool IsSkillStat(PlayerStatType statType)
+    {
+        return statType is PlayerStatType.AttackSpeed or PlayerStatType.Range
+            or PlayerStatType.Radius or PlayerStatType.Damage
+            or PlayerStatType.KnockbackForce or PlayerStatType.Cooldown
+            or PlayerStatType.Special;
+    }
+
     private void DisplayTopThreeCards()
     {
         for (int i = 0; i < slots.Length; i++)
@@ -87,10 +108,19 @@ public class PlayerCardUI : MonoBehaviour
 
     public bool TryGetNewCard(out Database.PlayerCardData newCard)
     {
-        if (selectedCardsQueue.Count > 0)
+        while (selectedCardsQueue.Count > 0)
         {
-            newCard = selectedCardsQueue.Dequeue();
-            return true;
+            var candidate = selectedCardsQueue.Dequeue();
+
+            // 현재 선택된 카드에 중복되는지 확인
+            bool isDuplicate = PlayerSetting.PlayerCards.Any(card => card.ID == candidate.ID) ||
+                               slots.Any(slot => slot.GetCurrentCard().ID == candidate.ID);
+
+            if (!isDuplicate)
+            {
+                newCard = candidate;
+                return true;
+            }
         }
 
         newCard = null;
