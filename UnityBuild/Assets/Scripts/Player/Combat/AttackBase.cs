@@ -17,7 +17,7 @@ namespace Player.Combat
             LastUsedTime = -9999;
         }
 
-        public virtual void Execute(Vector3 mousePosition, Vector3 firePoint, GameObject owner, int playerid, int skillid)
+        public virtual void Execute(Vector3 mousePosition, Vector3 firePoint, GameObject owner, int playerid, int skillid, float attackPower)
         {
             Debug.Log($"{attackData.Name} 공격 실행!");
         }

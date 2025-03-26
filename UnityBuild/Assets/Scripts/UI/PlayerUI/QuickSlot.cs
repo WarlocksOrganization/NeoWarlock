@@ -32,6 +32,7 @@ namespace UI
             maxSkillCul = cooldown;
             currentSkillCul = 0.1f;
             
+            skillButton.gameObject.SetActive(true);
             skillButton.SetUp(name, description, icon, name, description, upgradeIcon);
         }
 
@@ -51,6 +52,13 @@ namespace UI
             maxSkillCul = cooldown;
             currentSkillCul = maxSkillCul;
             skillCulImage2.fillAmount = 1;
+            SelectSkill(false);
+        }
+
+        public void DelSkill()
+        {
+            skinImage.sprite = null;
+            skillButton.gameObject.SetActive(false);
             SelectSkill(false);
         }
 

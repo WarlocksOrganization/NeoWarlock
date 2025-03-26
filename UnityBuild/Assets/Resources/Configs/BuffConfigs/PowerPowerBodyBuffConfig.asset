@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: PowerPowerBodyBuffConfig
   m_EditorClassIdentifier: 
   duration: 30
-  moveSpeedModifier: 2
-  attackDamageModifier: 0
+  moveSpeedModifier: 3
+  attackDamageModifier: 0.5
   defenseModifier: 5
   knonkbackModifier: -0.8
   tickDamage: 1

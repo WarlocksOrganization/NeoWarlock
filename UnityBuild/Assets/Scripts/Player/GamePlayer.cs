@@ -27,6 +27,7 @@
             [SerializeField] private GameObject gamePlayHand;
 
             private GamePlayUI gameplayUI;
+            private static bool gameplayObjectSpawned = false;
 
             private void Awake()
             {
@@ -50,19 +51,33 @@
                     playerCardUI = FindFirstObjectByType<PlayerCardUI>();
                 }
             }
+            
+            [RuntimeInitializeOnLoadMethod]
+            private static void OnLoad()
+            {
+                UnityEngine.SceneManagement.SceneManager.sceneLoaded += (scene, mode) =>
+                {
+                    gameplayObjectSpawned = false;
+                };
+            }
 
             protected void SpawnLobbyPlayerCharacter()
             {
-                GameObject gameObj = Instantiate(gamePlayObject, Vector3.zero, Quaternion.identity);
-                NetworkServer.Spawn(gameObj, connectionToClient);
-                
-                GameObject gamePlayobj = Instantiate(gamePlayHand, Vector3.zero, Quaternion.identity);
-                NetworkServer.Spawn(gamePlayobj, connectionToClient);
-                
+                if (isServer && !gameplayObjectSpawned)
+                {
+                    GameObject gameObj = Instantiate(gamePlayObject, Vector3.zero, Quaternion.identity);
+                    NetworkServer.Spawn(gameObj);
+        
+                    GameObject gamePlayobj = Instantiate(gamePlayHand, Vector3.zero, Quaternion.identity);
+                    NetworkServer.Spawn(gamePlayobj);
+
+                    gameplayObjectSpawned = true; // ✅ 중복 생성 방지
+                }
+
+                // 캐릭터는 여전히 각 플레이어별로 생성
                 Vector3 spawnPos = FindFirstObjectByType<SpawnPosition>().GetSpawnPosition();
                 playerCharacter = Instantiate((NetworkRoomManager.singleton as RoomManager).spawnPrefabs[0], spawnPos, Quaternion.identity).GetComponent<LobbyPlayerCharacter>();
                 NetworkServer.Spawn(playerCharacter.gameObject, connectionToClient);
-                
             }
 
             [Command]
@@ -154,7 +169,7 @@
 
                 if (gameplayUI != null)
                 {
-                    gameplayUI.ShowFinalScoreBoard(allRecords, roundIndex);
+                    gameplayUI.ShowGameOverTextAndScore(allRecords, roundIndex);
 
                     // ✅ 점수표 보여준 후 다음 라운드로 넘어가는 흐름
                     StartCoroutine(HandleRoundTransition()); // ← 여기가 빠져있었음
