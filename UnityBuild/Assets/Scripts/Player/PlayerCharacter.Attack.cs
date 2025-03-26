@@ -30,6 +30,9 @@ namespace Player
         [SyncVar] public float BaseAttackPower = 1;
         [SyncVar] public float AttackPower = 1;
         
+        [SyncVar(hook = nameof(OnItemSkillChanged))]
+        public int itemSkillId = -1;
+        
         private void UpdateAttack()
         {
             if (Input.GetKeyDown(KeyCode.Alpha1)) SetAttackType(1);
@@ -91,6 +94,11 @@ namespace Player
 
                 CmdSetAttackType(index);
             }
+        }
+        
+        private void OnItemSkillChanged(int _, int newSkillId)
+        {
+            SetAvailableAttack(4, newSkillId); // UI도 여기서 자동 갱신됨
         }
         
         public void SetAvailableAttack(int index, int skillId)

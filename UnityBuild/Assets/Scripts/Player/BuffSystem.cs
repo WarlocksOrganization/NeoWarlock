@@ -28,10 +28,10 @@ public class BuffSystem : NetworkBehaviour
     public void CmdApplyBuff(BuffData buffData, int attackPlayerId, int attackskillid)
     {
         if (activeBuffs.ContainsKey(buffData.BuffType))
-        {
+        { 
             StopCoroutine(activeBuffs[buffData.BuffType]);
-            RemoveBuffEffect(buffData);
-            activeBuffs.Remove(buffData.BuffType);
+            RemoveBuffEffect(buffData.BuffType);
+            activeBuffs.Remove(buffData.BuffType); 
         }
 
         RpcPlayBuffEffect(buffData.BuffType, true);
@@ -61,7 +61,7 @@ public class BuffSystem : NetworkBehaviour
 
         yield return new WaitForSeconds(buffData.duration);
 
-        RemoveBuffEffect(buffData);
+        RemoveBuffEffect(buffData.BuffType);
         RpcPlayBuffEffect(buffData.BuffType, false);
         activeBuffs.Remove(buffData.BuffType);
 
@@ -101,36 +101,32 @@ public class BuffSystem : NetworkBehaviour
         }
     }
 
-    private void RemoveBuffEffect(BuffData buffData)
+    private void RemoveBuffEffect(Constants.BuffType buffType)
     {
-        Constants.BuffType buffType = buffData.BuffType;
+        var suffixes = new[] { "def", "knock", "move", "atk" };
 
-        string defKey = BuffKey(buffType, "def");
-        if (activeBuffValues.ContainsKey(defKey))
+        foreach (var suffix in suffixes)
         {
-            playerCharacter.defense -= (int)activeBuffValues[defKey];
-            activeBuffValues.Remove(defKey);
-        }
-
-        string knockKey = BuffKey(buffType, "knock");
-        if (activeBuffValues.ContainsKey(knockKey))
-        {
-            playerCharacter.KnockbackFactor -= activeBuffValues[knockKey];
-            activeBuffValues.Remove(knockKey);
-        }
-
-        string moveKey = BuffKey(buffType, "move");
-        if (activeBuffValues.ContainsKey(moveKey))
-        {
-            playerCharacter.MoveSpeed -= activeBuffValues[moveKey];
-            activeBuffValues.Remove(moveKey);
-        }
-
-        string atkKey = BuffKey(buffType, "atk");
-        if (activeBuffValues.ContainsKey(atkKey))
-        {
-            playerCharacter.AttackPower -= activeBuffValues[atkKey];
-            activeBuffValues.Remove(atkKey);
+            string key = BuffKey(buffType, suffix);
+            if (activeBuffValues.TryGetValue(key, out float value))
+            {
+                switch (suffix)
+                {
+                    case "def":
+                        playerCharacter.defense -= (int)value;
+                        break;
+                    case "knock":
+                        playerCharacter.KnockbackFactor -= value;
+                        break;
+                    case "move":
+                        playerCharacter.MoveSpeed -= value;
+                        break;
+                    case "atk":
+                        playerCharacter.AttackPower -= value;
+                        break;
+                }
+                activeBuffValues.Remove(key);
+            }
         }
     }
 
@@ -205,10 +201,21 @@ public class BuffSystem : NetworkBehaviour
         foreach (var buffKey in new List<string>(activeBuffValues.Keys))
         {
             if (buffKey.EndsWith("_atk"))
+            {
                 playerCharacter.AttackPower -= activeBuffValues[buffKey];
+            }
             else if (buffKey.EndsWith("_move"))
+            {
                 playerCharacter.MoveSpeed -= activeBuffValues[buffKey];
-            // etc.
+            }
+            else if (buffKey.EndsWith("_def"))
+            {
+                playerCharacter.defense -= (int)activeBuffValues[buffKey];
+            }
+            else if (buffKey.EndsWith("_knock"))
+            {
+                playerCharacter.KnockbackFactor -= activeBuffValues[buffKey];
+            }
         }
         activeBuffValues.Clear();
 
@@ -235,6 +242,7 @@ public class BuffSystem : NetworkBehaviour
         if (activeBuffs.ContainsKey(buffData.BuffType))
         {
             StopCoroutine(activeBuffs[buffData.BuffType]);
+            RemoveBuffEffect(buffData.BuffType); 
             activeBuffs.Remove(buffData.BuffType);
         }
 

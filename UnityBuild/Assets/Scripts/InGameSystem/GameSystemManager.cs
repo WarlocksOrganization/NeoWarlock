@@ -9,7 +9,6 @@ public class GameSystemManager : MonoBehaviour
     public static GameSystemManager Instance;
 
     [SerializeField] private GameObject[] FallGrounds;
-    private GameHand gameHand;
     private int eventnum = 0;
 
     private void Awake()
@@ -45,8 +44,7 @@ public class GameSystemManager : MonoBehaviour
                 Vector3 spawnPos = target.transform.position;
                 spawnPos.y = 0;
 
-                gameHand = FindFirstObjectByType<GameHand>();
-                gameHand.Initialize();
+                GameHand.Instance.Initialize();
             }
             
             // 🔹 5초 뒤 지형 파괴 실행 (Coroutine 사용)
