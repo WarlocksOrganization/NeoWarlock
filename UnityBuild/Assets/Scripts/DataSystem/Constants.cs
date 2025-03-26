@@ -18,6 +18,9 @@ namespace DataSystem
         public static readonly int ScoreBoardTime = 12; // 스코어보드 보는 시간
         public static readonly int CardSelectionTime = 10; //카드 선택 시간
 
+
+        public static string LogFilepath = "/.config/unity3d/warlocks/smashup/Logs/room.log";
+        
         public enum RoomType
         {
             Solo = 0,
@@ -108,6 +111,33 @@ namespace DataSystem
             SoulSwamp,
             InfernalPoison,
             None = 100,
+        }
+
+        
+        public enum MatchServerRequestType
+        {
+            register,
+            login,
+            logout,
+            joinRoom,
+            exitRoom,
+            createRoom,
+            listRooms,
+            gameStart,
+            gameEnd,
+        }
+
+        public enum DataServerLogType
+        {
+            joinRoom,
+            leaveRoom,
+            createRoom,
+            gameStart,
+            gameEnd,
+            playerReady,
+            skillUse,
+            skillHit,
+            kill,
         }
 
         [Serializable]
