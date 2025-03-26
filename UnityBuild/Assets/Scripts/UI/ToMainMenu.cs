@@ -9,48 +9,64 @@ public class ToMainMenu : MonoBehaviour
 
     void Start()
     {
-        changeSceneButton.onClick.AddListener(() => ChangeScene("MainMenu"));
+        changeSceneButton.onClick.AddListener(DisconnectAndLoadMenu);
     }
 
-    void ChangeScene(string sceneName)
+    void DisconnectAndLoadMenu()
     {
-        Debug.Log("¸ŞÀÎ ¸Ş´º ¿äÃ». ÄÚµå ÃßÈÄ Àû¿ë");
-        Debug.Log($"¾À º¯°æ ¿äÃ»: {sceneName}");
-
-        NetworkManager networkManager = FindFirstObjectByType<NetworkManager>();
-
-        if (networkManager != null)
+        if (NetworkServer.active && NetworkClient.isConnected)
         {
-            Debug.Log("NetworkManager ¹ß°ßµÊ. ³×Æ®¿öÅ© Á¾·á Áß...");
-
-            if (NetworkServer.active && NetworkClient.isConnected)
-            {
-                Debug.Log("¼­¹ö + Å¬¶óÀÌ¾ğÆ® »óÅÂ ¡æ StopHost() È£Ãâ.");
-                networkManager.StopHost(); // È£½ºÆ® Á¾·á (Å¬¶óÀÌ¾ğÆ®µµ ÀÚµ¿ Á¾·áµÊ)
-            }
-            else if (NetworkServer.active)
-            {
-                Debug.Log("¼­¹ö »óÅÂ ¡æ StopServer() È£Ãâ.");
-                networkManager.StopServer(); // ¼­¹ö¸¸ Á¾·á
-            }
-            else if (NetworkClient.isConnected)
-            {
-                Debug.Log("Å¬¶óÀÌ¾ğÆ® »óÅÂ ¡æ StopClient() È£Ãâ.");
-                networkManager.StopClient(); // Å¬¶óÀÌ¾ğÆ®¸¸ Á¾·á
-            }
-
-            Debug.Log("¸ğµç ÄÚ·çÆ¾ Á¤Áö ¹× Mirror ³×Æ®¿öÅ© Á¾·á.");
-            StopAllCoroutines();  // ½ÇÇà ÁßÀÎ ÄÚ·çÆ¾ÀÌ ÀÖ´Ù¸é Á¤Áö
-
-            //Debug.Log("NetworkManager »èÁ¦ Áß...");
-            //Destroy(networkManager.gameObject);
+            NetworkManager.singleton.StopHost(); // ì„œë²„ì™€ í´ë¼ì´ì–¸íŠ¸ ëª¨ë‘ ì¢…ë£Œ
         }
-        else
+        else if (NetworkClient.isConnected)
         {
-            Debug.LogWarning("NetworkManager¸¦ Ã£À» ¼ö ¾ø½À´Ï´Ù. ±×´ë·Î ¾À º¯°æ.");
+            NetworkManager.singleton.StopClient(); // í´ë¼ì´ì–¸íŠ¸ë§Œ ì¢…ë£Œ
         }
+        Invoke(nameof(LoadMainMenu), 1f);  // ë˜ëŠ” Coroutine ì‚¬ìš© ê°€ëŠ¥
+    }
 
-        Debug.Log($"¾À ÀüÈ¯ ½ÇÇà: {sceneName}");
-        SceneManager.LoadScene(sceneName);
+    void LoadMainMenu()
+    {
+        SceneManager.LoadScene("MainMenu");
     }
 }
+
+    //     Debug.Log("ï¿½ï¿½ï¿½ï¿½ ï¿½Ş´ï¿½ ï¿½ï¿½Ã». ï¿½Úµï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½");
+    //     Debug.Log($"ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ã»: {sceneName}");
+
+    //     NetworkManager networkManager = FindFirstObjectByType<NetworkManager>();
+
+    //     if (networkManager != null)
+    //     {
+    //         Debug.Log("NetworkManager ï¿½ß°ßµï¿½. ï¿½ï¿½Æ®ï¿½ï¿½Å© ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½...");
+
+    //         if (NetworkServer.active && NetworkClient.isConnected)
+    //         {
+    //             Debug.Log("ï¿½ï¿½ï¿½ï¿½ + Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ® ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ StopHost() È£ï¿½ï¿½.");
+    //             networkManager.StopHost(); // È£ï¿½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½ (Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®ï¿½ï¿½ ï¿½Úµï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½)
+    //         }
+    //         else if (NetworkServer.active)
+    //         {
+    //             Debug.Log("ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ StopServer() È£ï¿½ï¿½.");
+    //             networkManager.StopServer(); // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+    //         }
+    //         else if (NetworkClient.isConnected)
+    //         {
+    //             Debug.Log("Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ® ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ StopClient() È£ï¿½ï¿½.");
+    //             networkManager.StopClient(); // Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+    //         }
+
+    //         Debug.Log("ï¿½ï¿½ï¿½ ï¿½Ú·ï¿½Æ¾ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ Mirror ï¿½ï¿½Æ®ï¿½ï¿½Å© ï¿½ï¿½ï¿½ï¿½.");
+    //         StopAllCoroutines();  // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ú·ï¿½Æ¾ï¿½ï¿½ ï¿½Ö´Ù¸ï¿½ ï¿½ï¿½ï¿½ï¿½
+
+    //         //Debug.Log("NetworkManager ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½...");
+    //         //Destroy(networkManager.gameObject);
+    //     }
+    //     else
+    //     {
+    //         Debug.LogWarning("NetworkManagerï¿½ï¿½ Ã£ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½. ï¿½×´ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½.");
+    //     }
+
+    //     Debug.Log($"ï¿½ï¿½ ï¿½ï¿½È¯ ï¿½ï¿½ï¿½ï¿½: {sceneName}");
+    //     SceneManager.LoadScene(sceneName);
+    // }

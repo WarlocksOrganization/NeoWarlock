@@ -191,11 +191,11 @@
                         //gameObject.SetActive(false);
                     }
                 }
-                else
-                {
-                    ScoreBoardUI scoreBoardUI = FindFirstObjectByType<ScoreBoardUI>();
-                    scoreBoardUI.ShowReturnToLobbyButton(); // → UI에 버튼 활성화 함수
-                }
+//                else
+//                {
+//                    ScoreBoardUI scoreBoardUI = FindFirstObjectByType<ScoreBoardUI>();
+//                    scoreBoardUI.ShowReturnToLobbyButton(); // → UI에 버튼 활성화 함수
+//                }
             }
             
             public void CheckGameOver()

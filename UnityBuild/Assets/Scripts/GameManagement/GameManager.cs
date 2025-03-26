@@ -204,6 +204,28 @@ namespace GameManagement
                 .Select(p => p.playerId)
                 .ToList();
         }
+        public Constants.PlayerRecord GetTopTotalScorePlayer()
+        {
+            int finalRound = Mathf.Max(0, currentRound - 1); // 음수 방지
+
+            return playerRecords.Values
+                .OrderByDescending(p => p.GetTotalScoreUpToRound(finalRound))
+                .FirstOrDefault(); // 빈 리스트 안전 처리
+        }
+
+        public Constants.PlayerStats GetTopKillPlayer()
+        {
+            return playerStatsArray
+                .OrderByDescending(p => p.kills + p.outKills)  // 혹은 p.kills만
+                .First();
+        }
+
+        public Constants.PlayerStats GetTopDamagePlayer()
+        {
+            return playerStatsArray
+                .OrderByDescending(p => p.damageDone)
+                .First();
+        }
     }
 
 }

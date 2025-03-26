@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using DataSystem;
+using DataSystem.Database;
 using GameManagement;
 using Mirror;
 using Player;
@@ -19,16 +20,30 @@ public class ScoreBoardUI : MonoBehaviour
 
     [SerializeField] private CanvasGroup canvasGroup;
     [SerializeField] private Button returnToLobbyButton;
+    [SerializeField] private Button resultToggleButton;
+
+    [SerializeField] private TMP_Text bestPlayerName;
+    [SerializeField] private TMP_Text bestPlayerStat;
+    [SerializeField] private Image bestPlayerIcon;
+    [SerializeField] private TMP_Text bestKillName;
+    [SerializeField] private TMP_Text bestKillStat;
+    [SerializeField] private Image bestKillIcon;
+    [SerializeField] private TMP_Text bestDamageName;
+    [SerializeField] private TMP_Text bestDamageStat;
+    [SerializeField] private Image bestDamageIcon;
+
 
     private void Awake()
     {
         returnToLobbyButton.gameObject.SetActive(false);
+        resultToggleButton.gameObject.SetActive(false);
         returnToLobbyButton.onClick.AddListener(OnClickReturnToLobby);
     }
 
     public void ShowReturnToLobbyButton()
     {
         returnToLobbyButton.gameObject.SetActive(true);
+        resultToggleButton.gameObject.SetActive(true);
     }
 
     public void ShowScoreBoard(Constants.PlayerRecord[] records, int roundIndex)
@@ -107,8 +122,87 @@ private IEnumerator ShowRankingFlow(Constants.PlayerRecord[] records, int roundI
 
         panel.AnimateDamage(prevDamage, finalDamage);
     }
+    // 최종 결과 출력
+//    GameRoomData roomData = FindFirstObjectByType<GameRoomData>();
+//    int totalRounds = roomData.Round;
+    int totalRounds = 3;
+//    if (roomData != null && roundIndex >= totalRounds)
+    if (roundIndex >= totalRounds - 1)
+    {
+        yield return new WaitForSeconds(3f); // 연출 간격
+
+        var ResultBoard = this.transform.Find("ResultBoard").gameObject;
+        var ScoreBoard = this.transform.Find("ScoreBoard").gameObject;
+        var ToggleButton = this.transform.Find("ToggleButton").GetComponent<Button>();
+        var LobbyButton = this.transform.Find("LobbyButton").GetComponent<Button>();
+
+
+        gameObject.SetActive(true);
+        ResultBoard.SetActive(true);
+        SetResultBoardData();
+        StartCoroutine(PopIn(ResultBoard.transform));
+
+        ScoreBoard.SetActive(false);
+        ToggleButton.gameObject.SetActive(true);
+        LobbyButton.gameObject.SetActive(true);
+
+        ToggleButton.onClick.RemoveAllListeners();
+        ToggleButton.onClick.AddListener(() =>
+        {
+            bool showResult = !ResultBoard.activeSelf;
+            ResultBoard.SetActive(showResult);
+            ScoreBoard.SetActive(!showResult);
+        });
+        LobbyButton.onClick.AddListener(() => OnClickReturnToLobby());
+
+    }
 }
 
+    private void SetResultBoardData()
+    {
+        var bestPlayer = GameManager.Instance.GetTopTotalScorePlayer();
+        var bestKill = GameManager.Instance.GetTopKillPlayer();
+        var bestDamage = GameManager.Instance.GetTopDamagePlayer();
+
+        int myId = PlayerSetting.PlayerId;
+        string ColorizeName(string name, int id)
+        {
+            return id == myId ? $"<color=yellow>{name}</color>" : name;
+        }
+
+        bestPlayerName.text = ColorizeName(bestPlayer.nickname, bestPlayer.playerId);
+        bestPlayerStat.text = $"점수 합계 : {bestPlayer.GetTotalScoreUpToRound(2)}";
+        bestPlayerIcon.sprite = Database.GetCharacterClassData(bestPlayer.characterClass).CharacterIcon;
+        bestKillName.text = ColorizeName(bestKill.nickname, bestKill.playerId);
+        bestKillStat.text = $"최대 처치 : {bestKill.kills + bestKill.outKills}";
+        bestKillIcon.sprite = Database.GetCharacterClassData(bestKill.characterClass).CharacterIcon;
+        bestDamageName.text = ColorizeName(bestDamage.nickname, bestDamage.playerId);
+        bestDamageStat.text = $"최대 데미지 : {bestDamage.damageDone}";
+        bestDamageIcon.sprite = Database.GetCharacterClassData(bestDamage.characterClass).CharacterIcon;
+    }
+
+
+    public IEnumerator PopIn(Transform target, float duration = 0.5f, float scaleMultiplier = 1f)
+    {
+        Vector3 start = Vector3.zero;
+        Vector3 end = Vector3.one * scaleMultiplier;
+        float time = 0f;
+
+        target.localScale = start;
+        target.gameObject.SetActive(true);
+
+        while (time < duration)
+        {
+            float t = time / duration;
+            // EaseOutBack 느낌 주기
+            float eased = 1f - Mathf.Pow(1f - t, 3);
+            target.localScale = Vector3.LerpUnclamped(start, end, eased);
+            time += Time.deltaTime;
+            yield return null;
+        }
+
+        target.localScale = end;
+    }
 
     private void OnClickReturnToLobby()
     {
