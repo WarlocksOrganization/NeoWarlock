@@ -2812,6 +2812,63 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6752040345112379355, guid: e49d5fac79bcfd8449333a2579e96c37, type: 3}
   m_PrefabInstance: {fileID: 177147943}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &181019665
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 5269373350961546677, guid: 9de43ce11df610b45bd6b2085a6ecd92, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 960
+      objectReference: {fileID: 0}
+    - target: {fileID: 5269373350961546677, guid: 9de43ce11df610b45bd6b2085a6ecd92, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 540
+      objectReference: {fileID: 0}
+    - target: {fileID: 5269373350961546677, guid: 9de43ce11df610b45bd6b2085a6ecd92, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5269373350961546677, guid: 9de43ce11df610b45bd6b2085a6ecd92, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5269373350961546677, guid: 9de43ce11df610b45bd6b2085a6ecd92, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5269373350961546677, guid: 9de43ce11df610b45bd6b2085a6ecd92, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5269373350961546677, guid: 9de43ce11df610b45bd6b2085a6ecd92, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5269373350961546677, guid: 9de43ce11df610b45bd6b2085a6ecd92, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5269373350961546677, guid: 9de43ce11df610b45bd6b2085a6ecd92, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5269373350961546677, guid: 9de43ce11df610b45bd6b2085a6ecd92, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8663779706795867248, guid: 9de43ce11df610b45bd6b2085a6ecd92, type: 3}
+      propertyPath: m_Name
+      value: AudioManager
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 9de43ce11df610b45bd6b2085a6ecd92, type: 3}
 --- !u!1001 &183193113
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -15996,6 +16053,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 982760776}
+  - component: {fileID: 982760777}
   m_Layer: 5
   m_Name: LoginUI
   m_TagString: Untagged
@@ -16026,6 +16084,22 @@ RectTransform:
   m_AnchoredPosition: {x: -960, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &982760777
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 982760775}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 88e489d9796ce73448cf1fae6307ab71, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _userName: {fileID: 289681134}
+  _password: {fileID: 1652393354}
+  _loginButton: {fileID: 2124191178}
+  _OnlineUI: {fileID: 1941930190}
 --- !u!1 &990710325
 GameObject:
   m_ObjectHideFlags: 0
@@ -17266,7 +17340,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b6da0329e68d81a4aa9579325526c409, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  matchServerIP: smashup.warlocks.site
+  matchServerIP: 127.0.0.1
   socketServerPort: 8080
   bufferSize: 8192
   maxRetries: 5
@@ -19885,9 +19959,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2da172d12745562469815048e28f955b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _roomContainerPrefab: {fileID: 2297908912244164802, guid: d0ce84d72ebd85f4b9bc888beba0d608, type: 3}
-  onlineUI: {fileID: 1941930190}
-  _contentParent: {fileID: 1489296527}
+  _roomContainerPrefab: {fileID: 0}
+  onlineUI: {fileID: 0}
+  _contentParent: {fileID: 0}
 --- !u!1001 &1282340061
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -25331,7 +25405,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1673040149}
   - component: {fileID: 1673040150}
-  - component: {fileID: 1673040151}
   m_Layer: 5
   m_Name: Main Menu UI
   m_TagString: Untagged
@@ -25375,23 +25448,7 @@ MonoBehaviour:
   nicknameInputField: {fileID: 1915209080}
   onlineUI: {fileID: 1941930190}
   lanUI: {fileID: 1342887726}
-  displayModeText: {fileID: 0}
---- !u!114 &1673040151
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1673040148}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 88e489d9796ce73448cf1fae6307ab71, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _userName: {fileID: 289681134}
-  _password: {fileID: 1652393354}
-  _loginButton: {fileID: 2124191178}
-  _OnlineUI: {fileID: 1941930190}
+  displayModeText: {fileID: 1408758007}
 --- !u!1 &1674732648
 GameObject:
   m_ObjectHideFlags: 0
@@ -30528,7 +30585,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   createRoomUI: {fileID: 916236714}
-  findRoomUI: {fileID: 1281179373}
+  findRoomUI: {fileID: 0}
 --- !u!1001 &1949398315
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -34622,6 +34679,7 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 2144704875}
+  - {fileID: 181019665}
   - {fileID: 638222528}
   - {fileID: 330585546}
   - {fileID: 410087041}

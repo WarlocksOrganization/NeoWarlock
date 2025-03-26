@@ -4,6 +4,8 @@ using System.Linq;
 using DataSystem;
 using DataSystem.Database;
 using GameManagement;
+using Mirror;
+using Player;
 using TMPro;
 using UI;
 using UnityEngine;
@@ -25,6 +27,8 @@ public class PlayerCardUI : MonoBehaviour
     private PlayerCharacterUI playerCharacterUI;
     private bool isLoading = true;
     
+    private GamePlayer myGamePlayer;
+    
 
     void Start()
     {
@@ -36,6 +40,13 @@ public class PlayerCardUI : MonoBehaviour
         remainingTime = maxTime;
         timerSlider.maxValue = 1f;
         timerSlider.value = 1f;
+        
+        myGamePlayer = FindObjectsOfType<GamePlayer>().FirstOrDefault(gp => gp.isOwned);
+
+        if (NetworkServer.active)
+        {
+            gameObject.SetActive(false);
+        }
     }
 
     void Update()
@@ -184,6 +195,11 @@ public class PlayerCardUI : MonoBehaviour
     {
         playerCharacterUI.GetComponent<CanvasGroup>().alpha = 1f;
         PlayerSetting.PlayerCards.AddRange(slots.Select(slot => slot.GetCurrentCard()));
+
+        if(!myGamePlayer) myGamePlayer = FindObjectsOfType<GamePlayer>().FirstOrDefault(gp => gp.isOwned);
+        myGamePlayer?.OnCardSelectionConfirmed();
+        myGamePlayer?.CmdConfirmCardSelected();
+
         gameObject.SetActive(false);
     }
 }

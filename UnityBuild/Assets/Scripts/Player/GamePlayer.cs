@@ -188,7 +188,7 @@ namespace Player
         {
             yield return new WaitForSeconds(Constants.ScoreBoardTime); // 점수판 5초 보여줌
 
-            int currentRound = GameManager.Instance.CurrentRound;
+            int currentRound = GameManager.Instance.currentRound;
 
             if (currentRound < 3)
             {
@@ -198,6 +198,11 @@ namespace Player
                     NetworkManager.singleton.ServerChangeScene(SceneManager.GetActiveScene().name);
                     //gameObject.SetActive(false);
                 }
+                else
+                {
+                    // ✅ 클라이언트라면 서버에 씬 전환 요청
+                    CmdRequestSceneReload();
+                }
             }
             else
             {
@@ -206,6 +211,13 @@ namespace Player
                     RpcShowReturnToLobbyButton();
                 }
             }
+        }
+        
+        [Command]
+        public void CmdRequestSceneReload()
+        {
+            Debug.Log("[GamePlayer] CmdRequestSceneReload called. Reloading scene on server.");
+            NetworkManager.singleton.ServerChangeScene(SceneManager.GetActiveScene().name);
         }
         
         [ClientRpc]
@@ -240,7 +252,7 @@ namespace Player
 
             // ✅ 올바른 타입의 데이터 전송
             var allRecords = GameManager.Instance.GetAllPlayerRecords(); // ← 이게 핵심
-            RpcSendFinalScore(allRecords, GameManager.Instance.CurrentRound - 1);
+            RpcSendFinalScore(allRecords, GameManager.Instance.currentRound - 1);
         }
         
         IEnumerator WaitForAllPlayersThenStartCardSelection()
@@ -261,5 +273,56 @@ namespace Player
 
             StartCoroutine(CardSelectionTimer());
         }
+        
+        public void OnCardSelectionConfirmed()
+        {
+            if (playerCharacter == null)
+            {
+                Debug.LogWarning("[GamePlayer] playerCharacter가 아직 없습니다.");
+                return;
+            }
+
+            playerCharacter.State = Constants.PlayerState.Ready;
+
+            // 강화 효과 반영 (이미 처리된 상태일 수 있으므로 서버 강화 재반영 필요 X)
+            playerCharacter.CmdSetCharacterData(
+                PlayerSetting.PlayerCharacterClass,
+                PlayerSetting.MoveSkill,
+                PlayerSetting.AttackSkillIDs
+            );
+
+            Debug.Log("[GamePlayer] 카드 선택 완료 및 캐릭터 정보 서버 전송 완료");
+        }
+        
+        [Command]
+        public void CmdConfirmCardSelected()
+        {
+            playerCharacter.State = Constants.PlayerState.Ready;
+
+            var allReady = FindObjectsOfType<LobbyPlayerCharacter>()
+                .All(p => p.State == Constants.PlayerState.Ready);
+
+            if (allReady)
+            {
+                RpcGameStart(); // 기존 UI 호출
+                // ✅ 여기에 타이머 시작 추가
+                var timer = FindFirstObjectByType<NetworkTimer>();
+                if (timer != null)
+                {
+                    timer.StartGameFlow(Constants.CountTime, Constants.MaxGameEventTime);
+                }
+            }
+        }
+        
+        [ClientRpc]
+        public void RpcGameStart()
+        {
+            GamePlayUI ui = FindFirstObjectByType<GamePlayUI>();
+            if (ui != null)
+            {
+                ui.CallGameStart(); // 👈 GameStart를 public 메서드로 분리
+            }
+        }
+
     }
 }

@@ -30,8 +30,7 @@ namespace GameManagement
         private Constants.PlayerStats[] playerStatsArray;
         private List<int> deathOrder = new();
         private Dictionary<int, Constants.PlayerRecord> playerRecords = new();
-        private int currentRound = 0;
-        public int CurrentRound => currentRound;
+        public int currentRound = 0;
         
         private HashSet<NetworkConnectionToClient> readyPlayers = new();
 

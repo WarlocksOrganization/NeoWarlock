@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Linq;
+using DataSystem;
 using DataSystem.Database;
 using GameManagement;
 using Mirror;
@@ -13,34 +15,95 @@ namespace Player
         {
             foreach (var cardData in GameManagement.PlayerSetting.PlayerCards)
             {
-                switch (cardData.StatType)
+                // 클라이언트 → 서버로 보내는 커맨드
+                if (isLocalPlayer || isOwned)
                 {
-                    // ✅ 기본 스탯 강화 (체력, 이동속도)
-                    case PlayerStatType.Health:
-                    case PlayerStatType.Speed:
-                    case PlayerStatType.AttackPower:
-                        CmdModifyPlayerStat(cardData.StatType, cardData.BonusStat);
-                        break;
+                    switch (cardData.StatType)
+                    {
+                        case PlayerStatType.Health:
+                        case PlayerStatType.Speed:
+                        case PlayerStatType.AttackPower:
+                            CmdModifyPlayerStat(cardData.StatType, cardData.BonusStat);
+                            break;
 
-                    // ✅ 특정 스킬 강화 (개별 AttackData 수정)
-                    case PlayerStatType.AttackSpeed:
-                    case PlayerStatType.Range:
-                    case PlayerStatType.Radius:
-                    case PlayerStatType.Damage:
-                    case PlayerStatType.KnockbackForce:
-                    case PlayerStatType.Cooldown:
-                        CmdModifyPlayerAttackStat(cardData.AppliedSkill, cardData.StatType, cardData.BonusStat);
-                        break;
-
-                    case PlayerStatType.Special:
-                        break;
-
-                    default:
-                        Debug.LogError($"[ApplyCardBonuses] 알 수 없는 StatType: {cardData.StatType}");
-                        break;
+                        case PlayerStatType.AttackSpeed:
+                        case PlayerStatType.Range:
+                        case PlayerStatType.Radius:
+                        case PlayerStatType.Damage:
+                        case PlayerStatType.KnockbackForce:
+                        case PlayerStatType.Cooldown:
+                            CmdModifyPlayerAttackStat(cardData.AppliedSkill, cardData.StatType, cardData.BonusStat);
+                            break;
+                    }
+                }
+                // 서버는 직접 처리
+                else if (isServer)
+                {
+                    ApplyStatOnServer(cardData); // 아래에 따로 분리해서 만듦
                 }
             } 
         }
+        
+        [Server]
+        private void ApplyStatOnServer(Database.PlayerCardData cardData)
+        {
+            float multiplier = 1 + (cardData.BonusStat / 100f);
+            switch (cardData.StatType)
+            {
+                case PlayerStatType.Health:
+                    maxHp = (int)(maxHp * multiplier);
+                    curHp = maxHp;
+                    break;
+
+                case PlayerStatType.Speed:
+                    MaxSpeed *= multiplier;
+                    MoveSpeed = MaxSpeed;
+                    break;
+
+                case PlayerStatType.AttackPower:
+                    AttackPower *= multiplier;
+                    break;
+
+                // 공격 스킬 관련
+                case PlayerStatType.AttackSpeed:
+                case PlayerStatType.Range:
+                case PlayerStatType.Radius:
+                case PlayerStatType.Damage:
+                case PlayerStatType.KnockbackForce:
+                case PlayerStatType.Cooldown:
+                    int skillIndex = System.Array.IndexOf(PlayerSetting.AttackSkillIDs, cardData.AppliedSkill);
+                    if (skillIndex == -1 || availableAttacks[skillIndex] == null)
+                        return;
+
+                    var attackData = availableAttacks[skillIndex].GetAttackData();
+                    if (attackData == null) return;
+
+                    switch (cardData.StatType)
+                    {
+                        case PlayerStatType.AttackSpeed:
+                            attackData.Speed *= multiplier;
+                            break;
+                        case PlayerStatType.Range:
+                            attackData.Range *= multiplier;
+                            break;
+                        case PlayerStatType.Radius:
+                            attackData.Radius *= multiplier;
+                            break;
+                        case PlayerStatType.Damage:
+                            attackData.Damage *= multiplier;
+                            break;
+                        case PlayerStatType.KnockbackForce:
+                            attackData.KnockbackForce *= multiplier;
+                            break;
+                        case PlayerStatType.Cooldown:
+                            float cooldownMultiplier = 1 - (cardData.BonusStat / 100f);
+                            attackData.Cooldown = Mathf.Max(0.5f, attackData.Cooldown * cooldownMultiplier);
+                            break;
+                    }
+                    break;
+            }
+        }
+
         
         [Command]
         private void CmdModifyPlayerStat(PlayerStatType statType, float bonusPercentage)
@@ -127,6 +190,6 @@ namespace Player
             }
 
             Debug.Log($"[서버] {attackData.Name} 강화: {statType} +{bonusPercentage}%");
-        }
+        } 
     }
 }

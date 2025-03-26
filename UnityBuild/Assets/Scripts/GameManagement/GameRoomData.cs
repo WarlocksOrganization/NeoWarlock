@@ -19,7 +19,7 @@ namespace GameManagement
         private void Start()
         {
             GameLobbyUI gameLobbyUI = FindFirstObjectByType<GameLobbyUI>();
-            if (gameLobbyUI != null)
+            if (gameLobbyUI != null && gameLobbyUI.RoomNameText != null)
             {
                 gameLobbyUI.RoomNameText.text = roomName;
             }

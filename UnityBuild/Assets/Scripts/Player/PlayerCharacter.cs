@@ -245,6 +245,12 @@ namespace Player
         [Command]
         public void CmdStartGame()
         {
+            var allPlayers = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None);
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.Init(allPlayers);
+            }
+            
             var manager = Networking.RoomManager.singleton as Networking.RoomManager;
             manager.StartGame();
         }

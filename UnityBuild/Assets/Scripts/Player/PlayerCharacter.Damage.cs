@@ -105,7 +105,7 @@ namespace Player
                 }
                 GameManager.Instance.RecordDeath(playerId);
                 
-                var gp = NetworkClient.connection.identity.GetComponent<GamePlayer>();
+                var gp = connectionToClient.identity.GetComponent<GamePlayer>();
                 if (gp != null && isServer)
                 {
                     gp.CheckGameOver();
