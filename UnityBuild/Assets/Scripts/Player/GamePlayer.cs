@@ -21,6 +21,9 @@ namespace Player
         [SyncVar]
         public string PlayerNickname;
 
+        [SyncVar]
+        public string UserId;
+
         public LobbyPlayerCharacter playerCharacter;
 
         [SerializeField] private GameObject gamePlayObject;
@@ -89,6 +92,13 @@ namespace Player
             playerCharacter.nickname = PlayerNickname;
         }
         
+        [Command]
+        public void CmdSetUserId(string userId)
+        {
+            UserId = userId;
+            playerCharacter.userId = userId;
+        }
+
         [Command]
         public void CmdSetPlayerNumber(int playerNum)
         {

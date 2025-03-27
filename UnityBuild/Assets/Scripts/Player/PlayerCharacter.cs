@@ -15,6 +15,8 @@ namespace Player
     {
         [SyncVar(hook = nameof(SetNickname_Hook))]
         public string nickname;
+        [SyncVar(hook = nameof(SetUserIdhook))]
+        public string userId;
         [SerializeField] private TMP_Text nicknameText;
         [SyncVar(hook = nameof(UpdatePlayerId))] public int playerId = -1;
         private CharacterController _characterController;
@@ -140,6 +142,11 @@ namespace Player
             nickname = value;
         }
         
+        public void SetUserIdhook(string _, string value)
+        {
+            userId = value;
+        }
+
         [Command]
         private void CmdTriggerAnimation(string animParameter)
         {

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using GameManagement;
 using Player;
 using TMPro;
 using UnityEngine;
@@ -47,6 +48,8 @@ public class KillLogUI : MonoBehaviour
 
         logItem.SetKillLog(killer, victim, skillId, isFall);
         RepositionLogs(); // ✅ 모든 로그 재배치
+        
+        FileLogger.LogKill(killer.userId, victim.userId, skillId.ToString(), isFall == true ? "outside" : "skill"); // ✅ 킬 로그 기록
     }
 
     // 🔹 킬 로그 반환 및 재정렬

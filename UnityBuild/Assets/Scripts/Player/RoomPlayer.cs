@@ -14,6 +14,9 @@ namespace Player
         [SyncVar]
         public string PlayerNickname;
 
+        [SyncVar]
+        public string UserId;
+
         public LobbyPlayerCharacter LobbyPlayer;
 
         public override void Start()
@@ -61,6 +64,13 @@ namespace Player
             Debug.Log(PlayerSetting.Nickname);
             PlayerNickname = nickname;
             LobbyPlayer.nickname = PlayerNickname;
+        }
+
+        [Command]
+        public void CmdSetUserId(string userId)
+        {
+            UserId = userId;
+            LobbyPlayer.userId = userId;
         }
         
         [Command]

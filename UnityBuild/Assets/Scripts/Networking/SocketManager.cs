@@ -27,7 +27,7 @@ namespace Networking
         private bool _restart = false;
 
         public string matchServerIP = "127.0.0.1"; // 서버 IP 주소
-        public int socketServerPort = 8080; // 서버 포트 번호
+        public ushort socketServerPort = 8080; // 서버 포트 번호
         public int bufferSize = 8192; // 버퍼 크기
         public int maxRetries = 5; // 최대 재시도 횟수
         public static SocketManager singleton;
@@ -69,7 +69,8 @@ namespace Networking
                     }
                     else if (args[i].StartsWith("-socketServerPort="))
                     {
-                        if (int.TryParse(args[i].Substring(18), out int port))
+                        ushort port;
+                        if (ushort.TryParse(args[i].Substring(18), out port))
                         {
                             socketServerPort = port;
                             Debug.Log($"[SocketManager] 소켓 서버 포트 변경: {socketServerPort}");

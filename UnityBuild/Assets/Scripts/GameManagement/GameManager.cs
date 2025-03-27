@@ -46,14 +46,16 @@ namespace GameManagement
                 {
                     playerId = pc.playerId,
                     characterClass = pc.PLayerCharacterClass,
-                    nickname = pc.nickname
+                    nickname = pc.nickname,
+                    userId = pc.userId
                 };
 
                 playerRecords[pc.playerId] = new Constants.PlayerRecord
                 {
                     playerId = pc.playerId,
                     nickname = pc.nickname,
-                    characterClass = pc.PLayerCharacterClass
+                    characterClass = pc.PLayerCharacterClass,
+                    userId = pc.userId
                 };
             }
 

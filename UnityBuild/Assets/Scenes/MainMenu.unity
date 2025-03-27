@@ -11764,7 +11764,7 @@ MonoBehaviour:
   DualMode: 1
   NoDelay: 1
   Interval: 10
-  Timeout: 3000
+  Timeout: 8000
   RecvBufferSize: 7361536
   SendBufferSize: 7361536
   FastResend: 2
@@ -17412,9 +17412,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bad97db35902ace47bca25c558e84f37, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  logServerIP: logs
-  logServerPort: 7878
-  Port: 7777
+  logServerIP: localhost
+  logServerPort: 8081
+  Port: 40000
 --- !u!4 &976250249
 Transform:
   m_ObjectHideFlags: 0
