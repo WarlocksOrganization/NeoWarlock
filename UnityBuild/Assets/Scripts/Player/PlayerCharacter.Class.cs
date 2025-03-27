@@ -134,5 +134,13 @@ namespace Player
                 
             }
         }
+        public void SetCharacterClass(Constants.CharacterClass cls)
+        {
+            if (characterModels == null)
+                InitializeCharacterModels();
+
+            PLayerCharacterClass = cls;
+            ApplyCharacterClass(cls);
+        }
     }
 }

@@ -9,7 +9,7 @@ public class PlayerStatusUI : MonoBehaviour
     {
         for (int i = 0; i < playerPanel.Length; i++)
         {
-            if (i >= players.Length)
+            if (i >= players.Length || players[i] == null || players[i].playerId < 0)
             {
                 playerPanel[i].GetComponent<CanvasGroup>().alpha = 0;
                 continue;

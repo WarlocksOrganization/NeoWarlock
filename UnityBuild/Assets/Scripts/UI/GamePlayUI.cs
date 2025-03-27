@@ -32,6 +32,7 @@ public class GamePlayUI : GameLobbyUI
     {
         // ✅ 현재 씬에서 모든 PlayerCharacter 찾기
         foundCharacters = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None)
+            .Where(player => player != null && player.playerId >= 0)
             .OrderBy(player => player.playerId)
             .ToArray();
 
@@ -183,5 +184,9 @@ public class GamePlayUI : GameLobbyUI
         yield return new WaitForSeconds(3f);
         
         ShowFinalScoreBoard(records, roundIndex);
+        if (roundIndex == 2)
+        {
+            countDownText.gameObject.SetActive(false);
+        }
     }
 }

@@ -11,6 +11,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using UnityEngine.InputSystem;
 
 public class ScoreBoardUI : MonoBehaviour
 {
@@ -21,6 +22,8 @@ public class ScoreBoardUI : MonoBehaviour
     [SerializeField] private CanvasGroup canvasGroup;
     [SerializeField] private Button returnToLobbyButton;
     [SerializeField] private Button resultToggleButton;
+    [SerializeField] private TMP_Text toggleButtonText;
+
 
     [SerializeField] private TMP_Text bestPlayerName;
     [SerializeField] private TMP_Text bestPlayerStat;
@@ -31,6 +34,12 @@ public class ScoreBoardUI : MonoBehaviour
     [SerializeField] private TMP_Text bestDamageName;
     [SerializeField] private TMP_Text bestDamageStat;
     [SerializeField] private Image bestDamageIcon;
+
+    [SerializeField] private GameObject playerCharacterPrefab;
+    [SerializeField] private Transform bestSpawnPoint;
+    [SerializeField] private Camera bestPlayerCamera;
+
+//    public RawImage bestPlayerShow;
 
 
     private void Awake()
@@ -152,6 +161,7 @@ private IEnumerator ShowRankingFlow(Constants.PlayerRecord[] records, int roundI
             bool showResult = !ResultBoard.activeSelf;
             ResultBoard.SetActive(showResult);
             ScoreBoard.SetActive(!showResult);
+            toggleButtonText.text = showResult ? "상세 보기" : "결과 보기";
         });
         LobbyButton.onClick.AddListener(() => OnClickReturnToLobby());
 
@@ -174,14 +184,57 @@ private IEnumerator ShowRankingFlow(Constants.PlayerRecord[] records, int roundI
         bestPlayerStat.text = $"점수 합계 : {bestPlayer.GetTotalScoreUpToRound(2)}";
         bestPlayerIcon.sprite = Database.GetCharacterClassData(bestPlayer.characterClass).CharacterIcon;
         bestKillName.text = ColorizeName(bestKill.nickname, bestKill.playerId);
-        bestKillStat.text = $"최대 처치 : {bestKill.kills + bestKill.outKills}";
+        bestKillStat.text = $"누적 처치 : {bestKill.kills + bestKill.outKills}";
         bestKillIcon.sprite = Database.GetCharacterClassData(bestKill.characterClass).CharacterIcon;
         bestDamageName.text = ColorizeName(bestDamage.nickname, bestDamage.playerId);
-        bestDamageStat.text = $"최대 데미지 : {bestDamage.damageDone}";
+        bestDamageStat.text = $"누적 데미지 : {bestDamage.damageDone}";
         bestDamageIcon.sprite = Database.GetCharacterClassData(bestDamage.characterClass).CharacterIcon;
+
+        showBestPlayer(bestPlayer);
     }
+    private void showBestPlayer(Constants.PlayerRecord bestPlayer)
+    {
 
+        var bestPlayerInstance = Instantiate(playerCharacterPrefab, bestSpawnPoint.position, Quaternion.identity);
 
+        var pc = bestPlayerInstance.GetComponent<PlayerCharacter>();
+        pc.PLayerCharacterClass = bestPlayer.characterClass;
+        pc.SetCharacterClass(bestPlayer.characterClass);
+
+        void TryDestroy<T>(GameObject obj) where T : Component
+        {
+            var comp = obj.GetComponent<T>();
+            if (comp != null) Destroy(comp);
+        }
+        TryDestroy<PlayerInput>(bestPlayerInstance); // 조작 입력 제거
+        TryDestroy<NetworkIdentity>(bestPlayerInstance);
+        //TryDestroy(bestPlayerInstance.GetComponent<NetworkTransform>());
+        //TryDestroy(bestPlayerInstance.GetComponent<PlayerController>()); // 직접 제어 컴포넌트 제거
+
+        Animator anim = bestPlayerInstance.transform
+            .Find("PlayerModel/Premade_Character")
+            .GetComponent<Animator>();
+
+        anim.Play("Idle"); // 혹은 VictoryPose 등
+
+        void SetLayerRecursively(Transform t, int layer)
+        {
+            t.gameObject.layer = layer;
+            foreach (Transform child in t)
+                SetLayerRecursively(child, layer);
+        }
+
+        SetLayerRecursively(bestPlayerInstance.transform, LayerMask.NameToLayer("BestPlayer"));
+        bestPlayerInstance.transform.rotation = Quaternion.Euler(0f, 180f, 0f); // 아바타 정면 보정
+        var camTarget = bestPlayerInstance.transform;
+
+        Vector3 lookAt = camTarget.position + Vector3.up * 1.4f;
+        Vector3 camPos = camTarget.position + new Vector3(0f, 1.2f, -2.5f);
+
+        bestPlayerCamera.transform.position = camPos;
+        bestPlayerCamera.transform.LookAt(lookAt);
+        //bestPlayerInstance.transform.rotation = Quaternion.Euler(0f, 180f, 0f);
+    }
     public IEnumerator PopIn(Transform target, float duration = 0.5f, float scaleMultiplier = 1f)
     {
         Vector3 start = Vector3.zero;
