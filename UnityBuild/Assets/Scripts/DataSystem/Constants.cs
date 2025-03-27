@@ -143,6 +143,13 @@ namespace DataSystem
             SFX_Button = 2001,
             SFX_Button2 = 2002,
             
+            SFX_Count = 2100,
+            SFX_Start = 2101,
+            
+            SFX_HandAttack = 2201,
+            SFX_HandEndAttack = 2202,
+            SFX_ComputerWarning = 2211,
+            
             SFX_Explosion,
             SFX_Heal,
             SFX_Swing

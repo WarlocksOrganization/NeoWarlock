@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using System.Collections.Generic;
 using DataSystem;
@@ -26,6 +27,8 @@ public class AudioManager : MonoBehaviour
     [Range(0f, 1f)] public float sfxVolume = 1f;
     
     [SerializeField] private AudioMixer mixer;
+    
+    private Coroutine bgmFadeCoroutine;
 
     private void Awake()
     {
@@ -99,11 +102,7 @@ public class AudioManager : MonoBehaviour
         {
             Debug.LogWarning($"[AudioManager] BGM SoundType {type} not found.");
         }
-    }
-
-    public void StopBGM()
-    {
-        bgmSource.Stop();
+        ApplyBGMVolumeToMixer(1);
     }
     
     public void PlaySFX(Constants.SoundType type, GameObject parent = null)
@@ -164,16 +163,7 @@ public class AudioManager : MonoBehaviour
     public void SetBGMVolume(float volume)
     {
         bgmVolume = volume;
-        
-        float vol = bgmVolume * 40 - 20f;
-        if (vol <= -20)
-        {
-            mixer.SetFloat("BGMVolume", -80);
-        }
-        else
-        {
-            mixer.SetFloat("BGMVolume", vol);
-        }
+        ApplyBGMVolumeToMixer(bgmVolume);
     }
     
     public float GetSFXVolume()
@@ -195,4 +185,31 @@ public class AudioManager : MonoBehaviour
             mixer.SetFloat("SFXVolume", vol);
         }
     }
+    
+    public void ApplyBGMVolumeToMixer(float volume)
+    {
+        float vol = volume * 40 - 20f;
+        mixer.SetFloat("BGMVolume", vol <= -20f ? -80f : vol);
+    }
+    
+    private IEnumerator FadeBGMVolumeRoutine(float targetVolume, float duration)
+    {
+        float startVolume = bgmVolume;
+        float timeElapsed = 0f;
+
+        while (timeElapsed < duration)
+        {
+            timeElapsed += Time.deltaTime;
+            float t = timeElapsed / duration;
+            float lerped = Mathf.Lerp(startVolume, targetVolume, t);
+            ApplyBGMVolumeToMixer(lerped);
+            yield return null;
+        }
+
+        ApplyBGMVolumeToMixer(targetVolume);
+        bgmVolume = targetVolume; // 최종적으로 설정값도 반영할지 여부는 선택
+        bgmFadeCoroutine = null;
+    }
+
+
 }
