@@ -28,6 +28,8 @@ public class AttackParticle : NetworkBehaviour
     public void SetAttackParticleData(Constants.SkillType skillType)
     {
        this.skillType = skillType;
+       
+       AudioManager.Instance?.PlayHitSFX(skillType, gameObject);
     }
     
     private void InitializeSkillEffects()

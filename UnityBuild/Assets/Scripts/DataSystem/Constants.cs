@@ -137,9 +137,19 @@ namespace DataSystem
             BGM_Lobby = 1002,
             BGM_SSAFY_CardSelect = 1101,
             BGM_SSAFY_GameStart = 1102,
+            BGM_SSAFY_ScoreBoard= 1103,
 
-            // SFX
-            SFX_Click,
+            // SFX UI
+            SFX_Button = 2001,
+            SFX_Button2 = 2002,
+            
+            SFX_Count = 2100,
+            SFX_Start = 2101,
+            
+            SFX_HandAttack = 2201,
+            SFX_HandEndAttack = 2202,
+            SFX_ComputerWarning = 2211,
+            
             SFX_Explosion,
             SFX_Heal,
             SFX_Swing
@@ -169,7 +179,7 @@ namespace DataSystem
         public enum DataServerLogType
         {
             joinRoom,
-            exitRoom,
+            leaveRoom,
             createRoom,
             gameStart,
             gameEnd,
@@ -245,6 +255,14 @@ namespace DataSystem
             public int outKills;
             public int damageDone;
             public int rank;
+        }
+        
+        [System.Serializable]
+        public class SkillSoundData
+        {
+            public SkillType skillType;
+            public AudioClip clip;
+            public AudioClip hitClip;
         }
 
         public class PlayerRecord

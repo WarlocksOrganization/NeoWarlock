@@ -1,34 +1,29 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using DataSystem;
 using DataSystem.Database;
 using GameManagement;
 using Mirror;
 using Networking;
 using UnityEngine;
-using System.Linq;
 using UnityEngine.SceneManagement;
 
 namespace Player
 {
     public class GamePlayer : NetworkRoomPlayer
     {
+        [SyncVar] public string PlayerNickname;
         public PlayerGameStats stats;
-        
-        private PlayerCardUI playerCardUI;
-
-        [SyncVar]
-        public string PlayerNickname;
-
         public LobbyPlayerCharacter playerCharacter;
 
         [SerializeField] private GameObject gamePlayObject;
         [SerializeField] private GameObject gamePlayHand;
 
+        private PlayerCardUI playerCardUI;
         private GamePlayUI gameplayUI;
         private static bool gameplayObjectSpawned = false;
-        
         private bool isRoundEnding = false;
 
         private void Awake()
@@ -53,122 +48,40 @@ namespace Player
                 playerCardUI = FindFirstObjectByType<PlayerCardUI>();
             }
         }
-        
-        [RuntimeInitializeOnLoadMethod]
-        private static void OnLoad()
-        {
-            SceneManager.sceneLoaded += (scene, mode) =>
-            {
-                gameplayObjectSpawned = false;
-            };
-        }
 
-        protected void SpawnLobbyPlayerCharacter()
+        [RuntimeInitializeOnLoadMethod]
+        private static void OnLoad() => SceneManager.sceneLoaded += (_, _) => gameplayObjectSpawned = false;
+
+        private void SpawnLobbyPlayerCharacter()
         {
             if (isServer && !gameplayObjectSpawned)
             {
-                GameObject gameObj = Instantiate(gamePlayObject, Vector3.zero, Quaternion.identity);
-                NetworkServer.Spawn(gameObj);
-    
-                GameObject gamePlayobj = Instantiate(gamePlayHand, Vector3.zero, Quaternion.identity);
-                NetworkServer.Spawn(gamePlayobj);
-
-                gameplayObjectSpawned = true; // ✅ 중복 생성 방지
+                NetworkServer.Spawn(Instantiate(gamePlayObject), connectionToClient);
+                NetworkServer.Spawn(Instantiate(gamePlayHand), connectionToClient);
+                gameplayObjectSpawned = true;
             }
 
-            // 캐릭터는 여전히 각 플레이어별로 생성
             Vector3 spawnPos = FindFirstObjectByType<SpawnPosition>().GetSpawnPosition();
-            playerCharacter = Instantiate((NetworkRoomManager.singleton as RoomManager).spawnPrefabs[0], spawnPos, Quaternion.identity).GetComponent<LobbyPlayerCharacter>();
-            NetworkServer.Spawn(playerCharacter.gameObject, connectionToClient);
+            GameObject pcObj = Instantiate((NetworkRoomManager.singleton as RoomManager).spawnPrefabs[0], spawnPos, Quaternion.identity);
+            playerCharacter = pcObj.GetComponent<LobbyPlayerCharacter>();
+            NetworkServer.Spawn(pcObj, connectionToClient);
         }
 
         [Command]
         public void CmdSetNickname(string nickname)
         {
             PlayerNickname = nickname;
-            playerCharacter.nickname = PlayerNickname;
+            if (playerCharacter != null)
+                playerCharacter.nickname = nickname;
         }
-        
+
         [Command]
         public void CmdSetPlayerNumber(int playerNum)
         {
-            playerCharacter.playerId = playerNum;
-        }
-        
-        private IEnumerator CardSelectionTimer()
-        {
-            int cardSelectionTime = Constants.CardSelectionTime;
-            while (cardSelectionTime > 0)
-            {
-                RpcUpdateTimer(cardSelectionTime);
-                yield return new WaitForSeconds(1f);
-                cardSelectionTime--;
-            }
-
-            RpcUpdateTimer(0); // ✅ 0초일 때 최종 업데이트
+            if (playerCharacter != null)
+                playerCharacter.playerId = playerNum;
         }
 
-        // ✅ 서버 -> 클라이언트 타이머 동기화
-        [ClientRpc]
-        private void RpcUpdateTimer(float time)
-        {
-            if (playerCardUI != null)
-            {
-                playerCardUI.UpdateTimer(time);
-            }
-
-            if (time <= 0)
-            {
-                if (!isOwned) return;
-
-                if (playerCharacter == null)
-                {
-                    LobbyPlayerCharacter[] pc = FindObjectsByType<LobbyPlayerCharacter>(sortMode: FindObjectsSortMode.None);
-                    foreach (var pcharacter in pc)
-                    {
-                        if (pcharacter.playerId == PlayerSetting.PlayerId)
-                        {
-                            playerCharacter = pcharacter;
-                            break;
-                        }
-                    }
-                }
-
-                playerCharacter.State = Constants.PlayerState.Ready;
-
-                foreach (var slot in playerCardUI.slots)
-                {
-                    var slotData = slot.GetCurrentCard();
-                    if (slotData.StatType == PlayerStatType.Special)
-                    {
-                        int skillIdToUpgrade = slotData.AppliedSkill;
-
-                        for (int i = 1; i < PlayerSetting.AttackSkillIDs.Length; i++)
-                        {
-                            if (PlayerSetting.AttackSkillIDs[i] == skillIdToUpgrade)
-                            {
-                                PlayerSetting.AttackSkillIDs[i] += 100;
-                                break;
-                            }
-                        }
-                    }
-                }
-
-                playerCharacter.CmdSetCharacterData(
-                    PlayerSetting.PlayerCharacterClass,
-                    PlayerSetting.MoveSkill,
-                    PlayerSetting.AttackSkillIDs
-                );
-            }
-        }
-
-        private void OnDestroy()
-        {
-            GameLobbyUI gameLobbyUI = FindFirstObjectByType<GameLobbyUI>();
-
-            gameLobbyUI?.UpdatePlayerInRoon();
-        }
-        
         [ClientRpc]
         public void RpcSendFinalScore(Constants.PlayerRecord[] allRecords, int roundIndex)
         {
@@ -177,29 +90,14 @@ namespace Player
 
         private IEnumerator ShowFinalScoreAndNextRound(Constants.PlayerRecord[] allRecords, int roundIndex)
         {
-            float timeout = 1f;
-            while (gameplayUI == null && timeout > 0f)
-            {
-                gameplayUI = FindFirstObjectByType<GamePlayUI>();
-                timeout -= Time.deltaTime;
-                yield return null;
-            }
-
-            if (gameplayUI != null)
-            {
-                gameplayUI.ShowGameOverTextAndScore(allRecords, roundIndex);
-            }
-            else
-            {
-                Debug.LogWarning("[GamePlayer] gameplayUI를 찾지 못했습니다. 점수판은 생략하고 다음 라운드로 넘어갑니다.");
-            }
-            
-            StartCoroutine(HandleRoundTransition()); // ✅ UI 없더라도 다음 라운드 진행
+            yield return new WaitUntil(() => gameplayUI != null);
+            gameplayUI.ShowGameOverTextAndScore(allRecords, roundIndex);
+            StartCoroutine(HandleRoundTransition());
         }
-        
+
         private IEnumerator HandleRoundTransition()
         {
-            yield return new WaitForSeconds(Constants.ScoreBoardTime); // 점수판 보여줌
+            yield return new WaitForSeconds(Constants.ScoreBoardTime);
 
             int currentRound = GameManager.Instance.currentRound;
 
@@ -207,99 +105,92 @@ namespace Player
             {
                 if (isServer)
                 {
-                    // ✅ 동일 씬 다시 로드 (예: Gameplay 씬)
                     NetworkManager.singleton.ServerChangeScene(SceneManager.GetActiveScene().name);
-                    //gameObject.SetActive(false);
                 }
                 else
                 {
-                    // ✅ 클라이언트라면 서버에 씬 전환 요청
+                    yield return new WaitUntil(() => NetworkClient.ready);
                     CmdRequestSceneReload();
                 }
             }
             else
             {
-                ShowReturnToLobbyButton();
+                // ❗ 현재 isServer 조건 걸려있음
+                // 이건 ClientRpc니까 서버가 아니라도 실행되도록 호출만 서버에서 하면 돼
+                if (isServer)
+                {
+                    Debug.Log("🔔 최종 라운드 종료, 로비 버튼 표시");
+                    RpcShowReturnToLobbyButton();
+                }
             }
         }
-        
-        [Command]
+
+        [Command(requiresAuthority = false)]
         public void CmdRequestSceneReload()
         {
-            Debug.Log("[GamePlayer] CmdRequestSceneReload called. Reloading scene on server.");
-            NetworkManager.singleton.ServerChangeScene(SceneManager.GetActiveScene().name);
+            if (isServer)
+                NetworkManager.singleton.ServerChangeScene(SceneManager.GetActiveScene().name);
         }
-        
-        public void ShowReturnToLobbyButton()
+
+        [ClientRpc]
+        public void RpcShowReturnToLobbyButton()
         {
-            ScoreBoardUI scoreBoardUI = FindFirstObjectByType<ScoreBoardUI>();
-            scoreBoardUI.ShowReturnToLobbyButton();
+            FindFirstObjectByType<ScoreBoardUI>()?.ShowReturnToLobbyButton();
         }
-        
-        public void CheckGameOver()
+
+        private IEnumerator WaitForAllPlayersThenStartCardSelection()
         {
-            if (isRoundEnding)
-                return;
-            
-            isRoundEnding = true;
-            
-            var alivePlayers = GameManager.Instance.GetAlivePlayers();
-            if (alivePlayers.Count > 1)
-                return;
-            
-            var roundRanks = GameManager.Instance.GetCurrentRoundRanks();
-
-            // ✅ roundData 생성
-            List<(int playerId, int kills, int outKills, int damageDone, int rank)> roundData = new();
-            foreach (var (playerId, rank) in roundRanks)
-            {
-                var stats = GameManager.Instance.GetPlayerStats(playerId);
-                roundData.Add((playerId, stats.kills, stats.outKills, stats.damageDone, rank));
-            }
-
-            GameManager.Instance.AddRoundResult(roundData);
-            
-            RpcUpdateRound(GameManager.Instance.currentRound);
-
-            // ✅ 올바른 타입의 데이터 전송
-            var allRecords = GameManager.Instance.GetAllPlayerRecords(); // ← 이게 핵심
-            RpcSendFinalScore(allRecords, GameManager.Instance.currentRound - 1);
-        }
-        
-        IEnumerator WaitForAllPlayersThenStartCardSelection()
-        {
-            // 모든 플레이어가 로비에 들어올 때까지 대기
-            while (NetworkServer.connections.Count < NetworkRoomManager.singleton.numPlayers)
-            {
-                yield return null;
-            }
-
-            // 모든 플레이어의 캐릭터가 생성되었는지도 확인
-            while (FindObjectsOfType<LobbyPlayerCharacter>().Length < NetworkRoomManager.singleton.numPlayers)
-            {
-                yield return null;
-            }
-
-            yield return new WaitForSeconds(0.5f); // 안정성 확보용
-
+            yield return new WaitUntil(() => NetworkServer.connections.Count >= NetworkRoomManager.singleton.numPlayers);
+            yield return new WaitUntil(() => FindObjectsOfType<LobbyPlayerCharacter>().Length >= NetworkRoomManager.singleton.numPlayers);
+            yield return new WaitForSeconds(0.5f);
             StartCoroutine(CardSelectionTimer());
         }
-        
+
+        private IEnumerator CardSelectionTimer()
+        {
+            int time = Constants.CardSelectionTime;
+            while (time > 0)
+            {
+                RpcUpdateTimer(time);
+                yield return new WaitForSeconds(1);
+                time--;
+            }
+
+            RpcUpdateTimer(0);
+
+            // ✅ 모든 플레이어를 강제로 Ready 상태로
+            var allPlayers = FindObjectsByType<LobbyPlayerCharacter>(FindObjectsSortMode.None);
+            foreach (var player in allPlayers)
+            {
+                player.State = Constants.PlayerState.Ready;
+            }
+
+            // ✅ 카운트다운 시작
+            RpcGameStart();
+
+            var timer = FindFirstObjectByType<NetworkTimer>();
+            timer?.StartGameFlow(Constants.CountTime, Constants.MaxGameEventTime);
+        }
+
+        [ClientRpc]
+        private void RpcUpdateTimer(float time)
+        {
+            playerCardUI?.UpdateTimer(time);
+        }
+
         public void OnCardSelectionConfirmed()
         {
             if (playerCharacter == null)
             {
-                playerCharacter = FindObjectsOfType<LobbyPlayerCharacter>()
+                playerCharacter = FindObjectsByType<LobbyPlayerCharacter>(FindObjectsSortMode.None)
                     .FirstOrDefault(pc => pc.playerId == PlayerSetting.PlayerId);
             }
 
             if (playerCharacter == null)
             {
-                Debug.LogWarning("[GamePlayer] playerCharacter를 여전히 찾지 못했습니다.");
+                Debug.LogWarning("[GamePlayer] playerCharacter를 찾을 수 없습니다.");
                 return;
             }
-
-            playerCharacter.State = Constants.PlayerState.Ready;
 
             playerCharacter.CmdSetCharacterData(
                 PlayerSetting.PlayerCharacterClass,
@@ -307,53 +198,60 @@ namespace Player
                 PlayerSetting.AttackSkillIDs
             );
 
-            Debug.Log("[GamePlayer] 카드 선택 완료 및 캐릭터 정보 서버 전송 완료");
+            int[] selectedCardIds = PlayerSetting.PlayerCards.Select(card => card.ID).ToArray();
+            CmdMarkPlayerReady(selectedCardIds);
         }
 
-        
         [Command]
-        public void CmdConfirmCardSelected()
+        public void CmdMarkPlayerReady(int[] selectedCardIds)
         {
-            if (playerCharacter == null)
-            {
-                playerCharacter = FindObjectsOfType<LobbyPlayerCharacter>()
-                    .FirstOrDefault(pc => pc.playerId == PlayerSetting.PlayerId);
-            }
-            
+            if (playerCharacter == null) return;
+
             playerCharacter.State = Constants.PlayerState.Ready;
 
-            var allReady = FindObjectsOfType<LobbyPlayerCharacter>()
+            // 모든 플레이어 준비 여부 체크
+            bool allReady = FindObjectsOfType<LobbyPlayerCharacter>()
                 .All(p => p.State == Constants.PlayerState.Ready);
 
             if (allReady)
             {
-                RpcGameStart(); // 기존 UI 호출
-                // ✅ 여기에 타이머 시작 추가
+                RpcGameStart();
                 var timer = FindFirstObjectByType<NetworkTimer>();
-                if (timer != null)
-                {
-                    timer.StartGameFlow(Constants.CountTime, Constants.MaxGameEventTime);
-                }
+                timer?.StartGameFlow(Constants.CountTime, Constants.MaxGameEventTime);
             }
         }
-        
+
         [ClientRpc]
         public void RpcGameStart()
         {
-            GamePlayUI ui = FindFirstObjectByType<GamePlayUI>();
-            if (ui != null)
-            {
-                ui.CallGameStart(); // 👈 GameStart를 public 메서드로 분리
-            }
+            if (isOwned)
+                FindFirstObjectByType<GamePlayUI>()?.CallGameStart();
         }
-        
+
+        public void CheckGameOver()
+        {
+            if (isRoundEnding) return;
+            isRoundEnding = true;
+
+            var alive = GameManager.Instance.GetAlivePlayers();
+            if (alive.Count > 1) return;
+
+            var roundRanks = GameManager.Instance.GetCurrentRoundRanks();
+            var roundData = roundRanks.Select(tuple =>
+            {
+                var stats = GameManager.Instance.GetPlayerStats(tuple.playerId);
+                return (tuple.playerId, stats.kills, stats.outKills, stats.damageDone, tuple.rank);
+            }).ToList();
+
+            GameManager.Instance.AddRoundResult(roundData);
+            RpcUpdateRound(GameManager.Instance.currentRound);
+            RpcSendFinalScore(GameManager.Instance.GetAllPlayerRecords(), GameManager.Instance.currentRound - 1);
+        }
+
         [ClientRpc]
         public void RpcUpdateRound(int round)
         {
             GameManager.Instance.currentRound = round;
-            Debug.Log($"[Client] currentRound updated: {round}");
         }
-
-
     }
 }

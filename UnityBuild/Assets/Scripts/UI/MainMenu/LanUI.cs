@@ -1,3 +1,4 @@
+using DataSystem;
 using GameManagement;
 using kcp2k;
 using Mirror;
@@ -14,6 +15,7 @@ namespace UI
 
         public void OnClickGameStartButtion()
         {
+            AudioManager.Instance.PlaySFX(Constants.SoundType.SFX_Button);
             NetworkManager.singleton.networkAddress = ipInputField.text;
             if (ipInputField.text == "")
             {

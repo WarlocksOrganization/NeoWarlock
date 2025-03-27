@@ -92,7 +92,25 @@ namespace DataSystem.Database
     
             public AttackConfig config; // ✅ 공격 설정을 ScriptableObject로 참조
             public Sprite Icon;
-        }
+            
+            public AttackData(AttackData other)
+            {
+                ID = other.ID;
+                Name = other.Name;
+                DisplayName = other.DisplayName;
+                Description = other.Description;
+                Speed = other.Speed;
+                Range = other.Range;
+                Radius = other.Radius;
+                Damage = other.Damage;
+                KnockbackForce = other.KnockbackForce;
+                Cooldown = other.Cooldown;
+                config = other.config;
+                Icon = other.Icon;
+            }
 
+            // 기본 생성자도 명시해주면 좋음
+            public AttackData() { }
+        }
     }
 }
