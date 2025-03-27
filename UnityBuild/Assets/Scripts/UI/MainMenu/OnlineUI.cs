@@ -2,6 +2,7 @@ using System.Collections;
 using Mirror;
 using Networking;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace UI
 {
@@ -9,7 +10,14 @@ namespace UI
     {
         [SerializeField] private GameObject createRoomUI;
         [SerializeField] private GameObject findRoomUI;
-    
+        [SerializeField] private GameObject nickNameUI;
+        [SerializeField] private GameObject logoutButton;
+
+        private void Start()
+        {
+            var socketManager = SocketManager.singleton as SocketManager;
+            logoutButton.GetComponent<Button>().onClick.AddListener(socketManager.CloseConnection);
+        }
         public void OnClickEnterGameRoomButton()
         {
             if (PlayerPrefs.HasKey("sessionToken"))
@@ -29,6 +37,11 @@ namespace UI
         {
             createRoomUI.SetActive(true);
             gameObject.SetActive(false);
+        }
+
+        public void OnEnable()
+        {
+            nickNameUI.GetComponent<NicknameUI>().SyncNicknameShower();
         }
     }
 }
