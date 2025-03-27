@@ -69,6 +69,15 @@ namespace Player
                 }
             }
 
+            foreach (var player in FindObjectsOfType<PlayerCharacter>())
+            {
+                if (player.playerId == attackPlayerId)
+                {
+                    FileLogger.LogSkillHit(player.userId, userId, damage, attackskillid.ToString());
+                    break;
+                }
+            }
+
             if (damage > 0) // 🔹 체력 감소 (데미지 입음)
             {
                 damage = Mathf.Min(damage, curHp); // 현재 체력보다 큰 데미지는 curHp만큼 감소

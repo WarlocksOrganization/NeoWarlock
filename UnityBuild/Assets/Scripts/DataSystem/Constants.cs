@@ -20,7 +20,8 @@ namespace DataSystem
         public static readonly int CountTime = 5; // 카운트타임 5
 
 
-        public static string LogFilepath = "/.config/unity3d/warlocks/smashup/Logs/room.log";
+        public static string LogFilepath = "/.config/unity3d/warlocks/smashup/Logs/";
+        public static string LogFilename = "room.txt";
         
         public enum RoomType
         {
@@ -223,6 +224,7 @@ namespace DataSystem
             public int playerId;
             public Constants.CharacterClass characterClass;
             public string nickname;
+            public string userId;
 
             public List<int> roundRanks = new List<int>();
             public int kills = 0;
@@ -269,6 +271,7 @@ namespace DataSystem
         {
             public int playerId;
             public string nickname;
+            public string userId;
             public Constants.CharacterClass characterClass;
             public List<RoundStats> roundStatsList = new();
 

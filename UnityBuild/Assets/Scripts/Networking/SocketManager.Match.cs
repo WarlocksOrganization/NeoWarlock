@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.WebSockets;
 using DataSystem;
+using GameManagement;
 using IO.Swagger.Model;
 using kcp2k;
 using Mirror;
@@ -199,6 +200,18 @@ namespace Networking
                     Dictionary<string, string> gameData = manager.GetRoomData();
                     gameData["gameId"] = data["gameId"].ToObject<int>().ToString();
                     manager.SetRoomData(gameData);
+
+                    List<string> userIds = new List<string>();
+                    foreach (var player in manager.roomSlots)
+                    {
+                        PlayerCharacter playerCharacter = player.GetComponent<PlayerCharacter>();
+                        if (playerCharacter != null)
+                        {
+                            userIds.Add(playerCharacter.userId);
+                        }
+                    }
+
+                    FileLogger.LogGameStart("1", int.TryParse(gameData["maxPlayerCount"], out int maxPlayerCount) ? maxPlayerCount : 0, userIds);
                 }
                 catch (Exception ex){
                     Debug.Log($"[SocketManager] 게임 시작 실패: {ex.Message}");
@@ -271,6 +284,7 @@ namespace Networking
                     {"roomId", data.SelectToken("roomId").ToString()}
                 };
                 manager.SetRoomData(roomData);
+                FileLogger.LogCreateRoom();
             }
             catch (Exception ex)
             {

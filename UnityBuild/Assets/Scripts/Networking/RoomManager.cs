@@ -1,5 +1,7 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using DataSystem;
 using GameManagement;
@@ -141,6 +143,19 @@ namespace Networking
             }
 
             base.OnServerConnect(conn);
+        }
+
+        public override void OnServerDisconnect(NetworkConnectionToClient conn)
+        {
+            PlayerCharacter playerCharacter = conn.identity.GetComponent<PlayerCharacter>();
+            if (playerCharacter == null)
+            {
+                Debug.LogWarning("[RoomManager] PlayerCharacter 컴포넌트가 존재하지 않습니다.");
+                return;
+            }
+
+            FileLogger.LogExitRoom(playerCharacter.userId);
+            base.OnServerDisconnect(conn);
         }
 
         public void StartGame()

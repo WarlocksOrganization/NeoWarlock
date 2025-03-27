@@ -16,9 +16,9 @@ namespace Networking
 { 
     public class LogManager : MonoBehaviour
     {
-        public string logServerIP = "logs";
-        public int logServerPort = 7878;
-        public int Port = 7777;
+        public string logServerIP = "localhost";
+        public ushort logServerPort = 8081;
+        public ushort Port = 7777;
         private Thread _logThread;
         private bool _isRunning = false;
         private int backupCount = 0;
@@ -54,7 +54,7 @@ namespace Networking
                 }
                 else if (args[i].StartsWith("-logServerPort="))
                 {
-                    if (int.TryParse(args[i].Substring(15), out int port))
+                    if (ushort.TryParse(args[i].Substring(15), out ushort port))
                     {
                         logServerPort = port;
                         Debug.Log($"[LogManager] 로그 서버 포트 변경: {logServerPort}");
@@ -71,10 +71,11 @@ namespace Networking
                 }
                 else if (args[i].StartsWith("-port="))
                 {
-                    if (int.TryParse(args[i].Substring(6), out int port))
+                    if (ushort.TryParse(args[i].Substring(6), out ushort port))
                     {
                         Port = port;
                         Debug.Log($"[LogManager] 포트 변경: {Port}");
+                        Constants.LogFilename = $"log_{Port}.log";
                     }
                     else
                     {
@@ -95,7 +96,7 @@ namespace Networking
             {
                 // 5분에 한 번씩 로그 전송
                 StartCoroutine(SendLogsToServer());
-                Thread.Sleep(300000);
+                Thread.Sleep(60000);
             }
         }
 
@@ -110,29 +111,30 @@ namespace Networking
 
             // 10분 단위로 로그 전송
             var roomManager = RoomManager.singleton as RoomManager;
-            while (DateTime.Now.Minute % 10 != Port % 10)
-            {
-                yield return new WaitForSeconds(30);
-            }
+            // while (DateTime.Now.Minute % 10 != Port % 10)
+            // {
+            //     yield return new WaitForSeconds(30);
+            // }
 
             // 로그 파일 읽기
-            string logPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + Constants.LogFilepath;
+            string logPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + Constants.LogFilepath + Constants.LogFilename;
             if (!File.Exists(logPath))
             {
                 Debug.LogWarning("[LogManager] 로그 파일이 존재하지 않습니다.");
                 yield break;
             }
-            string logText = File.ReadAllText(logPath);
+            string logText = $"[{File.ReadAllText(logPath)}]";
             // 로그 파일 json 객체로 변환
             JObject logJson = new JObject();
-
-            logJson["data"] = $"[{logText}]";
+            JArray logArray = JArray.Parse(logText);
+            logJson["data"] = logArray;
             logJson["timestamp"] = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
             
             string logJsonString = logJson.ToString();
+            Debug.Log(logJsonString);
 
             // 서버에 로그 전송
-            UnityWebRequest request = new UnityWebRequest($"http://{logServerIP}:{logServerPort}/log", "POST");
+            UnityWebRequest request = new UnityWebRequest($"http://{logServerIP}:{logServerPort}/api/log", "POST");
             byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(logJsonString);
             request.uploadHandler = (UploadHandler)new UploadHandlerRaw(bodyRaw);
             request.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
