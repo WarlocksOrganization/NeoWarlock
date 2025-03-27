@@ -53,6 +53,12 @@ namespace Player.Combat
         public void SetDecalProjector(IAttack attack, LayerMask targetLayer, Transform fireTransform)
         {
             currentAttack = attack;
+            if (currentAttack == null)
+            {
+                CloseProjectile(); // 💡 null일 땐 바로 닫고 나머지 실행 안 함
+                return;
+            }
+            
             mouseTargetLayer = targetLayer;
             this.fireTransform = fireTransform;
             decalProjector.gameObject.SetActive(true);

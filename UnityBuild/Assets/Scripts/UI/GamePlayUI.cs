@@ -140,12 +140,14 @@ public class GamePlayUI : GameLobbyUI
 
     private IEnumerator GameOverSequence(Constants.PlayerRecord[] records, int roundIndex)
     {
+        AudioManager.Instance.StopBGM();
         countDownText.gameObject.SetActive(true);
         countDownText.color = Color.green;
         countDownText.text = "Game Over";
         countDownAnimator.SetTrigger("isGameOver");
 
         yield return new WaitForSeconds(3f);
+        AudioManager.Instance.PlayBGM(Constants.SoundType.BGM_SSAFY_ScoreBoard);
         ShowFinalScoreBoard(records, roundIndex);
     }
 

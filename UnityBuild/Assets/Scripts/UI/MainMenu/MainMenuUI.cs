@@ -39,6 +39,7 @@ namespace UI
         }
         public void OnClickGameStartButtion()
         {
+            AudioManager.Instance.PlaySFX(Constants.SoundType.SFX_Button);
             PlayerSetting.Nickname = nicknameInputField.text;
             
             if (nicknameInputField.text == "")
@@ -51,6 +52,7 @@ namespace UI
 
         public void OnClickLANButtion()
         {
+            AudioManager.Instance.PlaySFX(Constants.SoundType.SFX_Button);
             PlayerSetting.Nickname = nicknameInputField.text;
             
             if (nicknameInputField.text == "")

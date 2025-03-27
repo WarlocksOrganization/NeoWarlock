@@ -1,3 +1,5 @@
+// ✅ PlayerCardUI.cs (서버 타이머 기반 리팩토링 완료)
+
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,62 +11,41 @@ using Player;
 using TMPro;
 using UI;
 using UnityEngine;
-using UnityEngine.Rendering;
 using UnityEngine.UI;
 
 public class PlayerCardUI : MonoBehaviour
 {
-    public PlayerCardSlot[] slots; // UI 슬롯 3개
-    [SerializeField] private TMP_Text timerText; // 남은 시간 표시
+    public PlayerCardSlot[] slots;
+    [SerializeField] private TMP_Text timerText;
     [SerializeField] private GameObject LoadingImage;
+    [SerializeField] private Slider timerSlider;
 
     private Queue<Database.PlayerCardData> selectedCardsQueue = new();
     public float maxTime = 10f;
     private float remainingTime;
-    public Slider timerSlider;
-    private bool isRunning = true;
+    private bool isLoading = true;
 
     private PlayerCharacterUI playerCharacterUI;
-    private bool isLoading = true;
-    
     private GamePlayer myGamePlayer;
-    
 
     void Start()
     {
         LoadingImage.SetActive(true);
         LoadRandomPlayerCards();
         DisplayTopThreeCards();
+
         playerCharacterUI = FindFirstObjectByType<PlayerCharacterUI>();
         playerCharacterUI.GetComponent<CanvasGroup>().alpha = 0f;
         remainingTime = maxTime;
         timerSlider.maxValue = 1f;
         timerSlider.value = 1f;
-        
-        myGamePlayer = FindObjectsOfType<GamePlayer>().FirstOrDefault(gp => gp.isOwned);
 
-        if (NetworkServer.active)
-        {
-            gameObject.SetActive(false);
-        }
+        myGamePlayer = FindObjectsOfType<GamePlayer>().FirstOrDefault(gp => gp.isOwned);
     }
 
     void Update()
     {
-        if (!isRunning) return;
-
-        remainingTime -= Time.deltaTime;
-        remainingTime = Mathf.Clamp(remainingTime, 0f, maxTime);
-
-        timerSlider.value = Mathf.Lerp(timerSlider.value, remainingTime / maxTime, Time.deltaTime * 10f);
-        //fillImage.color = Color.Lerp(endColor, startColor, ratio);
-        timerText.text = $"남은 시간: {Mathf.Ceil(remainingTime)}초";
-
-        if (remainingTime <= 0f)
-        {
-            isRunning = false;
-            ConfirmSelectedCards();
-        }
+        // 서버 타이머 기준으로 동작하므로 Update에서 처리하지 않음
     }
 
     private void LoadRandomPlayerCards()
@@ -74,17 +55,10 @@ public class PlayerCardUI : MonoBehaviour
         List<Database.PlayerCardData> availableCards = Database.playerCardDictionary.Values
             .Where(card =>
             {
-                // 중복 카드 제외
-                if (existingCardIds.Contains(card.ID))
-                    return false;
-
-                // 특수 강화 (스킬 강화 계열)인 경우만 필터링 필요
+                if (existingCardIds.Contains(card.ID)) return false;
                 if (IsSkillStat(card.StatType))
-                {
                     return PlayerSetting.AttackSkillIDs.Contains(card.AppliedSkill);
-                }
-
-                return true; // 기본 스탯은 그대로 허용
+                return true;
             })
             .ToList();
 
@@ -128,7 +102,6 @@ public class PlayerCardUI : MonoBehaviour
         {
             var candidate = selectedCardsQueue.Dequeue();
 
-            // 현재 선택된 카드에 중복되는지 확인
             bool isDuplicate = PlayerSetting.PlayerCards.Any(card => card.ID == candidate.ID) ||
                                slots.Any(slot => slot.GetCurrentCard().ID == candidate.ID);
 
@@ -143,7 +116,6 @@ public class PlayerCardUI : MonoBehaviour
         return false;
     }
 
-    // ⏳ 서버에서 호출하여 클라이언트 UI 업데이트
     public void UpdateTimer(float serverTime)
     {
         if (isLoading)
@@ -152,29 +124,20 @@ public class PlayerCardUI : MonoBehaviour
             StartCoroutine(FadeOutLoadingImage());
             AudioManager.Instance.PlayBGM(Constants.SoundType.BGM_SSAFY_CardSelect);
         }
-        float timeDiff = Mathf.Abs(remainingTime - serverTime);
 
-        if (timeDiff > 1f)
+        float ratio = Mathf.Clamp01(serverTime / maxTime);
+        timerSlider.value = ratio;
+        timerText.text = $"남은 시간: {Mathf.Ceil(serverTime)}초";
+
+        if (serverTime <= 0f)
         {
-            // 큰 차이는 바로 보정
-            remainingTime = serverTime;
-        }
-        else
-        {
-            // 부드럽게 동기화 (클라이언트 기준 시간 보정)
-            float smoothFactor = 0.3f;
-            remainingTime = Mathf.Lerp(remainingTime, serverTime, smoothFactor);
+            ApplySelectedCardsAndHide();
         }
     }
 
     private IEnumerator FadeOutLoadingImage()
     {
-        CanvasGroup canvasGroup = LoadingImage.GetComponent<CanvasGroup>();
-
-        if (canvasGroup == null)
-        {
-            canvasGroup = LoadingImage.AddComponent<CanvasGroup>();
-        }
+        CanvasGroup canvasGroup = LoadingImage.GetComponent<CanvasGroup>() ?? LoadingImage.AddComponent<CanvasGroup>();
 
         float duration = 0.5f;
         float elapsed = 0f;
@@ -189,18 +152,18 @@ public class PlayerCardUI : MonoBehaviour
         canvasGroup.alpha = 0f;
         LoadingImage.SetActive(false);
     }
-    
-    // ✅ 카드 선택 확정 및 UI 비활성화
-    private void ConfirmSelectedCards()
+
+    private void ApplySelectedCardsAndHide()
     {
         playerCharacterUI.GetComponent<CanvasGroup>().alpha = 1f;
 
         List<Database.PlayerCardData> selected = slots.Select(slot => slot.GetCurrentCard()).ToList();
         PlayerSetting.PlayerCards.AddRange(selected);
 
-        if(!myGamePlayer) myGamePlayer = FindObjectsOfType<GamePlayer>().FirstOrDefault(gp => gp.isOwned);
+        if (!myGamePlayer)
+            myGamePlayer = FindObjectsByType<GamePlayer>(sortMode: FindObjectsSortMode.None).FirstOrDefault(gp => gp.isOwned);
+
         myGamePlayer?.OnCardSelectionConfirmed();
-        myGamePlayer?.CmdConfirmCardSelected(); // ✅ 여기서 리스트 전달
 
         gameObject.SetActive(false);
     }

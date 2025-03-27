@@ -1,4 +1,5 @@
 using System.Collections;
+using DataSystem;
 using Mirror;
 using Networking;
 using UnityEngine;
@@ -12,6 +13,7 @@ namespace UI
     
         public void OnClickEnterGameRoomButton()
         {
+            AudioManager.Instance.PlaySFX(Constants.SoundType.SFX_Button);
             if (PlayerPrefs.HasKey("sessionToken"))
             {
                 findRoomUI.GetComponent<FindRoomUI>().TurnOnFindRoomUI();
@@ -27,6 +29,7 @@ namespace UI
 
         public void OnClickCreateGameRoomButton()
         {
+            AudioManager.Instance.PlaySFX(Constants.SoundType.SFX_Button);
             createRoomUI.SetActive(true);
             gameObject.SetActive(false);
         }

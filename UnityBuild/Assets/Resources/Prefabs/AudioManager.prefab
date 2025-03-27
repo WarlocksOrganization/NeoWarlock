@@ -54,10 +54,13 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 0b7e544c69ef35449b04868e3fb1d1b6, type: 3}
   - type: 1102
     clip: {fileID: 8300000, guid: a40d4c746e8805441a41e1edabfe3d27, type: 3}
+  - type: 1103
+    clip: {fileID: 8300000, guid: 7f999090b31f6f34f945915eb05178fd, type: 3}
   bgmSource: {fileID: 748880585081727111}
   sfxPrefab: {fileID: 0}
-  bgmVolume: 1
-  sfxVolume: 1
+  bgmVolume: 0.5
+  sfxVolume: 0.5
+  mixer: {fileID: 24100000, guid: 7d8e64e4cf14ff84e9caa239cc883fb3, type: 2}
 --- !u!82 &748880585081727111
 AudioSource:
   m_ObjectHideFlags: 0
@@ -67,7 +70,7 @@ AudioSource:
   m_GameObject: {fileID: 8663779706795867248}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: -521990773315918702, guid: 7d8e64e4cf14ff84e9caa239cc883fb3, type: 2}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
