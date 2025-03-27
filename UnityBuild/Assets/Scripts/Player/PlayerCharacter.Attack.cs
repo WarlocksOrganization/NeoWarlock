@@ -67,7 +67,10 @@ namespace Player
                 playerUI?.SelectSkill(index, false);
                 currentAttackIndex = 0;
                 currentAttack = null;
-                playerProjector.SetDecalProjector(null, mouseTargetLayer, transform);
+
+                // 💡 이 시점에 명확하게 projector 비활성화
+                playerProjector.CloseProjectile();
+
                 return;
             }
 
@@ -199,10 +202,12 @@ namespace Player
 
             float delay = currentAttack.GetAttackData().config.attackDelay;
             attackLockTime = currentAttack.GetAttackData().config.recoveryTime;
-            isMovingToTarget = false;
-            _targetPosition = transform.position;
-
-            playerProjector.CloseProjectile();
+            if (attackLockTime > 0)
+            {
+                isMovingToTarget = false;
+                _targetPosition = transform.position;
+            }
+            
             StartCoroutine(ExecuteAttack(target, delay));
         }
 

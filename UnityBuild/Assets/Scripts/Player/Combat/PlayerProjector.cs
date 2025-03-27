@@ -26,6 +26,8 @@ namespace Player.Combat
         private Vector3 direction;
         private float attackRange;
         private float distance;
+        
+        private bool projectorEnabled = false;
 
         void Start()
         {
@@ -34,10 +36,9 @@ namespace Player.Combat
     
         void Update()
         {
-            if (currentAttack == null)
-            {
+            if (!projectorEnabled || currentAttack == null)
                 return;
-            }
+            
             UpdateDecalProjector();
         }
 
@@ -55,9 +56,12 @@ namespace Player.Combat
             currentAttack = attack;
             if (currentAttack == null)
             {
-                CloseProjectile(); // 💡 null일 땐 바로 닫고 나머지 실행 안 함
+                projectorEnabled = false;
+                CloseProjectile();
                 return;
             }
+
+            projectorEnabled = true;
             
             mouseTargetLayer = targetLayer;
             this.fireTransform = fireTransform;

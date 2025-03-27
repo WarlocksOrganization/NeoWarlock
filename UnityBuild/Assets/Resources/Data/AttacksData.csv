@@ -6,7 +6,7 @@ ID,Name,DisplayName,Description,Speed,Range,Radius,Damage,KnockbackForce,Cooldow
 1011,ItemBomb, 폭탄,폭탄을 던져서 일정 범위 안의 적들을 밀어냅니다.,30,30,3,15,5,999
 
 1,Fireball,화염구,타오르는 화염구를 발사하여 적을 불태웁니다.,15,20,4,15,2,3
-101,Meteor,종말의 유성,거대한 유성이 떨어져 모든 것을 불태웁니다.,20,20,6,20,3,5
+101,Meteor,종말의 유성,거대한 유성이 떨어져 모든 것을 불태웁니다.,20,20,8,20,3,5
 
 2,Thunder,신의 심판,천둥을 불러 하늘의 분노를 적에게 내립니다.,0,20,5,20,3,5
 102,ThunderStrorm,천상의 격노,신의 분노가 연속적인 천둥으로 쏟아집니다.,0,20,5,20,3,8
@@ -42,8 +42,8 @@ ID,Name,DisplayName,Description,Speed,Range,Radius,Damage,KnockbackForce,Cooldow
 32,SoulVortex,영혼의 소용돌이,영혼의 폭풍이 적을 가두고 끌어당깁니다.,0,15,5,3,-0.3,10
 132,SoulSwamp,영혼의 늪,빠져나갈 수 없는 영혼의 늪을 소환합니다.,0,15,10,3,-0.5,10
 
-33,InfernalFlask,지옥불 투척,지옥의 불꽃으로 일정시간동안 불태웁니다.,10,15,4,5,0,5
-133,InfernalPoison,독불 소환,독의 불꽃으로 일정시간동안 불태웁니다.,10,20,6,5,0,5
+33,InfernalFlask,지옥불 투척,지옥의 불꽃으로 일정시간동안 불태웁니다.,10,20,4,5,0,5
+133,InfernalPoison,독불 소환,독의 불꽃으로 일정시간동안 불태웁니다.,10,25,6,5,0,5
 
 41,HollyAttack,성스러운 광휘,신성한 구체가 적을 심판합니다.,20,20,2,20,1.5,3
 141,HollySpear,성스러운 창,성스러운 창을 던집니다.,15,20,2,10,1.5,3
