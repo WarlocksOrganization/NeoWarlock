@@ -40,6 +40,7 @@ namespace UI
 
         public void OnClickRoomTypeButton(int index)
         {
+            AudioManager.Instance.PlaySFX(Constants.SoundType.SFX_Button);
             for (int i = 0; i < roomTypeButtons.Length; i++)
             {
                 roomTypeButtons[i].gameObject.GetComponent<Image>().color = (i == index) ? blackWithAlpha : whiteWithAlpha;
@@ -50,6 +51,7 @@ namespace UI
 
         public void OnClickMaxPlayerCountButton(int index)
         {
+            AudioManager.Instance.PlaySFX(Constants.SoundType.SFX_Button);
             for (int i = 0; i < maxPlayerCountButtons.Length; i++)
             {
                 maxPlayerCountButtons[i].gameObject.GetComponent<Image>().color = (i == index) ? blackWithAlpha : whiteWithAlpha;
@@ -60,6 +62,7 @@ namespace UI
 
         public void OnClickConfirmButton()
         {
+            AudioManager.Instance.PlaySFX(Constants.SoundType.SFX_Button);
             if (string.IsNullOrEmpty(roomNameInput.text))
             {
                 Debug.LogWarning("방 이름을 입력하세요!");
@@ -114,8 +117,8 @@ namespace UI
             manager.roomType = roomData.roomType;
             manager.maxPlayerCount = roomData.maxPlayerCount;
 
-            manager.StartServer();
-            // manager.StartServer(); //Debug
+            //manager.StartHost();
+            manager.StartServer(); //Debug
             Debug.Log($"방 생성 완료: {roomData.roomName}, 유형: {roomData.roomType}, 최대 인원: {roomData.maxPlayerCount}");
         }
     }

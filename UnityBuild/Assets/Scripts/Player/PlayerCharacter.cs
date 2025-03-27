@@ -67,6 +67,7 @@ namespace Player
             
             if (isOwned)
             {
+                EnableOnlyThisAudioListener();
                 playerLight.SetActive(true);
                 
                 virtualCamera = FindFirstObjectByType<CinemachineVirtualCamera>();
@@ -80,6 +81,25 @@ namespace Player
                 {
                     Debug.Log("playerUI가 없음");
                 }
+            }
+        }
+        
+        private void EnableOnlyThisAudioListener()
+        {
+            AudioListener[] allListeners = FindObjectsOfType<AudioListener>();
+            foreach (var listener in allListeners)
+            {
+                listener.enabled = false;
+            }
+
+            AudioListener myListener = GetComponent<AudioListener>();
+            if (myListener != null)
+            {
+                myListener.enabled = true;
+            }
+            else
+            {
+                Debug.LogWarning("[AudioManager] AudioListener component is missing on this GameObject.");
             }
         }
 
@@ -220,7 +240,7 @@ namespace Player
         }
 
         [Command]
-        private void CmdSetState(Constants.PlayerState value)
+        public void CmdSetState(Constants.PlayerState value)
         {
             State = value;
         }

@@ -5,6 +5,7 @@ using System.Linq;
 using Player.Combat;
 using UnityEngine;
 using Cinemachine;
+using DataSystem;
 
 public class GameHand : NetworkBehaviour
 {
@@ -136,6 +137,15 @@ public class GameHand : NetworkBehaviour
 
         NetworkServer.Spawn(explosion);
         RpcShakeCamera(shake, freq);
+
+        if (!isFinal)
+        {
+            AudioManager.Instance.PlaySFX(Constants.SoundType.SFX_HandAttack, gameObject);
+        }
+        else
+        {
+            AudioManager.Instance.PlaySFX(Constants.SoundType.SFX_HandEndAttack, gameObject);
+        }
         
         if (isFinal && Random.value <= 0.5f)
         {
@@ -251,6 +261,8 @@ public class GameHand : NetworkBehaviour
         }
 
         dirLight.intensity = 0f;
+        
+        AudioManager.Instance.ApplyBGMVolumeToMixer(0);
 
         // 10초 후 복구
         yield return new WaitForSeconds(10f);
@@ -271,12 +283,16 @@ public class GameHand : NetworkBehaviour
 
             yield return null;
         }
+        
+        AudioManager.Instance.ApplyBGMVolumeToMixer(1);
 
         // 보정
         dirLight.intensity = 1f;
         RenderSettings.ambientIntensity = 1f;
         RenderSettings.reflectionIntensity = 1f;
         RenderSettings.ambientLight = Color.white;
+        
+        AudioManager.Instance.PlayBGM(Constants.SoundType.BGM_SSAFY_GameStart);
     }
 
 }
