@@ -169,7 +169,7 @@ namespace DataSystem
         public enum DataServerLogType
         {
             joinRoom,
-            leaveRoom,
+            exitRoom,
             createRoom,
             gameStart,
             gameEnd,

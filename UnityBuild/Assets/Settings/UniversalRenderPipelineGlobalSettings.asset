@@ -33,16 +33,26 @@ MonoBehaviour:
   m_Settings:
     m_SettingsList:
       m_List:
+      - rid: -2
+      - rid: -2
       - rid: 4908300775612743842
       - rid: 4908300775612743843
       - rid: 6852985685364965378
       - rid: 6852985685364965379
       - rid: 6852985685364965380
       - rid: 6852985685364965381
+      - rid: -2
+      - rid: -2
       - rid: 4908300775612743844
       - rid: 4908300775612743845
       - rid: 6852985685364965384
       - rid: 6852985685364965385
+      - rid: -2
+      - rid: -2
+      - rid: -2
+      - rid: -2
+      - rid: -2
+      - rid: -2
       - rid: 4908300775612743846
       - rid: 4908300775612743847
       - rid: 4908300775612743848
@@ -50,10 +60,12 @@ MonoBehaviour:
       - rid: 4908300775612743850
       - rid: 4908300775612743851
       - rid: 6852985685364965392
+      - rid: -2
       - rid: 4908300775612743852
       - rid: 6852985685364965394
       - rid: 8712630790384254976
       - rid: 4885118573119537152
+      - rid: -2
       - rid: 4908300775612743853
     m_RuntimeSettings:
       m_List:
@@ -97,6 +109,8 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
     - rid: 4885118573119537152
       type: {class: UniversalRenderPipelineRuntimeXRResources, ns: UnityEngine.Rendering.Universal, asm: Unity.RenderPipelines.Universal.Runtime}
       data:

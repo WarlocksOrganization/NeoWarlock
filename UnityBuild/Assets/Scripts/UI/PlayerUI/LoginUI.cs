@@ -61,8 +61,6 @@ public class LoginUI : MonoBehaviour
             }
             yield return new WaitForSeconds(0.5f);
         }
-
-        TurnOnOnlineUI();
     }
 
     public void TurnOnOnlineUI()
