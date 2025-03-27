@@ -182,6 +182,11 @@ namespace Networking
         public override void OnClientDisconnect()
         {
             base.OnClientDisconnect();
+            var modal = ModalPopupUI.singleton as ModalPopupUI;
+            if (modal != null)
+            {
+                modal.ShowModalMessage("서버와의 연결이 끊겼습니다.");
+            }
             SocketManager.singleton.RequestExitRoom();
         }
     }
