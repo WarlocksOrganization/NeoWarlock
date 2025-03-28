@@ -51,6 +51,7 @@ MonoBehaviour:
   showRoomGUI: 1
   readyToBegin: 0
   index: 0
+  PlayerNickname: 
   stats:
     nickname: 
     characterClass: 0
@@ -59,10 +60,14 @@ MonoBehaviour:
     totalDamage: 0
     ranking: 0
     score: 0
-  PlayerNickname: 
+  UserId: 
   playerCharacter: {fileID: 0}
-  gamePlayObject: {fileID: 5686090464823823962, guid: 7bcca793a489720468df764893e84697, type: 3}
-  gamePlayHand: {fileID: 3982144661890126659, guid: f90b978d18b4de54dbbf4c1b08378f14, type: 3}
+  SSAFYPlayObject:
+  - {fileID: 5686090464823823962, guid: 7bcca793a489720468df764893e84697, type: 3}
+  - {fileID: 3982144661890126659, guid: f90b978d18b4de54dbbf4c1b08378f14, type: 3}
+  LavaPlayObject:
+  - {fileID: 5686090464823823962, guid: 1f3c75247312101499501410db72fd1f, type: 3}
+  SeaPlayObject: []
 --- !u!114 &6368749677994769231
 MonoBehaviour:
   m_ObjectHideFlags: 0

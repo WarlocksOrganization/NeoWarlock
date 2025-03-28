@@ -73,7 +73,7 @@ GameObject:
   - component: {fileID: 547806421986637824}
   - component: {fileID: -254589472763490636}
   m_Layer: 0
-  m_Name: GameHand
+  m_Name: SSAFYGameHand
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

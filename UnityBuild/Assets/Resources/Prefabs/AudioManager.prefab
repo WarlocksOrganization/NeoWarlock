@@ -65,13 +65,21 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 3667dbbc09479b64f8cb905122cee739, type: 3}
   - type: 2101
     clip: {fileID: 8300000, guid: f3b9f2d758288094f860535a78cc19a9, type: 3}
+  - type: 2105
+    clip: {fileID: 8300000, guid: 27e7d2e8fe371a049a594b4f532e44f9, type: 3}
+  - type: 2106
+    clip: {fileID: 8300000, guid: 0d1e8452d9c8e8d4185fd6301cdf83ca, type: 3}
   gameSFXList:
   - type: 2201
-    clip: {fileID: 8300000, guid: a978140bacd568a4b8cf9af346f6215e, type: 3}
+    clip: {fileID: 8300000, guid: 82f707f7d49501548a9f9e872f999ba6, type: 3}
   - type: 2202
     clip: {fileID: 8300000, guid: c960adb374c2bcc45b8e695bb1db7a68, type: 3}
   - type: 2211
     clip: {fileID: 8300000, guid: 567f4f69862b9c6488e05087e13e2ea5, type: 3}
+  - type: 2300
+    clip: {fileID: 8300000, guid: 17c5f75cb7bd42249b3b658585970289, type: 3}
+  - type: 2301
+    clip: {fileID: 8300000, guid: 4cf5835cd7f0d654eaa767ba70532732, type: 3}
   skillSFXList:
   - skillType: 0
     clip: {fileID: 8300000, guid: 3e8f64b2e83646e40b55c4f016c2ff31, type: 3}

@@ -29,6 +29,14 @@ namespace DataSystem
             Team = 1,
         }
 
+        public enum RoomMapType
+        {
+            Random = 0,
+            SSAFY = 1,
+            Lava = 2,
+            Sea = 3,
+        }
+
         public enum PlayerState
         {
             NotReady = 0,
@@ -146,14 +154,15 @@ namespace DataSystem
             
             SFX_Count = 2100,
             SFX_Start = 2101,
+            SFX_Reroll = 2105,
+            SFX_RerollSpecial = 2106,
             
             SFX_HandAttack = 2201,
             SFX_HandEndAttack = 2202,
             SFX_ComputerWarning = 2211,
             
-            SFX_Explosion,
-            SFX_Heal,
-            SFX_Swing
+            SFX_GhostAttack = 2300,
+            SFX_PlayerDead = 2301,
         }
         
         [System.Serializable]

@@ -1,4 +1,5 @@
 using System.Collections;
+using GameManagement;
 using Mirror;
 using UnityEngine;
 
@@ -8,18 +9,23 @@ public class NetworkTimer : NetworkBehaviour
 
     // ✅ gamePlayUI를 매번 동적으로 참조 (씬 리로드 대응)
     private GamePlayUI GamePlayUI => gamePlayUI != null ? gamePlayUI : gamePlayUI = FindFirstObjectByType<GamePlayUI>();
+    
+    private bool gameStarted = false;
 
     // 서버에서 Phase1 카운트다운 시작
+    
     [Server]
     public void StartGameFlow(int countdown1, int countdown2)
     {
+        if (gameStarted) return;
+        gameStarted = true;
+
         Debug.Log("[NetworkTimer] StartGameFlow 시작 - Phase1 카운트다운 시작");
         RpcStartPhase(1, countdown1);
 
         StartCoroutine(ServerCountdown(countdown1, () =>
         {
             Debug.Log("[NetworkTimer] Phase1 종료 - Phase2 진입 지시");
-            RpcForcePhaseStart(2);
             StartCoroutine(DelayThenStartPhase2(countdown2));
         }));
     }
@@ -44,17 +50,6 @@ public class NetworkTimer : NetworkBehaviour
     {
         Debug.Log($"[NetworkTimer] RpcStartPhase 호출 - Phase {phase}, {seconds}초");
         GamePlayUI?.StartCountdownUI(phase, seconds);
-    }
-
-    // 클라이언트들에게 Phase2 게임 상태 강제 전환
-    [ClientRpc]
-    private void RpcForcePhaseStart(int phase)
-    {
-        if (phase == 2)
-        {
-            Debug.Log("[NetworkTimer] RpcForcePhaseStart - Phase2 강제 시작");
-            GamePlayUI?.ForceStartPhase2();
-        }
     }
 
     // 이벤트 실행 트리거 (서버+클라이언트 동기화)

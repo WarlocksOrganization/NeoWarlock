@@ -22,8 +22,9 @@ namespace Player
         
         public LobbyPlayerCharacter playerCharacter;
 
-        [SerializeField] private GameObject gamePlayObject;
-        [SerializeField] private GameObject gamePlayHand;
+        [SerializeField] private GameObject[] SSAFYPlayObject;
+        [SerializeField] private GameObject[] LavaPlayObject;
+        [SerializeField] private GameObject[] SeaPlayObject;
 
         private PlayerCardUI playerCardUI;
         private GamePlayUI gameplayUI;
@@ -60,9 +61,30 @@ namespace Player
         {
             if (isServer && !gameplayObjectSpawned)
             {
-                NetworkServer.Spawn(Instantiate(gamePlayObject), connectionToClient);
-                NetworkServer.Spawn(Instantiate(gamePlayHand), connectionToClient);
                 gameplayObjectSpawned = true;
+                
+                GameRoomData gameRoomData = FindFirstObjectByType<GameRoomData>();
+                if (gameRoomData.roomMapType == Constants.RoomMapType.SSAFY)
+                {
+                    foreach (GameObject gameObject in SSAFYPlayObject)
+                    {
+                        NetworkServer.Spawn(Instantiate(gameObject), connectionToClient);
+                    }
+                }
+                else if (gameRoomData.roomMapType == Constants.RoomMapType.Lava)
+                {
+                    foreach (GameObject gameObject in LavaPlayObject)
+                    {
+                        NetworkServer.Spawn(Instantiate(gameObject), connectionToClient);
+                    }
+                }
+                else if (gameRoomData.roomMapType == Constants.RoomMapType.Sea)
+                {
+                    foreach (GameObject gameObject in SeaPlayObject)
+                    {
+                        NetworkServer.Spawn(Instantiate(gameObject), connectionToClient);
+                    }
+                }
             }
 
             Vector3 spawnPos = FindFirstObjectByType<SpawnPosition>().GetSpawnPosition();
@@ -132,6 +154,10 @@ namespace Player
                 {
                     Debug.Log("🔔 최종 라운드 종료, 로비 버튼 표시");
                     RpcShowReturnToLobbyButton();
+                }
+                else
+                {
+                    FindFirstObjectByType<ScoreBoardUI>()?.ShowReturnToLobbyButton();
                 }
             }
         }

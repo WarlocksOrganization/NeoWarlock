@@ -94,6 +94,7 @@ public class AudioManager : MonoBehaviour
 
             bgmSource.clip = clip;   
             bgmSource.volume = bgmVolume;
+            bgmSource.pitch = 1;
             bgmSource.Play();
 
             ApplyBGMVolumeToMixer(1);
@@ -102,6 +103,11 @@ public class AudioManager : MonoBehaviour
         {
             Debug.LogWarning($"[AudioManager] BGM SoundType {type} not found.");
         }
+    }
+
+    public void SetBGMPitch(float pitch)
+    {
+        bgmSource.pitch = pitch;
     }
     
     public void PlaySFX(Constants.SoundType type, GameObject parent = null)

@@ -34,6 +34,8 @@ namespace GameManagement
         
         private HashSet<NetworkConnectionToClient> readyPlayers = new();
 
+        public bool isLan = false;
+
         public void Init(PlayerCharacter[] characters)
         {
             playerStatsArray = new Constants.PlayerStats[characters.Length];

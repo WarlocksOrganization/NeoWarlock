@@ -1,4 +1,5 @@
 using Cinemachine;
+using DataSystem;
 using Mirror;
 using Player.Combat;
 using UI;
@@ -50,6 +51,8 @@ namespace Player
         {
             _characterController = GetComponent<CharacterController>();
 
+            AudioManager.Instance.PlaySFX(Constants.SoundType.SFX_PlayerDead, gameObject);
+            
             if (isOwned)
             {
                 virtualCamera = FindFirstObjectByType<CinemachineVirtualCamera>();
@@ -234,6 +237,7 @@ namespace Player
             {
                 attackEffect.Play();
             }
+            AudioManager.Instance.PlaySFX(Constants.SoundType.SFX_GhostAttack, gameObject);
         }
 
     }
