@@ -89,7 +89,7 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: a056b710cbddd384d9d7d94b54c81c94, type: 3}
     hitClip: {fileID: 8300000, guid: 8a4ca0640054c0147847b3ca1044121e, type: 3}
   - skillType: 6
-    clip: {fileID: 8300000, guid: f8c636767c32b2841b38a32c18d1470d, type: 3}
+    clip: {fileID: 8300000, guid: a8286699ccf269844afbe4cf294169d1, type: 3}
     hitClip: {fileID: 8300000, guid: 781fe360774bcf54d9ea68faa95e0ded, type: 3}
   - skillType: 7
     clip: {fileID: 8300000, guid: 5e0109950c24243489a2d3fa55a7449a, type: 3}
@@ -104,7 +104,7 @@ MonoBehaviour:
     clip: {fileID: 0}
     hitClip: {fileID: 8300000, guid: e2ecd876992e87c47b3a431600f1995b, type: 3}
   - skillType: 15
-    clip: {fileID: 8300000, guid: c71587c611597e04ea9d2b8075b96cee, type: 3}
+    clip: {fileID: 8300000, guid: 28bd281d9386c5741b53206e34678126, type: 3}
     hitClip: {fileID: 0}
   - skillType: 12
     clip: {fileID: 8300000, guid: 5c8c2c63c56b47748926831ac100c3c4, type: 3}
@@ -128,23 +128,23 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 7954f72fb3ab1814996f65517e8aef0c, type: 3}
     hitClip: {fileID: 8300000, guid: 561560c748e0a3d4a8ccac74dc88c0d2, type: 3}
   - skillType: 17
-    clip: {fileID: 8300000, guid: 6fa1705d3ace61242a8de3c0f7a706aa, type: 3}
+    clip: {fileID: 8300000, guid: 43fd2660bac62f1468670268d8a4c719, type: 3}
     hitClip: {fileID: 8300000, guid: 82e8eec305ebda740ace314d370ce0e9, type: 3}
   - skillType: 18
     clip: {fileID: 8300000, guid: 780060b0687113945a1cd6a7a0ab2e12, type: 3}
     hitClip: {fileID: 8300000, guid: 686e9cfd051bf8f46af4e3ff55313285, type: 3}
   - skillType: 19
-    clip: {fileID: 8300000, guid: f7a498b47678f2845b4d7bda2f8d9427, type: 3}
+    clip: {fileID: 8300000, guid: 9ba7b2e0c44ca7d4faf370d0dbe94edf, type: 3}
     hitClip: {fileID: 8300000, guid: 211894a928e03ea49868347f7e800683, type: 3}
   - skillType: 20
-    clip: {fileID: 8300000, guid: 5e91d9a3c3c65cc418d1d54cc02ccc23, type: 3}
+    clip: {fileID: 8300000, guid: 66510d92da51ab348a654c6f7163ddb7, type: 3}
     hitClip: {fileID: 8300000, guid: 4c620e6c700bee149aa0304da123a7b2, type: 3}
   - skillType: 26
     clip: {fileID: 8300000, guid: 72c0a17ca76c9f047a2c31fc01aa2740, type: 3}
     hitClip: {fileID: 0}
   - skillType: 27
     clip: {fileID: 8300000, guid: 30c062d8e46a02945af7abc1740ae116, type: 3}
-    hitClip: {fileID: 8300000, guid: 28bd281d9386c5741b53206e34678126, type: 3}
+    hitClip: {fileID: 8300000, guid: 3a8c8a74a32835f4682c5a94c424d195, type: 3}
   - skillType: 28
     clip: {fileID: 8300000, guid: 2bdc746723afbc8408198a21728de566, type: 3}
     hitClip: {fileID: 0}

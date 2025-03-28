@@ -152,7 +152,7 @@ namespace Player
         private IEnumerator WaitForAllPlayersThenStartCardSelection()
         {
             yield return new WaitUntil(() => NetworkServer.connections.Count >= NetworkRoomManager.singleton.numPlayers);
-            yield return new WaitUntil(() => FindObjectsOfType<LobbyPlayerCharacter>().Length >= NetworkRoomManager.singleton.numPlayers);
+            yield return new WaitUntil(() => FindObjectsByType<LobbyPlayerCharacter>(sortMode: FindObjectsSortMode.None).Length >= NetworkRoomManager.singleton.numPlayers);
             yield return new WaitForSeconds(0.5f);
             StartCoroutine(CardSelectionTimer());
         }
@@ -221,7 +221,7 @@ namespace Player
             playerCharacter.State = Constants.PlayerState.Ready;
 
             // 모든 플레이어 준비 여부 체크
-            bool allReady = FindObjectsOfType<LobbyPlayerCharacter>()
+            bool allReady = FindObjectsByType<LobbyPlayerCharacter>(sortMode: FindObjectsSortMode.None)
                 .All(p => p.State == Constants.PlayerState.Ready);
 
             if (allReady)

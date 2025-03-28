@@ -166,7 +166,7 @@ namespace Networking
                 return;
             }
 
-            var players = FindObjectsOfType<PlayerCharacter>();
+            var players = FindObjectsByType<PlayerCharacter>(sortMode: FindObjectsSortMode.None);
             bool allReady = players.All(p => p.State == Constants.PlayerState.Start);
 
             if (!allReady)

@@ -69,7 +69,7 @@ namespace Player
                 }
             }
 
-            foreach (var player in FindObjectsOfType<PlayerCharacter>())
+            foreach (var player in FindObjectsByType<PlayerCharacter>(sortMode: FindObjectsSortMode.None))
             {
                 if (player.playerId == attackPlayerId)
                 {

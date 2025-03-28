@@ -44,8 +44,7 @@ namespace Player.Combat
             if (!isServer) return; // ✅ 네트워크 서버 체크
 
             Collider[] hitColliders = Physics.OverlapSphere(position, explosionRadius);
-
-            bool hasHit = false;
+            
             foreach (Collider hit in hitColliders)
             {
                 IDamagable damagable = hit.transform.GetComponent<IDamagable>();
@@ -56,7 +55,6 @@ namespace Player.Combat
                     if (config.attackType == DataSystem.Constants.AttackType.Self && hit.transform.gameObject != owner) continue;
 
                     damagable.takeDamage((int)explosionDamage, position, knockbackForce, config,playerid, skillid);
-                    hasHit = true;
                 }
             }
 

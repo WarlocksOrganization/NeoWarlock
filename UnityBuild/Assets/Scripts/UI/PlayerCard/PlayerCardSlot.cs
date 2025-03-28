@@ -230,7 +230,6 @@
     private IEnumerator AnimateGlowScale()
         {
             float time = 0f;
-            float speed = 4f;
             Image glowImg = glowImage.GetComponent<Image>();
             Color baseColor = new Color(1f, 0.84f, 0f);
             Color pulseColor = new Color(1f, 0.55f, 0f);

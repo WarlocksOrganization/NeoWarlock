@@ -105,7 +105,7 @@ public class GameLobbyUI : MonoBehaviour
                 GameManager.Instance.Init(allPlayers);
             }
             
-            var players = FindObjectsOfType<PlayerCharacter>();
+            var players = FindObjectsByType<PlayerCharacter>(sortMode: FindObjectsSortMode.None);
             bool allReady = players.All(p => p.State == Constants.PlayerState.Start);
 
             if (!allReady)

@@ -47,7 +47,6 @@ namespace Player
         [Header("Ghost Settings")]
         [SerializeField] private GameObject ghostPrefab; // ✅ 유령 프리팹
         private GameObject ghostInstance;
-        private bool isGhost = false;
         
         
 
@@ -86,7 +85,7 @@ namespace Player
         
         private void EnableOnlyThisAudioListener()
         {
-            AudioListener[] allListeners = FindObjectsOfType<AudioListener>();
+            AudioListener[] allListeners = FindObjectsByType<AudioListener>(sortMode: FindObjectsSortMode.None);
             foreach (var listener in allListeners)
             {
                 listener.enabled = false;
@@ -257,16 +256,6 @@ namespace Player
             GameObject ghost = Instantiate(ghostPrefab, transform.position + Vector3.up, Quaternion.identity);
             NetworkServer.Spawn(ghost, connectionToClient); // 클라이언트와 동기화
             ghostInstance = ghost;
-
-            RpcSetupGhost(ghost);
-        }
-        
-        [ClientRpc]
-        private void RpcSetupGhost(GameObject ghost)
-        {
-            if (ghost == null) return;
-
-            isGhost = true;
         }
 
         [Command]

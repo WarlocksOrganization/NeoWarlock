@@ -188,6 +188,7 @@ namespace DataSystem
             skillUse,
             skillHit,
             kill,
+            exitRoom,
         }
 
         [Serializable]

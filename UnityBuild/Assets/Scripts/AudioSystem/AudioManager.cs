@@ -27,8 +27,6 @@ public class AudioManager : MonoBehaviour
     [Range(0f, 1f)] public float sfxVolume = 1f;
     
     [SerializeField] private AudioMixer mixer;
-    
-    private Coroutine bgmFadeCoroutine;
 
     private void Awake()
     {
@@ -97,12 +95,13 @@ public class AudioManager : MonoBehaviour
             bgmSource.clip = clip;   
             bgmSource.volume = bgmVolume;
             bgmSource.Play();
+
+            ApplyBGMVolumeToMixer(1);
         }
         else
         {
             Debug.LogWarning($"[AudioManager] BGM SoundType {type} not found.");
         }
-        ApplyBGMVolumeToMixer(1);
     }
     
     public void PlaySFX(Constants.SoundType type, GameObject parent = null)
@@ -163,7 +162,8 @@ public class AudioManager : MonoBehaviour
     public void SetBGMVolume(float volume)
     {
         bgmVolume = volume;
-        ApplyBGMVolumeToMixer(bgmVolume);
+        float vol = volume * 40 - 20f;
+        mixer.SetFloat("BGMVolume", vol <= -20f ? -80f : vol);
     }
     
     public float GetSFXVolume()
@@ -188,28 +188,30 @@ public class AudioManager : MonoBehaviour
     
     public void ApplyBGMVolumeToMixer(float volume)
     {
-        float vol = volume * 40 - 20f;
-        mixer.SetFloat("BGMVolume", vol <= -20f ? -80f : vol);
+        StopAllCoroutines();
+        StartCoroutine(FadeBGMVolumeCoroutine(volume, 0.5f));
     }
-    
-    private IEnumerator FadeBGMVolumeRoutine(float targetVolume, float duration)
-    {
-        float startVolume = bgmVolume;
-        float timeElapsed = 0f;
 
-        while (timeElapsed < duration)
+    private IEnumerator FadeBGMVolumeCoroutine(float targetMultiplier, float duration)
+    {
+        float startVol = bgmVolume * 40 - 20f;
+        mixer.GetFloat("BGMVolume", out float currentVol);
+
+        float targetVol = bgmVolume * targetMultiplier * 40 - 20f;
+        if (targetVol <= -20f) targetVol = -80f;
+
+        float elapsed = 0f;
+
+        while (elapsed < duration)
         {
-            timeElapsed += Time.deltaTime;
-            float t = timeElapsed / duration;
-            float lerped = Mathf.Lerp(startVolume, targetVolume, t);
-            ApplyBGMVolumeToMixer(lerped);
+            elapsed += Time.deltaTime;
+            float t = elapsed / duration;
+            float interpolated = Mathf.Lerp(currentVol, targetVol, t);
+            mixer.SetFloat("BGMVolume", interpolated);
             yield return null;
         }
 
-        ApplyBGMVolumeToMixer(targetVolume);
-        bgmVolume = targetVolume; // 최종적으로 설정값도 반영할지 여부는 선택
-        bgmFadeCoroutine = null;
+        mixer.SetFloat("BGMVolume", targetVol); // 최종 값 보정
     }
-
 
 }

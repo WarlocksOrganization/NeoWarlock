@@ -40,7 +40,7 @@ public class PlayerCardUI : MonoBehaviour
         timerSlider.maxValue = 1f;
         timerSlider.value = 1f;
 
-        myGamePlayer = FindObjectsOfType<GamePlayer>().FirstOrDefault(gp => gp.isOwned);
+        myGamePlayer = FindObjectsByType<GamePlayer>(sortMode: FindObjectsSortMode.None).FirstOrDefault(gp => gp.isOwned);
     }
 
     void Update()
