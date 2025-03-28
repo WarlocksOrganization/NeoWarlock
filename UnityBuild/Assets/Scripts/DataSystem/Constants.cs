@@ -15,10 +15,14 @@ namespace DataSystem
         public static readonly string CardIconPath = "Sprites/CardIcons/";
 
         public static readonly int MaxGameEventTime = 15; // 오브젝트 이벤트 시간 15
-        public static readonly int ScoreBoardTime = 20; // 스코어보드 보는 시간 12
+        public static readonly int ScoreBoardTime = 15; // 스코어보드 보는 시간 12
         public static readonly int CardSelectionTime = 10; //카드 선택 시간 10
         public static readonly int CountTime = 5; // 카운트타임 5
 
+
+        public static string LogFilepath = "/.config/unity3d/warlocks/smashup/Logs/";
+        public static string LogFilename = "room.txt";
+        
         public enum RoomType
         {
             Solo = 0,
@@ -125,6 +129,67 @@ namespace DataSystem
             
             None = 100,
         }
+        
+        public enum SoundType
+        {
+            None,
+            // BGM
+            BGM_MainMenu = 1001,
+            BGM_Lobby = 1002,
+            BGM_SSAFY_CardSelect = 1101,
+            BGM_SSAFY_GameStart = 1102,
+            BGM_SSAFY_ScoreBoard= 1103,
+
+            // SFX UI
+            SFX_Button = 2001,
+            SFX_Button2 = 2002,
+            
+            SFX_Count = 2100,
+            SFX_Start = 2101,
+            
+            SFX_HandAttack = 2201,
+            SFX_HandEndAttack = 2202,
+            SFX_ComputerWarning = 2211,
+            
+            SFX_Explosion,
+            SFX_Heal,
+            SFX_Swing
+        }
+        
+        [System.Serializable]
+        public class SoundData
+        {
+            public SoundType type;
+            public AudioClip clip;
+        }
+
+        
+        public enum MatchServerRequestType
+        {
+            register,
+            login,
+            logout,
+            joinRoom,
+            exitRoom,
+            createRoom,
+            listRooms,
+            gameStart,
+            gameEnd,
+        }
+
+        public enum DataServerLogType
+        {
+            joinRoom,
+            leaveRoom,
+            createRoom,
+            gameStart,
+            gameEnd,
+            playerReady,
+            skillUse,
+            skillHit,
+            kill,
+            exitRoom,
+        }
 
         [Serializable]
         public class BuffEffectEntry
@@ -160,6 +225,7 @@ namespace DataSystem
             public int playerId;
             public Constants.CharacterClass characterClass;
             public string nickname;
+            public string userId;
 
             public List<int> roundRanks = new List<int>();
             public int kills = 0;
@@ -193,11 +259,20 @@ namespace DataSystem
             public int damageDone;
             public int rank;
         }
+        
+        [System.Serializable]
+        public class SkillSoundData
+        {
+            public SkillType skillType;
+            public AudioClip clip;
+            public AudioClip hitClip;
+        }
 
         public class PlayerRecord
         {
             public int playerId;
             public string nickname;
+            public string userId;
             public Constants.CharacterClass characterClass;
             public List<RoundStats> roundStatsList = new();
 

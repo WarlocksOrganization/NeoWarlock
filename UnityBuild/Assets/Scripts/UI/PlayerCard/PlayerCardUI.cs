@@ -1,54 +1,51 @@
+// ✅ PlayerCardUI.cs (서버 타이머 기반 리팩토링 완료)
+
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using DataSystem;
 using DataSystem.Database;
 using GameManagement;
+using Mirror;
+using Player;
 using TMPro;
 using UI;
 using UnityEngine;
-using UnityEngine.Rendering;
 using UnityEngine.UI;
 
 public class PlayerCardUI : MonoBehaviour
 {
-    public PlayerCardSlot[] slots; // UI 슬롯 3개
-    [SerializeField] private TMP_Text timerText; // 남은 시간 표시
+    public PlayerCardSlot[] slots;
+    [SerializeField] private TMP_Text timerText;
+    [SerializeField] private GameObject LoadingImage;
+    [SerializeField] private Slider timerSlider;
 
     private Queue<Database.PlayerCardData> selectedCardsQueue = new();
     public float maxTime = 10f;
     private float remainingTime;
-    public Slider timerSlider;
-    private bool isRunning = true;
+    private bool isLoading = true;
 
     private PlayerCharacterUI playerCharacterUI;
+    private GamePlayer myGamePlayer;
 
     void Start()
     {
+        LoadingImage.SetActive(true);
         LoadRandomPlayerCards();
         DisplayTopThreeCards();
+
         playerCharacterUI = FindFirstObjectByType<PlayerCharacterUI>();
         playerCharacterUI.GetComponent<CanvasGroup>().alpha = 0f;
         remainingTime = maxTime;
         timerSlider.maxValue = 1f;
         timerSlider.value = 1f;
+
+        myGamePlayer = FindObjectsByType<GamePlayer>(sortMode: FindObjectsSortMode.None).FirstOrDefault(gp => gp.isOwned);
     }
 
     void Update()
     {
-        if (!isRunning) return;
-
-        remainingTime -= Time.deltaTime;
-        remainingTime = Mathf.Clamp(remainingTime, 0f, maxTime);
-
-        timerSlider.value = Mathf.Lerp(timerSlider.value, remainingTime / maxTime, Time.deltaTime * 10f);
-        //fillImage.color = Color.Lerp(endColor, startColor, ratio);
-        timerText.text = $"남은 시간: {Mathf.Ceil(remainingTime)}초";
-
-        if (remainingTime <= 0f)
-        {
-            isRunning = false;
-            ConfirmSelectedCards();
-        }
+        // 서버 타이머 기준으로 동작하므로 Update에서 처리하지 않음
     }
 
     private void LoadRandomPlayerCards()
@@ -56,7 +53,13 @@ public class PlayerCardUI : MonoBehaviour
         HashSet<int> existingCardIds = new(PlayerSetting.PlayerCards?.Select(card => card.ID) ?? new int[0]);
 
         List<Database.PlayerCardData> availableCards = Database.playerCardDictionary.Values
-            .Where(card => !existingCardIds.Contains(card.ID))
+            .Where(card =>
+            {
+                if (existingCardIds.Contains(card.ID)) return false;
+                if (IsSkillStat(card.StatType))
+                    return PlayerSetting.AttackSkillIDs.Contains(card.AppliedSkill);
+                return true;
+            })
             .ToList();
 
         if (availableCards.Count < 6)
@@ -73,6 +76,14 @@ public class PlayerCardUI : MonoBehaviour
         selectedCardsQueue = new Queue<Database.PlayerCardData>(selectedCards);
     }
 
+    private bool IsSkillStat(PlayerStatType statType)
+    {
+        return statType is PlayerStatType.AttackSpeed or PlayerStatType.Range
+            or PlayerStatType.Radius or PlayerStatType.Damage
+            or PlayerStatType.KnockbackForce or PlayerStatType.Cooldown
+            or PlayerStatType.Special;
+    }
+
     private void DisplayTopThreeCards()
     {
         for (int i = 0; i < slots.Length; i++)
@@ -87,39 +98,73 @@ public class PlayerCardUI : MonoBehaviour
 
     public bool TryGetNewCard(out Database.PlayerCardData newCard)
     {
-        if (selectedCardsQueue.Count > 0)
+        while (selectedCardsQueue.Count > 0)
         {
-            newCard = selectedCardsQueue.Dequeue();
-            return true;
+            var candidate = selectedCardsQueue.Dequeue();
+
+            bool isDuplicate = PlayerSetting.PlayerCards.Any(card => card.ID == candidate.ID) ||
+                               slots.Any(slot => slot.GetCurrentCard().ID == candidate.ID);
+
+            if (!isDuplicate)
+            {
+                newCard = candidate;
+                return true;
+            }
         }
 
         newCard = null;
         return false;
     }
 
-    // ⏳ 서버에서 호출하여 클라이언트 UI 업데이트
     public void UpdateTimer(float serverTime)
     {
-        float timeDiff = Mathf.Abs(remainingTime - serverTime);
-
-        if (timeDiff > 1f)
+        if (isLoading)
         {
-            // 큰 차이는 바로 보정
-            remainingTime = serverTime;
+            isLoading = false;
+            StartCoroutine(FadeOutLoadingImage());
+            AudioManager.Instance.PlayBGM(Constants.SoundType.BGM_SSAFY_CardSelect);
         }
-        else
+
+        float ratio = Mathf.Clamp01(serverTime / maxTime);
+        timerSlider.value = ratio;
+        timerText.text = $"남은 시간: {Mathf.Ceil(serverTime)}초";
+
+        if (serverTime <= 0f)
         {
-            // 부드럽게 동기화 (클라이언트 기준 시간 보정)
-            float smoothFactor = 0.3f;
-            remainingTime = Mathf.Lerp(remainingTime, serverTime, smoothFactor);
+            ApplySelectedCardsAndHide();
         }
     }
 
-    // ✅ 카드 선택 확정 및 UI 비활성화
-    private void ConfirmSelectedCards()
+    private IEnumerator FadeOutLoadingImage()
+    {
+        CanvasGroup canvasGroup = LoadingImage.GetComponent<CanvasGroup>() ?? LoadingImage.AddComponent<CanvasGroup>();
+
+        float duration = 0.5f;
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            canvasGroup.alpha = Mathf.Lerp(1f, 0f, elapsed / duration);
+            yield return null;
+        }
+
+        canvasGroup.alpha = 0f;
+        LoadingImage.SetActive(false);
+    }
+
+    private void ApplySelectedCardsAndHide()
     {
         playerCharacterUI.GetComponent<CanvasGroup>().alpha = 1f;
-        PlayerSetting.PlayerCards.AddRange(slots.Select(slot => slot.GetCurrentCard()));
+
+        List<Database.PlayerCardData> selected = slots.Select(slot => slot.GetCurrentCard()).ToList();
+        PlayerSetting.PlayerCards.AddRange(selected);
+
+        if (!myGamePlayer)
+            myGamePlayer = FindObjectsByType<GamePlayer>(sortMode: FindObjectsSortMode.None).FirstOrDefault(gp => gp.isOwned);
+
+        myGamePlayer?.OnCardSelectionConfirmed();
+
         gameObject.SetActive(false);
     }
 }

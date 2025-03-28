@@ -192,6 +192,16 @@ public class BuffSystem : NetworkBehaviour
         RpcClearAllBuffs();
     }
 
+    public void ServerClearAllBuffs()
+    {
+        if (!isServer)
+        {
+            return;
+        }
+
+        RpcClearAllBuffs();
+    }
+
     [ClientRpc]
     private void RpcClearAllBuffs()
     {

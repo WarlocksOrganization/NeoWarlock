@@ -26,6 +26,8 @@ namespace Player.Combat
         private Vector3 direction;
         private float attackRange;
         private float distance;
+        
+        private bool projectorEnabled = false;
 
         void Start()
         {
@@ -34,10 +36,9 @@ namespace Player.Combat
     
         void Update()
         {
-            if (currentAttack == null)
-            {
+            if (!projectorEnabled || currentAttack == null)
                 return;
-            }
+            
             UpdateDecalProjector();
         }
 
@@ -53,6 +54,15 @@ namespace Player.Combat
         public void SetDecalProjector(IAttack attack, LayerMask targetLayer, Transform fireTransform)
         {
             currentAttack = attack;
+            if (currentAttack == null)
+            {
+                projectorEnabled = false;
+                CloseProjectile();
+                return;
+            }
+
+            projectorEnabled = true;
+            
             mouseTargetLayer = targetLayer;
             this.fireTransform = fireTransform;
             decalProjector.gameObject.SetActive(true);
@@ -89,7 +99,7 @@ namespace Player.Combat
                 attackRange = attackData.Range;
                 decalProjector.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
                 decalProjector.material = circleMaterial;
-                decalProjector.size = new Vector3(attackData.Range*2, attackData.Range*2, 3);
+                decalProjector.size = new Vector3(attackData.Radius*2, attackData.Radius*2, 3);
             }
 
             else if (currentAttack is ProjectileAttack || currentAttack is SelfAttack)

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using DataSystem;
 using DataSystem.Database;
@@ -44,6 +45,7 @@ public class ClassSelectionUI : MonoBehaviour
 
     public void ChangeClass(int classIndex)
     {
+        AudioManager.Instance.PlaySFX(Constants.SoundType.SFX_Button);
         characterClass = (Constants.CharacterClass)classIndex;
         
         if (playerSelectArea != null)
@@ -54,11 +56,14 @@ public class ClassSelectionUI : MonoBehaviour
 
     public void RollClass(int changeAmount)
     {
+        AudioManager.Instance.PlaySFX(Constants.SoundType.SFX_Button);
         ChangeClass(((int)characterClass + changeAmount+5)%5);
     }
     
     public void SelectClass()
     {
+        AudioManager.Instance.PlaySFX(Constants.SoundType.SFX_Button2);
+        
         if (playerCharacter == null)
         {
             FindPlayerCharacter();

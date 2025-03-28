@@ -15,6 +15,8 @@ namespace Player
     {
         [SyncVar(hook = nameof(SetNickname_Hook))]
         public string nickname;
+        [SyncVar(hook = nameof(SetUserIdhook))]
+        public string userId;
         [SerializeField] private TMP_Text nicknameText;
         [SyncVar(hook = nameof(UpdatePlayerId))] public int playerId = -1;
         private CharacterController _characterController;
@@ -45,7 +47,6 @@ namespace Player
         [Header("Ghost Settings")]
         [SerializeField] private GameObject ghostPrefab; // ✅ 유령 프리팹
         private GameObject ghostInstance;
-        private bool isGhost = false;
 
         public event System.Action OnStatChanged;
         public float CurrentAttackPower => AttackPower;
@@ -70,6 +71,7 @@ namespace Player
 
             if (isOwned)
             {
+                EnableOnlyThisAudioListener();
                 playerLight.SetActive(true);
 
                 virtualCamera = FindFirstObjectByType<CinemachineVirtualCamera>();
@@ -83,6 +85,25 @@ namespace Player
                 {
                     Debug.Log("playerUI가 없음");
                 }
+            }
+        }
+        
+        private void EnableOnlyThisAudioListener()
+        {
+            AudioListener[] allListeners = FindObjectsByType<AudioListener>(sortMode: FindObjectsSortMode.None);
+            foreach (var listener in allListeners)
+            {
+                listener.enabled = false;
+            }
+
+            AudioListener myListener = GetComponent<AudioListener>();
+            if (myListener != null)
+            {
+                myListener.enabled = true;
+            }
+            else
+            {
+                Debug.LogWarning("[AudioManager] AudioListener component is missing on this GameObject.");
             }
         }
 
@@ -149,6 +170,11 @@ namespace Player
         {
             nicknameText.text = value;
             nickname = value;
+        }
+        
+        public void SetUserIdhook(string _, string value)
+        {
+            userId = value;
         }
 
         [Command]
@@ -224,7 +250,7 @@ namespace Player
         }
 
         [Command]
-        private void CmdSetState(Constants.PlayerState value)
+        public void CmdSetState(Constants.PlayerState value)
         {
             State = value;
         }
@@ -237,22 +263,23 @@ namespace Player
         private void SpawnGhost()
         {
             if (!isServer) return; // 서버에서만 실행
-
-            GameObject ghost = Instantiate(ghostPrefab, transform.position, Quaternion.identity);
+            
+            GameObject ghost = Instantiate(ghostPrefab, transform.position + Vector3.up, Quaternion.identity);
             NetworkServer.Spawn(ghost, connectionToClient); // 클라이언트와 동기화
             ghostInstance = ghost;
-
-            RpcSetupGhost(ghost);
         }
 
-        [ClientRpc]
-        private void RpcSetupGhost(GameObject ghost)
+        [Command]
+        public void CmdStartGame()
         {
-            if (ghost == null) return;
-
-            isGhost = true;
+            var allPlayers = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None);
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.Init(allPlayers);
+            }
+            
+            var manager = Networking.RoomManager.singleton as Networking.RoomManager;
+            manager.StartGame();
         }
-
-
     }
 }

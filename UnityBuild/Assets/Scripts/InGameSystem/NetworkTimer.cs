@@ -1,57 +1,82 @@
-using System;
 using System.Collections;
 using Mirror;
 using UnityEngine;
 
 public class NetworkTimer : NetworkBehaviour
 {
-    [SyncVar(hook = nameof(OnTimeChanged))] // ✅ 모든 클라이언트와 시간 동기화
-    public int currentTime = 10;
-
     private GamePlayUI gamePlayUI;
 
-    private void Awake()
-    {
-        gamePlayUI = FindFirstObjectByType<GamePlayUI>();
-    }
+    // ✅ gamePlayUI를 매번 동적으로 참조 (씬 리로드 대응)
+    private GamePlayUI GamePlayUI => gamePlayUI != null ? gamePlayUI : gamePlayUI = FindFirstObjectByType<GamePlayUI>();
 
-    [Server] // ✅ 서버에서만 실행
-    public void StartCountdown(int time)
+    // 서버에서 Phase1 카운트다운 시작
+    [Server]
+    public void StartGameFlow(int countdown1, int countdown2)
     {
-        StopAllCoroutines();
-        StartCoroutine(CountdownCoroutine(time));
-    }
+        Debug.Log("[NetworkTimer] StartGameFlow 시작 - Phase1 카운트다운 시작");
+        RpcStartPhase(1, countdown1);
 
-    [Server] // ✅ 서버에서만 실행
-    private IEnumerator CountdownCoroutine(int time)
-    {
-        currentTime = time;
-        while (currentTime > 0)
+        StartCoroutine(ServerCountdown(countdown1, () =>
         {
-            yield return new WaitForSeconds(1);
-            if (currentTime == 1)
-            {
-                StartEvent();
-            }
-            currentTime--;
+            Debug.Log("[NetworkTimer] Phase1 종료 - Phase2 진입 지시");
+            RpcForcePhaseStart(2);
+            StartCoroutine(DelayThenStartPhase2(countdown2));
+        }));
+    }
+
+    // Phase2 시작 지연 (카운트다운 UI 시간 확보용)
+    private IEnumerator DelayThenStartPhase2(int countdown2)
+    {
+        yield return new WaitForSeconds(1f); // 1초 지연
+        StartPhase2(countdown2);
+    }
+
+    // 서버용 코루틴
+    private IEnumerator ServerCountdown(int time, System.Action onComplete)
+    {
+        yield return new WaitForSeconds(time);
+        onComplete?.Invoke();
+    }
+
+    // 모든 클라이언트에 Phase1 or Phase2 카운트다운 시작 알림
+    [ClientRpc]
+    private void RpcStartPhase(int phase, int seconds)
+    {
+        Debug.Log($"[NetworkTimer] RpcStartPhase 호출 - Phase {phase}, {seconds}초");
+        GamePlayUI?.StartCountdownUI(phase, seconds);
+    }
+
+    // 클라이언트들에게 Phase2 게임 상태 강제 전환
+    [ClientRpc]
+    private void RpcForcePhaseStart(int phase)
+    {
+        if (phase == 2)
+        {
+            Debug.Log("[NetworkTimer] RpcForcePhaseStart - Phase2 강제 시작");
+            GamePlayUI?.ForceStartPhase2();
         }
     }
 
-    private void OnTimeChanged(int oldTime, int newTime)
+    // 이벤트 실행 트리거 (서버+클라이언트 동기화)
+    [ClientRpc]
+    private void RpcTriggerEvent()
     {
-        gamePlayUI.UpdateCountdownUI(newTime);
-    }
-    
-    [Server] // ✅ 서버에서만 실행
-    public void StartEvent()
-    {
-        RpcStartEvent();
+        Debug.Log("[NetworkTimer] RpcTriggerEvent - Phase2 이벤트 실행");
+        GamePlayUI?.UpdateCountdownUI(0, 2);
+        GameSystemManager.Instance.StartEvent();
     }
 
-    [ClientRpc]
-    private void RpcStartEvent()
+    // Phase2 타이머 시작 (서버 기준)
+    [Server]
+    public void StartPhase2(int countdown)
     {
-        gamePlayUI.UpdateCountdownUI(0);
-        GameSystemManager.Instance.StartEvent();
+        Debug.Log("[NetworkTimer] StartPhase2 시작");
+        RpcStartPhase(2, countdown);
+        StartCoroutine(ServerCountdown(countdown, () =>
+        {
+            Debug.Log("[NetworkTimer] Phase2 종료 - 이벤트 실행");
+            RpcTriggerEvent();
+            GameSystemManager.Instance.StartEvent();
+        }));
     }
 }

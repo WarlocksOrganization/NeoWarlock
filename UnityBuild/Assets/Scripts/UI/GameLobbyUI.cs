@@ -6,6 +6,7 @@ using GameManagement;
 using Mirror;
 using Networking;
 using Player;
+using Telepathy;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -35,6 +36,7 @@ public class GameLobbyUI : MonoBehaviour
             PlayerSelection.SetActive(true);
         }
         CheckIfHost();
+        AudioManager.Instance.PlayBGM(Constants.SoundType.BGM_Lobby);
     }
 
     public void OpenPlayerSelection()
@@ -103,7 +105,7 @@ public class GameLobbyUI : MonoBehaviour
                 GameManager.Instance.Init(allPlayers);
             }
             
-            var players = FindObjectsOfType<PlayerCharacter>();
+            var players = FindObjectsByType<PlayerCharacter>(sortMode: FindObjectsSortMode.None);
             bool allReady = players.All(p => p.State == Constants.PlayerState.Start);
 
             if (!allReady)
@@ -113,6 +115,10 @@ public class GameLobbyUI : MonoBehaviour
             }
 
             (NetworkManager.singleton as RoomManager).StartGame();
+        }
+        else
+        {
+            PlayerCharacters[0].GetComponent<PlayerCharacter>().CmdStartGame();
         }
     }
 

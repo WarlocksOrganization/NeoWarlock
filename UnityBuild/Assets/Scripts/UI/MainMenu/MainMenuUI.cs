@@ -1,3 +1,4 @@
+using DataSystem;
 using GameManagement;
 using kcp2k;
 using Mirror;
@@ -21,11 +22,11 @@ namespace UI
             {
                 case FullScreenMode.FullScreenWindow:
                 case FullScreenMode.ExclusiveFullScreen:
-                    displayModeMessage = "전체화면 : Alt+Enter";
+                    displayModeMessage = "창모드 : Alt+Enter";
                     break;
 
                 case FullScreenMode.Windowed:
-                    displayModeMessage = "창모드 : Alt+Enter";
+                    displayModeMessage = "전체화면 : Alt+Enter";
                     break;
 
                 default:
@@ -33,9 +34,12 @@ namespace UI
                     break;
             }
             displayModeText.text = displayModeMessage;
+            
+            AudioManager.Instance.PlayBGM(Constants.SoundType.BGM_MainMenu);
         }
         public void OnClickGameStartButtion()
         {
+            AudioManager.Instance.PlaySFX(Constants.SoundType.SFX_Button);
             PlayerSetting.Nickname = nicknameInputField.text;
             
             if (nicknameInputField.text == "")
@@ -48,6 +52,7 @@ namespace UI
 
         public void OnClickLANButtion()
         {
+            AudioManager.Instance.PlaySFX(Constants.SoundType.SFX_Button);
             PlayerSetting.Nickname = nicknameInputField.text;
             
             if (nicknameInputField.text == "")

@@ -100,67 +100,67 @@
                 //특정 스킬 강화
                 case PlayerStatType.AttackSpeed:
                     cardTypeText.text = "스킬 강화";
-                    aD = SkillData[currentCard.AppliedSkillIndex];
+                    aD = Database.GetAttackData(currentCard.AppliedSkill); if (aD == null) return;
                     skillButton.SetUp(aD.DisplayName, aD.Description, aD.Icon);
                     cardIconFrame.sprite = blueIconFrame;
-                    cardNameText.text = $"{SkillData[currentCard.AppliedSkillIndex].DisplayName}";
+                    cardNameText.text = $"{aD.DisplayName}";
                     cardDetailText.text = ApplyColorToNumber($"투사체 속도 +{cardData.BonusStat}%", "#FF3535", "#008CFF");
                 break;
 
                 case PlayerStatType.Range:
                     cardTypeText.text = "스킬 강화";
-                    aD = SkillData[currentCard.AppliedSkillIndex];
+                    aD = Database.GetAttackData(currentCard.AppliedSkill); if (aD == null) return;
                     skillButton.SetUp(aD.DisplayName, aD.Description, aD.Icon);
                     cardIconFrame.sprite = blueIconFrame;
-                    cardNameText.text = $"{SkillData[currentCard.AppliedSkillIndex].DisplayName}";
-                    cardDetailText.text = ApplyColorToNumber($"최대 거리 +{cardData.BonusStat}%", "#FF3535", "#008CFF");
+                    cardNameText.text = $"{aD.DisplayName}";
+                    cardDetailText.text = ApplyColorToNumber($"사거리 +{cardData.BonusStat}%", "#FF3535", "#008CFF");
                 break;
 
                 case PlayerStatType.Radius:
                     cardTypeText.text = "스킬 강화";
-                    aD = SkillData[currentCard.AppliedSkillIndex];
+                    aD = Database.GetAttackData(currentCard.AppliedSkill); if (aD == null) return;
                     skillButton.SetUp(aD.DisplayName, aD.Description, aD.Icon);
                     cardIconFrame.sprite = purpleIconFrame;
-                    cardNameText.text = $"{SkillData[currentCard.AppliedSkillIndex].DisplayName}";
+                    cardNameText.text = $"{aD.DisplayName}";
                     cardDetailText.text = ApplyColorToNumber($"타격 범위 +{cardData.BonusStat}%", "#FF3535", "#008CFF");
                 break;
 
                 case PlayerStatType.Damage:
                     cardTypeText.text = "스킬 강화";
-                    aD = SkillData[currentCard.AppliedSkillIndex];
+                    aD = Database.GetAttackData(currentCard.AppliedSkill); if (aD == null) return;
                     skillButton.SetUp(aD.DisplayName, aD.Description, aD.Icon);
                     cardIconFrame.sprite = blueIconFrame;
-                    cardNameText.text = $"{SkillData[currentCard.AppliedSkillIndex].DisplayName}";
+                    cardNameText.text = $"{aD.DisplayName}";
                     cardDetailText.text = ApplyColorToNumber($"데미지 +{cardData.BonusStat}%", "#FF3535", "#008CFF");
                 break;
 
                 case PlayerStatType.KnockbackForce:
                     cardTypeText.text = "스킬 강화";
-                    aD = SkillData[currentCard.AppliedSkillIndex];
+                    aD = Database.GetAttackData(currentCard.AppliedSkill); if (aD == null) return;
                     skillButton.SetUp(aD.DisplayName, aD.Description, aD.Icon);
                     cardIconFrame.sprite = purpleIconFrame;
-                    cardNameText.text = $"{SkillData[currentCard.AppliedSkillIndex].DisplayName}";
+                    cardNameText.text = $"{aD.DisplayName}";
                     cardDetailText.text = ApplyColorToNumber($"넉백 거리 +{cardData.BonusStat}%", "#FF3535", "#008CFF");
                 break;
 
                 case PlayerStatType.Cooldown:
                     cardTypeText.text = "스킬 강화";
-                    aD = SkillData[currentCard.AppliedSkillIndex];
+                    aD = Database.GetAttackData(currentCard.AppliedSkill); if (aD == null) return;
                     skillButton.SetUp(aD.DisplayName, aD.Description, aD.Icon);
                     cardIconFrame.sprite = purpleIconFrame;
-                    cardNameText.text = $"{SkillData[currentCard.AppliedSkillIndex].DisplayName}";
+                    cardNameText.text = $"{aD.DisplayName}";
                     cardDetailText.text = ApplyColorToNumber($"쿨다운 -{cardData.BonusStat}%", "#FF3535", "#008CFF");
                 break;
 
                 case PlayerStatType.Special:
                     cardTypeText.text = $"<color=#FFD700>스킬 승급</color>";
-                    aD = Database.GetAttackData(currentCard.AppliedSkillIndex +
-                                                (int)PlayerSetting.PlayerCharacterClass * 10 + 100);
-                    skillButton.SetUp(aD.DisplayName, aD.Description, aD.Icon);
+                    aD = Database.GetAttackData(currentCard.AppliedSkill);
+                    Database.AttackData ad2 = Database.GetAttackData(currentCard.AppliedSkill+100);
+                    skillButton.SetUp(ad2.DisplayName, ad2.Description, ad2.Icon);
                     cardIconFrame.sprite = goldIconFrame;
-                    cardNameText.text = $"{SkillData[currentCard.AppliedSkillIndex].DisplayName}";
-                    cardDetailText.text = ApplyColorAfterArrow($"{SkillData[currentCard.AppliedSkillIndex].DisplayName} \n->  " +
-                                          $"{Database.GetAttackData(currentCard.AppliedSkillIndex+(int)PlayerSetting.PlayerCharacterClass*10+100).DisplayName}", "#FFD700");
+                    cardNameText.text = $"{aD.DisplayName}";
+                    cardDetailText.text = ApplyColorAfterArrow($"{aD.DisplayName} \n->  " +
+                                          $"{ad2.DisplayName}", "#FFD700");
                                     glowImage.SetActive(true);
 
                     if (glowCoroutine != null)
@@ -230,7 +230,6 @@
     private IEnumerator AnimateGlowScale()
         {
             float time = 0f;
-            float speed = 4f;
             Image glowImg = glowImage.GetComponent<Image>();
             Color baseColor = new Color(1f, 0.84f, 0f);
             Color pulseColor = new Color(1f, 0.55f, 0f);

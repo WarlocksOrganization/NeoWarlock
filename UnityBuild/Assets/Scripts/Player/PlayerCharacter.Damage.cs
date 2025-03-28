@@ -69,6 +69,15 @@ namespace Player
                 }
             }
 
+            foreach (var player in FindObjectsByType<PlayerCharacter>(sortMode: FindObjectsSortMode.None))
+            {
+                if (player.playerId == attackPlayerId)
+                {
+                    FileLogger.LogSkillHit(player.userId, userId, damage, attackskillid.ToString());
+                    break;
+                }
+            }
+
             if (damage > 0) // 🔹 체력 감소 (데미지 입음)
             {
                 damage = Mathf.Min(damage, curHp); // 현재 체력보다 큰 데미지는 curHp만큼 감소
@@ -105,7 +114,7 @@ namespace Player
                 }
                 GameManager.Instance.RecordDeath(playerId);
                 
-                var gp = NetworkClient.connection.identity.GetComponent<GamePlayer>();
+                var gp = connectionToClient.identity.GetComponent<GamePlayer>();
                 if (gp != null && isServer)
                 {
                     gp.CheckGameOver();
@@ -115,9 +124,13 @@ namespace Player
                 {
                     RpcTransmitKillLog(attackPlayerId, this.attackskillid, true);
                 }
-                else
+                else if(attackPlayerId != playerId)
                 {
                     RpcTransmitKillLog(attackPlayerId, attackskillid, false);
+                }
+                else
+                {
+                    RpcTransmitKillLog(-1, -1, false);
                 }
             }
         }

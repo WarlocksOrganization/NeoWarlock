@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Linq;
+using DataSystem;
 using Mirror;
 using Player;
 using UnityEngine;
@@ -22,7 +23,7 @@ public class GameSystemManager : MonoBehaviour
     public void StartEvent()
     {
         if (FallGrounds == null || FallGrounds.Length == 0) return;
-
+        //Debug.Log($"[GameSystemManager] StartEvent() {NetworkServer.active} {FallGrounds[eventnum] != null}");
         if (eventnum < FallGrounds.Length)
         {
             GameObject selectedGround = FallGrounds[eventnum];
@@ -35,8 +36,10 @@ public class GameSystemManager : MonoBehaviour
                 var allPlayers = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None)
                     .Where(p => !p.isDead)
                     .ToList();
+                Debug.Log("[GameSystemManager] StartEvent()");
 
                 if (allPlayers.Count == 0) return;
+                Debug.Log("[GameSystemManager] StartEvent()");
 
                 var target = allPlayers[Random.Range(0, allPlayers.Count)];
 
@@ -45,10 +48,12 @@ public class GameSystemManager : MonoBehaviour
                 spawnPos.y = 0;
 
                 GameHand.Instance.Initialize();
+                Debug.Log("[GameSystemManager] StartEvent()");
             }
             
             // 🔹 5초 뒤 지형 파괴 실행 (Coroutine 사용)
             StartCoroutine(DelayedFall(selectedGround, 4f));
+            Debug.Log("[GameSystemManager] StartEvent()");
         }
     }
 
@@ -65,6 +70,7 @@ public class GameSystemManager : MonoBehaviour
                 fallGround.Fall();
             }
         }
+        GameSystemManager.Instance.EndEventAndStartNextTimer();
     }
     public void NetEvent()
     {
@@ -90,4 +96,16 @@ public class GameSystemManager : MonoBehaviour
         }
         eventnum++; // 다음 이벤트로 이동
     }
+    
+    // GameSystemManager.cs
+
+    public void EndEventAndStartNextTimer()
+    {
+        var timer = FindFirstObjectByType<NetworkTimer>();
+        if (timer != null && NetworkServer.active)
+        {
+            timer.StartPhase2(Constants.MaxGameEventTime);
+        }
+    }
+
 }

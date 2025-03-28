@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Cinemachine;
 using DataSystem;
 using DataSystem.Database;
+using GameManagement;
 using Mirror;
 using TMPro;
 using UI;
@@ -58,7 +59,14 @@ namespace Player
             MoveSkill = newMoveSkill;
             AttackSkills = newAttackSkills;
 
-            buffSystem?.CmdClearAllBuffs();
+            if (NetworkClient.active)
+            {
+                buffSystem?.CmdClearAllBuffs();
+            }
+            else
+            {
+                buffSystem?.ServerClearAllBuffs();
+            }
         }
 
         // 캐릭터 클래스 변경 시 호출될 동기화 함수
@@ -104,16 +112,19 @@ namespace Player
         private void OnAttackSkillsChanged(int[] oldSkills, int[] newSkills)
         {
             if (newSkills == null)
-            {
                 return;
-            }
+
             for (int i = 1; i <= 3; i++)
             {
                 SetAvailableAttack(i, newSkills[i]);
             }
 
-            ApplyCardBonuses();
-            
+            // ✅ 스킬 바뀐 이후 카드 적용
+            if (PlayerSetting.PlayerCards != null && PlayerSetting.PlayerCards.Count > 0)
+            {
+                ApplyCardBonuses(PlayerSetting.PlayerCards);
+            }
+
             if (isOwned && playerUI == null)
             {
                 playerUI = FindFirstObjectByType<PlayerCharacterUI>();
