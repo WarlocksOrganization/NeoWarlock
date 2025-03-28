@@ -22,39 +22,44 @@ namespace Player
         private BuffSystem buffSystem;
         private EffectSystem effectSystem;
         [SerializeField]  private PlayerCharacterUI playerUI;
-        
+
         [SerializeField] private LayerMask mouseTargetLayer;
-        
+
         [SyncVar(hook = nameof(SetIsDead_Hook))]
         public bool isDead  = false;
 
         [SyncVar(hook = nameof(SetState_Hook))]
         public Constants.PlayerState State = Constants.PlayerState.NotReady;
-         
-        
-        
+
+
+
         [SerializeField] private Animator animator;
         [SerializeField] private GameObject playerLight;
-        
+
         private float attackLockTime = 0f;
 
         [SerializeField] private Transform attackTransform;
 
         private GameLobbyUI gameLobbyUI;
-        
+
         [Header("Ghost Settings")]
         [SerializeField] private GameObject ghostPrefab; // ✅ 유령 프리팹
         private GameObject ghostInstance;
         private bool isGhost = false;
-        
-        
+
+        public event System.Action OnStatChanged;
+        public float CurrentAttackPower => AttackPower;
+        public float BasePower => BaseAttackPower;
+        public int MaxHp => maxHp;
+        public int CurHp => curHp;
+
 
         private void Awake()
         {
             _characterController = GetComponent<CharacterController>();
             buffSystem = GetComponent<BuffSystem>();
             effectSystem = GetComponent<EffectSystem>();
-            
+
             InitializeCharacterModels();
         }
 
@@ -62,11 +67,11 @@ namespace Player
         {
 
             UpdateCount();
-            
+
             if (isOwned)
             {
                 playerLight.SetActive(true);
-                
+
                 virtualCamera = FindFirstObjectByType<CinemachineVirtualCamera>();
                 if (virtualCamera != null)
                 {
@@ -103,14 +108,20 @@ namespace Player
             gameLobbyUI.UpdatePlayerInRoon();
         }
 
+        // 스탯 UI 이벤트
+        public void NotifyStatChanged()
+        {
+            OnStatChanged?.Invoke();
+        }
+        //
         void Update()
         {
             if (!isOwned) return;
 
             if (isDead) return;
-            
+
             if (State == Constants.PlayerState.NotReady || State == Constants.PlayerState.Ready) return;
-            
+
             if (!_characterController.isGrounded)
             {
                 gravityVelocity.y += gravity * Time.deltaTime; // 중력 가속도 증가
@@ -122,15 +133,15 @@ namespace Player
 
             Move();
             UpdateCameraTarget();
-            
+
             if (0 < attackLockTime)
             {
                 attackLockTime-=Time.deltaTime;
                 return;
             }
-            
+
             if (State != Constants.PlayerState.Start) return;
-            
+
             UpdateAttack();
         }
 
@@ -139,7 +150,7 @@ namespace Player
             nicknameText.text = value;
             nickname = value;
         }
-        
+
         [Command]
         private void CmdTriggerAnimation(string animParameter)
         {
@@ -148,7 +159,7 @@ namespace Player
                 RpcTriggerAnimation(animParameter);
             }
         }
-        
+
         [ClientRpc]
         private void RpcTriggerAnimation(string trigger)
         {
@@ -173,7 +184,7 @@ namespace Player
         private void CmdSetIsDead(bool value)
         {
             isDead = value;
-    
+
             // ✅ 서버에서 클라이언트에게 UI 업데이트 전송
             RpcUpdatePlayerStatus(connectionToClient);
         }
@@ -199,7 +210,7 @@ namespace Player
 
             gameLobbyUI.UpdatePlayerInRoon();
         }
-        
+
         public void SetState(Constants.PlayerState value)
         {
             if (!isServer)
@@ -222,7 +233,7 @@ namespace Player
         {
             State = newValue;
         }
-        
+
         private void SpawnGhost()
         {
             if (!isServer) return; // 서버에서만 실행
@@ -233,7 +244,7 @@ namespace Player
 
             RpcSetupGhost(ghost);
         }
-        
+
         [ClientRpc]
         private void RpcSetupGhost(GameObject ghost)
         {

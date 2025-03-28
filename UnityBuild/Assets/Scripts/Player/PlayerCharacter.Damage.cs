@@ -149,6 +149,8 @@ namespace Player
             if (isOwned)
             {
                 playerUI.SetDamageEffect(1f-(float)newHp / maxHp);
+                // 스탯창 갱신
+                NotifyStatChanged();
             }
         }
         

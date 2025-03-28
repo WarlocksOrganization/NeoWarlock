@@ -136,7 +136,6 @@
                     }
                     
                     playerCharacter.State = Constants.PlayerState.Ready;
-                    
                     foreach (var slot in playerCardUI.slots)
                     {
                         var slotData = slot.GetCurrentCard();
@@ -151,9 +150,17 @@
                         PlayerSetting.MoveSkill,
                         PlayerSetting.AttackSkillIDs
                     );
+                    StartCoroutine(DelayedStatSetup());
                 }
             }
+            private IEnumerator DelayedStatSetup()
+            {
+                yield return new WaitUntil(() => playerCharacter.PLayerCharacterClass != Constants.CharacterClass.None);
 
+                var statUI = FindFirstObjectByType<PlayerStatUI>();
+                statUI?.Setup(playerCharacter);
+                playerCharacter.NotifyStatChanged();
+            }
             private void OnDestroy()
             {
                 GameLobbyUI gameLobbyUI = FindFirstObjectByType<GameLobbyUI>();
