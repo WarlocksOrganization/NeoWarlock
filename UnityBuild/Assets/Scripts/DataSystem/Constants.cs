@@ -147,6 +147,9 @@ namespace DataSystem
             BGM_SSAFY_CardSelect = 1101,
             BGM_SSAFY_GameStart = 1102,
             BGM_SSAFY_ScoreBoard= 1103,
+            
+            BGM_Lava_GameStart = 1105,
+            BGM_Sea_GameStart = 1110,
 
             // SFX UI
             SFX_Button = 2001,
@@ -156,10 +159,15 @@ namespace DataSystem
             SFX_Start = 2101,
             SFX_Reroll = 2105,
             SFX_RerollSpecial = 2106,
+            SFX_AcquireItem = 2110,
             
             SFX_HandAttack = 2201,
             SFX_HandEndAttack = 2202,
             SFX_ComputerWarning = 2211,
+            
+            SFX_Lava = 2220,
+            SFX_FlyingDragon = 2221,
+            SFX_FallRock = 2222,
             
             SFX_GhostAttack = 2300,
             SFX_PlayerDead = 2301,

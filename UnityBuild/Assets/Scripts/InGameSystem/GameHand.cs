@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using Mirror;
 using Player;
 using System.Linq;
@@ -14,6 +15,8 @@ public class GameHand : NetworkBehaviour
     
     [SerializeField] private Animator animator;
     [SerializeField] private GameObject explosionPrefab;
+    
+    List<Animator> Screenanimators = new List<Animator>();
 
 
     private Transform target;
@@ -107,6 +110,27 @@ public class GameHand : NetworkBehaviour
         if (animator != null)
         {
             animator.SetTrigger("isAttack");
+        }
+        
+        if (Screenanimators.Count == 0)
+        {
+            GameObject[] allObjects = FindObjectsByType<GameObject>(sortMode: FindObjectsSortMode.None);
+            foreach (GameObject obj in allObjects)
+            {
+                if (obj.name == "ComputerScreen")
+                {
+                    Animator animator = obj.GetComponent<Animator>();
+                    if (animator != null)
+                    {
+                        Screenanimators.Add(animator);
+                    }
+                }
+            }
+        }
+
+        foreach (var animator in Screenanimators)
+        {
+            animator.SetTrigger("isError");
         }
     }
     
@@ -264,6 +288,11 @@ public class GameHand : NetworkBehaviour
 
         dirLight.intensity = 0f;
         
+        foreach (var anim in Screenanimators)
+        {
+            anim.SetBool("isBlackout", true);
+        }
+        
         AudioManager.Instance.SetBGMPitch(0.5f);
 
         // 10초 후 복구
@@ -293,6 +322,11 @@ public class GameHand : NetworkBehaviour
         RenderSettings.ambientIntensity = 1f;
         RenderSettings.reflectionIntensity = 1f;
         RenderSettings.ambientLight = Color.white;
+        
+        foreach (var anim in Screenanimators)
+        {
+            anim.SetBool("isBlackout", true);
+        }
         
         AudioManager.Instance.SetBGMPitch(1f);
     }

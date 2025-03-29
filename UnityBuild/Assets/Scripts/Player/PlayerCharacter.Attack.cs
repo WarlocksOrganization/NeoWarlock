@@ -85,7 +85,13 @@ namespace Player
         private void OnItemSkillChanged(int _, int newSkillId)
         {
             if (newSkillId > 0)
+            {
                 SetAvailableAttack(4, newSkillId);
+                if (isOwned)
+                {
+                    AudioManager.Instance.PlaySFX(Constants.SoundType.SFX_AcquireItem);
+                }
+            }
         }
 
         public void SetAvailableAttack(int index, int skillId)
@@ -192,6 +198,7 @@ namespace Player
             if (Time.time < attackLockTime) return;
 
             Vector3 dir = (target - transform.position).normalized;
+            dir.y = 0;
             playerModel.transform.rotation = Quaternion.LookRotation(dir);
 
             float range = currentAttack.GetAttackData().Range;

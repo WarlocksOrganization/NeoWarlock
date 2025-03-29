@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using Cinemachine;
 using DataSystem;
 using GameManagement;
@@ -257,7 +258,60 @@ namespace Player
             NetworkServer.Spawn(ghost, connectionToClient); // 클라이언트와 동기화
             ghostInstance = ghost;
         }
+        
+        [Command]
+        public void CmdResurrect()
+        {
+            StartCoroutine(DelayedResurrect(connectionToClient));
+        }
 
+        private IEnumerator DelayedResurrect(NetworkConnectionToClient conn)
+        {
+            // 1. 먼저 위치 이동
+            RpcMoveToSpawn(conn);
+
+            // 2. 0.5초 대기
+            yield return new WaitForSeconds(0.5f);
+
+            // 3. 체력 회복
+            curHp = maxHp;
+
+            // 4. 상태 복구
+            isDead = false;
+            _characterController.enabled = true;
+
+            // 5. 고스트 제거
+            if (ghostInstance != null)
+            {
+                NetworkServer.Destroy(ghostInstance);
+                ghostInstance = null;
+            }
+
+            // 6. 위치도 서버 측에서 초기화 (동기화용)
+            transform.position = Vector3.zero;
+
+            // 7. 부활 애니메이션 & 카메라 & UI
+            RpcTriggerAnimation("isLive");
+            RpcUpdatePlayerStatus(conn);
+            RpcResetCamera(conn);
+        }
+        
+        [TargetRpc]
+        private void RpcMoveToSpawn(NetworkConnection target)
+        {
+            transform.position = Vector3.zero;
+        }
+        
+        [TargetRpc]
+        private void RpcResetCamera(NetworkConnection target)
+        {
+            var cam = FindFirstObjectByType<Cinemachine.CinemachineVirtualCamera>();
+            if (cam != null)
+            {
+                cam.Follow = CinemachineCameraTarget.transform;
+            }
+        }
+        
         [Command]
         public void CmdStartGame()
         {

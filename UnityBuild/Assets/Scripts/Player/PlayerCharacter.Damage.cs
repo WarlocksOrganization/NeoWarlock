@@ -158,6 +158,10 @@ namespace Player
             {
                 playerHUD.GetComponent<CanvasGroup>().alpha = 0;
             }
+            else
+            {
+                playerHUD.GetComponent<CanvasGroup>().alpha = 1;
+            }
 
             if (isOwned)
             {

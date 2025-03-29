@@ -108,8 +108,8 @@ public class GamePlayUI : GameLobbyUI
 
                 gameState = Constants.GameState.Start;
                 UpdatePlayerInRoon();
-
-                AudioManager.Instance.PlayBGM(Constants.SoundType.BGM_SSAFY_GameStart);
+                
+                AudioManager.Instance.PlayBGM(GameSystemManager.Instance.mapConfig.bgmType);
             }
             else
             {
