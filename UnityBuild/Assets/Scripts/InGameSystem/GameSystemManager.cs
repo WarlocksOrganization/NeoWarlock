@@ -57,25 +57,28 @@ public class GameSystemManager : NetworkBehaviour
         var noise = virtualCamera.GetCinemachineComponent<Cinemachine.CinemachineBasicMultiChannelPerlin>();
         if (noise == null) return;
 
-        StartCoroutine(LavaShakeCoroutine(noise, amplitude, frequency, duration));
+        StartCoroutine(CameraShakeCoroutine(noise, amplitude, frequency, duration));
     }
 
-    protected IEnumerator LavaShakeCoroutine(Cinemachine.CinemachineBasicMultiChannelPerlin noise, float amp, float freq, float duration)
+    protected IEnumerator CameraShakeCoroutine(Cinemachine.CinemachineBasicMultiChannelPerlin noise, float amp, float freq, float duration)
     {
         float elapsed = 0f;
 
-        noise.m_AmplitudeGain = amp;
-        noise.m_FrequencyGain = freq;
-
         while (elapsed < duration)
         {
+            float t = elapsed / duration;
+            noise.m_AmplitudeGain = Mathf.Lerp(amp, 0f, t);
+            noise.m_FrequencyGain = Mathf.Lerp(freq, 0f, t);
+
             elapsed += Time.deltaTime;
             yield return null;
         }
 
+        // 마지막 보정
         noise.m_AmplitudeGain = 0f;
         noise.m_FrequencyGain = 0f;
     }
+
 
     
     [ClientRpc]

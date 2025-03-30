@@ -560,7 +560,8 @@ MonoBehaviour:
   FlyingDragon: {fileID: 226683260489230210}
   FlyingDragonSoundObject: {fileID: 6792298019679505703}
   skillItemPickupPrefab: {fileID: 3622867063374222405, guid: ab7c75548118a3d468ad99e1b58b764f, type: 3}
-  AttackPrefab: {fileID: 0}
+  AttackPrefab: {fileID: 322783647940636695, guid: a408ba58521f6a742b9cfee37f8bf882, type: 3}
+  attackConfig: {fileID: 11400000, guid: f326cc80028bb204cbe37fd1ee9c8188, type: 2}
 --- !u!114 &183545305397152434
 MonoBehaviour:
   m_ObjectHideFlags: 0

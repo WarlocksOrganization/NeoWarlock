@@ -253,7 +253,18 @@ namespace Player
             Vector3 firePos = attackTransform.position + dir;
             availableAttacks[index]?.Execute(target, firePos, gameObject, id, skillId, AttackPower);
 
-            if (index == 4) itemSkillId = -1;
+            if (index == 4)
+            {
+                // ✅ 사용 후 제거
+                itemSkillId = -1;
+
+                if (availableAttacks[4] is MonoBehaviour oldAttack)
+                {
+                    Destroy(oldAttack.gameObject); // 인스턴스 제거
+                }
+
+                availableAttacks[4] = null;
+            }
         }
 
         [Command(requiresAuthority = false)]

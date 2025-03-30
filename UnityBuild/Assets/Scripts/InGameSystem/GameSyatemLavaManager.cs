@@ -1,7 +1,10 @@
+using System;
 using System.Collections;
 using DataSystem;
 using Mirror;
+using Player;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class GameSyatemLavaManager : GameSystemManager
 {
@@ -14,6 +17,7 @@ public class GameSyatemLavaManager : GameSystemManager
     
     [SerializeField] private GameObject skillItemPickupPrefab;
     [SerializeField] private GameObject AttackPrefab;
+    [SerializeField] private AttackConfig attackConfig;
 
     public override void StartEvent()
     {
@@ -52,7 +56,7 @@ public class GameSyatemLavaManager : GameSystemManager
 
     public override void NetEvent()
     {
-        if (Random.value <= 0.5f)
+        if (Random.value < 0.5f)
         {
             Vector3 randomDirection = new Vector3(Random.Range(-1f, 1f), 0f, Random.Range(-1f, 1f)).normalized;
 
@@ -71,6 +75,43 @@ public class GameSyatemLavaManager : GameSystemManager
                 GameObject pickup = Instantiate(skillItemPickupPrefab, spawnPosition, Quaternion.identity);
 
                 NetworkServer.Spawn(pickup);
+            }
+        }
+        else
+        {
+            Vector3 randomDirection = new Vector3(Random.Range(-1f, 1f), 0f, Random.Range(-1f, 1f)).normalized;
+            
+            StartFlyingDragon(randomDirection);
+            
+            int attackCount = Random.Range(5, 10); // 🔹 2~4개 낙하 공격 소환
+
+            for (int i = 0; i < attackCount; i++)
+            {
+                Vector3 spawnPosition = new Vector3(
+                    Random.Range(-50f + eventnum*4, 50f - eventnum*4),
+                    Random.Range(30f, 40f),
+                    Random.Range(-50f + eventnum*4, 50f - eventnum*4)
+                );
+
+                // ✅ 아래 방향을 바라보도록 회전 설정
+                Quaternion downRotation = Quaternion.LookRotation(Vector3.down);
+
+                GameObject attack = Instantiate(AttackPrefab, spawnPosition, downRotation);
+        
+                attack.GetComponent<AttackProjectile>().SetProjectileData(
+                    10,  // damage
+                    10,   // speed
+                    5,   // radius
+                    5,   // range
+                    10,  // duration
+                    3,   // knockback
+                    attackConfig,
+                    null,
+                    -1,
+                    -1
+                );
+
+                NetworkServer.Spawn(attack);
             }
         }
     }
