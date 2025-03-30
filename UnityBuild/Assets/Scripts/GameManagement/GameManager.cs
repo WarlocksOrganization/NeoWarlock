@@ -220,15 +220,15 @@ namespace GameManagement
         public Constants.PlayerStats GetTopKillPlayer()
         {
             return playerStatsArray
-                .OrderByDescending(p => p.kills + p.outKills)  // 혹은 p.kills만
-                .First();
+                .OrderByDescending(p => p.kills + p.outKills)  // 추후 동점자 처리 추가
+                .FirstOrDefault();
         }
 
         public Constants.PlayerStats GetTopDamagePlayer()
         {
             return playerStatsArray
                 .OrderByDescending(p => p.damageDone)
-                .First();
+                .FirstOrDefault();
         }
     }
 

@@ -3,8 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using DataSystem;
-using DataSystem.Database;
 using GameManagement;
+using DataSystem.Database;
 using Mirror;
 using Player;
 using TMPro;
@@ -24,7 +24,6 @@ public class ScoreBoardUI : MonoBehaviour
     [SerializeField] private Button resultToggleButton;
     [SerializeField] private TMP_Text toggleButtonText;
 
-
     [SerializeField] private TMP_Text bestPlayerName;
     [SerializeField] private TMP_Text bestPlayerStat;
     [SerializeField] private Image bestPlayerIcon;
@@ -40,7 +39,6 @@ public class ScoreBoardUI : MonoBehaviour
     [SerializeField] private Camera bestPlayerCamera;
 
 //    public RawImage bestPlayerShow;
-
 
     private void Awake()
     {
@@ -131,11 +129,8 @@ private IEnumerator ShowRankingFlow(Constants.PlayerRecord[] records, int roundI
 
         panel.AnimateDamage(prevDamage, finalDamage);
     }
-    // 최종 결과 출력
-//    GameRoomData roomData = FindFirstObjectByType<GameRoomData>();
-//    int totalRounds = roomData.Round;
+
     int totalRounds = 3;
-//    if (roomData != null && roundIndex >= totalRounds)
     if (roundIndex >= totalRounds - 1)
     {
         yield return new WaitForSeconds(3f); // 연출 간격
@@ -192,6 +187,7 @@ private IEnumerator ShowRankingFlow(Constants.PlayerRecord[] records, int roundI
 
         showBestPlayer(bestPlayer);
     }
+
     private void showBestPlayer(Constants.PlayerRecord bestPlayer)
     {
 
@@ -256,7 +252,6 @@ private IEnumerator ShowRankingFlow(Constants.PlayerRecord[] records, int roundI
 
         target.localScale = end;
     }
-
     private void OnClickReturnToLobby()
     {
         if (NetworkServer.active && NetworkClient.isConnected)
