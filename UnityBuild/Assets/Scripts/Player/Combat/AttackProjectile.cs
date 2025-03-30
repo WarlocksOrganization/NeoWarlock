@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using DataSystem;
@@ -34,6 +35,10 @@ namespace Player
 
         [SyncVar] protected GameObject owner;
         private bool isExplode = false;
+        
+        [SerializeField] private GameObject rangeDecalPrefab;
+        private GameObject rangeDecalInstance;
+
 
         public void SetProjectileData(float damage, float speed, float radius, float range, float lifeTime, float knockback, AttackConfig config, GameObject owner, int playerid, int skillid)
         {
@@ -51,6 +56,8 @@ namespace Player
             transform.localScale = new Vector3(radius, radius, radius);
 
             skillType = config.skillType;
+
+            Debug.Log(skillType);
 
             this.owner = owner;
         }
@@ -85,6 +92,8 @@ namespace Player
                 StartCoroutine(MoveProjectile()); // ✅ MovePosition을 이용한 이동 처리
             }
             
+            ShowExplosionRange();
+            
             Invoke(nameof(DestroySelf), lifeTime);
         }
 
@@ -104,6 +113,8 @@ namespace Player
             {
                 StartCoroutine(MoveProjectile()); // ✅ MovePosition을 이용한 이동 처리
             }
+            
+            ShowExplosionRange();
             
             Invoke(nameof(DestroySelf), lifeTime);
         } 
@@ -194,5 +205,36 @@ namespace Player
                 skillEffects[newValue].SetActive(true);
             }
         }
+
+        private void OnDestroy()
+        {
+            if (rangeDecalInstance != null)
+            {
+                Destroy(rangeDecalInstance);
+            }
+        }
+
+        private void ShowExplosionRange()
+        {
+            if (rangeDecalPrefab == null) return;
+
+            Vector3 predictedPosition = transform.position;
+
+            if (Physics.Raycast(transform.position + Vector3.up * 5f, Vector3.down, out RaycastHit hit, 999f, layerMask))
+            {
+                predictedPosition = hit.point + Vector3.up * 0.05f; // 약간 띄워서 그리기
+            }
+
+            rangeDecalInstance = Instantiate(rangeDecalPrefab, predictedPosition, Quaternion.Euler(90, 0, 0));
+            rangeDecalInstance.transform.localScale = Vector3.one;
+    
+            // Decal Projector의 Size를 반지름에 맞게 설정
+            var projector = rangeDecalInstance.GetComponent<UnityEngine.Rendering.Universal.DecalProjector>();
+            if (projector != null)
+            {
+                projector.size = new Vector3(radius * 2f, radius * 2f, 20f);
+            }
+        }
+
     }
 }

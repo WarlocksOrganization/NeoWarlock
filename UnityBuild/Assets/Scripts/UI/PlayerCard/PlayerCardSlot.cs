@@ -1,5 +1,6 @@
     using System;
     using System.Collections;
+    using DataSystem;
     using DataSystem.Database;
     using GameManagement;
     using TMPro;
@@ -218,6 +219,8 @@
 
     private IEnumerator PlayGlowSequence()
     {
+        AudioManager.Instance.PlaySFX(Constants.SoundType.SFX_RerollSpecial);
+        
         // 폭발 효과 먼저 재생
         Debug.Log("ExplodeEffect");
         yield return StartCoroutine(PlayExplosionEffect(explosionImage));
@@ -292,6 +295,8 @@
         {
             if (playerCardUI.TryGetNewCard(out Database.PlayerCardData newCard))
             {
+                AudioManager.Instance.PlaySFX(Constants.SoundType.SFX_Reroll);
+                
                 reRollButton.gameObject.SetActive(false); // 리롤 버튼 비활성화
                 StartCoroutine(CardRotation(newCard));
             }

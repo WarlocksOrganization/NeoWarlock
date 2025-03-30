@@ -1,3 +1,4 @@
+using Player;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,6 +11,9 @@ namespace UI
         [SerializeField] private GameObject QuickSlotUI;
         [SerializeField] private GameObject ghostQuickUI;
         [SerializeField] private QuickSlot ghostQuickSlots;
+        
+        private PlayerCharacter localPlayer;
+
 
         public void SetQuickSlotData(int index, Sprite icon, float cooldown, string name, string description, Sprite upgradeIcon = null)
         {
@@ -52,7 +56,7 @@ namespace UI
         {
             if (hpPercent > 0.5f)
             {
-                DamageImage.color = new Color(1, 1, 1, hpPercent - 0.5f);
+                DamageImage.color = new Color(1, 1, 1, (hpPercent - 0.5f)*2f);
             }
             if (hpPercent == 1)
             {
@@ -61,5 +65,34 @@ namespace UI
                 ghostQuickUI.SetActive(true);
             }
         }
+        
+        public void OnResurrectButtonClicked()
+        {
+            localPlayer = GetLocalPlayer();
+            
+            if (localPlayer != null)
+            {
+                localPlayer.CmdResurrect();
+            }
+
+            SetDamageEffect(0f);
+            
+            QuickSlotUI.SetActive(true);
+            ghostQuickUI.SetActive(false);
+        }
+
+        
+        PlayerCharacter GetLocalPlayer()
+        {
+            foreach (var player in FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None))
+            {
+                if (player.isOwned) // 혹은 player.isLocalPlayer
+                {
+                    return player;
+                }
+            }
+            return null;
+        }
+
     }
 }

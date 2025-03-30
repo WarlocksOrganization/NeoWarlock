@@ -52,6 +52,7 @@ namespace UI
 
         public void OnClickLANButtion()
         {
+            GameManager.Instance.isLan = true;
             AudioManager.Instance.PlaySFX(Constants.SoundType.SFX_Button);
             PlayerSetting.Nickname = nicknameInputField.text;
             

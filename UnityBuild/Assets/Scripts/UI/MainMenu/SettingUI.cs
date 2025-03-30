@@ -7,13 +7,16 @@ public class SettingUI : MonoBehaviour
     [SerializeField] private Slider bgmSlider;
     [SerializeField] private Slider sfxSlider;
 
-    private void Awake()
+    private void OnEnable()
     {
         float bgmVolume = AudioManager.Instance.GetBGMVolume();
         bgmSlider.value = bgmVolume;
        
         float sfxVolume = AudioManager.Instance.GetSFXVolume();
         sfxSlider.value = sfxVolume;
+        
+        bgmSlider.onValueChanged.AddListener(SetBGMVolume);
+        sfxSlider.onValueChanged.AddListener(SetSFXVolume);
     }
 
     public void SetBGMVolume(float volume)

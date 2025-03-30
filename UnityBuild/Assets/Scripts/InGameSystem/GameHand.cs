@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using Mirror;
 using Player;
 using System.Linq;
@@ -14,6 +15,8 @@ public class GameHand : NetworkBehaviour
     
     [SerializeField] private Animator animator;
     [SerializeField] private GameObject explosionPrefab;
+    
+    List<Animator> Screenanimators = new List<Animator>();
 
 
     private Transform target;
@@ -108,6 +111,27 @@ public class GameHand : NetworkBehaviour
         {
             animator.SetTrigger("isAttack");
         }
+        
+        if (Screenanimators.Count == 0)
+        {
+            GameObject[] allObjects = FindObjectsByType<GameObject>(sortMode: FindObjectsSortMode.None);
+            foreach (GameObject obj in allObjects)
+            {
+                if (obj.name == "ComputerScreen")
+                {
+                    Animator animator = obj.GetComponent<Animator>();
+                    if (animator != null)
+                    {
+                        Screenanimators.Add(animator);
+                    }
+                }
+            }
+        }
+
+        foreach (var animator in Screenanimators)
+        {
+            animator.SetTrigger("isError");
+        }
     }
     
     [Server]
@@ -136,20 +160,13 @@ public class GameHand : NetworkBehaviour
         }
 
         NetworkServer.Spawn(explosion);
-        RpcShakeCamera(shake, freq);
-
-        if (!isFinal)
-        {
-            AudioManager.Instance.PlaySFX(Constants.SoundType.SFX_HandAttack, gameObject);
-        }
-        else
-        {
-            AudioManager.Instance.PlaySFX(Constants.SoundType.SFX_HandEndAttack, gameObject);
-        }
+        RpcShakeCamera(shake, freq, isFinal);
         
         if (isFinal && Random.value <= 0.5f)
         {
-            for (int i = 0; i < 2; i++)
+            int itemCount = Random.Range(1, 4); // 🔹 1~3 사이의 랜덤한 개수
+
+            for (int i = 0; i < itemCount; i++)
             {
                 Vector3 spawnPosition = new Vector3(
                     Random.Range(-15f, 15f),
@@ -187,7 +204,7 @@ public class GameHand : NetworkBehaviour
     }
     
     [ClientRpc]
-    private void RpcShakeCamera(float amplitude, float frequency)
+    private void RpcShakeCamera(float amplitude, float frequency, bool isFinal)
     {
         if (virtualCamera == null)
             virtualCamera = FindFirstObjectByType<CinemachineVirtualCamera>();
@@ -199,6 +216,15 @@ public class GameHand : NetworkBehaviour
         if (shakeCoroutine != null)
             StopCoroutine(shakeCoroutine);
         shakeCoroutine = StartCoroutine(ShakeCameraCoroutine(noise, amplitude, frequency));
+        
+        if (!isFinal)
+        {
+            AudioManager.Instance.PlaySFX(Constants.SoundType.SFX_HandAttack, gameObject);
+        }
+        else
+        {
+            AudioManager.Instance.PlaySFX(Constants.SoundType.SFX_HandEndAttack, gameObject);
+        }
     }
 
     private IEnumerator ShakeCameraCoroutine(CinemachineBasicMultiChannelPerlin noise, float amp, float freq)
@@ -262,7 +288,12 @@ public class GameHand : NetworkBehaviour
 
         dirLight.intensity = 0f;
         
-        AudioManager.Instance.ApplyBGMVolumeToMixer(0);
+        foreach (var anim in Screenanimators)
+        {
+            anim.SetBool("isBlackout", true);
+        }
+        
+        AudioManager.Instance.SetBGMPitch(0.5f);
 
         // 10초 후 복구
         yield return new WaitForSeconds(10f);
@@ -292,7 +323,12 @@ public class GameHand : NetworkBehaviour
         RenderSettings.reflectionIntensity = 1f;
         RenderSettings.ambientLight = Color.white;
         
-        AudioManager.Instance.PlayBGM(Constants.SoundType.BGM_SSAFY_GameStart);
+        foreach (var anim in Screenanimators)
+        {
+            anim.SetBool("isBlackout", true);
+        }
+        
+        AudioManager.Instance.SetBGMPitch(1f);
     }
 
 }

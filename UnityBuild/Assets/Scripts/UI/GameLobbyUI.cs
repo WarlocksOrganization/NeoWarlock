@@ -16,8 +16,14 @@ public class GameLobbyUI : MonoBehaviour
     public TMP_Text RoomNameText;
     [SerializeField] protected TMP_Text PlayerInRoonText;
     [SerializeField] protected GameObject PlayerSelection;
-    [SerializeField] protected Button StartGameButton; // ✅ 게임 시작 버튼
     [SerializeField] protected PlayerStatusUI playerStatusUI;
+    
+    [Header("맵 선택 관련")]
+    [SerializeField] protected Button StartGameButton;
+    [SerializeField] protected Button ChangeMapNextButton;
+    [SerializeField] protected Button ChangeMapBeforeButton;
+    [SerializeField] protected Image MapImage;
+    [SerializeField] protected TMP_Text MapName;
 
     public GameObject[] PlayerCharacters;
     protected PlayerCharacter[] foundCharacters;
@@ -85,11 +91,16 @@ public class GameLobbyUI : MonoBehaviour
         if (NetworkServer.active || playerNum == hostNum) // ✅ 방장인지 확인
         {
             StartGameButton.gameObject.SetActive(true);
+            ChangeMapNextButton.gameObject.SetActive(true);
+            ChangeMapBeforeButton.gameObject.SetActive(true);
+            
             StartGameButton.onClick.AddListener(StartGame); // ✅ 버튼 클릭 이벤트 추가
         }
         else
         {
             StartGameButton.gameObject.SetActive(false);
+            ChangeMapBeforeButton.gameObject.SetActive(false);
+            ChangeMapNextButton.gameObject.SetActive(false);
         }
     }
 
@@ -160,5 +171,25 @@ public class GameLobbyUI : MonoBehaviour
         }
 
         warningText.text = "";
+    }
+    
+    public void OnClickChangeMap(bool next)
+    {
+        if (!NetworkClient.active) return;
+
+        var player = NetworkClient.connection.identity.GetComponent<RoomPlayer>();
+        player.CmdChangeMap(next);
+        AudioManager.Instance.PlaySFX(Constants.SoundType.SFX_Button);
+    }
+    
+    [SerializeField] private MapConfig[] mapConfigs;
+
+    public virtual void UpdateMapUI(Constants.RoomMapType type)
+    {
+        var config = mapConfigs.FirstOrDefault(m => m.mapType == type);
+        if (config == null) return;
+
+        MapImage.sprite = config.mapSprite; // 또는 따로 image 설정
+        MapName.text = config.mapName;
     }
 }

@@ -108,8 +108,8 @@ public class GamePlayUI : GameLobbyUI
 
                 gameState = Constants.GameState.Start;
                 UpdatePlayerInRoon();
-
-                AudioManager.Instance.PlayBGM(Constants.SoundType.BGM_SSAFY_GameStart);
+                
+                AudioManager.Instance.PlayBGM(GameSystemManager.Instance.mapConfig.bgmType);
             }
             else
             {
@@ -159,6 +159,10 @@ public class GamePlayUI : GameLobbyUI
         UpdatePlayerInRoon();
         AudioManager.Instance.PlayBGM(Constants.SoundType.BGM_SSAFY_GameStart);
     }
-    
+
+    public override void UpdateMapUI(Constants.RoomMapType type)
+    {
+        return;
+    }
     
 }

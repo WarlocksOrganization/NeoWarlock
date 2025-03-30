@@ -64,6 +64,10 @@ private IEnumerator ShowRankingFlow(Constants.PlayerRecord[] records, int roundI
 
     // 2. 누적 점수 (반영 전)
     roundText.text = $"{roundIndex + 1} 라운드 통계";
+    if (roundIndex == 2)
+    {
+        roundText.text = "최종 통계";
+    }
 
     var preSorted = records
         .OrderByDescending(r => r.GetTotalScoreUpToRound(roundIndex - 1))
@@ -79,6 +83,8 @@ private IEnumerator ShowRankingFlow(Constants.PlayerRecord[] records, int roundI
 
     yield return StartCoroutine(FadeCanvasGroup(canvasGroup, 0f, 1f, 0.5f));
     yield return new WaitForSeconds(1f);
+    
+    AudioManager.Instance.PlaySFX(Constants.SoundType.SFX_ScoreCount);
 
     var finalSorted = records
         .OrderByDescending(r => r.GetTotalScoreUpToRound(roundIndex))

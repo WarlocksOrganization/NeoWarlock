@@ -51,6 +51,10 @@ MonoBehaviour:
   roomName: 
   roomType: 0
   maxPlayerCount: 0
+  Round: 3
+  roomMapType: 0
+  gameId: 
+  roomId: 
 --- !u!114 &26060392058629745
 MonoBehaviour:
   m_ObjectHideFlags: 0

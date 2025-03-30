@@ -101339,6 +101339,9 @@ MonoBehaviour:
   CinemachineCameraTarget: {fileID: 7304248433194766382}
   cameraOffset: 0.5
   maxCameraDistance: 3
+  baseTilt: 45
+  maxTilt: 60
+  tiltLerpSpeed: 1
   playerModel: {fileID: 8923555865260731763}
   PLayerCharacterClass: 100
   mageModel:
@@ -101377,6 +101380,7 @@ MonoBehaviour:
   - {fileID: 868064781335519991}
   - {fileID: 3473674132905561477}
   nickname: 
+  userId: 
   nicknameText: {fileID: 2327050446229530159}
   playerId: -1
   playerUI: {fileID: 0}

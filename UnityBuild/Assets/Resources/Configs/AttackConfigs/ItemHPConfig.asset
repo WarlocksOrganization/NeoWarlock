@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: ItemHPConfig
   m_EditorClassIdentifier: 
   attackType: 5
-  attackDelay: 1
-  recoveryTime: 1.5
+  attackDelay: 0.5
+  recoveryTime: 1
   attackDuration: 0
   attackInterval: 0
   animParameter: isUseItem

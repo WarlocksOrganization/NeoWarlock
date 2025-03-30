@@ -174,6 +174,8 @@ namespace Networking
                 Debug.LogWarning("[RoomManager] 아직 준비되지 않은 플레이어가 있어 게임을 시작할 수 없습니다.");
                 // return;
             }
+            
+            roomDataInstance.SetRandomMapIfNeeded();
 
             Debug.Log("[RoomManager] 모든 플레이어가 준비되었습니다. 게임을 시작합니다!");
             ServerChangeScene(GameplayScene);

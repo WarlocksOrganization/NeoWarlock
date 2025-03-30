@@ -57,10 +57,10 @@ namespace Player
         [Command]
         private void CmdModifyPlayerAttackStat(int skillId, PlayerStatType statType, float bonusPercent)
         {
-            int skillIndex = System.Array.IndexOf(PlayerSetting.AttackSkillIDs, skillId);
+            int skillIndex = System.Array.IndexOf(AttackSkills, skillId);
             if (skillIndex == -1 || skillIndex >= availableAttacks.Length || availableAttacks[skillIndex] == null)
             {
-                Debug.LogWarning($"[CmdModifyPlayerAttackStat] 유효하지 않은 스킬 ID: {skillId}");
+                Debug.LogWarning($"[CmdModifyPlayerAttackStat] 유효하지 않은 스킬 ID: {skillId}, {PlayerSetting.AttackSkillIDs}");
                 return;
             }
 

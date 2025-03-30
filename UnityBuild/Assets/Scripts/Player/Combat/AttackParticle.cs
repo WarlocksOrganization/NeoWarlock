@@ -28,8 +28,6 @@ public class AttackParticle : NetworkBehaviour
     public void SetAttackParticleData(Constants.SkillType skillType)
     {
        this.skillType = skillType;
-       
-       AudioManager.Instance?.PlayHitSFX(skillType, gameObject);
     }
     
     private void InitializeSkillEffects()
@@ -69,5 +67,6 @@ public class AttackParticle : NetworkBehaviour
         {
             skillEffects[newValue].SetActive(true);
         }
+        AudioManager.Instance?.PlayHitSFX(skillType, gameObject);
     }
 }

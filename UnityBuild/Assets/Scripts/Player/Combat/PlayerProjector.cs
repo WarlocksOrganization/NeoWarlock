@@ -88,10 +88,10 @@ namespace Player.Combat
                 
                 decalProjector.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
                 decalProjector.material = circleMaterial;
-                decalProjector.size = new Vector3(attackData.Radius*2, attackData.Radius*2, 3f);
+                decalProjector.size = new Vector3(attackData.Radius*2, attackData.Radius*2, 10f);
                 
                 rangeDecalProjector.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
-                rangeDecalProjector.size = new Vector3(attackData.Range*2 + attackData.Radius*2, attackData.Range*2 + attackData.Radius*2, 3f);
+                rangeDecalProjector.size = new Vector3(attackData.Range*2 + attackData.Radius*2, attackData.Range*2 + attackData.Radius*2, 10f);
             }
 
             else if (currentAttack is MeleeAttack)
@@ -99,7 +99,7 @@ namespace Player.Combat
                 attackRange = attackData.Range;
                 decalProjector.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
                 decalProjector.material = circleMaterial;
-                decalProjector.size = new Vector3(attackData.Radius*2, attackData.Radius*2, 3);
+                decalProjector.size = new Vector3(attackData.Radius*2, attackData.Radius*2, 10);
             }
 
             else if (currentAttack is ProjectileAttack || currentAttack is SelfAttack)
@@ -114,7 +114,7 @@ namespace Player.Combat
                 }
 
                 // Projector 크기 설정 (Y축 길이를 distance에 맞춰 동적으로 변경)
-                decalProjector.size = new Vector3(currentAttack.GetAttackData().Radius, distance, 3f);
+                decalProjector.size = new Vector3(currentAttack.GetAttackData().Radius, distance, 10);
 
                 if (arrowMaterial != null)
                 {

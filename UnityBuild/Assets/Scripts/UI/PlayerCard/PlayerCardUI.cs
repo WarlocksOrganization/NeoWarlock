@@ -1,5 +1,6 @@
 // ✅ PlayerCardUI.cs (서버 타이머 기반 리팩토링 완료)
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,7 @@ using TMPro;
 using UI;
 using UnityEngine;
 using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 public class PlayerCardUI : MonoBehaviour
 {
@@ -27,6 +29,9 @@ public class PlayerCardUI : MonoBehaviour
 
     private PlayerCharacterUI playerCharacterUI;
     private GamePlayer myGamePlayer;
+    
+    private Coroutine sliderRoutine;
+    private float lastTargetRatio = 1f;
 
     void Start()
     {
@@ -125,9 +130,14 @@ public class PlayerCardUI : MonoBehaviour
             AudioManager.Instance.PlayBGM(Constants.SoundType.BGM_SSAFY_CardSelect);
         }
 
-        float ratio = Mathf.Clamp01(serverTime / maxTime);
-        timerSlider.value = ratio;
+        float nextTargetRatio = Mathf.Clamp01((serverTime - 1f) / maxTime); // ✅ 1초 뒤 비율 예상
         timerText.text = $"남은 시간: {Mathf.Ceil(serverTime)}초";
+
+        if (sliderRoutine != null)
+            StopCoroutine(sliderRoutine);
+    
+        sliderRoutine = StartCoroutine(AnimateSlider(lastTargetRatio, nextTargetRatio, 1f));
+        lastTargetRatio = nextTargetRatio;
 
         if (serverTime <= 0f)
         {
@@ -135,6 +145,21 @@ public class PlayerCardUI : MonoBehaviour
         }
     }
 
+    private IEnumerator AnimateSlider(float from, float to, float duration)
+    {
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / duration);
+            timerSlider.value = Mathf.Lerp(from, to, t);
+            yield return null;
+        }
+
+        timerSlider.value = to;
+    }
+    
     private IEnumerator FadeOutLoadingImage()
     {
         CanvasGroup canvasGroup = LoadingImage.GetComponent<CanvasGroup>() ?? LoadingImage.AddComponent<CanvasGroup>();
@@ -159,6 +184,21 @@ public class PlayerCardUI : MonoBehaviour
 
         List<Database.PlayerCardData> selected = slots.Select(slot => slot.GetCurrentCard()).ToList();
         PlayerSetting.PlayerCards.AddRange(selected);
+        
+        // ✅ Special 카드 효과 처리
+        foreach (var card in selected)
+        {
+            if (card.StatType == PlayerStatType.Special)
+            {
+                int skillId = card.AppliedSkill;
+                int index  = Array.FindIndex(PlayerSetting.AttackSkillIDs, id => id == skillId);
+                if (index != -1)
+                {
+                    PlayerSetting.AttackSkillIDs[index] += 100; // 🎯 스킬 강화!
+                    Debug.Log($"[CardUI] 공격 스킬 강화됨: {skillId} → {PlayerSetting.AttackSkillIDs[index]}");
+                }
+            }
+        }
 
         if (!myGamePlayer)
             myGamePlayer = FindObjectsByType<GamePlayer>(sortMode: FindObjectsSortMode.None).FirstOrDefault(gp => gp.isOwned);

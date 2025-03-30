@@ -35,7 +35,6 @@ public class DamageBox : MonoBehaviour
         if (player != null)
         {
             playersInRange.Remove(player);
-            Debug.Log($"[DamageBox] 플레이어 {player.playerId} 나감. 남은 플레이어 수: {playersInRange.Count}");
 
             // ✅ 모든 플레이어가 나가면 코루틴 종료
             if (playersInRange.Count == 0 && damageCoroutine != null)
@@ -54,8 +53,6 @@ public class DamageBox : MonoBehaviour
             {
                 player.takeDamage(damagePerTick, transform.position, 0, null, -1, 0);
             }
-
-           // Debug.Log($"[DamageBox] 현재 감지된 플레이어 수: {playersInRange.Count}");
 
             yield return new WaitForSeconds(damageInterval);
         }
