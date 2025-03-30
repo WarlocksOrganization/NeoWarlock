@@ -771,7 +771,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4031071259228780606, guid: d6b251da85a7267408e12c79b5f45809, type: 3}
       propertyPath: m_Name
-      value: ProjectorEnemyPrefab
+      value: ProjectorPrefab
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

@@ -35,6 +35,11 @@ namespace GameManagement
         private HashSet<NetworkConnectionToClient> readyPlayers = new();
 
         public bool isLan = false;
+        
+        public void ResetRoundState()
+        {
+            roundEnded = false;
+        }
 
         public void Init(PlayerCharacter[] characters)
         {
@@ -210,6 +215,34 @@ namespace GameManagement
                 .Select(p => p.playerId)
                 .ToList();
         }
+        
+        public bool roundEnded = false;
+
+        public void TryCheckGameOver()
+        {
+            if (roundEnded) return;
+
+            var alive = GetAlivePlayers();
+            if (alive.Count > 1) return;
+
+            roundEnded = true;
+
+            var roundRanks = GetCurrentRoundRanks();
+            var roundData = roundRanks.Select(tuple =>
+            {
+                var stats = GetPlayerStats(tuple.playerId);
+                return (tuple.playerId, stats.kills, stats.outKills, stats.damageDone, tuple.rank);
+            }).ToList();
+
+            AddRoundResult(roundData);
+
+            foreach (var conn in NetworkServer.connections.Values)
+            {
+                conn.identity.GetComponent<GamePlayer>()?.RpcUpdateRound(currentRound);
+                conn.identity.GetComponent<GamePlayer>()?.RpcSendFinalScore(GetAllPlayerRecords(), currentRound - 1);
+            }
+        }
+
     }
 
 }

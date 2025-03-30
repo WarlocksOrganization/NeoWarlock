@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da50ede5f68917f4c9067a2e3fa82538, type: 3}
+  m_Name: RandomMapConfig
+  m_EditorClassIdentifier: 
+  mapType: 0
+  mapName: "\uB79C\uB364"
+  mapSprite: {fileID: 21300000, guid: 40bdf247c5e68bf4cb97dd9714e32501, type: 3}
+  bgmType: 1102
+  skyboxMaterial: {fileID: 2100000, guid: 5d133deeaa66ed445853e946ff25e073, type: 2}

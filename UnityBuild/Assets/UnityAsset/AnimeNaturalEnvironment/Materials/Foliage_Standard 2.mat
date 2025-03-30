@@ -151,6 +151,7 @@ Material:
     - _SSScolor: {r: 0.23395005, g: 0.5377358, b: 0, a: 0}
     - _SpecColor: {r: 0.6399291, g: 1, b: 0.15686166, a: 0.2}
   m_BuildTextureStacks: []
+  m_AllowLocking: 1
 --- !u!114 &1093774538138908404
 MonoBehaviour:
   m_ObjectHideFlags: 11

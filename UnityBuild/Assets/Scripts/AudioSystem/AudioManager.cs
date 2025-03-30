@@ -130,6 +130,32 @@ public class AudioManager : MonoBehaviour
         else
             Debug.LogWarning($"[AudioManager] SkillType {type} clip not found.");
     }
+    
+    public void PlaySFX(Constants.SoundType type, Vector3 position)
+    {
+        if (soundDict.TryGetValue(type, out AudioClip clip))
+        {
+            PlayClipAtPosition(clip, position);
+        }
+        else
+        {
+            Debug.LogWarning($"[AudioManager] SFX SoundType {type} not found.");
+        }
+    }
+    
+    private void PlayClipAtPosition(AudioClip clip, Vector3 position)
+    {
+        AudioSource sfx = Instantiate(sfxPrefab);
+        sfx.transform.position = position;
+
+        sfx.clip = clip;
+        sfx.volume = sfxVolume;
+        sfx.spatialBlend = 1f; // 3D 사운드로 처리
+
+        sfx.Play();
+        Destroy(sfx.gameObject, clip.length + 0.5f);
+    }
+
 
 // 히트 시 사운드 재생
     public void PlayHitSFX(Constants.SkillType type, GameObject parent = null)

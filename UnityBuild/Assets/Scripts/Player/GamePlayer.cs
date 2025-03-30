@@ -24,6 +24,7 @@ namespace Player
 
         [SerializeField] private GameObject[] SSAFYPlayObject;
         [SerializeField] private GameObject[] LavaPlayObject;
+        [SerializeField] private GameObject[] SpacePlayObject;
         [SerializeField] private GameObject[] SeaPlayObject;
 
         private PlayerCardUI playerCardUI;
@@ -74,6 +75,13 @@ namespace Player
                 else if (gameRoomData.roomMapType == Constants.RoomMapType.Lava)
                 {
                     foreach (GameObject gameObject in LavaPlayObject)
+                    {
+                        NetworkServer.Spawn(Instantiate(gameObject), connectionToClient);
+                    }
+                }
+                else if (gameRoomData.roomMapType == Constants.RoomMapType.Space)
+                {
+                    foreach (GameObject gameObject in SpacePlayObject)
                     {
                         NetworkServer.Spawn(Instantiate(gameObject), connectionToClient);
                     }
@@ -267,28 +275,25 @@ namespace Player
 
         public void CheckGameOver()
         {
-            if (isRoundEnding) return;
-            isRoundEnding = true;
-
-            var alive = GameManager.Instance.GetAlivePlayers();
-            if (alive.Count > 1) return;
-
-            var roundRanks = GameManager.Instance.GetCurrentRoundRanks();
-            var roundData = roundRanks.Select(tuple =>
-            {
-                var stats = GameManager.Instance.GetPlayerStats(tuple.playerId);
-                return (tuple.playerId, stats.kills, stats.outKills, stats.damageDone, tuple.rank);
-            }).ToList();
-
-            GameManager.Instance.AddRoundResult(roundData);
-            RpcUpdateRound(GameManager.Instance.currentRound);
-            RpcSendFinalScore(GameManager.Instance.GetAllPlayerRecords(), GameManager.Instance.currentRound - 1);
+            if (!isServer) return;
+            GameManager.Instance.TryCheckGameOver(); // ✅ 이제 여기서만 실행
         }
+
 
         [ClientRpc]
         public void RpcUpdateRound(int round)
         {
             GameManager.Instance.currentRound = round;
+        }
+        
+        [RuntimeInitializeOnLoadMethod]
+        private static void OnSceneLoaded()
+        {
+            SceneManager.sceneLoaded += (_, _) =>
+            {
+                if (GameManager.Instance != null)
+                    GameManager.Instance.ResetRoundState();
+            };
         }
     }
 }

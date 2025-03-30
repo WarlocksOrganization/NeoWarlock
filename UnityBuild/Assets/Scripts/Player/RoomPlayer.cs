@@ -116,5 +116,14 @@ namespace Player
         {
             //LobbyPlayer.SetCharacterClass(characterClass);
         }
+        
+        [Command]
+        public void CmdChangeMap(bool next)
+        {
+            if (!NetworkServer.active) return;
+
+            var room = FindFirstObjectByType<GameRoomData>();
+            room?.ChangeMap(next);
+        }
     }
 }

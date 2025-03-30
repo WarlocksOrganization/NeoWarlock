@@ -14,6 +14,9 @@ public class SettingUI : MonoBehaviour
        
         float sfxVolume = AudioManager.Instance.GetSFXVolume();
         sfxSlider.value = sfxVolume;
+        
+        bgmSlider.onValueChanged.AddListener(SetBGMVolume);
+        sfxSlider.onValueChanged.AddListener(SetSFXVolume);
     }
 
     public void SetBGMVolume(float volume)

@@ -8,6 +8,7 @@ namespace DataSystem
     {
         public Constants.RoomMapType mapType;
         public string mapName;
+        public Sprite mapSprite;
         public Constants.SoundType bgmType;
         public Material skyboxMaterial;
     }

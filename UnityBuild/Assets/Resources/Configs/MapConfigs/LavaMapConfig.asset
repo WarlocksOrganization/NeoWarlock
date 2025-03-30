@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: LavaMapConfig
   m_EditorClassIdentifier: 
   mapType: 2
-  mapName: "\uB3D9\uAD74"
+  mapName: "\uC6A9\uC758 \uB465\uC9C0"
+  mapSprite: {fileID: 21300000, guid: e82adfa9fa71d2d43b72427fa177b296, type: 3}
   bgmType: 1102
   skyboxMaterial: {fileID: 2100000, guid: 5d133deeaa66ed445853e946ff25e073, type: 2}

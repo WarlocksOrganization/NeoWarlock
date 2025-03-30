@@ -22,9 +22,12 @@ public class GameSystemManager : NetworkBehaviour
             Destroy(gameObject); // ✅ 중복된 Instance 제거
     }
 
-    protected void Start()
+    protected virtual void Start()
     {
-        RenderSettings.skybox = mapConfig.skyboxMaterial;
+        if (mapConfig != null && mapConfig.skyboxMaterial != null)
+        {
+            RenderSettings.skybox = mapConfig.skyboxMaterial;
+        }
     }
 
     public virtual void StartEvent()

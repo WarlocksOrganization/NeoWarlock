@@ -11651,6 +11651,8 @@ MonoBehaviour:
   - {fileID: 3622867063374222405, guid: ab7c75548118a3d468ad99e1b58b764f, type: 3}
   - {fileID: 5686090464823823962, guid: 1f3c75247312101499501410db72fd1f, type: 3}
   - {fileID: 322783647940636695, guid: a408ba58521f6a742b9cfee37f8bf882, type: 3}
+  - {fileID: 5686090464823823962, guid: 606df0497a136824b8de681a0a5ab317, type: 3}
+  - {fileID: 5686090464823823962, guid: f7568a4ee603c8d429b335064de24a78, type: 3}
   exceptionsDisconnect: 1
   snapshotSettings:
     bufferTimeMultiplier: 2
@@ -37301,6 +37303,10 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 7f999090b31f6f34f945915eb05178fd, type: 3}
   - type: 1105
     clip: {fileID: 8300000, guid: 7f999090b31f6f34f945915eb05178fd, type: 3}
+  - type: 1110
+    clip: {fileID: 8300000, guid: c59aa37163b19f5428e230325da72b78, type: 3}
+  - type: 1115
+    clip: {fileID: 8300000, guid: aacdac1fd68180f458bd27a995e19fd2, type: 3}
   uiSFXList:
   - type: 2001
     clip: {fileID: 8300000, guid: 91553fd9dcf9e7948968f6a3273017a6, type: 3}
@@ -37314,6 +37320,8 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 27e7d2e8fe371a049a594b4f532e44f9, type: 3}
   - type: 2106
     clip: {fileID: 8300000, guid: 0d1e8452d9c8e8d4185fd6301cdf83ca, type: 3}
+  - type: 2107
+    clip: {fileID: 8300000, guid: 481a1156eddddf14eb725c82c8c0b8c4, type: 3}
   gameSFXList:
   - type: 2201
     clip: {fileID: 8300000, guid: 82f707f7d49501548a9f9e872f999ba6, type: 3}
@@ -37331,6 +37339,10 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 6e5f7b3a5d706d34d9506ff2fbd86559, type: 3}
   - type: 2221
     clip: {fileID: 8300000, guid: bc47dff200f459444b01a072d86afd99, type: 3}
+  - type: 2230
+    clip: {fileID: 8300000, guid: ea23b9962d3b41343b8dcc828005afe6, type: 3}
+  - type: 2231
+    clip: {fileID: 8300000, guid: 6c12ba1f7bc8ca247b62f564be27c946, type: 3}
   skillSFXList:
   - skillType: 0
     clip: {fileID: 8300000, guid: 3e8f64b2e83646e40b55c4f016c2ff31, type: 3}

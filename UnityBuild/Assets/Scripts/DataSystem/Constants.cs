@@ -34,7 +34,8 @@ namespace DataSystem
             Random = 0,
             SSAFY = 1,
             Lava = 2,
-            Sea = 3,
+            Space = 3,
+            Sea = 4,
         }
 
         public enum PlayerState
@@ -149,7 +150,8 @@ namespace DataSystem
             BGM_SSAFY_ScoreBoard= 1103,
             
             BGM_Lava_GameStart = 1105,
-            BGM_Sea_GameStart = 1110,
+            BGM_Space_GameStart = 1110,
+            BGM_Sea_GameStart = 1115,
 
             // SFX UI
             SFX_Button = 2001,
@@ -159,6 +161,7 @@ namespace DataSystem
             SFX_Start = 2101,
             SFX_Reroll = 2105,
             SFX_RerollSpecial = 2106,
+            SFX_ScoreCount = 2107,
             SFX_AcquireItem = 2110,
             
             SFX_HandAttack = 2201,
@@ -168,6 +171,9 @@ namespace DataSystem
             SFX_Lava = 2220,
             SFX_FlyingDragon = 2221,
             SFX_FallRock = 2222,
+            
+            SFX_FallingMeteor = 2230,
+            SFX_MeteorExplosion = 2231,
             
             SFX_GhostAttack = 2300,
             SFX_PlayerDead = 2301,

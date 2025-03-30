@@ -67,7 +67,10 @@ MonoBehaviour:
   - {fileID: 3982144661890126659, guid: f90b978d18b4de54dbbf4c1b08378f14, type: 3}
   LavaPlayObject:
   - {fileID: 5686090464823823962, guid: 1f3c75247312101499501410db72fd1f, type: 3}
-  SeaPlayObject: []
+  SpacePlayObject:
+  - {fileID: 5686090464823823962, guid: f7568a4ee603c8d429b335064de24a78, type: 3}
+  SeaPlayObject:
+  - {fileID: 5686090464823823962, guid: 606df0497a136824b8de681a0a5ab317, type: 3}
 --- !u!114 &6368749677994769231
 MonoBehaviour:
   m_ObjectHideFlags: 0
