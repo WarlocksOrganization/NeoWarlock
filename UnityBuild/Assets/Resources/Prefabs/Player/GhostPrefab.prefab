@@ -99,7 +99,7 @@ MonoBehaviour:
   ownedMaterial: {fileID: 2100000, guid: b36b11cc52c29c14fa355603870d9b97, type: 2}
   attackRadius: 3
   attackDamage: 0
-  attackKnockback: 1
+  attackKnockback: 1.5
   attackCooldown: 3
   attackDelay: 0.3
   attackRecoveryTime: 0.6

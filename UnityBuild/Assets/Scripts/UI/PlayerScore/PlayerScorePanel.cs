@@ -19,11 +19,11 @@ public class PlayerScorePanel : MonoBehaviour
     [SerializeField] private TMP_Text damageText;
     [SerializeField] public TMP_Text totalScoreText;
 
-    public void SetupWithScore(Constants.PlayerRecord record, int score, int upToRoundIndex, bool includeCurrentRound)
+    public void SetupWithScore(Constants.PlayerRecord record, int score, int upToRoundIndex, bool includeCurrentRound, int localPlayerId )
     {
         id = record.playerId;
         nicknameText.text = record.nickname;
-        nicknameText.color = record.playerId == PlayerSetting.PlayerId ? Color.yellow : Color.white;
+        nicknameText.color = record.playerId == localPlayerId ? Color.yellow : Color.white;
         classIcon.sprite = Database.GetCharacterClassData(record.characterClass).CharacterIcon;
         totalScoreText.text = score.ToString();
 

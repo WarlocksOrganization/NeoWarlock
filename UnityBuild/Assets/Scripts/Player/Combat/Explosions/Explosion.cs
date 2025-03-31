@@ -11,7 +11,6 @@ namespace Player.Combat
         protected float explosionDamage;
         protected float explosionRadius;
         protected float knockbackForce;
-        protected float knockbackForceFactor = 20f;
         protected float explosionDuration = 3f; // 지속 시간
         protected float explosionInterval = 0.5f; // 폭발 간격
 
@@ -28,7 +27,7 @@ namespace Player.Combat
         {
             explosionDamage = damage;
             explosionRadius = radius;
-            knockbackForce = knockback * knockbackForceFactor;
+            knockbackForce = knockback;
             if (config != null)
             {
                 this.config = config;

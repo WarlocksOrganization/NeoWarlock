@@ -266,22 +266,5 @@ namespace Player
                 availableAttacks[4] = null;
             }
         }
-
-        [Command(requiresAuthority = false)]
-        public void CmdCertainAttack(Vector3 target, int skillId, bool useOrigin)
-        {
-            if (!certainAttacks.ContainsKey(skillId))
-            {
-                var data = Database.GetAttackData(skillId);
-                if (data != null)
-                    certainAttacks[skillId] = CreateAttackInstance(data);
-            }
-
-            if (certainAttacks.TryGetValue(skillId, out var attack))
-            {
-                Vector3 firePos = useOrigin ? attackTransform.position : attackTransform.position + (target - transform.position).normalized;
-                attack.Execute(target, firePos, gameObject, playerId, skillId, AttackPower);
-            }
-        }
     }
 }

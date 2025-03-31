@@ -28,13 +28,6 @@ public class FloatingDamageText : MonoBehaviour
         float newfadeDuration = fadeDuration*fontSizeScale;
 
         damageText.text = Mathf.Abs(damage).ToString();
-        StartCoroutine(FadeOutAndDestroy(newfadeDuration));
-    }
-
-    private IEnumerator FadeOutAndDestroy(float newfadeDuration)
-    {
-        CanvasGroup canvasGroup = GetComponent<CanvasGroup>();
-        Vector3 startPosition = transform.position;
         
         if (damage > 0)
             damageText.color = Color.yellow; // 데미지 (노란색)
@@ -42,6 +35,23 @@ public class FloatingDamageText : MonoBehaviour
             damageText.color = Color.green; // 체력 회복 (초록색)
         else
             damageText.color = Color.white; // 0 데미지 (흰색)
+
+        
+        StartCoroutine(FadeOutAndDestroy(newfadeDuration));
+    }
+    
+    public void SetText(string message)
+    {
+        damageText.color = Color.cyan;
+        damageText.fontSize = baseFontSize*1.5f;
+        damageText.text = message;
+        StartCoroutine(FadeOutAndDestroy(fadeDuration));
+    }
+
+    private IEnumerator FadeOutAndDestroy(float newfadeDuration)
+    {
+        CanvasGroup canvasGroup = GetComponent<CanvasGroup>();
+        Vector3 startPosition = transform.position;
 
         float elapsedTime = 0f;
         while (elapsedTime < newfadeDuration)

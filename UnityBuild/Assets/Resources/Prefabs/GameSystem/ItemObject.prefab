@@ -100,6 +100,7 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
+  floatingTextPrefab: {fileID: 7419919620569818252, guid: e91df33ee3e256a4d80b9260a3d087e4, type: 3}
 --- !u!114 &4327027966890835434
 MonoBehaviour:
   m_ObjectHideFlags: 0

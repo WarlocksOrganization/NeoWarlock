@@ -4079,6 +4079,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   currentRound: 0
   isLan: 0
+  roundEnded: 0
 --- !u!4 &1338923486
 Transform:
   m_ObjectHideFlags: 0
@@ -5159,11 +5160,16 @@ MonoBehaviour:
   RoomNameText: {fileID: 0}
   PlayerInRoonText: {fileID: 1536093928}
   PlayerSelection: {fileID: 0}
-  StartGameButton: {fileID: 0}
   playerStatusUI: {fileID: 866795493}
+  StartGameButton: {fileID: 0}
+  ChangeMapNextButton: {fileID: 0}
+  ChangeMapBeforeButton: {fileID: 0}
+  MapImage: {fileID: 0}
+  MapName: {fileID: 0}
   PlayerCharacters: []
   killLogUI: {fileID: 1880275957}
   warningText: {fileID: 0}
+  mapConfigs: []
   alamGameObject: {fileID: 120480834}
   alamText: {fileID: 2088901005}
   countDownText: {fileID: 2032623820}

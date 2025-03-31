@@ -33,7 +33,7 @@ public class ScoreBoardUI : MonoBehaviour
 
     public void ShowScoreBoard(Constants.PlayerRecord[] records, int roundIndex)
 {
-    gameObject.SetActive(true);
+    Debug.Log("ShowScoreBoard");
     StartCoroutine(ShowRankingFlow(records, roundIndex)); // ✅ records 사용
 }
 
@@ -53,8 +53,10 @@ private IEnumerator ShowRankingFlow(Constants.PlayerRecord[] records, int roundI
 
         var panel = scorePanels[record.playerId];
         panel.gameObject.SetActive(true);
+        
+        int localPlayerId = PlayerSetting.PlayerId;
 
-        panel.SetupWithScore(record, GameManager.Instance.GetScoreAtRound(record, roundIndex), roundIndex, includeCurrentRound: false);
+        panel.SetupWithScore(record, GameManager.Instance.GetScoreAtRound(record, roundIndex), roundIndex, includeCurrentRound: false, localPlayerId );
         panel.SetRoundRanks(record.roundStatsList.Take(roundIndex).Select(r => r.rank).ToList());
         panel.GetComponent<RectTransform>().anchoredPosition = panelPositions[i].anchoredPosition;
     }
@@ -77,7 +79,8 @@ private IEnumerator ShowRankingFlow(Constants.PlayerRecord[] records, int roundI
     {
         var panel = scorePanels[preSorted[i].playerId];
         int preScore = preSorted[i].GetTotalScoreUpToRound(roundIndex - 1);
-        panel.SetupWithScore(preSorted[i], preScore, roundIndex - 1, includeCurrentRound: true);
+        int localPlayerId = PlayerSetting.PlayerId;
+        panel.SetupWithScore(preSorted[i], preScore, roundIndex - 1, includeCurrentRound: true, localPlayerId);
         panel.GetComponent<RectTransform>().anchoredPosition = panelPositions[i].anchoredPosition;
     }
 
@@ -95,7 +98,8 @@ private IEnumerator ShowRankingFlow(Constants.PlayerRecord[] records, int roundI
         var panel = scorePanels.First(p => p.id == finalSorted[i].playerId);
         int before = preSorted.First(p => p.playerId == finalSorted[i].playerId).GetTotalScoreUpToRound(roundIndex - 1);
         int after = finalSorted[i].GetTotalScoreUpToRound(roundIndex);
-        panel.SetupWithScore(finalSorted[i], after, roundIndex, includeCurrentRound: true);
+        int localPlayerId = PlayerSetting.PlayerId;
+        panel.SetupWithScore(finalSorted[i], after, roundIndex, includeCurrentRound: true, localPlayerId);
         panel.AnimateScore(before, after);
         panel.MoveTo(panelPositions[i].anchoredPosition);
         

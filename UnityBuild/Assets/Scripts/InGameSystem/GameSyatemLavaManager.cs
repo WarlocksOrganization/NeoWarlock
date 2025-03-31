@@ -31,6 +31,8 @@ public class GameSyatemLavaManager : GameSystemManager
         NetEvent();
         
         RpcShakeCameraWhileLavaRises(1f, 1.5f, riseDuration);
+        
+        GameSystemManager.Instance.EndEventAndStartNextTimer(); // 다음 타이머 시작
     }
 
     private IEnumerator RaiseLava(float targetY, float duration)
@@ -50,8 +52,6 @@ public class GameSyatemLavaManager : GameSystemManager
         }
 
         lavaTrans.position = endPos; // 정확히 목표 위치로
-        
-        GameSystemManager.Instance.EndEventAndStartNextTimer(); // 다음 타이머 시작
     }
 
     public override void NetEvent()
@@ -92,6 +92,8 @@ public class GameSyatemLavaManager : GameSystemManager
     
     private IEnumerator SpawnFallingAttacks(int count)
     {
+        yield return new WaitForSeconds(1.5f);
+        
         for (int i = 0; i < count; i++)
         {
             Vector3 spawnPosition = new Vector3(
@@ -106,8 +108,8 @@ public class GameSyatemLavaManager : GameSystemManager
 
             attack.GetComponent<AttackProjectile>().SetProjectileData(
                 10,  // damage
-                10,  // speed
-                5,   // radius
+                20,  // speed
+                7.5f,   // radius
                 5,   // range
                 10,  // duration
                 3,   // knockback
@@ -120,7 +122,7 @@ public class GameSyatemLavaManager : GameSystemManager
             NetworkServer.Spawn(attack);
 
             // ✅ 0.1초 지연
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSeconds(0.25f);
         }
     }
 
