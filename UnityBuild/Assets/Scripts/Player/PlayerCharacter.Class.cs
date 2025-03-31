@@ -79,6 +79,14 @@ namespace Player
             animator.SetFloat("Blend", (int)newClass);
             ApplyCharacterClass(newClass);
             UpdateCount();
+            if (isOwned)
+            {
+                var statUI = FindFirstObjectByType<PlayerStatUI>();
+                if (statUI != null)
+                {
+                    statUI.Setup(this);
+                }
+            }
         }
 
         private void ApplyCharacterClass(Constants.CharacterClass newClass)

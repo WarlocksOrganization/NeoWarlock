@@ -25,6 +25,7 @@ namespace Player
                     CmdModifyPlayerAttackStat(card.AppliedSkill, card.StatType, card.BonusStat);
                 }
             }
+            NotifyStatChanged();
         }
 
         // ✅ 기본 스탯 적용 (서버 전용)

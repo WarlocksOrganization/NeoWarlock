@@ -16,11 +16,14 @@ namespace Player
         [SyncVar(hook = nameof(OnHpChanged))] // ✅ Hook 추가
         public int curHp = 150;
 
-        [SyncVar] private int maxHp = 150;
+        [SyncVar(hook = nameof(OnHpChanged))] public int maxHp = 150;
+        public int MaxHp => maxHp;
+        public int CurHp => curHp;
 
         [SyncVar] private int attackPlayersId = -1;
         [SyncVar] private int attackskillid = -1;
-        [SyncVar] public int defense = 0; // ✅ 방어력 추가
+        [SyncVar(hook = nameof(OnDefenseChanged))] public int defense = 0; // ✅ 방어력 추가
+        public int Defense => defense;
         
         public void takeDamage(int damage, Vector3 attackTran, float knockbackForce, AttackConfig attackConfig, int attackPlayerId, int attackskillid)
         {
@@ -51,6 +54,7 @@ namespace Player
                 }
             }
         }
+        private void OnDefenseChanged(int oldVal, int newVal) => NotifyStatChanged();
 
         public void DecreaseHp(int damage, int attackPlayerId, int attackskillid)
         {
@@ -166,6 +170,7 @@ namespace Player
             if (isOwned)
             {
                 playerUI.SetDamageEffect(1f-(float)newHp / maxHp);
+                NotifyStatChanged();
             }
         }
         

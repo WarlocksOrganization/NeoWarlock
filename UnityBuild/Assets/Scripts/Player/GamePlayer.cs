@@ -242,9 +242,18 @@ namespace Player
                 PlayerSetting.MoveSkill,
                 PlayerSetting.AttackSkillIDs
             );
-
+            StartCoroutine(DelayedStatSetup());
             int[] selectedCardIds = PlayerSetting.PlayerCards.Select(card => card.ID).ToArray();
             CmdMarkPlayerReady(selectedCardIds);
+        }
+
+        private IEnumerator DelayedStatSetup()
+        {
+            yield return new WaitUntil(() => playerCharacter.PLayerCharacterClass != Constants.CharacterClass.None);
+
+            var statUI = FindFirstObjectByType<PlayerStatUI>();
+            statUI?.Setup(playerCharacter);
+            playerCharacter.NotifyStatChanged();
         }
 
         [Command]

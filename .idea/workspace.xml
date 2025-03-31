@@ -5,22 +5,21 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="cc3f9180-20e1-46e1-b7c9-eeeaba4f5e46" name="Changes" comment="Changes">
-      <change beforePath="$PROJECT_DIR$/UnityBuild/Assets/Resources/Prefabs/Player/GhostPrefab.prefab.meta" beforeDir="false" afterPath="$PROJECT_DIR$/UnityBuild/Assets/Resources/Prefabs/Player/GhostPrefab.prefab.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UnityBuild/Assets/Resources/Prefabs/Player/MoveIndicator.prefab.meta" beforeDir="false" afterPath="$PROJECT_DIR$/UnityBuild/Assets/Resources/Prefabs/Player/MoveIndicator.prefab.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UnityBuild/Assets/Resources/Prefabs/Player/PlayerCharacter.prefab.meta" beforeDir="false" afterPath="$PROJECT_DIR$/UnityBuild/Assets/Resources/Prefabs/Player/PlayerCharacter.prefab.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UnityBuild/Assets/Resources/Prefabs/Player/PlayerScorePanelPrefab.prefab.meta" beforeDir="false" afterPath="$PROJECT_DIR$/UnityBuild/Assets/Resources/Prefabs/Player/PlayerScorePanelPrefab.prefab.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UnityBuild/Assets/Resources/Prefabs/Player/RoomPlayer.prefab.meta" beforeDir="false" afterPath="$PROJECT_DIR$/UnityBuild/Assets/Resources/Prefabs/Player/RoomPlayer.prefab.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UnityBuild/Assets/Resources/Prefabs/UI/PlayerUI.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/UnityBuild/Assets/Resources/Prefabs/UI/PlayerUI.prefab" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UnityBuild/Assets/Resources/Projector/ArrowProjectorMaterial.mat" beforeDir="false" afterPath="$PROJECT_DIR$/UnityBuild/Assets/Resources/Projector/ArrowProjectorMaterial.mat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UnityBuild/Assets/Scenes/GamePlay (1).unity" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/UnityBuild/Assets/Scenes/GamePlay (1).unity.meta" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/UnityBuild/Assets/Scenes/GamePlay.unity" beforeDir="false" afterPath="$PROJECT_DIR$/UnityBuild/Assets/Scenes/GamePlay.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UnityBuild/Assets/Scenes/MainMenu.unity" beforeDir="false" afterPath="$PROJECT_DIR$/UnityBuild/Assets/Scenes/MainMenu.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UnityBuild/Assets/Scripts/GameManagement/GameManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/UnityBuild/Assets/Scripts/GameManagement/GameManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UnityBuild/Assets/Scripts/Player/BuffSystem.cs" beforeDir="false" afterPath="$PROJECT_DIR$/UnityBuild/Assets/Scripts/Player/BuffSystem.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UnityBuild/Assets/Scripts/Player/GamePlayer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/UnityBuild/Assets/Scripts/Player/GamePlayer.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UnityBuild/Assets/Scripts/Player/PlayerCharacter.Attack.cs" beforeDir="false" afterPath="$PROJECT_DIR$/UnityBuild/Assets/Scripts/Player/PlayerCharacter.Attack.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UnityBuild/Assets/Scripts/Player/PlayerCharacter.Card.cs" beforeDir="false" afterPath="$PROJECT_DIR$/UnityBuild/Assets/Scripts/Player/PlayerCharacter.Card.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UnityBuild/Assets/Scripts/Player/PlayerCharacter.Class.cs" beforeDir="false" afterPath="$PROJECT_DIR$/UnityBuild/Assets/Scripts/Player/PlayerCharacter.Class.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UnityBuild/Assets/Scripts/UI/PlayerScore/ScoreBoardUI.cs" beforeDir="false" afterPath="$PROJECT_DIR$/UnityBuild/Assets/Scripts/UI/PlayerScore/ScoreBoardUI.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UnityBuild/Assets/Settings/PC_RPAsset.asset" beforeDir="false" afterPath="$PROJECT_DIR$/UnityBuild/Assets/Settings/PC_RPAsset.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UnityBuild/Assets/Scripts/Player/PlayerCharacter.Damage.cs" beforeDir="false" afterPath="$PROJECT_DIR$/UnityBuild/Assets/Scripts/Player/PlayerCharacter.Damage.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UnityBuild/Assets/Scripts/Player/PlayerCharacter.Movement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/UnityBuild/Assets/Scripts/Player/PlayerCharacter.Movement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UnityBuild/Assets/Scripts/Player/PlayerCharacter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/UnityBuild/Assets/Scripts/Player/PlayerCharacter.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UnityBuild/Assets/Settings/UniversalRenderPipelineGlobalSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/UnityBuild/Assets/Settings/UniversalRenderPipelineGlobalSettings.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UnityBuild/Assets/TextMesh Pro/Resources/Fonts &amp; Materials/LiberationSans SDF - Fallback.asset" beforeDir="false" afterPath="$PROJECT_DIR$/UnityBuild/Assets/TextMesh Pro/Resources/Fonts &amp; Materials/LiberationSans SDF - Fallback.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UnityBuild/ProjectSettings/GraphicsSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/UnityBuild/ProjectSettings/GraphicsSettings.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UnityBuild/ProjectSettings/TagManager.asset" beforeDir="false" afterPath="$PROJECT_DIR$/UnityBuild/ProjectSettings/TagManager.asset" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
