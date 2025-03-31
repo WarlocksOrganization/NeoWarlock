@@ -123,7 +123,14 @@ namespace Player
                 lastMovementSkillTime = -Mathf.Infinity;
             }
         }
+        public void SetCharacterClass(Constants.CharacterClass cls)
+        {
+            if (characterModels == null)
+                InitializeCharacterModels();
 
+            PLayerCharacterClass = cls;
+            ApplyCharacterClass(cls);
+        }
         private void ActivateCharacterModel(Constants.CharacterClass newClass)
         {
             foreach (var model in characterModels.Values)
