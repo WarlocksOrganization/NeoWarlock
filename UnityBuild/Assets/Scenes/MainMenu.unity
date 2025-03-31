@@ -7053,7 +7053,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 361876267}
-  - component: {fileID: 361876266}
+  - component: {fileID: 361876268}
   m_Layer: 0
   m_Name: ModalManager
   m_TagString: Untagged
@@ -7061,18 +7061,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &361876266
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 361876265}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e54ea47b47670c74fa9ff82f6295d68f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!4 &361876267
 Transform:
   m_ObjectHideFlags: 0
@@ -7088,6 +7076,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &361876268
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 361876265}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a531d24142607fd4288ca9666a55b1df, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  modalPrefab: {fileID: 1666918232306240129, guid: d452d80f673be384db13894cdd7d4ddf, type: 3}
 --- !u!1001 &371273260
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -18657,7 +18658,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b6da0329e68d81a4aa9579325526c409, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  matchServerIP: j12a509.p.ssafy.io
+  socketServerIP: j12a509.p.ssafy.io
   socketServerPort: 8080
   bufferSize: 8192
   maxRetries: 5
@@ -26069,6 +26070,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d29a164b0e831df4b9367fab658ecf37, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _nicknameErrorText: {fileID: 1115912967}
+  _nickNameShowText: {fileID: 1220417501}
+  _nicknameInputField: {fileID: 1608194033}
+  _nicknameConfirmButton: {fileID: 161262414}
+  _onlineUI: {fileID: 1941930190}
 --- !u!1 &1620720339
 GameObject:
   m_ObjectHideFlags: 0
@@ -32864,6 +32870,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   createRoomUI: {fileID: 916236714}
   findRoomUI: {fileID: 1281179373}
+  nicknameUI: {fileID: 1619069060}
 --- !u!1001 &1949398315
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -36777,6 +36784,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   currentRound: 0
   isLan: 0
+  roundEnded: 0
 --- !u!1 &536811835975850709
 GameObject:
   m_ObjectHideFlags: 0
