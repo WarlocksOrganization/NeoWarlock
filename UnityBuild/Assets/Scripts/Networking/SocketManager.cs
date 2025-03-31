@@ -12,6 +12,7 @@ using Unity.VisualScripting;
 using System.Linq;
 using IO.Swagger.Model;
 using kcp2k;
+using System.Buffers.Text;
 
 namespace Networking
 {
@@ -46,6 +47,14 @@ namespace Networking
         {   
             // 서버에 연결
             // 백그라운드 스레드로 연결
+            if (PlayerPrefs.HasKey("sessionToken"))
+            {
+                PlayerPrefs.DeleteKey("sessionToken");
+            }
+            if (PlayerPrefs.HasKey("userId"))
+            {
+                PlayerPrefs.DeleteKey("userId");
+            }
 
             if (UnityEngine.Application.platform.Equals(RuntimePlatform.LinuxServer))
             {
@@ -100,8 +109,8 @@ namespace Networking
                 InitSocketConnection();
             }
 
-
             // TEST
+            // InitSocketConnection();
             // StartCoroutine(TestResister());
         }
 
@@ -228,6 +237,23 @@ namespace Networking
             if (_client != null)
                 _client.Close();
 
+            StopAllCoroutines();
+            
+            // 로컬 저장소 초기화
+            if (PlayerPrefs.HasKey("sessionToken"))
+            {
+                PlayerPrefs.DeleteKey("sessionToken");
+            }
+            if (PlayerPrefs.HasKey("userId"))
+            {
+                PlayerPrefs.DeleteKey("userId");
+            }
+            if (PlayerPrefs.HasKey("nickName"))
+            {
+                PlayerPrefs.DeleteKey("nickName");
+                PlayerPrefs.SetString("nickName", "Player" + UnityEngine.Random.Range(1000, 9999));
+            }
+
             Debug.Log("[SocketManager] 소켓 서버와 연결 해제.");
         }
         
@@ -286,6 +312,10 @@ namespace Networking
                             HandleExitRoom(data);
                             break;
 
+                        case "updateNickName":
+                            HandleUpdateNickname(data);
+                            break;
+
                         default:
                             Debug.LogWarning("[SocketManager] 알 수 없는 클라이언트 액션: " + message);
                             break;
@@ -294,6 +324,11 @@ namespace Networking
             }
             catch (Exception ex)
             {
+                var modal = ModalPopupUI.singleton as ModalPopupUI;
+                if (modal != null)
+                {
+                    modal.ShowModalMessage("서버 응답 처리 중 오류가 발생했습니다.");
+                }
                 Debug.LogError("[SocketManager] 클라이언트 소켓 응답 처리 오류: " + ex.Message);
             }
         }
@@ -348,6 +383,8 @@ namespace Networking
         // TEST
         public IEnumerator TestResister()
         {   
+            yield return new WaitForSeconds(1);
+            RequestRegister("gogogo", "testpassword");
             yield return new WaitForSeconds(1);
             RequestRegister("burnyouwithlight", "a509test");
             yield return new WaitForSeconds(1);
@@ -405,15 +442,6 @@ namespace Networking
             // 연결 해제 후 스레드 종료
             CloseConnection();
             _clientThread.Join();
-
-            if (PlayerPrefs.HasKey("sessionToken"))
-            {
-                PlayerPrefs.DeleteKey("sessionToken");
-            }
-            if (PlayerPrefs.HasKey("userName"))
-            {
-                PlayerPrefs.DeleteKey("userName");
-            }
         }
 
         public bool IsConnected()

@@ -99,7 +99,6 @@ public class GamePlayUI : GameLobbyUI
 
             if (time == 0)
             {
-                AudioManager.Instance.PlaySFX(Constants.SoundType.SFX_Start);
                 countDownText.text = "SMASH!";
                 countDownAnimator.SetTrigger("isStart"); // ✅ 트리거 설정
 
@@ -116,8 +115,7 @@ public class GamePlayUI : GameLobbyUI
                 countDownText.text = time.ToString();
                 countDownAnimator.SetTrigger("isCounting"); // ✅ 숫자 카운트 트리거
 
-                AudioManager.Instance.ApplyBGMVolumeToMixer(0);
-                AudioManager.Instance.PlaySFX(Constants.SoundType.SFX_Count);
+                AudioManager.Instance.StopBGM();
                 foreach (var player in foundCharacters)
                     player.SetState(Constants.PlayerState.Counting);
             }
@@ -142,14 +140,12 @@ public class GamePlayUI : GameLobbyUI
 
     private IEnumerator GameOverSequence(Constants.PlayerRecord[] records, int roundIndex)
     {
-        AudioManager.Instance.ApplyBGMVolumeToMixer(0);
         countDownText.gameObject.SetActive(true);
         countDownText.color = Color.green;
         countDownText.text = "Game Over";
         countDownAnimator.SetTrigger("isGameOver");
 
         yield return new WaitForSeconds(3f);
-        AudioManager.Instance.PlayBGM(Constants.SoundType.BGM_SSAFY_ScoreBoard);
         ShowFinalScoreBoard(records, roundIndex);
     }
 
