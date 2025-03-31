@@ -10,6 +10,7 @@ namespace UI
     {
         [SerializeField] private GameObject createRoomUI;
         [SerializeField] private GameObject findRoomUI;
+        [SerializeField] private GameObject nicknameUI;
     
         public void OnClickEnterGameRoomButton()
         {
@@ -32,6 +33,12 @@ namespace UI
             AudioManager.Instance.PlaySFX(Constants.SoundType.SFX_Button);
             createRoomUI.SetActive(true);
             gameObject.SetActive(false);
+        }
+
+        public void OnEnable()
+        {
+            // UI 활성화 시 닉네임 동기화
+            nicknameUI.GetComponent<NicknameUI>().SyncNicknameShower();
         }
     }
 }
