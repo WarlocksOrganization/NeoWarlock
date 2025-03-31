@@ -57,8 +57,6 @@ namespace Player
 
             skillType = config.skillType;
 
-            Debug.Log(skillType);
-
             this.owner = owner;
         }
 

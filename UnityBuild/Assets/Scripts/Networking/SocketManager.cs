@@ -230,18 +230,10 @@ namespace Networking
 
         public void CloseConnection()
         {
-            // 연결 해제
-            if (_stream != null)
-                _stream.Close();
-
-            if (_client != null)
-                _client.Close();
-
-            StopAllCoroutines();
-            
             // 로컬 저장소 초기화
             if (PlayerPrefs.HasKey("sessionToken"))
             {
+                RequestLogout();
                 PlayerPrefs.DeleteKey("sessionToken");
             }
             if (PlayerPrefs.HasKey("userId"))
@@ -253,6 +245,15 @@ namespace Networking
                 PlayerPrefs.DeleteKey("nickName");
                 PlayerPrefs.SetString("nickName", "Player" + UnityEngine.Random.Range(1000, 9999));
             }
+
+            // 연결 해제
+            if (_stream != null)
+                _stream.Close();
+
+            if (_client != null)
+                _client.Close();
+
+            StopAllCoroutines();
 
             Debug.Log("[SocketManager] 소켓 서버와 연결 해제.");
         }

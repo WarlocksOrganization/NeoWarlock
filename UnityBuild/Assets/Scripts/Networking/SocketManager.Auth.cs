@@ -72,6 +72,15 @@ namespace Networking
             SendRequestToServer(authData);
         }
 
+        public void RequestLogout()
+        {
+            // 인증 요청
+            JToken authData = new JObject();
+            authData["action"] = "logout";
+
+            SendMessageToServer(authData.ToString());
+        }
+
         public void RequestRefreshSession()
         {
             // 세션 갱신 요청
