@@ -12,6 +12,8 @@ public class GameSyatemSpaceManager : GameSystemManager
     [SerializeField] private GameObject[] FallGrounds;
     [SerializeField] private Animator meteorAnimator;
     [SerializeField] private GameObject meteorTrans;
+    
+    [SerializeField] private GameObject skillItemPickupPrefab;
 
     [SyncVar(hook = nameof(OnFallGroundOrderChanged))]
     private string fallGroundOrderStr; // 순서 정보를 문자열로 공유 (SyncVar 제한 우회)
@@ -34,6 +36,8 @@ public class GameSyatemSpaceManager : GameSystemManager
 
     public override void StartEvent()
     {
+        if (!NetworkServer.active) return; 
+        
         if (FallGrounds == null || FallGrounds.Length == 0) return;
         if (eventnum >= FallGrounds.Length) return;
 
@@ -49,6 +53,8 @@ public class GameSyatemSpaceManager : GameSystemManager
 
         StartCoroutine(DelayedFall(selectedGround, 5f));
         Debug.Log("[GameSystemManager] StartEvent()");
+        
+        GameSystemManager.Instance.EndEventAndStartNextTimer();
     }
 
     private void ShuffleFallGroundsExceptLast()
@@ -95,22 +101,71 @@ public class GameSyatemSpaceManager : GameSystemManager
     {
         yield return new WaitForSeconds(delay);
 
-        MeteorExplosion(groundGroup.transform.position);
-
         if (groundGroup != null)
         {
-            FallGround fallGrounds = groundGroup.GetComponent<FallGround>();
-            fallGrounds.Fall();
+            RpcDelayedFall(groundGroup.transform.position, groundGroup.name);
         }
-
-        GameSystemManager.Instance.EndEventAndStartNextTimer();
     }
+    
+    [ClientRpc]
+    private void RpcDelayedFall(Vector3 position, string groundName)
+    {
+        MeteorExplosion(position);
+
+        // 이름으로 찾아서 Fall 실행 (네트워크 객체 찾기 위해 이름 활용)
+        GameObject target = GameObject.Find(groundName);
+        if (target != null)
+        {
+            FallGround[] fallGrounds = target.GetComponentsInChildren<FallGround>(true);
+            foreach (var fg in fallGrounds)
+            {
+                fg.Fall();
+            }
+        }
+        else
+        {
+            Debug.LogWarning("[SpaceManager] RpcDelayedFall(): Ground 오브젝트를 찾을 수 없습니다: " + groundName);
+        }
+    }
+
+
 
     public override void NetEvent()
     {
         if (eventnum >= FallGrounds.Length) return;
+        
+        if (Random.value < 0.5f)
+        {
+            Vector3 randomDirection = new Vector3(Random.Range(-1f, 1f), 0f, Random.Range(-1f, 1f)).normalized;
+            
+            
+            int itemCount = Random.Range(1, 4); // 🔹 1~3 사이의 랜덤한 개수
 
-        GameObject nextGround = FallGrounds[eventnum];
+            for (int i = 0; i < itemCount; i++)
+            {
+                Vector3 spawnPosition = new Vector3(
+                    Random.Range(-40f, 40f),
+                    Random.Range(30f, 40f),
+                    Random.Range(-40f, 40f)
+                );
+
+                GameObject pickup = Instantiate(skillItemPickupPrefab, spawnPosition, Quaternion.identity);
+
+                NetworkServer.Spawn(pickup);
+            }
+        }
+
+        RpcPlayNextFall(eventnum);
+
+        eventnum++; // 다음 이벤트로 이동
+    }
+    
+    [ClientRpc]
+    private void RpcPlayNextFall(int index)
+    {
+        if (index >= FallGrounds.Length) return;
+
+        GameObject nextGround = FallGrounds[index];
         if (nextGround != null)
         {
             FallGround[] nextFallGrounds = nextGround.GetComponentsInChildren<FallGround>();
@@ -119,9 +174,8 @@ public class GameSyatemSpaceManager : GameSystemManager
                 nextFallGround.NextFall();
             }
         }
-
-        eventnum++; // 다음 이벤트로 이동
     }
+
 
     [ClientRpc]
     private void MeteorFall()
@@ -129,8 +183,7 @@ public class GameSyatemSpaceManager : GameSystemManager
         AudioManager.Instance.PlaySFX(Constants.SoundType.SFX_FallingMeteor, meteorTrans);
         meteorAnimator.SetTrigger("isStart");
     }
-
-    [ClientRpc]
+    
     private void MeteorExplosion(Vector3 target)
     {
         AudioManager.Instance.PlaySFX(Constants.SoundType.SFX_MeteorExplosion, target);
