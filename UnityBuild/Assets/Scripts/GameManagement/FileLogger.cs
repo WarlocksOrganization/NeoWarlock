@@ -50,10 +50,6 @@ namespace GameManagement
             LogEvent logEvent = new LogEvent(eventType, args);
             string json = logEvent.ToJson();
 
-#if UNITY_EDITOR
-            // 콘솔에 출력
-            Debug.Log(json);
-#else
             // 로그 파일에 기록
             try
             {
@@ -75,7 +71,6 @@ namespace GameManagement
             {
                 Debug.LogError("[FileLogger] 로그 파일 기록 오류: " + ex.Message);
             }
-#endif
         }
 
         public static void LogCreateRoom()

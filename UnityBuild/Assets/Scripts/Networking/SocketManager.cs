@@ -12,6 +12,7 @@ using Unity.VisualScripting;
 using System.Linq;
 using IO.Swagger.Model;
 using kcp2k;
+using System.Buffers.Text;
 
 namespace Networking
 {
@@ -25,7 +26,7 @@ namespace Networking
         private Queue<string> _messageQueue = new Queue<string>();
         private bool _restart = false;
 
-        public string matchServerIP = "127.0.0.1"; // 서버 IP 주소
+        public string socketServerIP = "127.0.0.1"; // 서버 IP 주소
         public ushort socketServerPort = 8080; // 서버 포트 번호
         public int bufferSize = 8192; // 버퍼 크기
         public int maxRetries = 5; // 최대 재시도 횟수
@@ -46,6 +47,14 @@ namespace Networking
         {   
             // 서버에 연결
             // 백그라운드 스레드로 연결
+            if (PlayerPrefs.HasKey("sessionToken"))
+            {
+                PlayerPrefs.DeleteKey("sessionToken");
+            }
+            if (PlayerPrefs.HasKey("userId"))
+            {
+                PlayerPrefs.DeleteKey("userId");
+            }
 
             if (UnityEngine.Application.platform.Equals(RuntimePlatform.LinuxServer))
             {
@@ -55,8 +64,8 @@ namespace Networking
                 {
                     if (args[i].StartsWith("-socketServerIP="))
                     {
-                        matchServerIP = args[i].Substring(16);
-                        Debug.Log($"[SocketManager] 소켓 서버 IP 변경: {matchServerIP}");
+                        socketServerIP = args[i].Substring(16);
+                        Debug.Log($"[SocketManager] 소켓 서버 IP 변경: {socketServerIP}");
                     }
                     else if (args[i].StartsWith("-socketServerPort="))
                     {
@@ -100,8 +109,8 @@ namespace Networking
                 InitSocketConnection();
             }
 
-
             // TEST
+            // InitSocketConnection();
             // StartCoroutine(TestResister());
         }
 
@@ -125,7 +134,7 @@ namespace Networking
                 try
                 {
                     _client = new TcpClient();
-                    _client.Connect(matchServerIP, socketServerPort);
+                    _client.Connect(socketServerIP, socketServerPort);
                     _stream = _client.GetStream();
                     Debug.Log("[SocketManager] 소켓 서버 연결 성공!");
                     InitialMessage();
@@ -221,6 +230,22 @@ namespace Networking
 
         public void CloseConnection()
         {
+            // 로컬 저장소 초기화
+            if (PlayerPrefs.HasKey("sessionToken"))
+            {
+                RequestLogout();
+                PlayerPrefs.DeleteKey("sessionToken");
+            }
+            if (PlayerPrefs.HasKey("userId"))
+            {
+                PlayerPrefs.DeleteKey("userId");
+            }
+            if (PlayerPrefs.HasKey("nickName"))
+            {
+                PlayerPrefs.DeleteKey("nickName");
+                PlayerPrefs.SetString("nickName", "Player" + UnityEngine.Random.Range(1000, 9999));
+            }
+
             // 연결 해제
             if (_stream != null)
                 _stream.Close();
@@ -228,74 +253,74 @@ namespace Networking
             if (_client != null)
                 _client.Close();
 
+            StopAllCoroutines();
+
             Debug.Log("[SocketManager] 소켓 서버와 연결 해제.");
         }
         
         private void ClientResponseHandler(string message)
         {
-            try
+            if (message.StartsWith("\"") && message.EndsWith("\""))
             {
-                if (message.StartsWith("\"") && message.EndsWith("\""))
+                message = message.Substring(1, message.Length - 2);
+                message = JToken.Parse(message).ToString();
+            }
+            JToken data = JToken.Parse(message);
+
+            if (data.SelectToken("action") != null)
+            {
+                // 요청식 응답 처리
+                if (!_pendingRequests.ContainsKey(data.SelectToken("action").ToString()))
                 {
-                    message = message.Substring(1, message.Length - 2);
-                    message = message.Replace("\\\"", "\"");
+                    Debug.LogWarning("[SocketManager] 요청되지 않은 클라이언트 액션: " + message);
+                    return;
                 }
-                JToken data = JToken.Parse(message);
 
-                if (data.SelectToken("action") != null)
+                _pendingRequests.Remove(data["action"].ToString());
+                Debug.Log("[SocketManager] 요청식 응답 처리: " + data.ToString());
+                // 응답 처리
+                
+                switch (data.SelectToken("action").ToString())
                 {
-                    // 요청식 응답 처리
-                    if (!_pendingRequests.ContainsKey(data.SelectToken("action").ToString()))
-                    {
-                        Debug.LogWarning("[SocketManager] 요청되지 않은 클라이언트 액션: " + message);
-                        return;
-                    }
 
-                    _pendingRequests.Remove(data["action"].ToString());
-                    Debug.Log("[SocketManager] 요청식 응답 처리: " + data.ToString());
-                    // 응답 처리
-                    
-                    switch (data.SelectToken("action").ToString())
-                    {
+                    case "login":
+                        HandleAuth(data);
+                        break;
 
-                        case "login":
-                            HandleAuth(data);
-                            break;
+                    case "register":
+                        HandleRegister(data);
+                        break;
 
-                        case "register":
-                            HandleRegister(data);
-                            break;
+                    case "refreshSession":
+                        HandleRefreshSession(data);
+                        break;
 
-                        case "refreshSession":
-                            HandleRefreshSession(data);
-                            break;
+                    case "listRooms":
+                        HandleListRooms(data);
+                        break;
 
-                        case "listRooms":
-                            HandleListRooms(data);
-                            break;
+                    case "createRoom":
+                        HandleCreateRoom(data);
+                        break;
 
-                        case "createRoom":
-                            HandleCreateRoom(data);
-                            break;
+                    case "joinRoom":
+                        HandleJoinRoom(data);
+                        break;
 
-                        case "joinRoom":
-                            HandleJoinRoom(data);
-                            break;
+                    case "exitRoom":
+                        HandleExitRoom(data);
+                        break;
 
-                        case "exitRoom":
-                            HandleExitRoom(data);
-                            break;
+                    case "updateNickName":
+                        HandleUpdateNickname(data);
+                        break;
 
-                        default:
-                            Debug.LogWarning("[SocketManager] 알 수 없는 클라이언트 액션: " + message);
-                            break;
-                    }
+                    default:
+                        Debug.LogWarning("[SocketManager] 알 수 없는 클라이언트 액션: " + message);
+                        break;
                 }
             }
-            catch (Exception ex)
-            {
-                Debug.LogError("[SocketManager] 클라이언트 소켓 응답 처리 오류: " + ex.Message);
-            }
+        
         }
 
         private void ServerResponseHandler(string message)
@@ -306,48 +331,43 @@ namespace Networking
                 return;
             }
 
-            // 응답 처리 시도
-            try
+            
+            if (message.StartsWith("\"") && message.EndsWith("\""))
             {
-                if (message.StartsWith("\"") && message.EndsWith("\""))
-                {
-                    message = message.Substring(1, message.Length - 2);
-                    message = message.Replace("\\\"", "\"");
-                }
-                JToken data = JToken.Parse(message);
-                
-                if (data.SelectToken("action") != null)
-                {
-                    // 중앙 서버 역할 시의 서버 메시지 처리
-                    switch (data.SelectToken("action").ToString())
-                    {
-                        case "setRoom":
-                            HandleSetRoomDataServer(data);
-                            break;
-                        
-                        case "gameStart":
-                            HandleGameStart(data);
-                            break;
-
-                        case "gameEnd":
-                            HandleGameEnd(data);
-                            break;
-
-                        default:
-                            Debug.LogWarning("[SocketManager] 알 수 없는 서버 액션: " + message);
-                            break;
-                    }
-                }
+                message = message.Substring(1, message.Length - 2);
+                message = JToken.Parse(message).ToString();
             }
-            catch (Exception ex)
+            JToken data = JToken.Parse(message);
+            
+            if (data.SelectToken("action") != null)
             {
-                Debug.LogError("[SocketManager] 서버 소켓 응답 처리 오류: " + ex.Message);
+                // 중앙 서버 역할 시의 서버 메시지 처리
+                switch (data.SelectToken("action").ToString())
+                {
+                    case "setRoom":
+                        HandleSetRoomDataServer(data);
+                        break;
+                    
+                    case "gameStart":
+                        HandleGameStart(data);
+                        break;
+
+                    case "gameEnd":
+                        HandleGameEnd(data);
+                        break;
+
+                    default:
+                        Debug.LogWarning("[SocketManager] 알 수 없는 서버 액션: " + message);
+                        break;
+                }
             }
         }
 
         // TEST
         public IEnumerator TestResister()
         {   
+            yield return new WaitForSeconds(1);
+            RequestRegister("gogogo", "testpassword");
             yield return new WaitForSeconds(1);
             RequestRegister("burnyouwithlight", "a509test");
             yield return new WaitForSeconds(1);
@@ -405,15 +425,6 @@ namespace Networking
             // 연결 해제 후 스레드 종료
             CloseConnection();
             _clientThread.Join();
-
-            if (PlayerPrefs.HasKey("sessionToken"))
-            {
-                PlayerPrefs.DeleteKey("sessionToken");
-            }
-            if (PlayerPrefs.HasKey("userName"))
-            {
-                PlayerPrefs.DeleteKey("userName");
-            }
         }
 
         public bool IsConnected()

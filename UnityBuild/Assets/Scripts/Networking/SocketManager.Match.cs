@@ -56,6 +56,11 @@ namespace Networking
             }
             catch (Exception ex){
                 RequestExitRoom();
+                var modal = ModalPopupUI.singleton as ModalPopupUI;
+                if (modal != null)
+                {
+                    modal.ShowModalMessage("방 참가 실패\n서버와의 연결에 실패했습니다.");
+                }
                 Debug.Log($"[SocketManager] 방 참가 실패: {ex.Message}");
             }
         }
@@ -83,16 +88,21 @@ namespace Networking
                     transport.Port = data.SelectToken("port").ToObject<ushort>();
 
                     manager.StartClient();
-                    Debug.Log($"[SocketManager] 방 참가 완료: {data["roomId"].ToObject<int>()}");
+                    Debug.Log($"[SocketManager] 방 생성 및 참가 완료: {data["roomId"].ToObject<int>()}");
                 }
                 catch (Exception ex){
                     RequestExitRoom();
-                    Debug.Log($"[SocketManager] 방 참가 실패: {ex.Message}");
+                    var modal = ModalPopupUI.singleton as ModalPopupUI;
+                    if (modal != null)
+                    {
+                        modal.ShowModalMessage("방 생성 및 참가 실패\n서버와의 연결에 실패했습니다.");
+                    }
+                    Debug.Log($"[SocketManager] 방 생성 및 참가 실패: {ex.Message}");
                 }
             }
             else
             {
-                Debug.Log($"[SocketManager] 방 참가 실패: {data["message"].ToString()}");
+                Debug.Log($"[SocketManager] 방 생성 및 참가 실패: {data["message"].ToString()}");
             }
         }
 
@@ -109,7 +119,7 @@ namespace Networking
                 Debug.Log(room);
             }
         }
-
+        
         private void HandleJoinRoom(JToken data)
         {   
             // 매치 참가 시 처리
@@ -120,6 +130,11 @@ namespace Networking
             else
             {
                 RequestExitRoom();
+                var modal = ModalPopupUI.singleton as ModalPopupUI;
+                if (modal != null)
+                {
+                    modal.ShowModalMessage("방 참가 실패\n서버와의 연결에 실패했습니다.");
+                }
                 Debug.Log($"[SocketManager] 방 참가 실패: {data.SelectToken("message").ToString()}");
             }
         }
@@ -134,6 +149,11 @@ namespace Networking
             }
             else
             {
+                var modal = ModalPopupUI.singleton as ModalPopupUI;
+                if (modal != null)
+                {
+                    modal.ShowModalMessage("방 퇴장 실패\n서버와의 연결에 실패했습니다.");
+                }
                 Debug.Log($"[SocketManager] 방 퇴장 실패: {data.SelectToken("message").ToString()}");
             }
         }

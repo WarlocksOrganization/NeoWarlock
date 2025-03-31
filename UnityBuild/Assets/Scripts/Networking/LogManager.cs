@@ -96,7 +96,7 @@ namespace Networking
             {
                 // 5분에 한 번씩 로그 전송
                 StartCoroutine(SendLogsToServer());
-                Thread.Sleep(60000);
+                Thread.Sleep(6000000); // 10분 대기
             }
         }
 
@@ -109,12 +109,14 @@ namespace Networking
                 yield break;
             }
 
-            // 10분 단위로 로그 전송
+            // Port 번호에 따라 10분 단위로 대기
+            // Port 번호의 마지막 자리와 현재 시간의 분을 비교하여 대기
             var roomManager = RoomManager.singleton as RoomManager;
-            // while (DateTime.Now.Minute % 10 != Port % 10)
-            // {
-            //     yield return new WaitForSeconds(30);
-            // }
+            while ((DateTime.Now.Minute % 10) != (int)(Port % 10))
+            {
+                // 10분 단위로 대기
+                yield return new WaitForSeconds(20);
+            }
 
             // 로그 파일 읽기
             string logPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + Constants.LogFilepath + Constants.LogFilename;
@@ -131,7 +133,6 @@ namespace Networking
             logJson["timestamp"] = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
             
             string logJsonString = logJson.ToString();
-            Debug.Log(logJsonString);
 
             // 서버에 로그 전송
             UnityWebRequest request = new UnityWebRequest($"http://{logServerIP}:{logServerPort}/api/log", "POST");
