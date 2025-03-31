@@ -123,6 +123,12 @@ public class PlayerCardUI : MonoBehaviour
 
     public void UpdateTimer(float serverTime)
     {
+        if (!gameObject.activeInHierarchy)
+        {
+            Debug.LogWarning("[PlayerCardUI] 비활성화된 상태에서 UpdateTimer 호출됨, 무시합니다.");
+            return;
+        }
+
         if (isLoading)
         {
             isLoading = false;
@@ -130,12 +136,17 @@ public class PlayerCardUI : MonoBehaviour
             AudioManager.Instance.PlayBGM(Constants.SoundType.BGM_SSAFY_CardSelect);
         }
 
-        float nextTargetRatio = Mathf.Clamp01((serverTime - 1f) / maxTime); // ✅ 1초 뒤 비율 예상
+        float nextTargetRatio = Mathf.Clamp01((serverTime - 1f) / maxTime);
+
+        // 🔒 슬라이더 되돌아가는 현상 방지
+        if (nextTargetRatio > lastTargetRatio)
+            nextTargetRatio = lastTargetRatio;
+
         timerText.text = $"남은 시간: {Mathf.Ceil(serverTime)}초";
 
         if (sliderRoutine != null)
             StopCoroutine(sliderRoutine);
-    
+
         sliderRoutine = StartCoroutine(AnimateSlider(lastTargetRatio, nextTargetRatio, 1f));
         lastTargetRatio = nextTargetRatio;
 

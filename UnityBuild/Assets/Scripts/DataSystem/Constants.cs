@@ -19,6 +19,8 @@ namespace DataSystem
         public static readonly int CardSelectionTime = 10; //카드 선택 시간 10
         public static readonly int CountTime = 5; // 카운트타임 5
 
+        public static readonly float KnockBackFactor = 20f;
+
 
         public static string LogFilepath = "/.config/unity3d/warlocks/smashup/Logs/";
         public static string LogFilename = "room.txt";

@@ -33,7 +33,7 @@ public class ScoreBoardUI : MonoBehaviour
 
     public void ShowScoreBoard(Constants.PlayerRecord[] records, int roundIndex)
 {
-    gameObject.SetActive(true);
+    Debug.Log("ShowScoreBoard");
     StartCoroutine(ShowRankingFlow(records, roundIndex)); // ✅ records 사용
 }
 

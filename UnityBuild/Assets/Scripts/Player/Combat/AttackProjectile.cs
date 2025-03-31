@@ -38,6 +38,8 @@ namespace Player
         
         [SerializeField] private GameObject rangeDecalPrefab;
         private GameObject rangeDecalInstance;
+        
+        [SerializeField] private Transform colliderTransform;
 
 
         public void SetProjectileData(float damage, float speed, float radius, float range, float lifeTime, float knockback, AttackConfig config, GameObject owner, int playerid, int skillid)
@@ -56,6 +58,13 @@ namespace Player
             transform.localScale = new Vector3(radius, radius, radius);
 
             skillType = config.skillType;
+
+            if (config.attackType == Constants.AttackType.ProjectileSky && colliderTransform)
+            {
+                colliderTransform.localScale = new Vector3(1f /radius,
+                    1f / radius,
+                    1f / radius);
+            }
 
             this.owner = owner;
         }

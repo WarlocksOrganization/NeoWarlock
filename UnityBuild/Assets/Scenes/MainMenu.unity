@@ -1433,7 +1433,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8914411044628652358, guid: 6f907931b233ec0468fb8fe3c28d5735, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 0.075
       objectReference: {fileID: 0}
     - target: {fileID: 8914411044628652358, guid: 6f907931b233ec0468fb8fe3c28d5735, type: 3}
       propertyPath: m_LocalPosition.z
@@ -8169,7 +8169,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 725135483988574, guid: 55c0c6fc1426ce7439bf6ba4a65f57d6, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 0.06
       objectReference: {fileID: 0}
     - target: {fileID: 725135483988574, guid: 55c0c6fc1426ce7439bf6ba4a65f57d6, type: 3}
       propertyPath: m_LocalPosition.z
@@ -11654,6 +11654,7 @@ MonoBehaviour:
   - {fileID: 322783647940636695, guid: a408ba58521f6a742b9cfee37f8bf882, type: 3}
   - {fileID: 5686090464823823962, guid: 606df0497a136824b8de681a0a5ab317, type: 3}
   - {fileID: 5686090464823823962, guid: f7568a4ee603c8d429b335064de24a78, type: 3}
+  - {fileID: 5412338807302183837, guid: ae1e3abd238802042840d15d7e4377c8, type: 3}
   exceptionsDisconnect: 1
   snapshotSettings:
     bufferTimeMultiplier: 2
@@ -18658,7 +18659,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b6da0329e68d81a4aa9579325526c409, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  socketServerIP: j12a509.p.ssafy.io
+  socketServerIP: 127.0.0.1
   socketServerPort: 8080
   bufferSize: 8192
   maxRetries: 5
@@ -29729,7 +29730,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3961238879593436105, guid: 2c37afe6a3ed28b48ac467b285524c36, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 0.035
       objectReference: {fileID: 0}
     - target: {fileID: 3961238879593436105, guid: 2c37afe6a3ed28b48ac467b285524c36, type: 3}
       propertyPath: m_LocalPosition.z
@@ -32832,7 +32833,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1941930191
 RectTransform:
   m_ObjectHideFlags: 0
