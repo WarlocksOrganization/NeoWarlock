@@ -87,6 +87,7 @@ namespace Player
                     statUI.Setup(this);
                 }
             }
+            lastMovementSkillTime = -Mathf.Infinity;
         }
 
         private void ApplyCharacterClass(Constants.CharacterClass newClass)

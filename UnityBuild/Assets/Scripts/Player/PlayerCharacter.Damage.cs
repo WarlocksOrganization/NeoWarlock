@@ -46,7 +46,7 @@ namespace Player
 
                 if (knockbackForce != 0)
                 {
-                    Debug.Log(knockbackForce);
+                        Debug.Log(knockbackForce);
                     RpcApplyKnockback(direction * knockbackForce * Constants.KnockBackFactor);
                     RpcTriggerAnimation("isHit"); 
                 }
@@ -101,6 +101,11 @@ namespace Player
             if (predamage != 0)
             {
                 ShowFloatingDamageText(damage);
+            }
+
+            if (damage < 0)
+            {
+                RpcPlaySkillEffect(Constants.SkillType.Heal);
             }
 
             if (curHp == 0)

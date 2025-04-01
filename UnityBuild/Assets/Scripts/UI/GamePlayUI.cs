@@ -129,19 +129,20 @@ public class GamePlayUI : GameLobbyUI
             alamText.text = $"{time}초";
         }
     }
-
+    
     public void ShowFinalScoreBoard(Constants.PlayerRecord[] records, int roundIndex)
     {
+        // 먼저 활성화 후 기다리도록 수정
+        scoreBoardUI.gameObject.SetActive(true);
         StartCoroutine(WaitAndShowScoreBoard(records, roundIndex));
     }
 
     private IEnumerator WaitAndShowScoreBoard(Constants.PlayerRecord[] records, int roundIndex)
     {
         // scoreBoardUI가 완전히 준비될 때까지 기다림
-        yield return new WaitUntil(() => scoreBoardUI != null && scoreBoardUI.gameObject.activeInHierarchy);
+        yield return new WaitUntil(() => scoreBoardUI != null); // 또는 바로 WaitForEndOfFrame도 가능
 
-        // 딜레이를 조금 줘서 렌더 타이밍 문제 방지
-        yield return new WaitForSeconds(0.1f);
+        yield return new WaitForSeconds(0.05f); // 렌더 타이밍 안정화용
 
         Debug.Log("[GamePlayUI] ShowFinalScoreBoard 진입");
         scoreBoardUI.ShowScoreBoard(records, roundIndex);

@@ -112,6 +112,8 @@ public class ScoreBoardUI : MonoBehaviour
         yield return StartCoroutine(FadeCanvasGroup(canvasGroup, 0f, 1f, 0.5f));
         yield return new WaitForSeconds(1f);
 
+        AudioManager.Instance.PlaySFX(Constants.SoundType.SFX_ScoreCount);
+
         var finalSorted = records
             .OrderByDescending(r => r.GetTotalScoreUpToRound(roundIndex))
             .ToList();

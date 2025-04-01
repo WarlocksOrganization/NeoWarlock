@@ -273,12 +273,19 @@ namespace Player
         [Command]
         public void CmdSetPlayerCards(string userId, int[] selectedCardIds)
         {
+            if (string.IsNullOrEmpty(userId))
+            {
+                Debug.LogError("[CmdSetPlayerCards] userId가 null이거나 빈 문자열입니다.");
+                return;
+            }
+
             var gameManager = GameManagement.GameManager.Instance;
             if (gameManager == null)
             {
                 Debug.LogError("[GamePlayer] GameManager is null.");
                 return;
             }
+
             gameManager.SetPlayerCards(userId, selectedCardIds);
         }
 
