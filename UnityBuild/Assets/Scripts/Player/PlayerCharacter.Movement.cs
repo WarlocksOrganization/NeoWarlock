@@ -10,9 +10,9 @@ namespace Player
     {
         [Header("Player Movement")]
         [SyncVar] public float MaxSpeed = 5f;
-        [SyncVar] public float MoveSpeed = 5.0f;
+        [SyncVar(hook = nameof(OnMoveSpeedChanged))] public float MoveSpeed = 5.0f;
         public float KnockbackDamping = 5f;
-        [SyncVar] public float KnockbackFactor = 1f;
+        [SyncVar(hook = nameof(OnKnockbackChanged))] public float KnockbackFactor = 1f;
         private float animationSpeed;
         
         private Vector3 _moveDirection = Vector3.zero;
@@ -27,7 +27,8 @@ namespace Player
         private float gravity = -9.81f; // ✅ Unity 기본 중력 값
         
         public GameObject moveIndicatorPrefab; // ✅ 이동 위치를 표시할 이펙트 프리팹
-
+        private void OnMoveSpeedChanged(float _, float __) => NotifyStatChanged();
+        private void OnKnockbackChanged(float _, float __) => NotifyStatChanged();
         public void Move()
         {
             _moveDirection = Vector3.zero;

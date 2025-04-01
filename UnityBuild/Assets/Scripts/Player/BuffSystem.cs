@@ -102,6 +102,7 @@ public class BuffSystem : NetworkBehaviour
             playerCharacter.AttackPower += buffData.attackDamageModifier;
             activeBuffValues[BuffKey(buffType, "atk")] = buffData.attackDamageModifier;
         }
+        playerCharacter.NotifyStatChanged();
     }
 
     private void RemoveBuffEffect(Constants.BuffType buffType)
@@ -129,6 +130,7 @@ public class BuffSystem : NetworkBehaviour
                         break;
                 }
                 activeBuffValues.Remove(key);
+                playerCharacter.NotifyStatChanged();
             }
         }
     }

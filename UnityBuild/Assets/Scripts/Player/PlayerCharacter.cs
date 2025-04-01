@@ -33,8 +33,6 @@ namespace Player
 
         [SyncVar(hook = nameof(SetState_Hook))]
         public Constants.PlayerState State = Constants.PlayerState.NotReady;
-         
-        
         
         [SerializeField] private Animator animator;
         [SerializeField] private GameObject playerLight;
@@ -49,8 +47,7 @@ namespace Player
         [SerializeField] private GameObject ghostPrefab; // ✅ 유령 프리팹
         private GameObject ghostInstance;
         
-        
-
+        public event System.Action OnStatChanged;
         private void Awake()
         {
             _characterController = GetComponent<CharacterController>();
@@ -123,6 +120,11 @@ namespace Player
                 gameLobbyUI = FindFirstObjectByType<GameLobbyUI>();
             }
             gameLobbyUI.UpdatePlayerInRoon();
+        }
+
+        public void NotifyStatChanged()
+        {
+            OnStatChanged?.Invoke();
         }
 
         void Update()
@@ -332,5 +334,30 @@ namespace Player
             var manager = Networking.RoomManager.singleton as Networking.RoomManager;
             manager.StartGame();
         }
+
+        [ClientRpc]
+        public void RpcRefreshStat(float atk, int def, float spd, int hp)
+        {
+            AttackPower = atk;
+            defense = def;
+            MoveSpeed = spd;
+            maxHp = hp;
+            curHp = maxHp;
+            KnockbackFactor = 1f;
+
+            NotifyStatChanged();
+        }
+        // public void ResetStatToBase()
+        // {
+        //     AttackPower = 1;
+        //     defense = 0;
+        //     MoveSpeed = 5f;
+        //     KnockbackFactor = 1f;
+        //     maxHp = 150;
+        //     curHp = maxHp;
+
+        //     NotifyStatChanged();
+        // }
+
     }
 }
