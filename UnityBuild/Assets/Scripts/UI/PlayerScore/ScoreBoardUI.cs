@@ -309,12 +309,11 @@ public class ScoreBoardUI : MonoBehaviour
     
     IEnumerator PlaySequence(Constants.CharacterClass charClass, Animator anim)
     {
-        PlayMappedMotion(charClass, "Attack3", anim);
-        yield return new WaitForSecondsRealtime(1f);
+        // PlayMappedMotion(charClass, "Attack3", anim);
+        // yield return new WaitForSecondsRealtime(1f);
 
-        PlayMappedMotion(charClass, "MoveSkill", anim);
-        yield return new WaitForSecondsRealtime(1f);
-
+        // PlayMappedMotion(charClass, "MoveSkill", anim);
+        // yield return new WaitForSecondsRealtime(0.3f);
         PlayMappedMotion(charClass, "Idle", anim);
     }
     
