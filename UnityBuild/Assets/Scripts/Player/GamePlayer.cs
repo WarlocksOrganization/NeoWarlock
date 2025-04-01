@@ -266,6 +266,18 @@ namespace Player
         }
 
         [Command]
+        public void CmdSetPlayerCards(string userId, int[] selectedCardIds)
+        {
+            var gameManager = GameManagement.GameManager.Instance;
+            if (gameManager == null)
+            {
+                Debug.LogError("[GamePlayer] GameManager is null.");
+                return;
+            }
+            gameManager.SetPlayerCards(userId, selectedCardIds);
+        }
+
+        [Command]
         public void CmdMarkPlayerReady(int[] selectedCardIds)
         {
             if (playerCharacter == null) return;
