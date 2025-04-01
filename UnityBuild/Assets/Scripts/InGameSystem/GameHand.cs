@@ -67,7 +67,7 @@ public class GameHand : NetworkBehaviour
     }
 
     [Server]
-    private void SwitchTarget()
+    public void SwitchTarget()
     {
         isAttacking = false;
         var allPlayers = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None)

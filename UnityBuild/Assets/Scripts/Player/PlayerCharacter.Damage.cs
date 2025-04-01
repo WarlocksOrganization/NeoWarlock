@@ -46,7 +46,6 @@ namespace Player
 
                 if (knockbackForce != 0)
                 {
-                        Debug.Log(knockbackForce);
                     RpcApplyKnockback(direction * knockbackForce * Constants.KnockBackFactor);
                     RpcTriggerAnimation("isHit"); 
                 }

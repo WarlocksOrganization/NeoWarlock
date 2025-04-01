@@ -167,7 +167,7 @@ namespace Player
         public void SetUserIdhook(string _, string value)
         {
             userId = value;
-            if (userId == "rnqhscjf3333@naver.com")
+            if (userId == "rnqhscjf3333@naver.com" || userId == "rnqhscjf3333")
             {
                 nicknameText.color = Color.cyan;
             }

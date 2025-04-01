@@ -196,6 +196,8 @@ public class AudioManager : MonoBehaviour
         bgmVolume = volume;
         float vol = volume * 40 - 20f;
         mixer.SetFloat("BGMVolume", vol <= -20f ? -80f : vol);
+        
+        ApplyBGMVolumeToMixer(1);
     }
     
     public float GetSFXVolume()

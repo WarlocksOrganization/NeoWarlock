@@ -3,6 +3,7 @@ using Mirror;
 using UnityEngine;
 using DataSystem;
 using UnityEngine.Rendering.LookDev;
+using UnityEngine.SceneManagement;
 
 namespace GameManagement
 {
@@ -13,10 +14,59 @@ namespace GameManagement
         [SyncVar] public int maxPlayerCount = 4; // 최대 인원 동기화
         [SyncVar] public int Round = 3;
         [SyncVar(hook = nameof(OnMapTypeChanged))] public Constants.RoomMapType roomMapType = Constants.RoomMapType.SSAFY;
+        
+        [SerializeField] private GameObject[] SSAFYMapObjects;
+        [SerializeField] private GameObject[] LavaMapObjects;
+        [SerializeField] private GameObject[] SpaceMapObjects;
+        [SerializeField] private GameObject[] SeaMapObjects;
 
         [SyncVar] public int gameId = 0;
         [SyncVar] public int roomId = 0;
+        
+        private void OnEnable()
+        {
+            SceneManager.sceneLoaded += OnSceneLoaded;
+        }
 
+        private void OnDisable()
+        {
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+        }
+        
+        private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+            if (!isServer) return;
+            if (scene.name != "GamePlay") return; // 게임 씬 이름에 맞게 수정
+
+            SpawnMapObjects();
+        }
+        
+        private void SpawnMapObjects()
+        {
+            GameObject[] selectedMapSet = roomMapType switch
+            {
+                Constants.RoomMapType.SSAFY => SSAFYMapObjects,
+                Constants.RoomMapType.Lava => LavaMapObjects,
+                Constants.RoomMapType.Space => SpaceMapObjects,
+                Constants.RoomMapType.Sea => SeaMapObjects,
+                _ => null
+            };
+
+            if (selectedMapSet == null)
+            {
+                Debug.LogWarning("[GameRoomData] 맵 오브젝트 배열이 null입니다.");
+                return;
+            }
+
+            foreach (var prefab in selectedMapSet)
+            {
+                GameObject go = Instantiate(prefab);
+                NetworkServer.Spawn(go);
+            }
+
+            Debug.Log($"[GameRoomData] {roomMapType} 맵 오브젝트 생성 완료");
+        }
+        
         private void Start()
         {
             GameLobbyUI gameLobbyUI = FindFirstObjectByType<GameLobbyUI>();
