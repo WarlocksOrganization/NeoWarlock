@@ -1173,7 +1173,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2b0ce109baddb4c43beabe6079d197c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damagePerTick: 10
+  damagePerTick: 5
   damageInterval: 0.5
   attackConfig: {fileID: 11400000, guid: 7c459bd35b86baf4c9c45df4c0569647, type: 2}
 --- !u!1 &9084252381916234459

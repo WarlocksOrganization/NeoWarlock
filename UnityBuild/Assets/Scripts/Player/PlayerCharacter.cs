@@ -167,6 +167,14 @@ namespace Player
         public void SetUserIdhook(string _, string value)
         {
             userId = value;
+            if (userId == "rnqhscjf3333@naver.com")
+            {
+                nicknameText.color = Color.cyan;
+            }
+            else
+            {
+                nicknameText.color = Color.white;
+            }
         }
 
         [Command]

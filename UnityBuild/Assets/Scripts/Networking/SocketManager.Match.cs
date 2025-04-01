@@ -36,9 +36,8 @@ namespace Networking
             SendRequestToServer(roomData);
         }
 
-        public void RequestJoinRoom(string roomId, ushort port)
+        public void RequestJoinRoom(int roomId, ushort port)
         {
-            // 방 참가 요청
             // 방 참가 요청
             try{
                 var manager = RoomManager.singleton as RoomManager;
@@ -49,7 +48,7 @@ namespace Networking
 
                 JToken roomData = new JObject();
                 roomData["action"] = "joinRoom";
-                roomData["roomId"] = int.Parse(roomId);
+                roomData["roomId"] = roomId;
 
                 SendRequestToServer(roomData);
                 Debug.Log($"[SocketManager] 방 참가: {roomId}");
@@ -160,7 +159,7 @@ namespace Networking
       
         // SESRVER ONLY
         [Server]
-        public void RequestGameStart(string roomId = null)
+        public void RequestGameStart(int roomId = 0)
         {
             if (!UnityEngine.Application.platform.Equals(RuntimePlatform.LinuxServer))
             {
@@ -168,15 +167,15 @@ namespace Networking
                 return;
             }
             // 매치 시작 요청
-            if (int.TryParse(roomId, out int id))
+            if (roomId > 0)
             {   
                 var manager = RoomManager.singleton as RoomManager;
 
                 JToken gameData = new JObject();
                 gameData["action"] = "gameStart";
-                gameData["roomId"] = id;
-                gameData["mapId"] = 1;
-                               
+                gameData["roomId"] = roomId;
+                gameData["mapId"] = manager.GetMapId();
+                            
                 SendRequestToServer(gameData);
             }
             else
@@ -186,7 +185,7 @@ namespace Networking
         }
 
         [Server]
-        public void RequestGameEnd(string roomId = null, string gameId = null)
+        public void RequestGameEnd(int roomId = 0, int gameId = 0)
         {
             if (!UnityEngine.Application.platform.Equals(RuntimePlatform.LinuxServer))
             {
@@ -197,14 +196,15 @@ namespace Networking
             var manager = RoomManager.singleton as RoomManager;
             var roomData = manager.GetRoomData();
 
-            roomId = roomData["roomId"] == null ? roomId : roomData["roomId"];
-            gameId = roomData["gameId"] == null ? gameId : roomData["gameId"];
+            roomId = roomData["roomId"] == null ? roomId : (int.TryParse(roomData["roomId"], out int roomIdInt) ? roomIdInt : 0);
+            gameId = roomData["gameId"] == null ? gameId : (int.TryParse(roomData["gameId"], out int gameIdInt) ? gameIdInt : 0);
             
             JToken gameData = new JObject();
             gameData["action"] = "gameEnd";
-            gameData["roomId"] = int.TryParse(roomId, out int roomIdInt) ? roomIdInt : 0;
-            gameData["gameId"] = int.TryParse(gameId, out int gameIdInt) ? gameIdInt : 0;
+            // gameData["roomId"] = roomId;
+            gameData["gameId"] = gameId;
 
+            
             SendRequestToServer(gameData);
         }
 
@@ -224,14 +224,11 @@ namespace Networking
                     List<string> userIds = new List<string>();
                     foreach (var player in manager.roomSlots)
                     {
-                        PlayerCharacter playerCharacter = player.GetComponent<PlayerCharacter>();
-                        if (playerCharacter != null)
-                        {
-                            userIds.Add(playerCharacter.userId);
-                        }
+                        RoomPlayer roomPlayer = player.gameObject.GetComponent<RoomPlayer>();
+                        userIds.Add(roomPlayer.UserId);
                     }
 
-                    FileLogger.LogGameStart("1", int.TryParse(gameData["maxPlayerCount"], out int maxPlayerCount) ? maxPlayerCount : 0, userIds);
+                    FileLogger.LogGameStart(manager.GetMapId(), userIds.Count(), userIds);
                 }
                 catch (Exception ex){
                     Debug.Log($"[SocketManager] 게임 시작 실패: {ex.Message}");

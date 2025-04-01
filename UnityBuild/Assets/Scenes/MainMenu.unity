@@ -7089,6 +7089,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   modalPrefab: {fileID: 1666918232306240129, guid: d452d80f673be384db13894cdd7d4ddf, type: 3}
+  _onlineUI: {fileID: 0}
+  _mainMenuUI: {fileID: 0}
 --- !u!1001 &371273260
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -11629,7 +11631,7 @@ MonoBehaviour:
   autoCreatePlayer: 1
   playerSpawnMethod: 0
   spawnPrefabs:
-  - {fileID: 7658781495225699053, guid: 1ca5049fd24d40b4b9bc11738b30ab02, type: 3}
+  - {fileID: 7658781495225699053, guid: f29a481617b995b48ac390f918ac6bd4, type: 3}
   - {fileID: 2924753196299772060, guid: b2c67b71c7486844e8d7aa2ad57a1462, type: 3}
   - {fileID: 5353179313893722497, guid: 903f0b777fb23884388c9436d588cdbd, type: 3}
   - {fileID: 322783647940636695, guid: 62731b0ab5cbf294d94385f67d394ac3, type: 3}
@@ -11712,7 +11714,7 @@ MonoBehaviour:
   DualMode: 1
   NoDelay: 1
   Interval: 10
-  Timeout: 8000
+  Timeout: 10000
   RecvBufferSize: 7361536
   SendBufferSize: 7361536
   FastResend: 2
@@ -14669,18 +14671,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
-      - m_Target: {fileID: 1082126108}
-        m_TargetAssemblyTypeName: Networking.SocketManager, Assembly-CSharp
-        m_MethodName: CloseConnection
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 1
-        m_CallState: 2
 --- !u!114 &814328531
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17363,6 +17353,7 @@ MonoBehaviour:
   logServerIP: localhost
   logServerPort: 8081
   Port: 40000
+  _logSendInterval: 300
 --- !u!4 &976250249
 Transform:
   m_ObjectHideFlags: 0
@@ -18659,7 +18650,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b6da0329e68d81a4aa9579325526c409, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  socketServerIP: 127.0.0.1
+  socketServerIP: j12a509.p.ssafy.io
   socketServerPort: 8080
   bufferSize: 8192
   maxRetries: 5
@@ -27217,6 +27208,7 @@ GameObject:
   - component: {fileID: 1670618431}
   - component: {fileID: 1670618433}
   - component: {fileID: 1670618432}
+  - component: {fileID: 1670618434}
   m_Layer: 5
   m_Name: Full Scren (1)
   m_TagString: Untagged
@@ -27343,6 +27335,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1670618430}
   m_CullTransparentMesh: 1
+--- !u!114 &1670618434
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1670618430}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 832ee9e18ec79dc428bda712e774bf93, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1673040148
 GameObject:
   m_ObjectHideFlags: 0
@@ -27411,8 +27415,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88e489d9796ce73448cf1fae6307ab71, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _userName: {fileID: 289681134}
-  _password: {fileID: 1652393354}
+  _userName: {fileID: 289681136}
+  _password: {fileID: 1652393356}
   _loginButton: {fileID: 2124191178}
   _OnlineUI: {fileID: 1941930190}
 --- !u!114 &1673040152
@@ -29588,8 +29592,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -725, y: 440}
-  m_SizeDelta: {x: -1550, y: -880}
+  m_AnchoredPosition: {x: -677.7944, y: 440}
+  m_SizeDelta: {x: -1455.5887, y: -880}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1001 &1783966216
 PrefabInstance:
@@ -32870,8 +32874,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   createRoomUI: {fileID: 916236714}
+  cancelButton: {fileID: 814328528}
   findRoomUI: {fileID: 1281179373}
   nicknameUI: {fileID: 1619069060}
+  mainMenuUI: {fileID: 1673040148}
 --- !u!1001 &1949398315
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -37384,7 +37390,7 @@ MonoBehaviour:
     clip: {fileID: 0}
     hitClip: {fileID: 8300000, guid: e2ecd876992e87c47b3a431600f1995b, type: 3}
   - skillType: 15
-    clip: {fileID: 8300000, guid: 28bd281d9386c5741b53206e34678126, type: 3}
+    clip: {fileID: 8300000, guid: 2bdc746723afbc8408198a21728de566, type: 3}
     hitClip: {fileID: 0}
   - skillType: 9
     clip: {fileID: 8300000, guid: e085c10645258f843b476ba906242a80, type: 3}
@@ -37423,7 +37429,7 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 30c062d8e46a02945af7abc1740ae116, type: 3}
     hitClip: {fileID: 8300000, guid: 3a8c8a74a32835f4682c5a94c424d195, type: 3}
   - skillType: 28
-    clip: {fileID: 8300000, guid: 2bdc746723afbc8408198a21728de566, type: 3}
+    clip: {fileID: 8300000, guid: cdc36230a9784ff49a909e30d3abed9d, type: 3}
     hitClip: {fileID: 0}
   - skillType: 29
     clip: {fileID: 8300000, guid: 56465cf9ee27bab4c84473b178913edd, type: 3}

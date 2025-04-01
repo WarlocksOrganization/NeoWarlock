@@ -21,7 +21,10 @@ namespace Networking
         public ushort Port = 7777;
         private Thread _logThread;
         private bool _isRunning = false;
-        private int backupCount = 0;
+
+        private int _lastTimeLogSend = -998244353; // 마지막 로그 전송 시각
+        [SerializeField]private int _logSendInterval = 300; // 로그 전송 간격 (초)
+        private Queue<string> _logWriterQueue = new Queue<string>();
 
         public static LogManager singleton;
 
@@ -83,21 +86,6 @@ namespace Networking
                     }
                 }
             }
-
-            _logThread = new Thread(StartLogRoutine);
-            _isRunning = true;
-            _logThread.Start();
-        }
-
-        [Server]
-        private void StartLogRoutine()
-        {
-            while (_isRunning)
-            {
-                // 5분에 한 번씩 로그 전송
-                StartCoroutine(SendLogsToServer());
-                Thread.Sleep(6000000); // 10분 대기
-            }
         }
 
         [Server]            
@@ -112,7 +100,7 @@ namespace Networking
             // Port 번호에 따라 10분 단위로 대기
             // Port 번호의 마지막 자리와 현재 시간의 분을 비교하여 대기
             var roomManager = RoomManager.singleton as RoomManager;
-            while ((DateTime.Now.Minute % 10) != (int)(Port % 10))
+            while ((DateTime.Now.Minute % 5) != (int)(Port % 5))
             {
                 // 10분 단위로 대기
                 yield return new WaitForSeconds(20);
@@ -126,6 +114,11 @@ namespace Networking
                 yield break;
             }
             string logText = $"[{File.ReadAllText(logPath)}]";
+            if (string.IsNullOrEmpty(logText) || logText == "[]")
+            {
+                Debug.LogWarning("[LogManager] 로그 파일이 비어있습니다.");
+                yield break;
+            }
             // 로그 파일 json 객체로 변환
             JObject logJson = new JObject();
             JArray logArray = JArray.Parse(logText);
@@ -148,13 +141,64 @@ namespace Networking
             else
             {
                 // 이전 로그 백업
-                string backupPath = logPath + $".{++backupCount}";
+                string backupPath = logPath + $".{DateTime.Now:yyyyMMdd_HHmmss}.bak";
                 File.Copy(logPath, backupPath);
                 File.WriteAllText(logPath, "");
                 Debug.Log("[LogManager] 로그 전송 성공");
             }
 
             request.Dispose();
+        }
+
+        [Server]
+        public void EnqueueLog(string log)
+        {
+            // 로그를 큐에 추가
+            if (!Application.platform.Equals(RuntimePlatform.LinuxServer))
+            {
+                Debug.LogWarning("[LogManager] 서버 모드에서 실행 중이 아닙니다.");
+                return;
+            }
+
+            _logWriterQueue.Enqueue(log);
+        }
+
+        private void Update()
+        {
+            if (!Application.platform.Equals(RuntimePlatform.LinuxServer))
+            {
+                // 로그 서버 모드가 아닐 경우 로그 전송을 하지 않음
+                return;
+            }
+
+            // 로그 큐에 있는 로그를 서버에 전송
+            if (_lastTimeLogSend + _logSendInterval < Time.time)
+            {
+                _lastTimeLogSend = (int)Time.time;
+                StartCoroutine(SendLogsToServer());
+            }
+
+            // 로그 파일에 기록
+            if (_logWriterQueue.Count > 0)
+            {
+                string log = _logWriterQueue.Dequeue();
+                string logDirPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + Constants.LogFilepath;
+                if (!Directory.Exists(logDirPath))
+                {
+                    Directory.CreateDirectory(logDirPath);
+                }
+                string logPath = logDirPath + Constants.LogFilename;
+                // 로그 파일이 존재하지 않으면 생성
+                if (!File.Exists(logPath))
+                {
+                    File.Create(logPath).Close();
+                }
+                // 로그 파일에 기록
+                using (StreamWriter writer = new StreamWriter(logPath, true))
+                {
+                    writer.WriteLine(log + ",");
+                }
+            }
         }
 
         private void OnApplicationQuit()
