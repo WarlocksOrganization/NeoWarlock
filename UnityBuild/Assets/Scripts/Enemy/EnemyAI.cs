@@ -112,9 +112,9 @@ public class EnemyAI : NetworkBehaviour, IDamagable
     }
 
     [Server]
-    public void takeDamage(int damage, Vector3 attackTran, float knockbackForce, AttackConfig attackConfig, int playerid, int skillid)
+    public int takeDamage(int damage, Vector3 attackTran, float knockbackForce, AttackConfig attackConfig, int playerid, int skillid)
     {
-        if (curHp <= 0) return;
+        if (curHp <= 0) return 0;
 
         curHp -= damage;
 
@@ -123,6 +123,8 @@ public class EnemyAI : NetworkBehaviour, IDamagable
             curHp = 0;
             Die();
         }
+
+        return this.damage;
     }
 
     [Server]

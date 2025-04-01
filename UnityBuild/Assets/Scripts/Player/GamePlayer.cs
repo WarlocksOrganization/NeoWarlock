@@ -30,7 +30,6 @@ namespace Player
         private PlayerCardUI playerCardUI;
         private GamePlayUI gameplayUI;
         private static bool gameplayObjectSpawned = false;
-        private bool isRoundEnding = false;
 
         private void Awake()
         {
@@ -217,10 +216,20 @@ namespace Player
             timer?.StartGameFlow(Constants.CountTime, Constants.MaxGameEventTime);
         }
 
-        [ClientRpc]
+        [TargetRpc]
         private void RpcUpdateTimer(float time)
         {
-            playerCardUI?.UpdateTimer(time);
+            if (playerCardUI == null)
+                playerCardUI = FindFirstObjectByType<PlayerCardUI>();
+
+            if (playerCardUI != null && playerCardUI.gameObject != null)
+            {
+                playerCardUI.UpdateTimer(time);
+            }
+            else
+            {
+                Debug.LogWarning("[GamePlayer] RpcUpdateTimer() - PlayerCardUI is missing or destroyed.");
+            }
         }
 
         public void OnCardSelectionConfirmed()

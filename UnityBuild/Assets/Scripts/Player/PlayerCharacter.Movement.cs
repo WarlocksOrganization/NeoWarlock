@@ -181,5 +181,12 @@ namespace Player
             // ✅ 1초 후 자동 삭제 (파티클을 사용하면 따로 제거할 필요 없음)
             Destroy(moveIndicatorInstance, 1f);
         }
+        
+        [Command(requiresAuthority = false)]
+        public void CmdUpdatePosition(Vector3 pos)
+        {
+            transform.position = pos;
+        }
+
     }
 }

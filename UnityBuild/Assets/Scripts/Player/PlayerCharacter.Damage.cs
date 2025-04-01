@@ -25,10 +25,10 @@ namespace Player
         [SyncVar(hook = nameof(OnDefenseChanged))] public int defense = 0; // ✅ 방어력 추가
         public int Defense => defense;
         
-        public void takeDamage(int damage, Vector3 attackTran, float knockbackForce, AttackConfig attackConfig, int attackPlayerId, int attackskillid)
+        public int takeDamage(int damage, Vector3 attackTran, float knockbackForce, AttackConfig attackConfig, int attackPlayerId, int attackskillid)
         {
-            if (!isServer || State == Constants.PlayerState.NotReady) return;
-            if (curHp <= 0) return;
+            if (!isServer || State == Constants.PlayerState.NotReady) return 0;
+            if (curHp <= 0) return 0;
             
             if (damage > 0)
             {
@@ -44,7 +44,8 @@ namespace Player
 
                 if (knockbackForce != 0)
                 {
-                    RpcApplyKnockback(direction * knockbackForce);
+                    Debug.Log(knockbackForce);
+                    RpcApplyKnockback(direction * knockbackForce * Constants.KnockBackFactor);
                     RpcTriggerAnimation("isHit"); 
                 }
 
@@ -53,6 +54,8 @@ namespace Player
                     ApplyBuffFromAttack(attackConfig.appliedBuff, attackPlayerId, attackskillid);
                 }
             }
+
+            return damage;
         }
         private void OnDefenseChanged(int oldVal, int newVal) => NotifyStatChanged();
 

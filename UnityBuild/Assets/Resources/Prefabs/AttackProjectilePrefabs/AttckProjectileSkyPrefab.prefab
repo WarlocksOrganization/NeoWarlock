@@ -29184,6 +29184,8 @@ MonoBehaviour:
     gObject: {fileID: 495833067180329345}
   - skillType: 1011
     gObject: {fileID: 0}
+  rangeDecalPrefab: {fileID: 0}
+  colliderTransform: {fileID: 2333324923650270475}
 --- !u!114 &642507581500943264
 MonoBehaviour:
   m_ObjectHideFlags: 0

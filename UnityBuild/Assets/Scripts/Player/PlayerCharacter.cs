@@ -233,13 +233,21 @@ namespace Player
         {
             if (!isServer)
             {
-                CmdSetState(value);
+                if (isOwned)
+                {
+                    CmdSetState(value);
+                }
+                else
+                {
+                    Debug.LogWarning($"[PlayerCharacter] 권한 없는 객체에서 CmdSetState 시도됨: playerId={playerId}");
+                }
             }
             else
             {
                 State = value;
             }
         }
+
 
         [Command]
         public void CmdSetState(Constants.PlayerState value)

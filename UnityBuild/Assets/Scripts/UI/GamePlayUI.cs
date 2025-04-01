@@ -132,6 +132,8 @@ public class GamePlayUI : GameLobbyUI
 
     public void ShowFinalScoreBoard(Constants.PlayerRecord[] records, int roundIndex)
     {
+        Debug.Log("ShowFinalScoreBoard" + scoreBoardUI);
+        scoreBoardUI.gameObject.SetActive(true);
         scoreBoardUI.ShowScoreBoard(records, roundIndex);
     }
 

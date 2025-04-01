@@ -14,6 +14,8 @@ namespace Player
         // ✅ 카드 효과 적용 (클라이언트에서 먼저 호출 가능)
         public void ApplyCardBonuses(List<Database.PlayerCardData> cards)
         {
+            if (!isOwned) return;
+            
             foreach (var card in cards)
             {
                 if (IsBasicStat(card.StatType))

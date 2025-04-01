@@ -57,7 +57,10 @@ public class BuffSystem : NetworkBehaviour
         }
         
 
-        RpcSideEffect(buffData);
+        if (isServer && (buffData.BuffType == Constants.BuffType.Charge || buffData.BuffType == Constants.BuffType.PowerCharge))
+        {
+            ApplyCharge(attackskillid);
+        }
 
         yield return new WaitForSeconds(buffData.duration);
 
@@ -160,6 +163,9 @@ public class BuffSystem : NetworkBehaviour
     private IEnumerator ForcedMove(BuffData buffData)
     {
         float elapsedTime = 0f;
+        float syncInterval = 0.1f; // 서버 위치 동기화 주기
+        float syncTimer = 0f;
+
         CharacterController characterController = playerCharacter.GetComponent<CharacterController>();
 
         if (characterController == null)
@@ -170,18 +176,25 @@ public class BuffSystem : NetworkBehaviour
 
         while (elapsedTime < buffData.duration)
         {
-            yield return null; // ✅ 매 프레임 실행
+            yield return null;
 
-            if (playerCharacter != null)
+            if (playerCharacter != null && characterController.enabled)
             {
                 Quaternion quaternion = playerCharacter.gameObject.transform.GetChild(2).rotation;
                 Vector3 moveDirection = quaternion * buffData.moveDirection;
                 moveDirection.y = 0f;
-                
+
                 characterController.Move(moveDirection * Time.deltaTime);
+
+                syncTimer += Time.deltaTime;
+                if (syncTimer >= syncInterval)
+                {
+                    playerCharacter.CmdUpdatePosition(playerCharacter.transform.position);
+                    syncTimer = 0f;
+                }
             }
 
-            elapsedTime += Time.deltaTime; // ✅ Time.deltaTime을 사용하여 정확한 시간 측정
+            elapsedTime += Time.deltaTime;
         }
     }
 
@@ -274,31 +287,19 @@ public class BuffSystem : NetworkBehaviour
         }
     }
 
-    [ClientRpc]
-    private void RpcSideEffect(BuffData buffData)
+    private void ApplyCharge(int skillId)
     {
-        switch (buffData.BuffType)
-        {
-            case Constants.BuffType.Charge:
-            case Constants.BuffType.PowerCharge:
-                StartCoroutine(Charge(buffData));
-                break;
-        }
-    }
+        GameObject holder = new GameObject("ChargeAttackZone");
+        holder.transform.SetParent(transform);
+        holder.transform.localPosition = Vector3.zero;
 
-    private IEnumerator Charge(BuffData buffData)
-    {
-        float elapsedTime = 0f;
-        int tick = 0;
+        var zone = holder.AddComponent<ChargeAttackZone>();
 
-        while (elapsedTime < buffData.duration)
+        zone.Initialize(gameObject, playerCharacter.playerId, skillId);
+
+        if (isServer)
         {
-            yield return new WaitForSeconds(0.016f);
-            if (++tick % 5 == 0)
-            {
-                playerCharacter.CmdCertainAttack(playerCharacter.transform.position, 230, true);
-            }
-            elapsedTime += 0.016f;
+            zone.StartAttack(); 
         }
     }
     
