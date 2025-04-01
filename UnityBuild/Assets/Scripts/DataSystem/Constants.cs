@@ -88,6 +88,7 @@ namespace DataSystem
             HolyShhield,
             PowerPowerBody,
             PowerCharge,
+            Lava,
             
             ItemHP = 100,
             ItemSpeed = 101,
