@@ -49,6 +49,11 @@ public class EnemyAI : NetworkBehaviour, IDamagable
     {
         if (curHp <= 0) return;
 
+        if (Time.time - lastAttackTime < attackCooldown)
+        {
+            return;
+        }
+
         if (target == null || target.isDead)
         {
             FindClosestPlayer();
@@ -59,18 +64,16 @@ public class EnemyAI : NetworkBehaviour, IDamagable
 
         if (dist > attackRange)
         {
-            // 이동
             Vector3 dir = (target.transform.position - transform.position).normalized;
             transform.position += dir * moveSpeed * Time.deltaTime;
 
             animator.SetBool("isMoving", true);
 
-            // ✅ Y축 회전만 적용하여 EnemyModel이 이동 방향을 바라보도록 함
             if (dir != Vector3.zero)
             {
                 Quaternion lookRot = Quaternion.LookRotation(dir);
                 Vector3 euler = lookRot.eulerAngles;
-                EnemyModel.rotation = Quaternion.Euler(0f, euler.y, 0f); // Y축만 반영
+                EnemyModel.rotation = Quaternion.Euler(0f, euler.y, 0f);
             }
         }
         else
@@ -80,9 +83,8 @@ public class EnemyAI : NetworkBehaviour, IDamagable
             if (Time.time - lastAttackTime >= attackCooldown)
             {
                 lastAttackTime = Time.time;
-                animator.SetTrigger("isAttack");
+                RpcPlayAttackAnimation(); // ✅ 클라이언트에 공격 애니메이션 재생 지시
 
-                // 딜 적용
                 target.takeDamage(damage, transform.position, knockbackDamage, null, -1, -1);
             }
         }
@@ -130,7 +132,7 @@ public class EnemyAI : NetworkBehaviour, IDamagable
     [Server]
     private void Die()
     {
-        animator.SetTrigger("isDead");
+        RpcPlayDeathAnimation();
         // 약간의 딜레이 후 파괴
         Invoke(nameof(DestroySelf), 2f);
     }
@@ -167,4 +169,17 @@ public class EnemyAI : NetworkBehaviour, IDamagable
         GameObject damageTextInstance = Instantiate(floatingDamageTextPrefab, transform.position + Vector3.up, Quaternion.identity);
         damageTextInstance.GetComponent<FloatingDamageText>().SetDamageText(damage);
     }
+    
+    [ClientRpc]
+    private void RpcPlayAttackAnimation()
+    {
+        animator.SetTrigger("isAttack");
+    }
+
+    [ClientRpc]
+    private void RpcPlayDeathAnimation()
+    {
+        animator.SetTrigger("isDead");
+    }
+
 }

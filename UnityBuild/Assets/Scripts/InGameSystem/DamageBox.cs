@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using DataSystem;
 using Player;
 using UnityEngine;
 
@@ -7,6 +8,7 @@ public class DamageBox : MonoBehaviour
 {
     [SerializeField] private int damagePerTick = 10; // ✅ 0.5초마다 줄 데미지
     [SerializeField] private float damageInterval = 0.5f; // ✅ 데미지 간격 (0.5초)
+    [SerializeField] private AttackConfig attackConfig;
     private HashSet<PlayerCharacter> playersInRange = new HashSet<PlayerCharacter>(); // ✅ 감지된 플레이어 저장
     private Coroutine damageCoroutine; // ✅ 개별 데미지 코루틴 추적
 
@@ -51,7 +53,7 @@ public class DamageBox : MonoBehaviour
         {
             foreach (var player in playersInRange) // ✅ 리스트 복사본 없이 직접 참조
             {
-                player.takeDamage(damagePerTick, transform.position, 0, null, -1, 0);
+                player.takeDamage(damagePerTick, transform.position, 0, attackConfig, -1, 0);
             }
 
             yield return new WaitForSeconds(damageInterval);

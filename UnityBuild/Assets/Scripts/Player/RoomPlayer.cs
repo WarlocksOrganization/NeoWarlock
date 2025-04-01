@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using DataSystem;
+using DataSystem.Database;
 using GameManagement;
 using Mirror;
 using Networking;
@@ -36,6 +37,8 @@ namespace Player
                 {
                     CmdSetClss(PlayerSetting.PlayerCharacterClass);
                 }
+                PlayerSetting.PlayerCards = new List<Database.PlayerCardData>();
+                PlayerSetting.ItemSkillID = 0;
             }
         }
 
