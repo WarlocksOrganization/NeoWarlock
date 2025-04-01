@@ -42,7 +42,7 @@ ID,Name,DisplayName,Description,Speed,Range,Radius,Damage,KnockbackForce,Cooldow
 132,SoulSwamp,영혼의 심연,저주받은 늪이 생성되어 적의 이동을 방해하고 천천히 생명을 갉아먹습니다. ,0,15,10,3,-0.5,10
 
 33,InfernalFlask,지옥의 갈증, 지옥불이 적을 불태우고 사용자의 생명을 치유합니다.,10,20,4,5,0,5
-133,InfernalPoison,저주의 연소,중독된 불꽃이 적을 집어삼키며 지속적인 고통을 안깁니다.,10,25,6,5,0,5
+133,InfernalPoison,저주의 연소,중독된 불꽃이 적을 집어삼키며 지속적인 고통을 안깁니다.,15,25,6,5,0,5
 
 
 41,HollyAttack,성스러운 광휘,신성한 구체가 적을 심판합니다.,20,20,2,20,1.5,3

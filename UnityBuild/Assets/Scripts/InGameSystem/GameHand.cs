@@ -180,7 +180,7 @@ public class GameHand : NetworkBehaviour
             }
         }
         // 정전 확률 10%
-        else if (isFinal && Random.value <= 0.1f)
+        else if (isFinal && Random.value <= 0.2f)
         {
             RpcTriggerBlackout();
             
