@@ -13,6 +13,7 @@ using System.Linq;
 using IO.Swagger.Model;
 using kcp2k;
 using System.Buffers.Text;
+using UI;
 
 namespace Networking
 {
@@ -25,6 +26,8 @@ namespace Networking
         private Dictionary<string, bool> _pendingRequests = new Dictionary<string, bool>(); 
         private Queue<string> _messageQueue = new Queue<string>();
         private bool _restart = false;
+        private bool _closeConnection = false;
+        private bool _serverTerminated = false;
         private int _lastAlivePingTime = 0;
 
         public string socketServerIP = "127.0.0.1"; // 서버 IP 주소
@@ -128,10 +131,41 @@ namespace Networking
         void ConnectToServer()
         {
             // 서버에 연결 시도
-            int retries = 0;
-            // 최대 재시도 횟수만큼 반복
-            while (_client == null || (!_client.Connected && retries < maxRetries))
+            if (UnityEngine.Application.platform.Equals(RuntimePlatform.LinuxServer))
             {
+                // 리눅스 서버에서 실행 중인 경우 재시도
+                int retries = 0;
+                while (!_client.Connected && retries < maxRetries)
+                {
+                    try
+                    {
+                        _client = new TcpClient(socketServerIP, socketServerPort);
+                        _stream = _client.GetStream();
+                        Debug.Log("[SocketManager] 소켓 서버 연결 성공!");
+                        InitialMessage();
+                        // 데이터 수신 시작
+                        ReceiveData();
+                        break;
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.LogError("[SocketManager] 소켓 서버 연결 오류: " + ex.Message);
+                        retries++;
+                        Thread.Sleep(1000); // 1초 대기 후 재시도
+                    }
+                }
+
+                if (retries == maxRetries)
+                {
+                    Debug.LogError("[SocketManager] 소켓 서버 연결 재시도 횟수 초과");
+                    // 서버 연결 실패 시 메인 스레드에서 종료
+                    _serverTerminated = true;
+                    return;
+                }
+            }
+            else
+            {
+                // 클라이언트 모드에서 실행 중인 경우 연결 시도        
                 try
                 {
                     _client = new TcpClient();
@@ -141,13 +175,16 @@ namespace Networking
                     InitialMessage();
                     // 데이터 수신 시작
                     ReceiveData();
-                    break;
                 }
                 catch (Exception ex)
                 {
                     Debug.LogError("[SocketManager] 소켓 서버 연결 오류: " + ex.Message);
-                    retries++;
-                    Thread.Sleep(1000);
+
+                    var modalPopup = ModalPopupUI.singleton;
+                    if (modalPopup != null)
+                    {
+                        modalPopup.EnqueueModalMessage("서버와의 연결에 실패했습니다.\n잠시 후 다시 시도해주세요.");
+                    }
                 }
             }
         }
@@ -190,19 +227,24 @@ namespace Networking
             catch(Exception ex)
             {
                 Debug.Log("[SocketManager] 소켓 통신 오류: " + ex.Message);
-                // 소켓 오류 시 연결 해제
-                if (ex.Message.Contains("SocketException"))
+                if (ex.Message.Contains("Unable to read data from the transport connection:"))
                 {
-                    CloseConnection();
-                    if (UnityEngine.Application.platform.Equals(RuntimePlatform.LinuxServer))
+                    Debug.Log("[SocketManager] 소켓 연결이 중단되었습니다.");
+                    if (!ex.Message.Contains("WSACancelBlockingCall"))
                     {
-                        // 리눅스 서버에서 실행 중인 경우 재시도
-                        _restart = true;
+                        EnqueueCloseConnection();
                     }
-                    else
-                    {
-                        UnityEngine.SceneManagement.SceneManager.LoadScene("MainMenu");
-                    }
+                }
+                else
+                {
+                    Debug.Log("[SocketManager] 소켓 통신 오류: " + ex.Message);
+                }
+
+                if (UnityEngine.Application.platform.Equals(RuntimePlatform.LinuxServer))
+                {
+                    // 리눅스 서버에서 실행 중인 경우 재시도
+                    EnqueueCloseConnection();
+                    _restart = true;
                 }
             }
         }
@@ -228,8 +270,24 @@ namespace Networking
 
             SendMessageToServer(data.ToString());
         }
+        
+        public void OnClickLogout()
+        {
+            // 로그아웃 버튼 클릭 시 호출
+            CloseConnection(true);
+            var modalPopup = ModalPopupUI.singleton;
+            if (modalPopup != null)
+            {
+                modalPopup.ShowModalMessage("로그아웃 되었습니다.");
+            }
+        }
 
-        public void CloseConnection()
+        public void EnqueueCloseConnection()
+        {
+            _closeConnection = true;
+        }
+
+        public void CloseConnection(bool calledFromClient = false)
         {
             // 로컬 저장소 초기화
             if (PlayerPrefs.HasKey("sessionToken"))
@@ -256,6 +314,27 @@ namespace Networking
 
             StopAllCoroutines();
 
+            if (!UnityEngine.Application.platform.Equals(RuntimePlatform.LinuxServer) && !calledFromClient)
+            {
+                // 클라이언트 모드에서 실행 중인 경우 씬 전환
+                var modalPopup = ModalPopupUI.singleton;
+                if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name != "MainMenu")
+                {
+                    UnityEngine.SceneManagement.SceneManager.LoadScene("MainMenu");
+                }
+
+                OnlineUI onlineUI = FindFirstObjectByType<OnlineUI>();
+                if (onlineUI != null)
+                {
+                    onlineUI.switchToMainMenuUI();
+                }
+                
+                if (modalPopup != null)
+                {
+                    modalPopup.ShowModalMessage("서버와의 연결이 끊어졌습니다.");
+                }
+            }
+
             Debug.Log("[SocketManager] 소켓 서버와 연결 해제.");
         }
         
@@ -267,6 +346,28 @@ namespace Networking
                 message = JToken.Parse(message).ToString();
             }
             JToken data = JToken.Parse(message);
+
+            if (data.SelectToken("status") != null && data.SelectToken("status").ToString() == "error")
+            {
+                // 서버에서 에러 응답 처리
+                Debug.LogWarning("[SocketManager] 서버 에러 응답: " + message);
+                var modalPopup = ModalPopupUI.singleton as ModalPopupUI;
+                if (modalPopup != null)
+                {
+                    string modalMessage = "서버에서 에러가 발생했습니다.\n잠시 후 다시 시도해주세요.";
+                    if (message.Contains("Invalid password") || message.Contains("Invalid username"))
+                    {
+                        modalMessage = "아이디 또는 비밀번호가\n잘못되었습니다.\n다시 시도해주세요.";
+                    }
+                    else if (message.Contains("Invalid session token"))
+                    {
+                        modalMessage = "세션이 만료되었습니다.\n다시 로그인해주세요.";
+                    }
+         
+                    modalPopup.EnqueueModalMessage(modalMessage);
+                }
+                return;
+            }
 
             if (data.SelectToken("action") != null)
             {
@@ -385,12 +486,31 @@ namespace Networking
 
         private void Update()
         {
-            if (_restart)
+            if (UnityEngine.Application.platform.Equals(RuntimePlatform.LinuxServer))
             {
-                // 리눅스 서버에서 실행 중인 경우 재시도
-                _restart = false;
-                InitSocketConnection();
+                if (_serverTerminated)
+                {
+                    // 서버 연결이 종료된 경우
+                    Debug.Log("[SocketManager] 서버 연결 종료됨. 스레드 종료.");
+                    _clientThread.Abort();
+                    UnityEngine.Application.Quit();
+                    return;
+                }
+                if (_restart)
+                {
+                    // 리눅스 서버에서 실행 중인 경우 재시도
+                    _restart = false;
+                    InitSocketConnection();
+                }
             }
+            
+            // 소켓 연결 상태 확인 및 메시지 처리
+            if (_closeConnection)
+            {
+                // 연결 해제 요청 시 연결 해제
+                CloseConnection(false);
+                _closeConnection = false;
+            }            
 
             if (_messageQueue.Count > 0)
             {

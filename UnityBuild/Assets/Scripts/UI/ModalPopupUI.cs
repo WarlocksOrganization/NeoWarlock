@@ -3,13 +3,18 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections.Generic;
 
 public class ModalPopupUI : MonoBehaviour
 {
     [SerializeField] private GameObject modalPrefab;
+    [SerializeField] private GameObject _onlineUI;
+    [SerializeField] private GameObject _mainMenuUI;
     private GameObject _modalObject;
     private GameObject _modalMessage;
     private GameObject _modalConfirm;
+
+    private Queue<string> _modalQueue = new Queue<string>();
 
     public static ModalPopupUI singleton;
 
@@ -58,5 +63,19 @@ public class ModalPopupUI : MonoBehaviour
     {
         // 모달 팝업을 닫는 함수
         _modalObject.SetActive(false);
+    }
+
+    public void EnqueueModalMessage(string message)
+    {
+        _modalQueue.Enqueue(message);
+    }
+
+    void Update()
+    {
+        if (_modalQueue.Count > 0)
+        {
+            string message = _modalQueue.Dequeue();
+            ShowModalMessage(message);
+        }
     }
 }
