@@ -139,6 +139,11 @@ namespace GameManagement
             }
 
             deathOrder.Clear();
+
+            if (currentRound >= 3)
+            {
+                GameResult();
+            }
         }
 
         public int GetScoreAtRound(Constants.PlayerRecord record, int roundIndex)
@@ -241,6 +246,90 @@ namespace GameManagement
                 conn.identity.GetComponent<GamePlayer>()?.RpcUpdateRound(currentRound);
                 conn.identity.GetComponent<GamePlayer>()?.RpcSendFinalScore(GetAllPlayerRecords(), currentRound - 1);
             }
+        }
+
+        public void GameResult()
+        {
+            if (Application.platform != RuntimePlatform.LinuxServer)
+            {
+                Debug.LogWarning("[GameManager] 서버 모드에서 실행 중이 아닙니다.");
+                return;
+            }
+
+            Debug.Log("[GameManager] 게임 종료. 결과 기록 중...");
+            List<Dictionary<string, object>> playerLogs = new List<Dictionary<string, object>>();
+            var allPlayerRecords = GameManager.Instance.GetAllPlayerRecords();
+            foreach (Constants.PlayerRecord playerRecord in allPlayerRecords)
+            {
+                List<int> roundRanks = new List<int> 
+                {
+                    playerRecord.roundStatsList[0].rank,
+                    playerRecord.roundStatsList[1].rank,
+                    playerRecord.roundStatsList[2].rank
+                };
+
+                List<int> roundScore = new List<int> 
+                {
+                    playerRecord.GetScoreAtRound(0),
+                    playerRecord.GetScoreAtRound(1),
+                    playerRecord.GetScoreAtRound(2)
+                };
+
+                var gamePlayers = FindObjectsByType<GamePlayer>(FindObjectsSortMode.None);
+                var player = gamePlayers.Where(p => p.UserId == playerRecord.userId)
+                    .OrderByDescending(p => p.PlayerCards.Count())
+                    .FirstOrDefault();
+
+                if (player == null)
+                {
+                    Debug.LogWarning($"[GameManager] 플레이어를 찾을 수 없습니다. userId: {playerRecord.userId}");
+                }
+                else if (player.PlayerCards.Count() < 9)
+                {
+                    Debug.LogWarning($"[GameManager] 플레이어 카드 수가 부족합니다. 임의로 채웁니다. userId: {playerRecord.userId}");
+                    int playerCardCount = player.PlayerCards.Count();
+                    player.PlayerCards = new int[9]
+                    {
+                        playerCardCount > 0 ? player.PlayerCards[0] : 0,
+                        playerCardCount > 1 ? player.PlayerCards[1] : 0,
+                        playerCardCount > 2 ? player.PlayerCards[2] : 0,
+                        playerCardCount > 3 ? player.PlayerCards[3] : 0,
+                        playerCardCount > 4 ? player.PlayerCards[4] : 0,
+                        playerCardCount > 5 ? player.PlayerCards[5] : 0,
+                        playerCardCount > 6 ? player.PlayerCards[6] : 0,
+                        playerCardCount > 7 ? player.PlayerCards[7] : 0,
+                        playerCardCount > 8 ? player.PlayerCards[8] : 0
+                    };
+                }
+                
+
+                Dictionary<string, object> playerLog = new Dictionary<string, object>
+                {
+                    ["userId"] = playerRecord.userId,
+                    ["classCode"] = (int)playerRecord.characterClass,
+                    ["round1Set"] = new int[] {player.PlayerCards[0], player.PlayerCards[1], player.PlayerCards[2]},
+                    ["round2Set"] = new int[] {player.PlayerCards[3], player.PlayerCards[4], player.PlayerCards[5]},
+                    ["round3Set"] = new int[] {player.PlayerCards[6], player.PlayerCards[7], player.PlayerCards[8]},
+                    ["roundRank"] = roundRanks,
+                    ["roundScore"] = roundScore
+                };
+                playerLogs.Add(playerLog);
+            }
+            
+            var manager = Networking.RoomManager.singleton as Networking.RoomManager;
+            Dictionary<string, string> roomData = manager.GetRoomData();
+            var socketManager = Networking.SocketManager.singleton as Networking.SocketManager;
+            if (socketManager != null && socketManager.IsConnected())
+            {
+                int roomId = int.TryParse(roomData["roomId"], out roomId) ? roomId : 0;
+                int gameId = int.TryParse(roomData["gameId"], out gameId) ? gameId : 0;
+                socketManager.RequestGameEnd(roomId, gameId);
+            }
+            else
+            {
+                Debug.LogWarning("[GameManager] SocketManager가 존재하지 않거나 연결되지 않았습니다.");
+            }
+            FileLogger.LogGameEnd(manager.GetMapId(), playerLogs.Count(), playerLogs);
         }
     }
 }

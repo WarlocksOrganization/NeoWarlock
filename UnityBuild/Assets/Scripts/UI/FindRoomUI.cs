@@ -12,7 +12,7 @@ public class FindRoomUI : MonoBehaviour
     [SerializeField] private GameObject _roomContainerPrefab;
     [SerializeField] private GameObject onlineUI;
     [SerializeField] private GameObject _contentParent;
-    private Dictionary<string, ushort> _roomPortDict = new Dictionary<string, ushort>();
+    private Dictionary<int, ushort> _roomPortDict = new Dictionary<int, ushort>();
 
 
     public void TurnOnFindRoomUI()
@@ -37,16 +37,17 @@ public class FindRoomUI : MonoBehaviour
         foreach (JToken room in data["rooms"])
         {
             GameObject roomContainer = Instantiate(_roomContainerPrefab, _contentParent.transform);
-            roomContainer.transform.Find("RoomId").GetComponent<TextMeshProUGUI>().text = room.SelectToken("roomId").ToString();
+            int roomId = int.TryParse(room.SelectToken("RoomId").ToString(), out int result) ? result : 0;
+            roomContainer.transform.Find("RoomId").GetComponent<TextMeshProUGUI>().text = roomId.ToString();
             roomContainer.transform.Find("RoomType").GetComponent<TextMeshProUGUI>().text = "개인전";
             roomContainer.transform.Find("RoomName").GetComponent<TextMeshProUGUI>().text = room.SelectToken("roomName").ToString();
             roomContainer.transform.Find("RoomCount").GetComponent<TextMeshProUGUI>().text = room.SelectToken("currentPlayers").ToString() + " / " + room.SelectToken("maxPlayers").ToString();
-            _roomPortDict[room.SelectToken("roomId").ToString()] = room.SelectToken("port").ToObject<ushort>();
-            roomContainer.GetComponentInChildren<Button>().onClick.AddListener(() => OnClickRoom(room.SelectToken("roomId").ToString()));
+            _roomPortDict[roomId] = room.SelectToken("port").ToObject<ushort>();
+            roomContainer.GetComponentInChildren<Button>().onClick.AddListener(() => OnClickRoom(roomId));
         }
     }
 
-    private void OnClickRoom(string roomId)
+    private void OnClickRoom(int roomId)
     {
         // 방 입장 요청
         GetComponentInChildren<Button>().interactable = false;

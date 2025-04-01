@@ -113,6 +113,7 @@ namespace Networking
                 PlayerPrefs.SetString("nickName", data.SelectToken("nickName").ToString());
 
                 PlayerSetting.Nickname = data.SelectToken("nickName").ToString();
+                PlayerSetting.UserId = data.SelectToken("userId").ToString();
 
                 LoginUI loginUI = FindFirstObjectByType<LoginUI>();
                 if (loginUI != null)

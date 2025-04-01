@@ -2,16 +2,24 @@ using System.Collections;
 using DataSystem;
 using Mirror;
 using Networking;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace UI
 {
     public class OnlineUI : MonoBehaviour
     {
         [SerializeField] private GameObject createRoomUI;
+        [SerializeField] private GameObject cancelButton;
         [SerializeField] private GameObject findRoomUI;
         [SerializeField] private GameObject nicknameUI;
-    
+
+        private void Start()
+        {
+            var socketManager = SocketManager.singleton as SocketManager;
+            cancelButton.GetComponentInChildren<Button>().onClick.AddListener(socketManager.CloseConnection);
+        }
         public void OnClickEnterGameRoomButton()
         {
             AudioManager.Instance.PlaySFX(Constants.SoundType.SFX_Button);

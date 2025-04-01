@@ -44,94 +44,90 @@ namespace GameManagement
             }
 
             Dictionary<string, string> roomData = roomManager.GetRoomData();
-            args["roomId"] = roomData["roomId"] == null ? "0" : roomData["roomId"];
-            args["gameId"] = roomData["gameId"] == null ? "0" : roomData["gameId"];
-            args["patchVersion"] = "0.51"; // Add patch version to all logs
+            args["roomId"] = int.TryParse(roomData["roomId"].ToString(), out int roomId) ? roomId : 0;
+            args["gameId"] =  int.TryParse(roomData["gameId"].ToString(), out int gameId) ? gameId : 0;
+            args["patchVersion"] = Application.version;
             LogEvent logEvent = new LogEvent(eventType, args);
             string json = logEvent.ToJson();
 
-            // 로그 파일에 기록
-            try
+            var LogManager = Networking.LogManager.singleton;
+            if (LogManager == null)
             {
-                string logDirPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + Constants.LogFilepath;
-                string logPath = logDirPath + Constants.LogFilename;
-                // 로그 파일이 시스템 경로에 없으면 생성
-                if (!Directory.Exists(logDirPath))
-                {
-                    Directory.CreateDirectory(logDirPath);
-                }
-                if (!File.Exists(logPath))
-                {
-                    File.Create(logPath).Close();
-                }
-
-                File.AppendAllText(logPath, json + "," + Environment.NewLine);
+                Debug.LogWarning("[FileLogger] LogManager가 존재하지 않습니다.");
+                return;
             }
-            catch (Exception ex)
-            {
-                Debug.LogError("[FileLogger] 로그 파일 기록 오류: " + ex.Message);
-            }
+            LogManager.EnqueueLog(json);
         }
 
+        // 임시로 CreateRoom, GameStart, GameEnd 로그를 남김
+        // 추후에 필요에 따라 추가적인 로그를 남길 수 있음
         public static void LogCreateRoom()
         {
             Dictionary<string, object> args = new Dictionary<string, object>();
-            args["gameId"] = "0"; // Default gameId for room creation
-            args["userId"] = "0"; // Server as the creator
+            args["gameId"] = 0; // Default gameId for room creation
+            args["userId"] = 0; // Server as the creator
             Log(Constants.DataServerLogType.createRoom, args);
         }
 
         public static void LogJoinRoom(string userId)
         {
             Dictionary<string, object> args = new Dictionary<string, object>();
-            args["userId"] = userId;
+            args["userId"] = int.TryParse(userId, out int userIdInt) ? userIdInt : 0;
             Log(Constants.DataServerLogType.joinRoom, args);
         }
 
         public static void LogExitRoom(string userId)
         {
             Dictionary<string, object> args = new Dictionary<string, object>();
-            args["userId"] = userId;
+            args["userId"] = int.TryParse(userId, out int userIdInt) ? userIdInt : 0;
             Log(Constants.DataServerLogType.exitRoom, args);
         }
 
         public static void LogPlayerReady(string userId)
         {
             Dictionary<string, object> args = new Dictionary<string, object>();
-            args["userId"] = userId;
+            args["userId"] = int.TryParse(userId, out int userIdInt) ? userIdInt : 0;
             Log(Constants.DataServerLogType.playerReady, args);
         }
 
-        public static void LogGameStart(string mapId, int playerCount, List<string> userIds)
+        public static void LogGameStart(int mapId, int playerCount, List<string> userIds)
         {
             Dictionary<string, object> args = new Dictionary<string, object>();
             args["mapId"] = mapId;
             args["playerCount"] = playerCount;
-            args["userId"] = userIds;
+            List<int> userIdInts = new List<int>();
+            foreach (string userId in userIds)
+            {
+                if (int.TryParse(userId, out int userIdInt))
+                {
+                    userIdInts.Add(userIdInt);
+                }
+            }
+            args["userIds"] = userIdInts;
             Log(Constants.DataServerLogType.gameStart, args);
         }
 
         public static void LogSkillHit(string userId, string target, int damage, string skillId)
         {
-            Dictionary<string, object> args = new Dictionary<string, object>();
-            args["userId"] = userId;
-            args["target"] = target;
-            args["damage"] = damage;
-            args["skillId"] = skillId;
-            Log(Constants.DataServerLogType.skillHit, args);
+            // Dictionary<string, object> args = new Dictionary<string, object>();
+            // args["userId"] = int.TryParse(userId, out int userIdInt) ? userIdInt : 0;
+            // args["target"] = int.TryParse(target, out int targetInt) ? targetInt : 0;
+            // args["damage"] = damage;
+            // args["skillId"] = int.TryParse(skillId, out int skillIdInt) ? skillIdInt : 0;
+            // Log(Constants.DataServerLogType.skillHit, args);
         }
 
         public static void LogKill(string userId, string target, string killType, string skillId)
         {
             Dictionary<string, object> args = new Dictionary<string, object>();
-            args["userId"] = userId;
-            args["target"] = target;
+            args["userId"] = int.TryParse(userId, out int userIdInt) ? userIdInt : 0;
+            args["target"] = int.TryParse(target, out int targetInt) ? targetInt : 0;
             args["killType"] = killType;
-            args["skillId"] = skillId;
+            args["skillId"] = int.TryParse(skillId, out int skillIdInt) ? skillIdInt : 0;
             Log(Constants.DataServerLogType.kill, args);
         }
 
-        public static void LogGameEnd(string mapId, int playerCount, List<Dictionary<string, object>> playerLogs)
+        public static void LogGameEnd(int mapId, int playerCount, List<Dictionary<string, object>> playerLogs)
         {
             Dictionary<string, object> args = new Dictionary<string, object>();
             args["mapId"] = mapId;

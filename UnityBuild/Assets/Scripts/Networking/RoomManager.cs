@@ -3,12 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using DataSystem;
 using GameManagement;
 using kcp2k;
 using Mirror;
 using Newtonsoft.Json.Linq;
 using Player;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -144,10 +146,9 @@ namespace Networking
 
             base.OnServerConnect(conn);
         }
-
         public void StartGame()
         {
-            if (roomDataInstance.gameId != null)
+            if (roomDataInstance.gameId > 0)
             {
                 Debug.LogWarning("[RoomManager] 이미 게임이 시작되었습니다.");
                 return;
@@ -165,6 +166,8 @@ namespace Networking
             roomDataInstance.SetRandomMapIfNeeded();
 
             Debug.Log("[RoomManager] 모든 플레이어가 준비되었습니다. 게임을 시작합니다!");
+            var socketManager = SocketManager.singleton;
+            socketManager.RequestGameStart(roomDataInstance.roomId);
             ServerChangeScene(GameplayScene);
         }
         public Dictionary<string, string> GetRoomData()
@@ -173,16 +176,29 @@ namespace Networking
             data["roomName"] = roomDataInstance.roomName;
             data["roomType"] = roomDataInstance.roomType.ToString();
             data["maxPlayerCount"] = roomDataInstance.maxPlayerCount.ToString();
-            data["gameId"] = roomDataInstance.gameId;
-            data["roomId"] = roomDataInstance.roomId;
+            data["gameId"] = roomDataInstance.gameId.ToString();
+            data["roomId"] = roomDataInstance.roomId.ToString();
             return data;
         }
 
         public void SetRoomData(Dictionary<string, string> data)
         {
-            roomDataInstance.SetRoomData(data["roomName"], Constants.RoomType.Solo, int.Parse(data["maxPlayerCount"]), data["gameId"], data["roomId"]);
+            if (roomDataInstance == null)
+            {
+                Debug.LogWarning("[RoomManager] roomDataInstance가 null입니다. 방 데이터를 설정할 수 없습니다.");
+                return;
+            }
+            int maxPlayerCount = int.TryParse(data["maxPlayerCount"], out maxPlayerCount) ? maxPlayerCount : 6;
+            int gId = int.TryParse(data["gameId"], out gId) ? gId : 0;
+            int rId = int.TryParse(data["roomId"], out rId) ? rId : 0;
+            roomDataInstance.SetRoomData(data["roomName"], Constants.RoomType.Solo, maxPlayerCount, gId, rId);
         }
         
+        public int GetMapId()
+        {
+            return (int)roomDataInstance.roomMapType;
+        }
+
         public override void OnClientDisconnect()
         {
             base.OnClientDisconnect();
