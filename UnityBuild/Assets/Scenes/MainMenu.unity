@@ -17351,6 +17351,7 @@ MonoBehaviour:
   logServerIP: localhost
   logServerPort: 8081
   Port: 40000
+  _logSendInterval: 300
 --- !u!4 &976250249
 Transform:
   m_ObjectHideFlags: 0
@@ -18647,7 +18648,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b6da0329e68d81a4aa9579325526c409, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  socketServerIP: 127.0.0.1
+  socketServerIP: j12a509.p.ssafy.io
   socketServerPort: 8080
   bufferSize: 8192
   maxRetries: 5

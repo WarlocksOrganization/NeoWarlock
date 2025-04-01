@@ -147,7 +147,7 @@ namespace Player
                     .ToArray();
                 if (playerCharacters.Count() > attackPlayerId)
                 {
-                    string attackerUserId = attackPlayerId == -1 ? "0" : playerCharacters[attackPlayerId].userId;
+                    string attackerUserId = attackPlayerId == -1 ? (attackPlayersId == -1 ? "0" : playerCharacters[attackPlayersId].userId) : playerCharacters[attackPlayerId].userId;
                     FileLogger.LogKill(attackerUserId, userId, attackskillid == 0 ? "outside" : "skill", attackskillid.ToString());
                 }
             }

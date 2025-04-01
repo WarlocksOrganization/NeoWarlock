@@ -2,6 +2,7 @@ using System;
 using Mirror;
 using DataSystem;
 using UnityEngine;
+using System.Collections.Generic;
 
 namespace GameManagement
 {
@@ -9,6 +10,8 @@ namespace GameManagement
     public class PlayerGameStats
     {
         public string nickname;
+        public string userId;
+        public List<int> selectedCards;
         public Constants.CharacterClass characterClass;
         public int kills;
         public int deaths;
@@ -20,10 +23,12 @@ namespace GameManagement
         {
         }
 
-        public PlayerGameStats(string nickname)
+        public PlayerGameStats(string nickname, string userId = "0")
         {
             this.nickname = nickname;
+            this.userId = userId;
             this.characterClass = Constants.CharacterClass.None;
+            this.selectedCards = new List<int>();
             this.kills = 0;
             this.deaths = 0;
             this.totalDamage = 0f;

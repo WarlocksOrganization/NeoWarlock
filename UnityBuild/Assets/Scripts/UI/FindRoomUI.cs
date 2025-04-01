@@ -37,7 +37,7 @@ public class FindRoomUI : MonoBehaviour
         foreach (JToken room in data["rooms"])
         {
             GameObject roomContainer = Instantiate(_roomContainerPrefab, _contentParent.transform);
-            int roomId = int.TryParse(room.SelectToken("RoomId").ToString(), out int result) ? result : 0;
+            int roomId = int.TryParse(room.SelectToken("roomId").ToString(), out int result) ? result : 0;
             roomContainer.transform.Find("RoomId").GetComponent<TextMeshProUGUI>().text = roomId.ToString();
             roomContainer.transform.Find("RoomType").GetComponent<TextMeshProUGUI>().text = "개인전";
             roomContainer.transform.Find("RoomName").GetComponent<TextMeshProUGUI>().text = room.SelectToken("roomName").ToString();

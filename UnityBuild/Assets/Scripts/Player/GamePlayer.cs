@@ -18,7 +18,6 @@ namespace Player
     {
         [SyncVar] public string PlayerNickname;
         public PlayerGameStats stats;
-        public int[] PlayerCards;
 
         [SyncVar]
         public string UserId;
@@ -258,6 +257,7 @@ namespace Player
             );
             StartCoroutine(DelayedStatSetup());
             int[] selectedCardIds = PlayerSetting.PlayerCards.Select(card => card.ID).ToArray();
+            CmdSetPlayerCards(UserId, selectedCardIds);
             CmdMarkPlayerReady(selectedCardIds);
         }
 
@@ -271,12 +271,24 @@ namespace Player
         }
 
         [Command]
+        public void CmdSetPlayerCards(string userId, int[] selectedCardIds)
+        {
+            var gameManager = GameManagement.GameManager.Instance;
+            if (gameManager == null)
+            {
+                Debug.LogError("[GamePlayer] GameManager is null.");
+                return;
+            }
+            gameManager.SetPlayerCards(playerCharacter.userId, selectedCardIds);
+        }
+
+        [Command]
         public void CmdMarkPlayerReady(int[] selectedCardIds)
         {
             if (playerCharacter == null) return;
 
             playerCharacter.State = Constants.PlayerState.Ready;
-            PlayerCards = selectedCardIds;
+
             // 모든 플레이어 준비 여부 체크
             bool allReady = FindObjectsByType<LobbyPlayerCharacter>(sortMode: FindObjectsSortMode.None)
                 .All(p => p.State == Constants.PlayerState.Ready);

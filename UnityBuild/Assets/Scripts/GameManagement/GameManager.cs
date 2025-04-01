@@ -13,6 +13,8 @@ namespace GameManagement
     {
         public static GameManager Instance { get; private set; }
 
+        public static Dictionary<string, int[]> playerCards = new Dictionary<string, int[]>();
+
         private void Awake()
         {
             if (Instance == null)
@@ -68,6 +70,7 @@ namespace GameManagement
 
             deathOrder.Clear();
             currentRound = 0;
+            playerCards.Clear();
         }
 
         public void RecordDamage(int attackerId, int damage)
@@ -248,6 +251,18 @@ namespace GameManagement
             }
         }
 
+        public void SetPlayerCards(string userId, int[] cards)
+        {
+            if (playerCards.ContainsKey(userId))
+            {
+                playerCards[userId] = cards;
+            }
+            else
+            {
+                playerCards.Add(userId, cards);
+            }
+        }
+
         public void GameResult()
         {
             if (Application.platform != RuntimePlatform.LinuxServer)
@@ -275,41 +290,32 @@ namespace GameManagement
                     playerRecord.GetScoreAtRound(2)
                 };
 
-                var gamePlayers = FindObjectsByType<GamePlayer>(FindObjectsSortMode.None);
-                var player = gamePlayers.Where(p => p.UserId == playerRecord.userId)
-                    .OrderByDescending(p => p.PlayerCards.Count())
-                    .FirstOrDefault();
-
-                if (player == null)
+                int[] thisPlayerCards = playerCards.ContainsKey(playerRecord.userId) ? playerCards[playerRecord.userId] : new int[9];
+                if (thisPlayerCards.Length != 9)
                 {
-                    Debug.LogWarning($"[GameManager] 플레이어를 찾을 수 없습니다. userId: {playerRecord.userId}");
-                }
-                else if (player.PlayerCards.Count() < 9)
-                {
-                    Debug.LogWarning($"[GameManager] 플레이어 카드 수가 부족합니다. 임의로 채웁니다. userId: {playerRecord.userId}");
-                    int playerCardCount = player.PlayerCards.Count();
-                    player.PlayerCards = new int[9]
+                    Debug.LogWarning($"[GameManager] {playerRecord.nickname}의 카드 세트가 유효하지 않습니다.");
+                    int cardCount = thisPlayerCards.Length;
+                    thisPlayerCards = new int[9]
                     {
-                        playerCardCount > 0 ? player.PlayerCards[0] : 0,
-                        playerCardCount > 1 ? player.PlayerCards[1] : 0,
-                        playerCardCount > 2 ? player.PlayerCards[2] : 0,
-                        playerCardCount > 3 ? player.PlayerCards[3] : 0,
-                        playerCardCount > 4 ? player.PlayerCards[4] : 0,
-                        playerCardCount > 5 ? player.PlayerCards[5] : 0,
-                        playerCardCount > 6 ? player.PlayerCards[6] : 0,
-                        playerCardCount > 7 ? player.PlayerCards[7] : 0,
-                        playerCardCount > 8 ? player.PlayerCards[8] : 0
+                        cardCount > 0 ? thisPlayerCards[0] : 0,
+                        cardCount > 1 ? thisPlayerCards[1] : 0,
+                        cardCount > 2 ? thisPlayerCards[2] : 0,
+                        cardCount > 3 ? thisPlayerCards[3] : 0,
+                        cardCount > 4 ? thisPlayerCards[4] : 0,
+                        cardCount > 5 ? thisPlayerCards[5] : 0,
+                        cardCount > 6 ? thisPlayerCards[6] : 0,
+                        cardCount > 7 ? thisPlayerCards[7] : 0,
+                        cardCount > 8 ? thisPlayerCards[8] : 0
                     };
-                }
-                
+                }           
 
                 Dictionary<string, object> playerLog = new Dictionary<string, object>
                 {
                     ["userId"] = playerRecord.userId,
                     ["classCode"] = (int)playerRecord.characterClass,
-                    ["round1Set"] = new int[] {player.PlayerCards[0], player.PlayerCards[1], player.PlayerCards[2]},
-                    ["round2Set"] = new int[] {player.PlayerCards[3], player.PlayerCards[4], player.PlayerCards[5]},
-                    ["round3Set"] = new int[] {player.PlayerCards[6], player.PlayerCards[7], player.PlayerCards[8]},
+                    ["round1Set"] = new int[] {thisPlayerCards[0], thisPlayerCards[1], thisPlayerCards[2]},
+                    ["round2Set"] = new int[] {thisPlayerCards[3], thisPlayerCards[4], thisPlayerCards[5]},
+                    ["round3Set"] = new int[] {thisPlayerCards[6], thisPlayerCards[7], thisPlayerCards[8]},
                     ["roundRank"] = roundRanks,
                     ["roundScore"] = roundScore
                 };
