@@ -66,7 +66,7 @@ public class PlayerStatUI : MonoBehaviour
         defStat.text = playerCharacter.Defense.ToString();
         spdStat.text = Mathf.Round(playerCharacter.MoveSpeed * 10).ToString();
         // knockStat.text = Mathf.Round(10 / playerCharacter.KnockbackFactor).ToString();
-        knockStat.text = 100 * (1 - playerCharacter.KnockbackFactor).ToString();
+        knockStat.text = (100 * (1 - playerCharacter.KnockbackFactor)).ToString();
 
         if (playerCharacter.CurHp == 0)
         {

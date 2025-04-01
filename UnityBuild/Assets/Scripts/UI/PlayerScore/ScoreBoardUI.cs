@@ -12,6 +12,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using UnityEngine.InputSystem;
+using UnityEngine.Playables;
+using UnityEngine.Animations;
 
 public class ScoreBoardUI : MonoBehaviour
 {
@@ -37,8 +39,18 @@ public class ScoreBoardUI : MonoBehaviour
     [SerializeField] private GameObject playerCharacterPrefab;
     [SerializeField] private Transform bestSpawnPoint;
     [SerializeField] private Camera bestPlayerCamera;
-
-    //    public RawImage bestPlayerShow;
+    [SerializeField] Vector3 cameraOffset = new Vector3(-0.8f, 0.9f, -2.4f);
+    [SerializeField] Vector3 cameraLookOffset = new Vector3(0f, 1.8f, 0f);
+    private readonly Dictionary<Constants.CharacterClass, (string folder, string prefix)> classAnimMap =
+    new()
+    {
+        { Constants.CharacterClass.Necromancer, ("Necro", "N") },
+        { Constants.CharacterClass.Warrior, ("Warrior", "W") },
+        { Constants.CharacterClass.Mage, ("Magician", "M") },
+        { Constants.CharacterClass.Archer, ("Archer", "A") },
+        { Constants.CharacterClass.Priest, ("Priest", "P") },
+    };
+    private PlayableGraph? currentGraph = null;
 
     private void Awake()
     {
@@ -146,10 +158,12 @@ public class ScoreBoardUI : MonoBehaviour
 
 
             gameObject.SetActive(true);
+            Constants.PlayerRecord bestPlayer;
             ResultBoard.SetActive(true);
-            SetResultBoardData(records);
+            SetResultBoardData(records, out bestPlayer);
             StartCoroutine(PopIn(ResultBoard.transform));
-
+            showBestPlayer(bestPlayer);
+                
             ScoreBoard.SetActive(false);
             ToggleButton.gameObject.SetActive(true);
             LobbyButton.gameObject.SetActive(true);
@@ -167,17 +181,18 @@ public class ScoreBoardUI : MonoBehaviour
         }
     }
 
-    private void SetResultBoardData(Constants.PlayerRecord[] records)
+    private void SetResultBoardData(Constants.PlayerRecord[] records, out Constants.PlayerRecord bestPlayer)
     {
     Debug.Log("[ResultBoard] SetResultBoardData 진입");
 
-    var bestPlayer = records
+    bestPlayer = records
         .OrderByDescending(r => r.GetTotalScoreUpToRound(GameManager.Instance.currentRound - 1))
         .FirstOrDefault();
 
     var bestKill = records
-        .OrderByDescending(r => r.roundStatsList.Sum(rs => rs.kills + rs.outKills))
-        .FirstOrDefault();
+        .OrderByDescending(r => r.roundStatsList.Sum(rs => rs.kills + rs.outKills))     // 1차 기준: 킬 수
+        .ThenByDescending(r => r.GetTotalScoreUpToRound(GameManager.Instance.currentRound - 1)) // 2차 기준: 점수
+        .First();
 
     var bestDamage = records
         .OrderByDescending(r => r.roundStatsList.Sum(rs => rs.damageDone))
@@ -210,8 +225,6 @@ public class ScoreBoardUI : MonoBehaviour
         int bestDamageDone = bestDamage.roundStatsList.Sum(rs => rs.damageDone);
         bestDamageStat.text = $"누적 데미지 : {bestDamageDone}";
         bestDamageIcon.sprite = Database.GetCharacterClassData(bestDamage.characterClass).CharacterIcon;
-
-        showBestPlayer(bestPlayer);
     }
 
     private void showBestPlayer(Constants.PlayerRecord bestPlayer)
@@ -235,7 +248,7 @@ public class ScoreBoardUI : MonoBehaviour
             .Find("PlayerModel/Premade_Character")
             .GetComponent<Animator>();
 
-        anim.Play("Idle"); // 혹은 VictoryPose 등
+        StartCoroutine(PlaySequence(bestPlayer.characterClass, anim));
 
         void SetLayerRecursively(Transform t, int layer)
         {
@@ -248,13 +261,54 @@ public class ScoreBoardUI : MonoBehaviour
         bestPlayerInstance.transform.rotation = Quaternion.Euler(0f, 180f, 0f); // 아바타 정면 보정
         var camTarget = bestPlayerInstance.transform;
 
-        Vector3 lookAt = camTarget.position + Vector3.up * 1.4f;
-        Vector3 camPos = camTarget.position + new Vector3(0f, 1.2f, -2.5f);
+        Vector3 camPos = camTarget.position + cameraOffset;
+        Vector3 lookAt = camTarget.position + cameraLookOffset; // 더 높은 지점 응시
 
         bestPlayerCamera.transform.position = camPos;
         bestPlayerCamera.transform.LookAt(lookAt);
         //bestPlayerInstance.transform.rotation = Quaternion.Euler(0f, 180f, 0f);
     }
+
+    public void PlayMappedMotion(Constants.CharacterClass charClass, string motionName, Animator animator)
+    {
+        currentGraph?.Destroy();
+
+        if (!classAnimMap.TryGetValue(charClass, out var map))
+        {
+            Debug.LogError($"[AnimLoad] ❗️ Unknown class: {charClass}");
+            return;
+        }
+
+        string path = $"Animation/Player/{map.folder}/{map.prefix}{motionName}";
+        AnimationClip clip = Resources.Load<AnimationClip>(path);
+
+        if (!clip)
+        {
+            Debug.LogError($"[AnimLoad] ❌ Animation not found at path: {path}");
+            return;
+        }
+
+        var graph = PlayableGraph.Create("VictorySequence");
+        graph.SetTimeUpdateMode(DirectorUpdateMode.GameTime);
+
+        var clipPlayable = AnimationClipPlayable.Create(graph, clip);
+        var output = AnimationPlayableOutput.Create(graph, "AnimOutput", animator);
+        output.SetSourcePlayable(clipPlayable);
+
+        graph.Play();
+    }
+    
+    IEnumerator PlaySequence(Constants.CharacterClass charClass, Animator anim)
+    {
+        PlayMappedMotion(charClass, "Attack3", anim);
+        yield return new WaitForSecondsRealtime(1f);
+
+        PlayMappedMotion(charClass, "MoveSkill", anim);
+        yield return new WaitForSecondsRealtime(1f);
+
+        PlayMappedMotion(charClass, "Idle", anim);
+    }
+    
     public IEnumerator PopIn(Transform target, float duration = 0.5f, float scaleMultiplier = 1f)
     {
         Vector3 start = Vector3.zero;
@@ -299,5 +353,9 @@ public class ScoreBoardUI : MonoBehaviour
             yield return null;
         }
         cg.alpha = to;
+    }
+    private void OnDestroy()
+    {
+        currentGraph?.Destroy(); // 씬 종료 시 혹시 남아 있는 그래프도 해제
     }
 }
