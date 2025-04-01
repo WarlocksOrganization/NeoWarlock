@@ -279,7 +279,7 @@ namespace Player
                 Debug.LogError("[GamePlayer] GameManager is null.");
                 return;
             }
-            gameManager.SetPlayerCards(playerCharacter.userId, selectedCardIds);
+            gameManager.SetPlayerCards(userId, selectedCardIds);
         }
 
         [Command]
