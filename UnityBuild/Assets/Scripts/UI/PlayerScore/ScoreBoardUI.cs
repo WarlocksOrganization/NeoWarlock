@@ -278,14 +278,14 @@ public class ScoreBoardUI : MonoBehaviour
         //bestPlayerInstance.transform.rotation = Quaternion.Euler(0f, 180f, 0f);
     }
 
-    public void PlayMappedMotion(Constants.CharacterClass charClass, string motionName, Animator animator)
+    public IEnumerator PlayMappedMotion(Constants.CharacterClass charClass, string motionName, Animator animator)
     {
         currentGraph?.Destroy();
 
         if (!classAnimMap.TryGetValue(charClass, out var map))
         {
             Debug.LogError($"[AnimLoad] ❗️ Unknown class: {charClass}");
-            return;
+            yield break; // 🔁 중요
         }
 
         string path = $"Animation/Player/{map.folder}/{map.prefix}{motionName}";
@@ -294,7 +294,7 @@ public class ScoreBoardUI : MonoBehaviour
         if (!clip)
         {
             Debug.LogError($"[AnimLoad] ❌ Animation not found at path: {path}");
-            return;
+            yield break; // 🔁 중요
         }
 
         var graph = PlayableGraph.Create("VictorySequence");
@@ -305,17 +305,20 @@ public class ScoreBoardUI : MonoBehaviour
         output.SetSourcePlayable(clipPlayable);
 
         graph.Play();
+        currentGraph = graph;
+
+        yield return new WaitForSecondsRealtime(clip.length); // 클립 길이만큼 대기
+        // graph.Destroy(); // 자동 해제
     }
     
     IEnumerator PlaySequence(Constants.CharacterClass charClass, Animator anim)
     {
-        PlayMappedMotion(charClass, "Attack3", anim);
-        yield return new WaitForSecondsRealtime(1f);
+        // PlayMappedMotion(charClass, "Attack3", anim);
+        // yield return new WaitForSecondsRealtime(1f);
 
-        PlayMappedMotion(charClass, "MoveSkill", anim);
-        yield return new WaitForSecondsRealtime(1f);
-
-        PlayMappedMotion(charClass, "Idle", anim);
+        // PlayMappedMotion(charClass, "MoveSkill", anim);
+        // yield return new WaitForSecondsRealtime(0.3f);
+        yield return PlayMappedMotion(charClass, "Idle", anim);
     }
     
     public IEnumerator PopIn(Transform target, float duration = 0.5f, float scaleMultiplier = 1f)
