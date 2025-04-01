@@ -14,8 +14,8 @@ namespace GameManagement
         [SyncVar] public int Round = 3;
         [SyncVar(hook = nameof(OnMapTypeChanged))] public Constants.RoomMapType roomMapType = Constants.RoomMapType.SSAFY;
 
-        [SyncVar] public string gameId = null;
-        [SyncVar] public string roomId = null;
+        [SyncVar] public int gameId = 0;
+        [SyncVar] public int roomId = 0;
 
         private void Start()
         {
@@ -40,7 +40,7 @@ namespace GameManagement
         }
 
         [Server]
-        public void SetRoomData(string name, Constants.RoomType type, int maxPlayers, string gId = null, string rId = null)
+        public void SetRoomData(string name, Constants.RoomType type, int maxPlayers, int gId = 0, int rId = 0)
         {
             roomName = name;
             roomType = type;

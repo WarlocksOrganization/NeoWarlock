@@ -5,8 +5,10 @@ using System.Linq;
 using DataSystem;
 using DataSystem.Database;
 using GameManagement;
+using kcp2k;
 using Mirror;
 using Networking;
+using Newtonsoft.Json.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -50,6 +52,7 @@ namespace Player
             {
                 CmdSetNickname(PlayerSetting.Nickname);
                 CmdSetPlayerNumber(PlayerSetting.PlayerId);
+                CmdSetUserId(PlayerSetting.UserId);
                 playerCardUI = FindFirstObjectByType<PlayerCardUI>();
             }
         }
@@ -160,6 +163,7 @@ namespace Player
                 if (isServer)
                 {
                     Debug.Log("🔔 최종 라운드 종료, 로비 버튼 표시");
+                    // 모든 플레이어에게 로비 버튼 표시
                     RpcShowReturnToLobbyButton();
                 }
                 else
@@ -253,6 +257,7 @@ namespace Player
             );
             StartCoroutine(DelayedStatSetup());
             int[] selectedCardIds = PlayerSetting.PlayerCards.Select(card => card.ID).ToArray();
+            CmdSetPlayerCards(UserId, selectedCardIds);
             CmdMarkPlayerReady(selectedCardIds);
         }
 

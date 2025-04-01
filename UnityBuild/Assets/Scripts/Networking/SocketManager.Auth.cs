@@ -15,26 +15,13 @@ namespace Networking
 {
     public partial class SocketManager : MonoBehaviour
     {   
-        private IEnumerator AlivePingSender()
-        {
-            // AlivePing 요청을 주기적으로 보내는 코루틴
-            while (_client == null || !_client.Connected)
-            {
-                yield return new WaitForSeconds(1);
-            }
-
-            while (_client.Connected)
-            {
-                AlivePing();
-                yield return new WaitForSeconds(10);
-            }
-        }
         private void AlivePing()
         {
             // 서버에 AlivePing 요청
             JToken aliveData = new JObject();
             aliveData["action"] = "alivePing";
             _pendingRequests["refreshSession"] = true;
+            _lastAlivePingTime = (int)Time.time;
             SendMessageToServer(aliveData.ToString());
         }
 
@@ -113,6 +100,7 @@ namespace Networking
                 PlayerPrefs.SetString("nickName", data.SelectToken("nickName").ToString());
 
                 PlayerSetting.Nickname = data.SelectToken("nickName").ToString();
+                PlayerSetting.UserId = data.SelectToken("userId").ToString();
 
                 LoginUI loginUI = FindFirstObjectByType<LoginUI>();
                 if (loginUI != null)
@@ -125,7 +113,7 @@ namespace Networking
                     modal.ShowModalMessage("로그인 성공\n환영합니다, " + PlayerSetting.Nickname + " 님!");
                 }
                 // AlivePing 요청을 주기적으로 보내는 코루틴
-                StartCoroutine(AlivePingSender());
+                AlivePing();
             }
             else
             {

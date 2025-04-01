@@ -1,7 +1,9 @@
+using System.Linq;
 using DataSystem;
 using GameManagement;
 using Interfaces;
 using Mirror;
+using Networking;
 using UI;
 using UnityEngine;
 using UnityEngine.UI;
@@ -138,6 +140,15 @@ namespace Player
                 else
                 {
                     RpcTransmitKillLog(-1, -1, false);
+                }
+
+                PlayerCharacter[] playerCharacters = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None)
+                    .OrderBy(player => player.GetComponent<NetworkIdentity>().netId)
+                    .ToArray();
+                if (playerCharacters.Count() > attackPlayerId)
+                {
+                    string attackerUserId = attackPlayerId == -1 ? (attackPlayersId == -1 ? "0" : playerCharacters[attackPlayersId].userId) : playerCharacters[attackPlayerId].userId;
+                    FileLogger.LogKill(attackerUserId, userId, attackskillid == 0 ? "outside" : "skill", attackskillid.ToString());
                 }
             }
         }
