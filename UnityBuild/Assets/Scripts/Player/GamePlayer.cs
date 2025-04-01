@@ -32,12 +32,6 @@ namespace Player
         private PlayerCardUI playerCardUI;
         private GamePlayUI gameplayUI;
         private static bool gameplayObjectSpawned = false;
-
-        private void Awake()
-        {
-            gameplayUI = FindFirstObjectByType<GamePlayUI>();
-        }
-
         public override void Start()
         {
             base.Start();
@@ -54,11 +48,18 @@ namespace Player
                 CmdSetPlayerNumber(PlayerSetting.PlayerId);
                 CmdSetUserId(PlayerSetting.UserId);
                 playerCardUI = FindFirstObjectByType<PlayerCardUI>();
+                gameplayUI = FindFirstObjectByType<GamePlayUI>();
             }
         }
 
         [RuntimeInitializeOnLoadMethod]
-        private static void OnLoad() => SceneManager.sceneLoaded += (_, _) => gameplayObjectSpawned = false;
+        private static void OnLoad()
+        {
+            SceneManager.sceneLoaded += (_, _) => gameplayObjectSpawned = false;
+        }
+        
+        
+        
 
         private void SpawnLobbyPlayerCharacter()
         {
@@ -133,7 +134,10 @@ namespace Player
 
         private IEnumerator ShowFinalScoreAndNextRound(Constants.PlayerRecord[] allRecords, int roundIndex)
         {
+            gameplayUI = FindFirstObjectByType<GamePlayUI>();
+            Debug.Log("ShowFinalScoreAndNextRound");
             yield return new WaitUntil(() => gameplayUI != null);
+            Debug.Log("ShowFinalScoreAndNextRoundEnd");
             gameplayUI.ShowGameOverTextAndScore(allRecords, roundIndex);
             StartCoroutine(HandleRoundTransition());
         }
@@ -318,6 +322,7 @@ namespace Player
         public void CheckGameOver()
         {
             if (!isServer) return;
+            Debug.Log("CheckGameOver");
             GameManager.Instance.TryCheckGameOver(); // ✅ 이제 여기서만 실행
         }
 
@@ -335,7 +340,21 @@ namespace Player
             {
                 if (GameManager.Instance != null)
                     GameManager.Instance.ResetRoundState();
+
+                // 🔥 씬 변경 후 GamePlayer 자동 제거 코루틴 실행
+                var players = GameObject.FindObjectsOfType<GamePlayer>();
+                foreach (var player in players)
+                {
+                    player.StartCoroutine(player.DestroySelfAfterDelay());
+                }
             };
+        }
+
+        private IEnumerator DestroySelfAfterDelay()
+        {
+            yield return new WaitForSeconds(1f);
+            Debug.Log($"[GamePlayer] {gameObject.name} 씬 변경 후 1초 뒤 제거됨");
+            Destroy(gameObject);
         }
     }
 }

@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe25a225da670384e89deb818f013fd8, type: 3}
   m_Name: FireBuffConfig
   m_EditorClassIdentifier: 
-  duration: 1
+  duration: 3
   moveSpeedModifier: 0
   attackDamageModifier: 0
   defenseModifier: 0

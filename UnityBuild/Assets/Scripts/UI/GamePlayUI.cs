@@ -60,10 +60,17 @@ public class GamePlayUI : GameLobbyUI
         StartCube.SetActive(false);
     }
 
+    private Coroutine countdownRoutine;
+
     public void StartCountdownUI(int phase, int seconds)
     {
-        StopAllCoroutines(); // 중복 방지
-        StartCoroutine(UICountdownRoutine(phase, seconds));
+        if (countdownRoutine != null)
+        {
+            StopCoroutine(countdownRoutine);
+            countdownRoutine = null;
+        }
+
+        countdownRoutine = StartCoroutine(UICountdownRoutine(phase, seconds));
     }
 
     private IEnumerator UICountdownRoutine(int phase, int seconds)
@@ -132,6 +139,7 @@ public class GamePlayUI : GameLobbyUI
     
     public void ShowFinalScoreBoard(Constants.PlayerRecord[] records, int roundIndex)
     {
+        Debug.Log("[GamePlayUI] ShowFinalScoreBoard 진입");
         // 먼저 활성화 후 기다리도록 수정
         scoreBoardUI.gameObject.SetActive(true);
         StartCoroutine(WaitAndShowScoreBoard(records, roundIndex));
@@ -144,7 +152,7 @@ public class GamePlayUI : GameLobbyUI
 
         yield return new WaitForSeconds(0.05f); // 렌더 타이밍 안정화용
 
-        Debug.Log("[GamePlayUI] ShowFinalScoreBoard 진입");
+        Debug.Log("[GamePlayUI] WaitAndShowScoreBoard 진입");
         scoreBoardUI.ShowScoreBoard(records, roundIndex);
     }
 
@@ -155,6 +163,8 @@ public class GamePlayUI : GameLobbyUI
 
     private IEnumerator GameOverSequence(Constants.PlayerRecord[] records, int roundIndex)
     {
+        Debug.Log("[GamePlayUI] GameOverSequence 진입");
+        
         AudioManager.Instance.ApplyBGMVolumeToMixer(0);
         countDownText.gameObject.SetActive(true);
         countDownText.color = Color.green;
@@ -162,6 +172,8 @@ public class GamePlayUI : GameLobbyUI
         countDownAnimator.SetTrigger("isGameOver");
 
         yield return new WaitForSeconds(3f);
+        
+        Debug.Log("[GamePlayUI] GameOverSequence2 진입");
         AudioManager.Instance.PlayBGM(Constants.SoundType.BGM_SSAFY_ScoreBoard);
         ShowFinalScoreBoard(records, roundIndex);
     }
