@@ -14,6 +14,7 @@ namespace GameManagement
         public static int ItemSkillID = 0;
         
         public static int PlayerId;
+        public static string UserId;
         
         public static List<Database.PlayerCardData> PlayerCards = new List<Database.PlayerCardData>();
     }

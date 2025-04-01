@@ -33,6 +33,7 @@ namespace Player
             {
                 CmdSetPlayerNumber(); // ✅ 이제 서버에서 자동으로 playerId 할당
                 CmdSetNickname(PlayerSetting.Nickname);
+                CmdSetUserId(PlayerSetting.UserId);
                 if (PlayerSetting.PlayerCharacterClass != Constants.CharacterClass.None)
                 {
                     CmdSetClss(PlayerSetting.PlayerCharacterClass);

@@ -25,6 +25,7 @@ namespace Networking
         private Dictionary<string, bool> _pendingRequests = new Dictionary<string, bool>(); 
         private Queue<string> _messageQueue = new Queue<string>();
         private bool _restart = false;
+        private int _lastAlivePingTime = 0;
 
         public string socketServerIP = "127.0.0.1"; // 서버 IP 주소
         public ushort socketServerPort = 8080; // 서버 포트 번호
@@ -402,6 +403,13 @@ namespace Networking
                 {
                     ClientResponseHandler(message);
                 }
+            }
+
+            if (_lastAlivePingTime > 0 && _lastAlivePingTime + 10 < Time.time)
+            {
+                // 10초마다 서버에 AlivePing 요청
+                _lastAlivePingTime = (int)Time.time;
+                AlivePing();
             }
         }
 
