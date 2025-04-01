@@ -64,6 +64,12 @@ public class GamePlayUI : GameLobbyUI
 
     public void StartCountdownUI(int phase, int seconds)
     {
+        if (countDownText == null)
+        {
+            Debug.LogWarning("[GamePlayUI] countDownText가 아직 초기화되지 않았습니다.");
+            return;
+        }
+
         if (countdownRoutine != null)
         {
             StopCoroutine(countdownRoutine);

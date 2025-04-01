@@ -290,7 +290,7 @@ namespace Player
                 return;
             }
 
-            gameManager.SetPlayerCards(userId, selectedCardIds);
+            //gameManager.SetPlayerCards(userId, selectedCardIds);
         }
 
         [Command]
@@ -355,6 +355,11 @@ namespace Player
             yield return new WaitForSeconds(1f);
             Debug.Log($"[GamePlayer] {gameObject.name} 씬 변경 후 1초 뒤 제거됨");
             Destroy(gameObject);
+        }
+        
+        void OnDestroy()
+        {
+            StopAllCoroutines(); // or Stop specific coroutine
         }
     }
 }

@@ -48,9 +48,23 @@ public class NetworkTimer : NetworkBehaviour
     [ClientRpc]
     private void RpcStartPhase(int phase, int seconds)
     {
-        Debug.Log($"[NetworkTimer] RpcStartPhase 호출 - Phase {phase}, {seconds}초");
-        GamePlayUI?.StartCountdownUI(phase, seconds);
+        StartCoroutine(WaitAndStartCountdown(phase, seconds));
     }
+
+    private IEnumerator WaitAndStartCountdown(int phase, int seconds)
+    {
+        yield return new WaitUntil(() =>
+            FindFirstObjectByType<GamePlayUI>() != null &&
+            FindFirstObjectByType<GamePlayUI>().isActiveAndEnabled &&
+            FindFirstObjectByType<GamePlayUI>().gameObject.activeInHierarchy
+        );
+
+        yield return null; // 1프레임 더 대기 (UI 요소 초기화 타이밍 확보)
+
+        var ui = FindFirstObjectByType<GamePlayUI>();
+        ui?.StartCountdownUI(phase, seconds);
+    }
+
 
     // 이벤트 실행 트리거 (서버+클라이언트 동기화)
     [ClientRpc]
