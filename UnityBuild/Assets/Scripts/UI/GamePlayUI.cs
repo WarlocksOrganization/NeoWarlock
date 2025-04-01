@@ -132,8 +132,18 @@ public class GamePlayUI : GameLobbyUI
 
     public void ShowFinalScoreBoard(Constants.PlayerRecord[] records, int roundIndex)
     {
-        Debug.Log("ShowFinalScoreBoard" + scoreBoardUI);
-        scoreBoardUI.gameObject.SetActive(true);
+        StartCoroutine(WaitAndShowScoreBoard(records, roundIndex));
+    }
+
+    private IEnumerator WaitAndShowScoreBoard(Constants.PlayerRecord[] records, int roundIndex)
+    {
+        // scoreBoardUI가 완전히 준비될 때까지 기다림
+        yield return new WaitUntil(() => scoreBoardUI != null && scoreBoardUI.gameObject.activeInHierarchy);
+
+        // 딜레이를 조금 줘서 렌더 타이밍 문제 방지
+        yield return new WaitForSeconds(0.1f);
+
+        Debug.Log("[GamePlayUI] ShowFinalScoreBoard 진입");
         scoreBoardUI.ShowScoreBoard(records, roundIndex);
     }
 
