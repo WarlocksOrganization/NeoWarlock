@@ -46,6 +46,13 @@ public class ScoreBoardUI : MonoBehaviour
         resultToggleButton.gameObject.SetActive(false);
         returnToLobbyButton.onClick.AddListener(OnClickReturnToLobby);
     }
+    
+    private void Start()
+    {
+        canvasGroup.alpha = 1f;
+        canvasGroup.interactable = true;
+        canvasGroup.blocksRaycasts = true;
+    }
 
     public void ShowReturnToLobbyButton()
     {

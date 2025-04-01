@@ -4,10 +4,12 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Text.RegularExpressions;
+using UnityEngine.EventSystems;
+
 public class LoginUI : MonoBehaviour
 {
-    [SerializeField] private GameObject _userName;
-    [SerializeField] private GameObject _password;
+    [SerializeField] private TMP_InputField _userName;
+    [SerializeField] private TMP_InputField _password;
     [SerializeField] private GameObject _loginButton;
 
     [SerializeField] private GameObject _OnlineUI;
@@ -18,6 +20,22 @@ public class LoginUI : MonoBehaviour
         if (PlayerPrefs.HasKey("sessionToken"))
         {
             TurnOnOnlineUI();
+        }
+        
+        _userName.onSubmit.AddListener(_ => OnClickLogin());
+        _password.onSubmit.AddListener(_ => OnClickLogin());
+    }
+    
+    void Update()
+    {
+        // 현재 ID 입력 필드가 선택되어 있고 Tab 키를 누른 경우
+        if (_userName.isFocused && Input.GetKeyDown(KeyCode.Tab))
+        {
+            // Tab 기본 기능 차단
+            EventSystem.current.SetSelectedGameObject(null);
+
+            // 포커스를 Password Input으로 넘김
+            _password.Select();
         }
     }
 
@@ -42,8 +60,8 @@ public class LoginUI : MonoBehaviour
             yield return new WaitForSeconds(0.5f);
         }
 
-        System.String _userNameText = _userName.GetComponent<TMP_InputField>().text.Trim();
-        System.String _passwordText = _password.GetComponent<TMP_InputField>().text.Trim();
+        System.String _userNameText = _userName.text.Trim();
+        System.String _passwordText = _password.text.Trim();
 
         _userNameText = Regex.Replace(_userNameText, @"[^\u0020-\u007E]", string.Empty);
         _passwordText = Regex.Replace(_passwordText, @"[^\u0020-\u007E]", string.Empty);
