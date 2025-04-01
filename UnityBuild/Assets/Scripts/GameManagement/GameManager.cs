@@ -228,10 +228,16 @@ namespace GameManagement
 
         public void TryCheckGameOver()
         {
+            Debug.Log("TryCheckGameOver");
+            
             if (roundEnded) return;
+            
+            Debug.Log("TryCheckGameOver2");
 
             var alive = GetAlivePlayers();
             if (alive.Count > 1) return;
+            
+            Debug.Log("TryCheckGameOver3");
 
             roundEnded = true;
 

@@ -304,34 +304,58 @@
 
         private IEnumerator CardRotation(Database.PlayerCardData newCard)
         {
-            float rotationPerStep = 30f;  // 한 스텝당 회전 각도 (30도씩 회전)
-            int stepsPerRotation = 12;    // 한 바퀴(360도)를 몇 단계로 나눌 것인가 (30도씩 12번 = 360도)
-            int totalRotations = 3;       // 몇 바퀴 회전할 것인가 (3바퀴)
-            int currentStep = 0;          // 현재 회전 단계
+            float flipDuration = 0.15f;   // 앞면으로 가기까지 시간
+            float spinDuration = 0.6f;   // 바뀐 뒤 전체 회전 시간
+            float totalDuration = flipDuration + spinDuration;
 
-            // **1단계: 빠르게 90도까지 회전 (카드 변경)**
-            while (currentStep < 3)  // 30도씩 3번 → 90도
+            Quaternion startRot = transform.rotation;
+            Quaternion midRot = Quaternion.Euler(0, 90f, 0);
+            Quaternion endRot = Quaternion.Euler(0, 0, 0);
+
+            // ▶ 1단계: 빠르게 반 바퀴 돌며 사라짐
+            float elapsed = 0f;
+            while (elapsed < flipDuration)
             {
-                transform.rotation = Quaternion.Euler(0, transform.rotation.eulerAngles.y + rotationPerStep, 0);
-                currentStep++;
+                float t = elapsed / flipDuration;
+                t = EaseInOut(t);
+                transform.rotation = Quaternion.Slerp(startRot, midRot, t);
+                elapsed += Time.deltaTime;
                 yield return null;
             }
 
-            // 정확히 90도 맞추고 카드 교체
-            transform.rotation = Quaternion.Euler(0, 90, 0);
-            SetCardData(newCard); // 새 카드 적용
+            transform.rotation = midRot;
+            SetCardData(newCard); // 카드 교체
+            yield return new WaitForSeconds(0.05f); // 자연스러운 텀
 
-            // **2단계: 빠르게 여러 번 추가 회전**
-            int targetSteps = totalRotations * stepsPerRotation;  // 총 회전 스텝 수 (3바퀴 * 12스텝 = 36스텝)
-
-            while (currentStep < targetSteps + 3)  // 기존 3스텝(90도) 포함해서 총 39스텝
+            // ▶ 2단계: 여러 바퀴 돌면서 정면으로 정착
+            float spinAngle = 360f * 3; // 3바퀴
+            elapsed = 0f;
+            while (elapsed < spinDuration)
             {
-                transform.rotation = Quaternion.Euler(0, transform.rotation.eulerAngles.y + rotationPerStep, 0);
-                currentStep++;
+                float t = elapsed / spinDuration;
+                t = EaseOutBack(t); // 살짝 튀어나오는 느낌의 easing
+
+                float angle = Mathf.Lerp(90f, 0f, t) + spinAngle * (1 - t);
+                transform.rotation = Quaternion.Euler(0, angle, 0);
+
+                elapsed += Time.deltaTime;
                 yield return null;
             }
 
-            // **3단계: 최종적으로 0도에 정착**
-            transform.rotation = Quaternion.Euler(0, 0, 0);
+            transform.rotation = endRot;
         }
+        private float EaseInOut(float t)
+        {
+            return t < 0.5f
+                ? 2f * t * t
+                : -1f + (4f - 2f * t) * t;
+        }
+
+        private float EaseOutBack(float t)
+        {
+            float c1 = 1.70158f;
+            float c3 = c1 + 1;
+            return 1 + c3 * Mathf.Pow(t - 1, 3) + c1 * Mathf.Pow(t - 1, 2);
+        }
+
     }

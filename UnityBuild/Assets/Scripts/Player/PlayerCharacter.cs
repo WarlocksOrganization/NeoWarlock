@@ -245,10 +245,6 @@ namespace Player
                 {
                     CmdSetState(value);
                 }
-                else
-                {
-                    Debug.LogWarning($"[PlayerCharacter] 권한 없는 객체에서 CmdSetState 시도됨: playerId={playerId}");
-                }
             }
             else
             {

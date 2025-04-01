@@ -132,6 +132,7 @@ namespace DataSystem
             SoulSwamp,
             InfernalPoison,
             
+            Heal = 10000,
             ItemHP = 10001,
             ItemSpeed = 1002,
             ItemAttack = 1003,

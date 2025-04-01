@@ -37402,7 +37402,7 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 628d1267b9d05054aa15f5c990979bc8, type: 3}
     hitClip: {fileID: 8300000, guid: f70e66a78f097bb468b284fa78ee40bc, type: 3}
   - skillType: 12
-    clip: {fileID: 8300000, guid: 5c8c2c63c56b47748926831ac100c3c4, type: 3}
+    clip: {fileID: 8300000, guid: 86d3ccc6ef4cb664a8369917be69cf08, type: 3}
     hitClip: {fileID: 0}
   - skillType: 3
     clip: {fileID: 8300000, guid: 6790cf9336669404aaab1d883cc39c2f, type: 3}
@@ -37452,6 +37452,9 @@ MonoBehaviour:
   - skillType: 1004
     clip: {fileID: 0}
     hitClip: {fileID: 8300000, guid: 95da89f5ce648e543b4f192355b82a2f, type: 3}
+  - skillType: 21
+    clip: {fileID: 8300000, guid: 1f1a4655fd6c9dc4085db9782474eba9, type: 3}
+    hitClip: {fileID: 0}
   bgmSource: {fileID: 748880585236253846}
   sfxPrefab: {fileID: 7925833501838690345, guid: f5517e83d2cdd6646a4a67146b59e991, type: 3}
   bgmVolume: 0.5
