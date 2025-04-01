@@ -14,11 +14,12 @@ namespace UI
         [SerializeField] private GameObject cancelButton;
         [SerializeField] private GameObject findRoomUI;
         [SerializeField] private GameObject nicknameUI;
+        [SerializeField] private GameObject mainMenuUI;
 
         private void Start()
         {
             var socketManager = SocketManager.singleton as SocketManager;
-            cancelButton.GetComponentInChildren<Button>().onClick.AddListener(socketManager.CloseConnection);
+            cancelButton.GetComponentInChildren<Button>().onClick.AddListener(socketManager.OnClickLogout);
         }
         public void OnClickEnterGameRoomButton()
         {
@@ -40,6 +41,12 @@ namespace UI
         {
             AudioManager.Instance.PlaySFX(Constants.SoundType.SFX_Button);
             createRoomUI.SetActive(true);
+            gameObject.SetActive(false);
+        }
+
+        public void switchToMainMenuUI()
+        {
+            mainMenuUI.SetActive(true);
             gameObject.SetActive(false);
         }
 

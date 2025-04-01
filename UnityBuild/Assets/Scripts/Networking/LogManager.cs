@@ -114,6 +114,11 @@ namespace Networking
                 yield break;
             }
             string logText = $"[{File.ReadAllText(logPath)}]";
+            if (string.IsNullOrEmpty(logText) || logText == "[]")
+            {
+                Debug.LogWarning("[LogManager] 로그 파일이 비어있습니다.");
+                yield break;
+            }
             // 로그 파일 json 객체로 변환
             JObject logJson = new JObject();
             JArray logArray = JArray.Parse(logText);
