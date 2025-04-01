@@ -1,6 +1,6 @@
 characterClass,skill1,skill2,skill3,movementSkill,characterName,characterDescription,characterAtk,characterHp,characterSpeed,characterKnock
 Mage,1,2,3,TelePort,마법사,원거리에서 강력한 마법을 \n사용하여 적을 제압하는 클래스,4,2,1,3
 Archer,11,12,13,Roll,궁수,빠른 공격 속도를 이용하여 \n적을 제압하는 클래스,2,3,4,1
-Warrior,21,22,23,Dash,전사,튼튼한 방어력과 강력한 \n근접 공격을 가진 클래스,1,4,2,3
+Warrior,21,22,123,Dash,전사,튼튼한 방어력과 강력한 \n근접 공격을 가진 클래스,1,4,2,3
 Necromancer,31,32,33,PhantomStep,네크로맨서,어둠의 마법을 사용하여 \n적을 약화시키는 클래스,4,1,3,2
 Priest,41,42,43,HolyTeleport,사제,신성한 힘을 사용하여 아군을 \n치유하고 보호하는 클래스,1,4,2,3

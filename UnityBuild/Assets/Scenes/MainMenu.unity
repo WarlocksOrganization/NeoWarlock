@@ -11629,7 +11629,7 @@ MonoBehaviour:
   autoCreatePlayer: 1
   playerSpawnMethod: 0
   spawnPrefabs:
-  - {fileID: 7658781495225699053, guid: 1ca5049fd24d40b4b9bc11738b30ab02, type: 3}
+  - {fileID: 7658781495225699053, guid: f29a481617b995b48ac390f918ac6bd4, type: 3}
   - {fileID: 2924753196299772060, guid: b2c67b71c7486844e8d7aa2ad57a1462, type: 3}
   - {fileID: 5353179313893722497, guid: 903f0b777fb23884388c9436d588cdbd, type: 3}
   - {fileID: 322783647940636695, guid: 62731b0ab5cbf294d94385f67d394ac3, type: 3}
@@ -27411,8 +27411,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88e489d9796ce73448cf1fae6307ab71, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _userName: {fileID: 289681134}
-  _password: {fileID: 1652393354}
+  _userName: {fileID: 289681136}
+  _password: {fileID: 1652393356}
   _loginButton: {fileID: 2124191178}
   _OnlineUI: {fileID: 1941930190}
 --- !u!114 &1673040152
@@ -29588,8 +29588,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -725, y: 440}
-  m_SizeDelta: {x: -1550, y: -880}
+  m_AnchoredPosition: {x: -677.7944, y: 440}
+  m_SizeDelta: {x: -1455.5887, y: -880}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1001 &1783966216
 PrefabInstance:
@@ -37384,7 +37384,7 @@ MonoBehaviour:
     clip: {fileID: 0}
     hitClip: {fileID: 8300000, guid: e2ecd876992e87c47b3a431600f1995b, type: 3}
   - skillType: 15
-    clip: {fileID: 8300000, guid: 28bd281d9386c5741b53206e34678126, type: 3}
+    clip: {fileID: 8300000, guid: 2bdc746723afbc8408198a21728de566, type: 3}
     hitClip: {fileID: 0}
   - skillType: 9
     clip: {fileID: 8300000, guid: e085c10645258f843b476ba906242a80, type: 3}
@@ -37423,7 +37423,7 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 30c062d8e46a02945af7abc1740ae116, type: 3}
     hitClip: {fileID: 8300000, guid: 3a8c8a74a32835f4682c5a94c424d195, type: 3}
   - skillType: 28
-    clip: {fileID: 8300000, guid: 2bdc746723afbc8408198a21728de566, type: 3}
+    clip: {fileID: 8300000, guid: cdc36230a9784ff49a909e30d3abed9d, type: 3}
     hitClip: {fileID: 0}
   - skillType: 29
     clip: {fileID: 8300000, guid: 56465cf9ee27bab4c84473b178913edd, type: 3}
