@@ -51,8 +51,9 @@ MonoBehaviour:
   showRoomGUI: 1
   readyToBegin: 0
   index: 0
-  playerName: 
-  lobbyPlayer: {fileID: 0}
+  PlayerNickname: 
+  UserId: 
+  LobbyPlayer: {fileID: 0}
 --- !u!114 &6368749677994769231
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -66,7 +67,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sceneId: 0
-  _assetId: 2736425546
+  _assetId: 3761687673
   serverOnly: 0
   visibility: 0
   hasSpawned: 0
