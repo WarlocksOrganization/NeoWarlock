@@ -27,7 +27,9 @@ namespace Player
         private Dictionary<int, AttackBase> activeAttacks = new();
 
         [SyncVar] public float BaseAttackPower = 1;
-        [SyncVar] public float AttackPower = 1;
+        [SyncVar(hook = nameof(OnAttackPowerChanged))] public float AttackPower = 1;
+        public float BasePower => BaseAttackPower;
+        public float CurrentAttackPower => AttackPower;
 
         [SyncVar(hook = nameof(OnItemSkillChanged))]
         public int itemSkillId = -1;
@@ -51,7 +53,7 @@ namespace Player
                 }
             }
         }
-
+        private void OnAttackPowerChanged(float oldValue, float newValue) => NotifyStatChanged();
         private void OnCurrentAttackChanged(int oldIndex, int newIndex)
         {
             if (newIndex >= 0 && newIndex < availableAttacks.Length)

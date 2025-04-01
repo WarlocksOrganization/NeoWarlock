@@ -242,7 +242,5 @@ namespace GameManagement
                 conn.identity.GetComponent<GamePlayer>()?.RpcSendFinalScore(GetAllPlayerRecords(), currentRound - 1);
             }
         }
-
     }
-
 }

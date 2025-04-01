@@ -79,6 +79,14 @@ namespace Player
             animator.SetFloat("Blend", (int)newClass);
             ApplyCharacterClass(newClass);
             UpdateCount();
+            if (isOwned)
+            {
+                var statUI = FindFirstObjectByType<PlayerStatUI>();
+                if (statUI != null)
+                {
+                    statUI.Setup(this);
+                }
+            }
         }
 
         private void ApplyCharacterClass(Constants.CharacterClass newClass)
@@ -123,7 +131,14 @@ namespace Player
                 lastMovementSkillTime = -Mathf.Infinity;
             }
         }
+        public void SetCharacterClass(Constants.CharacterClass cls)
+        {
+            if (characterModels == null)
+                InitializeCharacterModels();
 
+            PLayerCharacterClass = cls;
+            ApplyCharacterClass(cls);
+        }
         private void ActivateCharacterModel(Constants.CharacterClass newClass)
         {
             foreach (var model in characterModels.Values)
