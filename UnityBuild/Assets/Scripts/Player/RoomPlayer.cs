@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using DataSystem;
 using DataSystem.Database;
 using GameManagement;
@@ -45,6 +46,16 @@ namespace Player
 
         protected void SpawnLobbyPlayerCharacter()
         {
+            // ✅ 이미 connectionToClient로 캐릭터 생성됐는지 확인
+            bool alreadySpawned = FindObjectsByType<LobbyPlayerCharacter>(FindObjectsSortMode.None)
+                .Any(p => p.connectionToClient == this.connectionToClient);
+
+            if (alreadySpawned)
+            {
+                Debug.LogWarning($"[GamePlayer] 캐릭터 중복 생성 방지 - connId: {connectionToClient.connectionId}");
+                return;
+            }
+            
             Vector3 spawnPos = FindFirstObjectByType<SpawnPosition>().GetSpawnPosition();
             LobbyPlayer = Instantiate((NetworkRoomManager.singleton as RoomManager).spawnPrefabs[0], spawnPos, Quaternion.identity).GetComponent<LobbyPlayerCharacter>();
             NetworkServer.Spawn(LobbyPlayer.gameObject, connectionToClient);

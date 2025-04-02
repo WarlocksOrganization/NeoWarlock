@@ -93,7 +93,10 @@ namespace GameManagement
         public void RecordDeath(int playerId)
         {
             if (!deathOrder.Contains(playerId))
+            {
                 deathOrder.Add(playerId);
+                Debug.Log($"[RecordDeath] 플레이어 {playerId} 사망 기록됨");
+            }
         }
 
         public List<(int playerId, int rank)> GetCurrentRoundRanks()
@@ -238,10 +241,11 @@ namespace GameManagement
         private IEnumerator DelayedGameOverCheck()
         {
             isCheckingGameOver = true;
-            yield return new WaitForSeconds(0.2f); // ✅ 죽음 처리 다 끝날 때까지 잠깐 대기
+            yield return new WaitForSeconds(0.5f); // 🔄 여유 시간 늘리기
 
             var alive = GetAlivePlayers();
-            Debug.Log($"[TryCheckGameOver] 현재 생존자 수: {alive.Count}");
+
+            Debug.Log($"[TryCheckGameOver] 현재 생존자 수: {alive.Count} / roundEnded: {roundEnded}");
 
             if (alive.Count > 1)
             {
@@ -249,6 +253,7 @@ namespace GameManagement
                 yield break;
             }
 
+            // ✅ 생존자 1명 → 게임 종료 로직 진입
             roundEnded = true;
 
             var roundRanks = GetCurrentRoundRanks();

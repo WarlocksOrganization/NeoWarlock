@@ -7687,7 +7687,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentRound: 0
-  isLan: 0
   roundEnded: 0
 --- !u!4 &1338923486
 Transform:

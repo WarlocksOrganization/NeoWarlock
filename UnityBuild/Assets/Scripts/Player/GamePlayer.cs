@@ -32,7 +32,7 @@ namespace Player
         private PlayerCardUI playerCardUI;
         private GamePlayUI gameplayUI;
         private static bool gameplayObjectSpawned = false;
-        private bool isSpawnPlayer = false;
+        public bool isPlayerSpawned = false;
         
         public override void Start()
         {
@@ -53,12 +53,6 @@ namespace Player
                 playerCardUI = FindFirstObjectByType<PlayerCardUI>();
                 gameplayUI = FindFirstObjectByType<GamePlayUI>();
             }
-        }
-        
-        [RuntimeInitializeOnLoadMethod]
-        private static void OnLoad()
-        {
-            SceneManager.sceneLoaded += (_, _) => gameplayObjectSpawned = false;
         }
         
         private void SpawnLobbyPlayerCharacter()
@@ -97,13 +91,21 @@ namespace Player
                     }
                 }
             }
+            
+            if (!isServer || isPlayerSpawned) return;
+            isPlayerSpawned = true;
 
-            if (isSpawnPlayer)
+            // ✅ 이미 connectionToClient로 캐릭터 생성됐는지 확인
+            bool alreadySpawned = FindObjectsByType<LobbyPlayerCharacter>(FindObjectsSortMode.None)
+                .Any(p => p.connectionToClient == this.connectionToClient);
+
+            if (alreadySpawned)
             {
+                Debug.LogWarning($"[GamePlayer] 캐릭터 중복 생성 방지 - connId: {connectionToClient.connectionId}");
                 return;
             }
-            isSpawnPlayer = true;
-            
+
+            // ✅ 스폰
             Vector3 spawnPos = FindFirstObjectByType<SpawnPosition>().GetSpawnPosition();
             GameObject pcObj = Instantiate((NetworkRoomManager.singleton as RoomManager).spawnPrefabs[0], spawnPos, Quaternion.identity);
             playerCharacter = pcObj.GetComponent<LobbyPlayerCharacter>();
@@ -342,9 +344,49 @@ namespace Player
             GameManager.Instance.currentRound = round;
         }
         
+        [RuntimeInitializeOnLoadMethod]
+        private static void OnLoad()
+        {
+            SceneManager.sceneLoaded += (_, _) =>
+            {
+                gameplayObjectSpawned = false;
+
+                if (GameManager.Instance != null)
+                    GameManager.Instance.ResetRoundState();
+
+                if (NetworkServer.active)
+                {
+                    var players = GameObject.FindObjectsOfType<GamePlayer>();
+                    foreach (var player in players)
+                    {
+                        if (player.isPlayerSpawned)
+                        {
+                            player.StartCoroutine(player.DestroySelfAfterDelay());
+                        }
+                    }
+                }
+            };
+        }
+
+        private IEnumerator DestroySelfAfterDelay()
+        {
+            yield return new WaitForSeconds(1f);
+            Debug.Log($"[GamePlayer] {gameObject.name} 씬 변경 후 1초 뒤 제거됨");
+
+            if (NetworkServer.active)
+            {
+                NetworkServer.Destroy(gameObject); // ✅ 네트워크 오브젝트는 반드시 서버에서 제거
+            }
+        }
+
+        
         void OnDestroy()
         {
             StopAllCoroutines(); // or Stop specific coroutine
+            if (playerCharacter != null)
+            {
+                NetworkServer.Destroy(playerCharacter.gameObject);
+            }
         }
     }
 }

@@ -139,6 +139,15 @@ public class GameLobbyUI : MonoBehaviour
         {
             killerId = deadId;
         }
+
+        if (foundCharacters == null || 
+            deadId < 0 || deadId >= foundCharacters.Length || 
+            killerId < 0 || killerId >= foundCharacters.Length)
+        {
+            Debug.LogWarning($"[UpdateKillLog] 잘못된 인덱스 접근: deadId={deadId}, killerId={killerId}, foundCharacters.Length={foundCharacters?.Length}");
+            return;
+        }
+
         killLogUI?.AddKillLog(foundCharacters[killerId], foundCharacters[deadId], skillid, isFall);
 
         UpdatePlayerInRoon();
