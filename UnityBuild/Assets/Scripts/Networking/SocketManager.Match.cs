@@ -44,8 +44,6 @@ namespace Networking
                 KcpTransport transport = manager.GetComponent<KcpTransport>();
                 transport.Port = port;
 
-                manager.StartClient();
-
                 JToken roomData = new JObject();
                 roomData["action"] = "joinRoom";
                 roomData["roomId"] = roomId;
@@ -124,6 +122,8 @@ namespace Networking
             // 매치 참가 시 처리
             if (data.SelectToken("status").ToString() == "success")
             {   
+                var manager = RoomManager.singleton as RoomManager;
+                manager.StartClient();
                 Debug.Log($"[SocketManager] 방 참가 완료");
             }
             else
