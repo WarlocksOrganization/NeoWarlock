@@ -135,11 +135,12 @@ namespace Networking
             {
                 // 리눅스 서버에서 실행 중인 경우 재시도
                 int retries = 0;
-                while (!_client.Connected && retries < maxRetries)
+                while (_client == null || (!_client.Connected && retries < maxRetries))
                 {
                     try
                     {
-                        _client = new TcpClient(socketServerIP, socketServerPort);
+                        _client = new TcpClient();
+                        _client.Connect(socketServerIP, socketServerPort);
                         _stream = _client.GetStream();
                         Debug.Log("[SocketManager] 소켓 서버 연결 성공!");
                         InitialMessage();

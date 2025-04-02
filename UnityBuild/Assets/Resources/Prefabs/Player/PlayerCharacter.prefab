@@ -101394,7 +101394,7 @@ MonoBehaviour:
   animator: {fileID: 5766581736010466980}
   playerLight: {fileID: 1398236466007650778}
   attackTransform: {fileID: 2138096227263670792}
-  ghostPrefab: {fileID: 6925654504224896694, guid: b0d3bfde8f4a99945a3507bc4b4ecfd3, type: 3}
+  ghostPrefab: {fileID: 6925654504224896694, guid: d92812cd84e8a3b47ad569643a3da68c, type: 3}
   playerHUD: {fileID: 7880346224794796878}
   floatingDamageTextPrefab: {fileID: 7419919620569818252, guid: e91df33ee3e256a4d80b9260a3d087e4, type: 3}
   curHp: 150
@@ -101404,7 +101404,7 @@ MonoBehaviour:
   MoveSpeed: 5
   KnockbackDamping: 5
   KnockbackFactor: 1
-  moveIndicatorPrefab: {fileID: 3744133877081091469, guid: fb52422b677d6854fbb50e37433fd5bb, type: 3}
+  moveIndicatorPrefab: {fileID: 3744133877081091469, guid: da84a4385c31b7a448fa96ec205734f5, type: 3}
 --- !u!114 &330592031979261645
 MonoBehaviour:
   m_ObjectHideFlags: 0

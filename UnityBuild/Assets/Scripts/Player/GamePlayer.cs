@@ -23,6 +23,11 @@ namespace Player
         public string UserId;
         
         public LobbyPlayerCharacter playerCharacter;
+        
+        [SerializeField] private GameObject[] SSAFYPlayObject;
+        [SerializeField] private GameObject[] LavaPlayObject;
+        [SerializeField] private GameObject[] SpacePlayObject;
+        [SerializeField] private GameObject[] SeaPlayObject;
 
         private PlayerCardUI playerCardUI;
         private GamePlayUI gameplayUI;
@@ -47,8 +52,49 @@ namespace Player
             }
         }
         
+        [RuntimeInitializeOnLoadMethod]
+        private static void OnLoad()
+        {
+            SceneManager.sceneLoaded += (_, _) => gameplayObjectSpawned = false;
+        }
+        
         private void SpawnLobbyPlayerCharacter()
         {
+            if (isServer && !gameplayObjectSpawned)
+            {
+                gameplayObjectSpawned = true;
+                
+                GameRoomData gameRoomData = FindFirstObjectByType<GameRoomData>();
+                if (gameRoomData.roomMapType == Constants.RoomMapType.SSAFY)
+                {
+                    foreach (GameObject gameObject in SSAFYPlayObject)
+                    {
+                        NetworkServer.Spawn(Instantiate(gameObject), connectionToClient);
+                    }
+                }
+                else if (gameRoomData.roomMapType == Constants.RoomMapType.Lava)
+                {
+                    foreach (GameObject gameObject in LavaPlayObject)
+                    {
+                        NetworkServer.Spawn(Instantiate(gameObject), connectionToClient);
+                    }
+                }
+                else if (gameRoomData.roomMapType == Constants.RoomMapType.Space)
+                {
+                    foreach (GameObject gameObject in SpacePlayObject)
+                    {
+                        NetworkServer.Spawn(Instantiate(gameObject), connectionToClient);
+                    }
+                }
+                else if (gameRoomData.roomMapType == Constants.RoomMapType.Sea)
+                {
+                    foreach (GameObject gameObject in SeaPlayObject)
+                    {
+                        NetworkServer.Spawn(Instantiate(gameObject), connectionToClient);
+                    }
+                }
+            }
+            
             Vector3 spawnPos = FindFirstObjectByType<SpawnPosition>().GetSpawnPosition();
             GameObject pcObj = Instantiate((NetworkRoomManager.singleton as RoomManager).spawnPrefabs[0], spawnPos, Quaternion.identity);
             playerCharacter = pcObj.GetComponent<LobbyPlayerCharacter>();
@@ -242,7 +288,7 @@ namespace Player
                 return;
             }
 
-            //gameManager.SetPlayerCards(userId, selectedCardIds);
+            gameManager.SetPlayerCards(userId, selectedCardIds);
         }
 
         [Command]

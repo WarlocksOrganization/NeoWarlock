@@ -50,7 +50,6 @@ public class GameHand : NetworkBehaviour
     {
         isAttacking = false;
         animator.SetBool("isReady", true);
-        SwitchTarget();
     }
 
     [ServerCallback]
