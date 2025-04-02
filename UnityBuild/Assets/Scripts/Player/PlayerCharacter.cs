@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using Cinemachine;
 using DataSystem;
 using GameManagement;
@@ -167,14 +168,9 @@ namespace Player
         public void SetUserIdhook(string _, string value)
         {
             userId = value;
-            if (userId == "1" || userId == "2" || userId == "3" || userId == "4" || userId == "5" || userId == "6")
-            {
-                nicknameText.color = Color.yellow;
-            }
-            else
-            {
-                nicknameText.color = Color.white;
-            }
+    
+            HashSet<string> highlightIds = new HashSet<string> { "1", "2", "3", "4", "5", "6" };
+            nicknameText.color = highlightIds.Contains(userId) ? Color.yellow : Color.white;
         }
 
         [Command]

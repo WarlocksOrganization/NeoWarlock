@@ -505,6 +505,8 @@ MonoBehaviour:
   playerCharacterPrefab: {fileID: 7658781495225699053, guid: f29a481617b995b48ac390f918ac6bd4, type: 3}
   bestSpawnPoint: {fileID: 286821681}
   bestPlayerCamera: {fileID: 1522257752}
+  cameraOffset: {x: -0.8, y: 0.9, z: -2.4}
+  cameraLookOffset: {x: 0, y: 1.8, z: 0}
 --- !u!1 &49538541
 GameObject:
   m_ObjectHideFlags: 0
@@ -2855,6 +2857,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damagePerTick: 500
   damageInterval: 0.5
+  attackConfig: {fileID: 0}
 --- !u!65 &431726572
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -11998,6 +12001,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 594206024633346803, guid: 97ee53ba4e0d5194eb516962daf4f16d, type: 3}
       propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2501598707299397114, guid: 97ee53ba4e0d5194eb516962daf4f16d, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2501598707299397114, guid: 97ee53ba4e0d5194eb516962daf4f16d, type: 3}
+      propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4962589572273391152, guid: 97ee53ba4e0d5194eb516962daf4f16d, type: 3}

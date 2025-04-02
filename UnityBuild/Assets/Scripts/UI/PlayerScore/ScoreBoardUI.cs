@@ -72,6 +72,21 @@ public class ScoreBoardUI : MonoBehaviour
     {
         returnToLobbyButton.gameObject.SetActive(true);
         resultToggleButton.gameObject.SetActive(true);
+        
+        StartCoroutine(ReturnToLobbyAfterDelay());
+    }
+    
+    private IEnumerator ReturnToLobbyAfterDelay()
+    {
+        float delay = 20f;
+        yield return new WaitForSeconds(delay);
+
+        // ✅ 버튼을 누르지 않았을 경우에만 자동 복귀 실행
+        if (returnToLobbyButton.gameObject.activeSelf)
+        {
+            Debug.Log("[ScoreBoardUI] 201초가 지나 자동으로 로비로 돌아갑니다.");
+            OnClickReturnToLobby();
+        }
     }
 
     public void ShowScoreBoard(Constants.PlayerRecord[] records, int roundIndex)

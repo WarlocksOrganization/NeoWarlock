@@ -333,29 +333,36 @@ namespace Player
             GameManager.Instance.currentRound = round;
         }
         
-        [RuntimeInitializeOnLoadMethod]
-        private static void OnSceneLoaded()
-        {
-            SceneManager.sceneLoaded += (_, _) =>
-            {
-                if (GameManager.Instance != null)
-                    GameManager.Instance.ResetRoundState();
-
-                // 🔥 씬 변경 후 GamePlayer 자동 제거 코루틴 실행
-                var players = GameObject.FindObjectsOfType<GamePlayer>();
-                foreach (var player in players)
-                {
-                    player.StartCoroutine(player.DestroySelfAfterDelay());
-                }
-            };
-        }
-
-        private IEnumerator DestroySelfAfterDelay()
-        {
-            yield return new WaitForSeconds(1f);
-            Debug.Log($"[GamePlayer] {gameObject.name} 씬 변경 후 1초 뒤 제거됨");
-            Destroy(gameObject);
-        }
+       [RuntimeInitializeOnLoadMethod]
+       private static void OnSceneLoaded()
+       {
+           SceneManager.sceneLoaded += (_, _) =>
+           {
+               if (GameManager.Instance != null)
+                   GameManager.Instance.ResetRoundState();
+       
+               // ✅ 서버에서만 GamePlayer 제거
+               if (NetworkServer.active)
+               {
+                   var players = GameObject.FindObjectsOfType<GamePlayer>();
+                   foreach (var player in players)
+                   {
+                       player.StartCoroutine(player.DestroySelfAfterDelay());
+                   }
+               }
+           };
+       }
+       
+       private IEnumerator DestroySelfAfterDelay()
+       {
+           yield return new WaitForSeconds(1f);
+           Debug.Log($"[GamePlayer] {gameObject.name} 씬 변경 후 1초 뒤 제거됨");
+       
+           if (NetworkServer.active)
+           {
+               NetworkServer.Destroy(gameObject); // ✅ 네트워크 오브젝트는 반드시 서버에서 제거
+           }
+       }
         
         void OnDestroy()
         {
