@@ -1,4 +1,6 @@
 // ✅ GameManager.cs - 전체 재작성
+
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using DataSystem;
@@ -35,8 +37,6 @@ namespace GameManagement
         public int currentRound = 0;
         
         private HashSet<NetworkConnectionToClient> readyPlayers = new();
-
-        public bool isLan = false;
         
         public void ResetRoundState()
         {
@@ -225,19 +225,29 @@ namespace GameManagement
         }
         
         public bool roundEnded = false;
+        private bool isCheckingGameOver = false;
 
         public void TryCheckGameOver()
         {
-            Debug.Log("TryCheckGameOver");
-            
-            if (roundEnded) return;
-            
-            Debug.Log("TryCheckGameOver2");
+            if (!NetworkServer.active) return;
+            if (roundEnded || isCheckingGameOver) return;
+
+            StartCoroutine(DelayedGameOverCheck());
+        }
+
+        private IEnumerator DelayedGameOverCheck()
+        {
+            isCheckingGameOver = true;
+            yield return new WaitForSeconds(0.2f); // ✅ 죽음 처리 다 끝날 때까지 잠깐 대기
 
             var alive = GetAlivePlayers();
-            if (alive.Count > 1) return;
-            
-            Debug.Log("TryCheckGameOver3");
+            Debug.Log($"[TryCheckGameOver] 현재 생존자 수: {alive.Count}");
+
+            if (alive.Count > 1)
+            {
+                isCheckingGameOver = false;
+                yield break;
+            }
 
             roundEnded = true;
 
@@ -255,6 +265,8 @@ namespace GameManagement
                 conn.identity.GetComponent<GamePlayer>()?.RpcUpdateRound(currentRound);
                 conn.identity.GetComponent<GamePlayer>()?.RpcSendFinalScore(GetAllPlayerRecords(), currentRound - 1);
             }
+
+            isCheckingGameOver = false;
         }
 
         public void SetPlayerCards(string userId, int[] cards)
