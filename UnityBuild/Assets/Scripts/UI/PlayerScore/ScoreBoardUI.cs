@@ -52,6 +52,8 @@ public class ScoreBoardUI : MonoBehaviour
     };
     private PlayableGraph? currentGraph = null;
 
+    private bool isBestPlayerSpawned  = false;
+
     private void Awake()
     {
         returnToLobbyButton.gameObject.SetActive(false);
@@ -238,7 +240,13 @@ public class ScoreBoardUI : MonoBehaviour
 
     private void showBestPlayer(Constants.PlayerRecord bestPlayer)
     {
+        if (isBestPlayerSpawned )
+        {
+            return;
+        }
 
+        isBestPlayerSpawned  = true;
+        
         var bestPlayerInstance = Instantiate(playerCharacterPrefab, bestSpawnPoint.position, Quaternion.identity);
 
         var pc = bestPlayerInstance.GetComponent<PlayerCharacter>();
