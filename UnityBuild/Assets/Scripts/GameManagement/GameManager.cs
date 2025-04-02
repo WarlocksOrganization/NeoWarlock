@@ -24,6 +24,7 @@ namespace GameManagement
                 Instance = this;
                 DontDestroyOnLoad(gameObject);
                 Database.LoadDataBase();
+                Application.runInBackground = true;
             }
             else
             {
