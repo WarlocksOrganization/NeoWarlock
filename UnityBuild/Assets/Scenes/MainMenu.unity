@@ -7166,8 +7166,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   modalPrefab: {fileID: 1666918232306240129, guid: d452d80f673be384db13894cdd7d4ddf, type: 3}
-  _onlineUI: {fileID: 0}
-  _mainMenuUI: {fileID: 0}
+  _onlineUI: {fileID: 1941930190}
+  _mainMenuUI: {fileID: 1673040148}
 --- !u!1001 &371273260
 PrefabInstance:
   m_ObjectHideFlags: 0
