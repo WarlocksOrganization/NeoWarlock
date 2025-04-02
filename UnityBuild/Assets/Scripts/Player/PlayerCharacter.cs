@@ -167,9 +167,9 @@ namespace Player
         public void SetUserIdhook(string _, string value)
         {
             userId = value;
-            if (userId == "17")
+            if (userId == "33")
             {
-                nicknameText.color = Color.cyan;
+                nicknameText.color = Color.yellow;
             }
             else
             {
