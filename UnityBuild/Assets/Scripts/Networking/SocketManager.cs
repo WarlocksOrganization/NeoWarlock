@@ -201,7 +201,7 @@ namespace Networking
             }
             else
             {
-                SendMessageToServer("{\"connectionType\":\"client\"}");
+                SendMessageToServer("{\"connectionType\":\"client\",\"version\":\"" + UnityEngine.Application.version + "\"}");
             }
         }
 
