@@ -263,8 +263,10 @@ namespace Player
         private void SpawnGhost()
         {
             if (!isServer) return; // 서버에서만 실행
-            
-            GameObject ghost = Instantiate(ghostPrefab, transform.position + Vector3.up, Quaternion.identity);
+
+            Vector3 spawnPos = transform.position;
+            spawnPos.y = Mathf.Max(spawnPos.y + 1f, 3f);
+            GameObject ghost = Instantiate(ghostPrefab, spawnPos, Quaternion.identity);
             NetworkServer.Spawn(ghost, connectionToClient); // 클라이언트와 동기화
             ghostInstance = ghost;
         }
@@ -298,7 +300,7 @@ namespace Player
             }
 
             // 6. 위치도 서버 측에서 초기화 (동기화용)
-            transform.position = Vector3.zero;
+            transform.position =  FindFirstObjectByType<SpawnPosition>().GetSpawnPosition();
 
             // 7. 부활 애니메이션 & 카메라 & UI
             RpcTriggerAnimation("isLive");

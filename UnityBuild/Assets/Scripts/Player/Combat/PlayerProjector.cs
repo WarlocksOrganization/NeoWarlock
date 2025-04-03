@@ -102,7 +102,7 @@ namespace Player.Combat
                 decalProjector.size = new Vector3(attackData.Radius*2, attackData.Radius*2, 10);
             }
 
-            else if (currentAttack is ProjectileAttack || currentAttack is SelfAttack)
+            else if (currentAttack is ProjectileAttack || currentAttack is BeamAttack || currentAttack is SelfAttack)
             {
                 
                 distance = currentAttack.GetAttackData().Range;
@@ -159,7 +159,7 @@ namespace Player.Combat
                 decalProjector.transform.position = startPosition;
             }
 
-            else if (currentAttack is ProjectileAttack || currentAttack is SelfAttack)
+            else if (currentAttack is ProjectileAttack || currentAttack is BeamAttack || currentAttack is SelfAttack)
             {
                 startPosition = fireTransform.position;
                 

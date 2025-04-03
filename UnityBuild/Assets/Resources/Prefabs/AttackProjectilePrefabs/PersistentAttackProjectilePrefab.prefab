@@ -58,6 +58,9 @@ MonoBehaviour:
   skilleffectList:
   - skillType: 19
     gObject: {fileID: 1580841343230634611}
+  rangeDecalPrefab: {fileID: 0}
+  colliderTransform: {fileID: 0}
+  explosionEffectPrefab: {fileID: 5353179313893722497, guid: 903f0b777fb23884388c9436d588cdbd, type: 3}
 --- !u!114 &642507581500943264
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: df90348267cf8264a9dedab5a56b461f, type: 3}
-  m_Name: HollyBallConfig
+  m_Name: HolyBeamConfig
   m_EditorClassIdentifier: 
-  attackType: 1
+  attackType: 6
   attackDelay: 0.5
   recoveryTime: 1
   attackDuration: 0
@@ -21,5 +21,7 @@ MonoBehaviour:
   attackTrans: {x: 0, y: 1, z: 0}
   Prefab: {fileID: 322783647940636695, guid: 37f2acf25e527df43a982a902e47a741, type: 3}
   explosionEffectPrefab: {fileID: 5412338807302183837, guid: 68a8102c387cfd24583565c4ddfae556, type: 3}
+  particlePrefab: {fileID: 5353179313893722497, guid: 903f0b777fb23884388c9436d588cdbd, type: 3}
+  particlePrefab2: {fileID: 5353179313893722497, guid: 7658cf58f0cd914469a7c9a7fe73dcd2, type: 3}
   skillType: 23
   appliedBuff: {fileID: 0}

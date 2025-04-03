@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using DataSystem;
+using Interfaces;
 using Mirror;
 using Player.Combat;
 using UnityEngine;
@@ -12,26 +13,7 @@ namespace Player
 
         protected override void Explode()
         {
-            if (attackConfig != null)
-            {
-                Vector3 explosionPosition = transform.position + Vector3.up * 2f; 
-                if (Physics.Raycast(transform.position + Vector3.up * 5f, Vector3.down, out RaycastHit hit, 10f, layerMask))
-                {
-                    explosionPosition = hit.point + Vector3.up * 0.1f;
-                }
 
-                GameObject explosion = Instantiate(attackConfig.explosionEffectPrefab, explosionPosition, Quaternion.identity);
-                Explosion explosionComponent = explosion.GetComponent<Explosion>();
-
-                if (explosionComponent != null)
-                {
-                    explosionComponent.Initialize(damage, radius, knockbackForce, attackConfig, this.owner, playerid, skillid);
-                }
-
-                NetworkServer.Spawn(explosion);
-            }
-
-            // ✅ 폭발 후에도 사라지지 않도록 유지 (Destroy 제거)
         }
 
         protected override void OnTriggerEnter(Collider col)
@@ -53,6 +35,23 @@ namespace Player
             {
                 explodedTargets.Add(col); // 이미 폭발한 대상 저장
                 Explode();
+            }
+            
+            IDamagable damagable = col.transform.GetComponent<IDamagable>();
+            if (damagable != null)
+            {
+                damagable.takeDamage((int)damage, transform.position, knockbackForce, attackConfig, playerid, skillid);
+            }
+            
+            if (attackConfig != null && attackConfig.particlePrefab != null)
+            {
+                Vector3 hitPoint = col.ClosestPoint(owner.transform.position);
+                Quaternion hitRot = Quaternion.LookRotation((hitPoint - transform.position).normalized);
+                
+                GameObject effect = Instantiate(attackConfig.particlePrefab, hitPoint, hitRot);
+                effect.transform.localScale = new Vector3(1f, 1f, 1f);  // ✅ 프리팹 인스턴스에서만 변경
+                effect.GetComponent<AttackParticle>().SetAttackParticleData(attackConfig.skillType);
+                NetworkServer.Spawn(effect); // ✅ 네트워크에 동기화
             }
         }
     }

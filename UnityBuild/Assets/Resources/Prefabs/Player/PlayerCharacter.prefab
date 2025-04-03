@@ -112876,6 +112876,10 @@ PrefabInstance:
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 8973330300912168042, guid: 9aa7c091dcba0854da1e0a6489480cb8, type: 3}
+      propertyPath: VelocityModule.inWorldSpace
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8973330300912168042, guid: 9aa7c091dcba0854da1e0a6489480cb8, type: 3}
       propertyPath: EmissionModule.m_Bursts.Array.size
       value: 2
       objectReference: {fileID: 0}
@@ -112886,6 +112890,10 @@ PrefabInstance:
     - target: {fileID: 8973330300912168042, guid: 9aa7c091dcba0854da1e0a6489480cb8, type: 3}
       propertyPath: InitialModule.startLifetime.scalar
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8973330300912168042, guid: 9aa7c091dcba0854da1e0a6489480cb8, type: 3}
+      propertyPath: VelocityModule.speedModifier.scalar
+      value: 5.71
       objectReference: {fileID: 0}
     - target: {fileID: 8973330300912168042, guid: 9aa7c091dcba0854da1e0a6489480cb8, type: 3}
       propertyPath: ColorModule.gradient.maxGradient.atime4

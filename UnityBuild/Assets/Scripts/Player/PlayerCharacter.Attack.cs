@@ -136,6 +136,7 @@ namespace Player
                 Constants.AttackType.Area => go.AddComponent<AreaAttack>(),
                 Constants.AttackType.Melee => go.AddComponent<MeleeAttack>(),
                 Constants.AttackType.Self => go.AddComponent<SelfAttack>(),
+                Constants.AttackType.Beam => go.AddComponent<BeamAttack>(),
                 _ => null
             };
 

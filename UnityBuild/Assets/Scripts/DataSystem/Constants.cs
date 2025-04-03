@@ -73,6 +73,7 @@ namespace DataSystem
             Area,
             Melee,
             Self,
+            Beam,
         }
 
         public enum BuffType
@@ -122,7 +123,7 @@ namespace DataSystem
             Starfall,
             Dash,
             HollyAttack,
-            HolyBall,
+            HolyBeam,
             HolyRecovery,
             HolyTeleport,
             PowerSlash,
@@ -131,6 +132,9 @@ namespace DataSystem
             PhantomSmart,
             SoulSwamp,
             InfernalPoison,
+            HollyAttackPlus,
+            HolyBeamPlus,
+            HolyRecoveryPlus,
             
             Heal = 10000,
             ItemHP = 10001,
