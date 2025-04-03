@@ -144,6 +144,10 @@ MonoBehaviour:
   skilleffectList:
   - skillType: 29
     gObject: {fileID: 5863195115566073810}
+  rangeDecalPrefab: {fileID: 0}
+  colliderTransform: {fileID: 0}
+  fieldOfView: 90
+  rotationSpeed: 60
 --- !u!114 &642507581500943264
 MonoBehaviour:
   m_ObjectHideFlags: 0

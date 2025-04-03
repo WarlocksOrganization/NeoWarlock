@@ -141,14 +141,14 @@ public class BuffSystem : NetworkBehaviour
 
         while (elapsedTime < buffData.duration)
         {
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(1f);
 
             if (playerCharacter != null)
             {
                 playerCharacter.DecreaseHp(buffData.tickDamage, attackPlayerId, attackskillid);
             }
 
-            elapsedTime += 0.5f;
+            elapsedTime += 1f;
         }
 
         activeTickDamage.Remove(buffData.BuffType);

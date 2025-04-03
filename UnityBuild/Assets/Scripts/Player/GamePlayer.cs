@@ -356,7 +356,7 @@ namespace Player
 
                 if (NetworkServer.active)
                 {
-                    var players = GameObject.FindObjectsOfType<GamePlayer>();
+                    var players = GameObject.FindObjectsByType<GamePlayer>(sortMode: FindObjectsSortMode.None);
                     foreach (var player in players)
                     {
                         if (player.isPlayerSpawned)

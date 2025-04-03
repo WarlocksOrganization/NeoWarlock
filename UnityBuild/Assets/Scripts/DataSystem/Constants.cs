@@ -85,7 +85,7 @@ namespace DataSystem
             Poison,
             Charge,
             PowerBody,
-            HolyShhield,
+            ItemShhield,
             PowerPowerBody,
             PowerCharge,
             Lava,
@@ -122,7 +122,7 @@ namespace DataSystem
             Starfall,
             Dash,
             HollyAttack,
-            HollyShild,
+            HolyBall,
             HolyRecovery,
             HolyTeleport,
             PowerSlash,
@@ -137,6 +137,7 @@ namespace DataSystem
             ItemSpeed = 1002,
             ItemAttack = 1003,
             ItemDefense = 1004,
+            ItemShild = 1005,
            
             ItemBomb = 1011,
             
