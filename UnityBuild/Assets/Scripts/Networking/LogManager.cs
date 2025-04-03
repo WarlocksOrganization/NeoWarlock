@@ -44,6 +44,8 @@ namespace Networking
             if (!Application.platform.Equals(RuntimePlatform.LinuxServer))
             {
                 Debug.LogWarning("[LogManager] 서버 모드에서 실행 중이 아닙니다.");
+                Debug.unityLogger.logEnabled = false;
+                Application.logMessageReceived += HandleLog;
                 return;
             }
 
@@ -201,6 +203,43 @@ namespace Networking
             }
         }
 
+        private void HandleLog(string logString, string stackTrace, LogType type)
+        {
+            // 일반 로그는 무시시
+            if (type == LogType.Log)
+            {
+                return;
+            }
+
+            // 커스텀 클라이언트 로그 기록
+            WriteCustomClientLog(logString, stackTrace);
+        }
+
+        private void WriteCustomClientLog(string logString, string stackTrace)
+        {
+            // 게임 디렉토리 내에 생성
+            string logDirPath = Path.Combine(Application.dataPath, "../Logs");
+            string logFilePath = Path.Combine(logDirPath, "client_log.txt");
+
+            if (!Directory.Exists(logDirPath))
+            {
+                Directory.CreateDirectory(logDirPath);
+            }
+            if (!File.Exists(logFilePath))
+            {
+                File.Create(logFilePath).Close();
+            }
+
+            using (StreamWriter writer = new StreamWriter(logFilePath, true))
+            {
+                writer.WriteLine($"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] {logString}");
+                if (!string.IsNullOrEmpty(stackTrace))
+                {
+                    writer.WriteLine(stackTrace);
+                }
+            }
+        }
+
         private void OnApplicationQuit()
         {
             // 애플리케이션이 종료될 때 로그 전송 중지
@@ -208,6 +247,11 @@ namespace Networking
             {
                 _isRunning = false;
                 _logThread.Join();
+            }
+
+            if (!Application.platform.Equals(RuntimePlatform.LinuxServer))
+            {
+                Application.logMessageReceived -= HandleLog;
             }
         }
     }

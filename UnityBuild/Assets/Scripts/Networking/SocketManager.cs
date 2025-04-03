@@ -14,6 +14,7 @@ using IO.Swagger.Model;
 using kcp2k;
 using System.Buffers.Text;
 using UI;
+using Mirror;
 
 namespace Networking
 {
@@ -27,6 +28,7 @@ namespace Networking
         private Queue<string> _messageQueue = new Queue<string>();
         private bool _restart = false;
         private bool _closeConnection = false;
+        private bool _calledFromClient = false;
         private bool _serverTerminated = false;
         private int _lastAlivePingTime = 0;
 
@@ -231,10 +233,11 @@ namespace Networking
                 if (ex.Message.Contains("Unable to read data from the transport connection:"))
                 {
                     Debug.Log("[SocketManager] 소켓 연결이 중단되었습니다.");
-                    if (!ex.Message.Contains("WSACancelBlockingCall"))
+                    if (ex.Message.Contains("WSACancelBlockingCall"))
                     {
-                        EnqueueCloseConnection();
+                        _calledFromClient = true;
                     }
+                    EnqueueCloseConnection();
                 }
                 else
                 {
@@ -275,12 +278,14 @@ namespace Networking
         public void OnClickLogout()
         {
             // 로그아웃 버튼 클릭 시 호출
-            CloseConnection(true);
             var modalPopup = ModalPopupUI.singleton;
-            if (modalPopup != null)
+            if (modalPopup != null && PlayerPrefs.HasKey("sessionToken"))
             {
                 modalPopup.ShowModalMessage("로그아웃 되었습니다.");
             }
+            
+            _calledFromClient = true;
+            EnqueueCloseConnection();
         }
 
         public void EnqueueCloseConnection()
@@ -293,7 +298,10 @@ namespace Networking
             // 로컬 저장소 초기화
             if (PlayerPrefs.HasKey("sessionToken"))
             {
-                RequestLogout();
+                if (_client != null &&_client.Connected)
+                {
+                    RequestLogout();
+                }
                 PlayerPrefs.DeleteKey("sessionToken");
             }
             if (PlayerPrefs.HasKey("userId"))
@@ -509,8 +517,9 @@ namespace Networking
             if (_closeConnection)
             {
                 // 연결 해제 요청 시 연결 해제
-                CloseConnection(false);
+                CloseConnection(_calledFromClient);
                 _closeConnection = false;
+                _calledFromClient = false;
             }            
 
             if (_messageQueue.Count > 0)

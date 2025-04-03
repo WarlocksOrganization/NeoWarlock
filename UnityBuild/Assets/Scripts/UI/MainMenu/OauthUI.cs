@@ -5,6 +5,7 @@ using System.Text;
 using Networking;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.UI;
 
 public class OauthUI : MonoBehaviour
 {
@@ -183,6 +184,9 @@ public class OauthUI : MonoBehaviour
             {
                 string identifier = "google" + request.downloadHandler.text.Split(',')[0].Split(':')[1].Replace("\"", "").Trim();
                 Debug.Log("[OauthUI] User Info: " + identifier);
+                SocketManager.singleton.InitSocketConnection();
+                yield return new WaitForSeconds(1);
+                SocketManager.singleton.RequestOauth(identifier);
             }
             // Debug.Log("[OauthUI] User Info: " + request.downloadHandler.text);
         }
