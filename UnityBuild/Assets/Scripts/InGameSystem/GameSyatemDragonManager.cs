@@ -26,13 +26,13 @@ public class GameSyatemDragonManager : GameSystemManager
         eventnum++; // 다음 이벤트로 증가
 
         float targetY = eventnum * risePerEvent;
-        StartCoroutine(RaiseLava(targetY, riseDuration));
+        //StartCoroutine(RaiseLava(targetY, riseDuration));
         
         NetEvent();
         
         RpcShakeCameraWhileLavaRises(1f, 1.5f, riseDuration);
         
-        GameSystemManager.Instance.EndEventAndStartNextTimer(); // 다음 타이머 시작
+        //GameSystemManager.Instance.EndEventAndStartNextTimer(); // 다음 타이머 시작
     }
 
     private IEnumerator RaiseLava(float targetY, float duration)

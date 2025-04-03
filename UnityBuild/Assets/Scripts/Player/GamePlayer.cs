@@ -28,6 +28,8 @@ namespace Player
         [SerializeField] private GameObject[] LavaPlayObject;
         [SerializeField] private GameObject[] SpacePlayObject;
         [SerializeField] private GameObject[] SeaPlayObject;
+        
+        [SerializeField] private  GameObject[] LavaDragonPlayObject;
 
         private PlayerCardUI playerCardUI;
         private GamePlayUI gameplayUI;
@@ -86,6 +88,13 @@ namespace Player
                 else if (gameRoomData.roomMapType == Constants.RoomMapType.Sea)
                 {
                     foreach (GameObject gameObject in SeaPlayObject)
+                    {
+                        NetworkServer.Spawn(Instantiate(gameObject), connectionToClient);
+                    }
+                }
+                else if (gameRoomData.roomMapType == Constants.RoomMapType.LavaDragon)
+                {
+                    foreach (GameObject gameObject in LavaDragonPlayObject)
                     {
                         NetworkServer.Spawn(Instantiate(gameObject), connectionToClient);
                     }

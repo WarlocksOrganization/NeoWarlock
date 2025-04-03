@@ -38,6 +38,8 @@ namespace DataSystem
             Lava = 2,
             Space = 3,
             Sea = 4,
+            
+            LavaDragon = 11,
         }
 
         public enum PlayerState
