@@ -43,23 +43,16 @@ public class FindRoomUI : MonoBehaviour
             roomContainer.transform.Find("RoomName").GetComponent<TextMeshProUGUI>().text = room.SelectToken("roomName").ToString();
             roomContainer.transform.Find("RoomCount").GetComponent<TextMeshProUGUI>().text = room.SelectToken("currentPlayers").ToString() + " / " + room.SelectToken("maxPlayers").ToString();
             _roomPortDict[roomId] = room.SelectToken("port").ToObject<ushort>();
-            roomContainer.GetComponentInChildren<Button>().onClick.AddListener(() => OnClickRoom(roomId));
+            Button roomButton = roomContainer.GetComponent<Button>();
+            roomButton.onClick.RemoveAllListeners(); // 기존 리스너 제거
+            roomButton.onClick.AddListener(() => OnClickRoom(roomId));
+            roomButton.onClick.AddListener(() => GameObject.Find("ButtonDisabler").GetComponent<ButtonDisabler>().ButtonDisable(roomButton));
         }
     }
 
     private void OnClickRoom(int roomId)
     {
-        // 방 입장 요청
-        GetComponentInChildren<Button>().interactable = false;
-        StartCoroutine(ButtonDisableCoroutine());
         Networking.SocketManager.singleton.RequestJoinRoom(roomId, _roomPortDict[roomId]);
-    }
-
-    private IEnumerator ButtonDisableCoroutine()
-    {
-        // 버튼 클릭 방지 코루틴
-        yield return new WaitForSeconds(1);
-        GetComponentInChildren<Button>().interactable = true;
     }
 
     public void OnClickCloseFindRoom()
