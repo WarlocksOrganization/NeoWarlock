@@ -102,6 +102,8 @@ public class ScoreBoardUI : MonoBehaviour
 
         var roundSorted = records
             .OrderByDescending(r => GameManager.Instance.GetScoreAtRound(r, roundIndex))
+            .ThenByDescending(r => r.roundStatsList[roundIndex].kills + r.roundStatsList[roundIndex].outKills) // 🔥 킬수 포함
+            .ThenBy(r => r.playerId) // 🔥 아이디 순서
             .ToList();
 
         for (int i = 0; i < roundSorted.Count; i++)
@@ -127,6 +129,8 @@ public class ScoreBoardUI : MonoBehaviour
 
         var preSorted = records
             .OrderByDescending(r => r.GetTotalScoreUpToRound(roundIndex - 1))
+            .ThenByDescending(r => r.roundStatsList[roundIndex].kills + r.roundStatsList[roundIndex].outKills) // 🔥 킬수 포함
+            .ThenBy(r => r.playerId) // 🔥 아이디 순서
             .ToList();
 
     for (int i = 0; i < preSorted.Count; i++)
@@ -145,6 +149,8 @@ public class ScoreBoardUI : MonoBehaviour
 
         var finalSorted = records
             .OrderByDescending(r => r.GetTotalScoreUpToRound(roundIndex))
+            .ThenByDescending(r => r.roundStatsList[roundIndex].kills + r.roundStatsList[roundIndex].outKills) // 🔥 킬수 포함
+            .ThenBy(r => r.playerId) // 🔥 아이디 순서
             .ToList();
 
     for (int i = 0; i < finalSorted.Count; i++)
