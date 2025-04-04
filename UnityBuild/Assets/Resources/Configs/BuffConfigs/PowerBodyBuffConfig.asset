@@ -13,10 +13,10 @@ MonoBehaviour:
   m_Name: PowerBodyBuffConfig
   m_EditorClassIdentifier: 
   duration: 10
-  moveSpeedModifier: -1
+  moveSpeedModifier: 0
   attackDamageModifier: 0
   defenseModifier: 3
   knonkbackModifier: -0.5
-  tickDamage: -2
+  tickDamage: -3
   moveDirection: {x: 0, y: 0, z: 0}
   BuffType: 7

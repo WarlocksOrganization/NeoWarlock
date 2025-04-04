@@ -28,6 +28,13 @@ namespace Player
                     CmdTriggerAnimation("isMoveSkill");
 
                     Vector3 targetPos = Vector3.zero;
+                    
+                    float moveX = Input.GetAxis("Horizontal");
+                    float moveZ = Input.GetAxis("Vertical");
+                    
+                    moveKeyboard = transform.right * moveX + transform.forward * moveZ;
+                    moveKeyboard = moveKeyboard.normalized;
+                    
                     if (moveKeyboard.magnitude > 0.1f)
                     {
                         targetPos = transform.position + moveKeyboard * movementSkill.maxDistance;

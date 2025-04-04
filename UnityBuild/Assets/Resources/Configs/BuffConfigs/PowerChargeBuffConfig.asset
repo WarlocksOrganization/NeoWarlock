@@ -16,7 +16,7 @@ MonoBehaviour:
   moveSpeedModifier: 0
   attackDamageModifier: 0
   defenseModifier: 0
-  knonkbackModifier: 0
+  knonkbackModifier: -1
   tickDamage: 0
   moveDirection: {x: 0, y: 0, z: 15}
   BuffType: 10
