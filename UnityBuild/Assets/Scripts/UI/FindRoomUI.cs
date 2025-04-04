@@ -43,10 +43,18 @@ public class FindRoomUI : MonoBehaviour
             roomContainer.transform.Find("RoomName").GetComponent<TextMeshProUGUI>().text = room.SelectToken("roomName").ToString();
             roomContainer.transform.Find("RoomCount").GetComponent<TextMeshProUGUI>().text = room.SelectToken("currentPlayers").ToString() + " / " + room.SelectToken("maxPlayers").ToString();
             _roomPortDict[roomId] = room.SelectToken("port").ToObject<ushort>();
-            Button roomButton = roomContainer.GetComponent<Button>();
+            Button roomButton = roomContainer.GetComponentInChildren<Button>();
             roomButton.onClick.RemoveAllListeners(); // 기존 리스너 제거
-            roomButton.onClick.AddListener(() => OnClickRoom(roomId));
-            roomButton.onClick.AddListener(() => GameObject.Find("ButtonDisabler").GetComponent<ButtonDisabler>().ButtonDisable(roomButton));
+            if (room.SelectToken("status").ToString() == "WAITING")
+            {
+                roomButton.onClick.AddListener(() => OnClickRoom(roomId));
+                roomButton.onClick.AddListener(() => GameObject.Find("ButtonDisabler").GetComponent<ButtonDisabler>().ButtonDisable(roomButton));
+            }
+            else
+            {
+                roomButton.GetComponentInChildren<TextMeshProUGUI>().text = "게임중";
+                roomButton.interactable = false; // 게임 중인 방은 클릭 불가능
+            }
         }
     }
 
