@@ -18,6 +18,21 @@ namespace Networking
 {
     public partial class SocketManager : MonoBehaviour
     {
+        private JToken _latestRoomData;
+        private bool _hasPendingRoomUpdate = false;
+
+        public struct RoomListChangedMessage : NetworkMessage
+        {
+            public string eventName;
+        }
+
+        public bool HasPendingRoomUpdate => _hasPendingRoomUpdate;
+
+        public void ClearRoomUpdateFlag()
+        {
+            _hasPendingRoomUpdate = false;
+        }
+
         public void RequestCreateRoom(string roomName, int maxPlayers)
         {
             // 방 생성 요청
@@ -86,6 +101,7 @@ namespace Networking
 
                     manager.StartClient();
                     Debug.Log($"[SocketManager] 방 생성 및 참가 완료: {data["roomId"].ToObject<int>()}");
+//                    BroadcastRoomListChanged();
                 }
                 catch (Exception ex){
                     RequestExitRoom();
@@ -156,8 +172,8 @@ namespace Networking
                 Debug.Log($"[SocketManager] 방 퇴장 실패: {data.SelectToken("message").ToString()}");
             }
         }
-      
-        // SESRVER ONLY
+
+        // SERVER ONLY
         [Server]
         public void RequestGameStart(int roomId = 0)
         {
@@ -216,6 +232,7 @@ namespace Networking
             if (data.SelectToken("status").ToString() == "success")
             {
                 try{
+//                    BroadcastRoomListChanged();
                     var manager = RoomManager.singleton as RoomManager;
                     Dictionary<string, string> gameData = manager.GetRoomData();
                     gameData["gameId"] = data["gameId"].ToObject<int>().ToString();
@@ -309,5 +326,27 @@ namespace Networking
             }
         }
 
+        // 방 리스트 업데이트 broadcast
+//        [Server]
+//        private void BroadcastRoomListChanged()
+//        {
+//            string message = JsonConvert.SerializeObject(new {
+//                eventName = "roomListUpdated"
+//            });
+//
+//            foreach (var client in connectedClients) // 이 부분은 TCP 기반 클라이언트 목록이어야 함
+//            {
+//                try
+//                {
+//                    NetworkStream stream = client.GetStream();
+//                    byte[] data = Encoding.UTF8.GetBytes(message);
+//                    stream.Write(data, 0, data.Length);
+//                }
+//                catch (Exception ex)
+//                {
+//                    Debug.LogError($"[SocketManager] 클라이언트 전송 실패: {ex.Message}");
+//                }
+//            }
+//        }
     }
 }

@@ -11,15 +11,19 @@ namespace UI
     public class OnlineUI : MonoBehaviour
     {
         [SerializeField] private GameObject createRoomUI;
-        [SerializeField] private GameObject cancelButton;
+        [SerializeField] private GameObject lobbyButton;
+        [SerializeField] private GameObject quitButton;
         [SerializeField] private GameObject findRoomUI;
         [SerializeField] private GameObject nicknameUI;
         [SerializeField] private GameObject mainMenuUI;
 
+        private SocketManager socketManager;
+
         private void Start()
         {
-            var socketManager = SocketManager.singleton as SocketManager;
-            cancelButton.GetComponentInChildren<Button>().onClick.AddListener(socketManager.OnClickLogout);
+            socketManager = SocketManager.singleton as SocketManager;
+            lobbyButton.GetComponentInChildren<Button>().onClick.AddListener(socketManager.OnClickLogout);
+            quitButton.GetComponentInChildren<Button>().onClick.AddListener(QuitGame);
         }
         public void OnClickEnterGameRoomButton()
         {
@@ -54,6 +58,12 @@ namespace UI
         {
             // UI 활성화 시 닉네임 동기화
             nicknameUI.GetComponent<NicknameUI>().SyncNicknameShower();
+        }
+
+        public void QuitGame()
+        {
+            socketManager?.OnClickLogout();
+            Application.Quit();
         }
     }
 }

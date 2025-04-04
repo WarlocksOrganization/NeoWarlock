@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using Networking;
 using Newtonsoft.Json.Linq;
 using UnityEngine.Windows.Speech;
 using System.Collections.Generic;
@@ -10,8 +11,10 @@ using Player.Combat;
 public class FindRoomUI : MonoBehaviour
 {
     [SerializeField] private GameObject _roomContainerPrefab;
-    [SerializeField] private GameObject onlineUI;
+    // [SerializeField] private GameObject onlineUI;
     [SerializeField] private GameObject _contentParent;
+    [SerializeField] private Button _refreshButton;
+
     private Dictionary<int, ushort> _roomPortDict = new Dictionary<int, ushort>();
 
 
@@ -20,9 +23,16 @@ public class FindRoomUI : MonoBehaviour
         // 방 목록 요청
         Debug.Log("방 목록 요청");
 
-        gameObject.SetActive(true);
-        onlineUI.SetActive(false);
+        // gameObject.SetActive(true);
+        // onlineUI.SetActive(false);
         Networking.SocketManager.singleton.RequestListRooms();
+        _refreshButton.onClick.AddListener(OnClickRefresh);
+        ShowRefreshButton(false);
+    }
+
+    public void ShowRefreshButton(bool show)
+    {
+        _refreshButton.gameObject.SetActive(show);
     }
 
     public void UpdateContainer(JToken data)
@@ -63,9 +73,19 @@ public class FindRoomUI : MonoBehaviour
         Networking.SocketManager.singleton.RequestJoinRoom(roomId, _roomPortDict[roomId]);
     }
 
-    public void OnClickCloseFindRoom()
-    {
-        gameObject.SetActive(false);
-        onlineUI.SetActive(true);
-    }
+    private void OnClickRefresh()
+        {
+//            var socket = SocketManager.singleton;
+//            if (socket != null && socket.HasPendingRoomUpdate)
+//            {
+//                socket.RequestListRooms();
+//                socket.ClearRoomUpdateFlag();
+//                ShowRefreshButton(false);
+//            }
+        }
+    // public void OnClickCloseFindRoom()
+    // {
+    //     gameObject.SetActive(false);
+    //     onlineUI.SetActive(true);
+    // }
 }
