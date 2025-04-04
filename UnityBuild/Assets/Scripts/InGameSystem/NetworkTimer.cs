@@ -19,13 +19,11 @@ public class NetworkTimer : NetworkBehaviour
     {
         if (gameStarted) return;
         gameStarted = true;
-
-        Debug.Log("[NetworkTimer] StartGameFlow 시작 - Phase1 카운트다운 시작");
+        
         RpcStartPhase(1, countdown1);
 
         StartCoroutine(ServerCountdown(countdown1, () =>
         {
-            Debug.Log("[NetworkTimer] Phase1 종료 - Phase2 진입 지시");
             StartCoroutine(DelayThenStartPhase2(countdown2));
         }));
     }
@@ -70,8 +68,8 @@ public class NetworkTimer : NetworkBehaviour
     [ClientRpc]
     private void RpcTriggerEvent()
     {
-        Debug.Log("[NetworkTimer] RpcTriggerEvent - Phase2 이벤트 실행");
         GamePlayUI?.UpdateCountdownUI(0, 2);
+        
         GameSystemManager.Instance.StartEvent();
     }
 
@@ -79,12 +77,11 @@ public class NetworkTimer : NetworkBehaviour
     [Server]
     public void StartPhase2(int countdown)
     {
-        Debug.Log("[NetworkTimer] StartPhase2 시작");
         RpcStartPhase(2, countdown);
         StartCoroutine(ServerCountdown(countdown, () =>
         {
-            Debug.Log("[NetworkTimer] Phase2 종료 - 이벤트 실행");
             RpcTriggerEvent();
+            
             GameSystemManager.Instance.StartEvent();
         }));
     }

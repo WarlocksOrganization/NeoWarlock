@@ -11772,6 +11772,7 @@ MonoBehaviour:
   - {fileID: 5686090464823823962, guid: f7568a4ee603c8d429b335064de24a78, type: 3}
   - {fileID: 5412338807302183837, guid: ae1e3abd238802042840d15d7e4377c8, type: 3}
   - {fileID: 5353179313893722497, guid: 7658cf58f0cd914469a7c9a7fe73dcd2, type: 3}
+  - {fileID: 5412338807302183837, guid: 65c11cc41bbe24647a14a902c19e576a, type: 3}
   exceptionsDisconnect: 1
   snapshotSettings:
     bufferTimeMultiplier: 2
@@ -38108,6 +38109,27 @@ MonoBehaviour:
   - skillType: 21
     clip: {fileID: 8300000, guid: 1f1a4655fd6c9dc4085db9782474eba9, type: 3}
     hitClip: {fileID: 0}
+  - skillType: 22
+    clip: {fileID: 8300000, guid: 2a0cb0b368330cd4b9b872e20292fd5f, type: 3}
+    hitClip: {fileID: 8300000, guid: 2a3eac2f2f9eaa447a94be39ffa04cac, type: 3}
+  - skillType: 23
+    clip: {fileID: 8300000, guid: b0b9842af3e8414479a942d213766796, type: 3}
+    hitClip: {fileID: 0}
+  - skillType: 24
+    clip: {fileID: 0}
+    hitClip: {fileID: 8300000, guid: 04f4057db2c396341ad849eabd2e56ca, type: 3}
+  - skillType: 32
+    clip: {fileID: 8300000, guid: 208cb199dcbe9a44e8dd1b10a978d836, type: 3}
+    hitClip: {fileID: 8300000, guid: dbcecd92fe536ce46bcb466aa876b243, type: 3}
+  - skillType: 33
+    clip: {fileID: 8300000, guid: a6acf054893e94b44bcb427afd656966, type: 3}
+    hitClip: {fileID: 0}
+  - skillType: 34
+    clip: {fileID: 0}
+    hitClip: {fileID: 8300000, guid: baa6521f0313da64695e261d39ebaf9e, type: 3}
+  - skillType: 34
+    clip: {fileID: 0}
+    hitClip: {fileID: 8300000, guid: baa6521f0313da64695e261d39ebaf9e, type: 3}
   bgmSource: {fileID: 748880585236253846}
   sfxPrefab: {fileID: 7925833501838690345, guid: f5517e83d2cdd6646a4a67146b59e991, type: 3}
   bgmVolume: 0.5

@@ -70,7 +70,7 @@ namespace Player.Combat
                 elapsed += interval;
             }
 
-            Debug.Log($"[BeamAttack] 빔 공격 종료 (총 지속 시간: {duration}초)");
+            //Debug.Log($"[BeamAttack] 빔 공격 종료 (총 지속 시간: {duration}초)");
         }
     }
 }

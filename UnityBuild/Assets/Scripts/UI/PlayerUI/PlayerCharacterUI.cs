@@ -58,6 +58,10 @@ namespace UI
             {
                 DamageImage.color = new Color(1, 1, 1, (hpPercent - 0.5f)*2f);
             }
+            else
+            {
+                DamageImage.color = new Color(1, 1, 1, 0);
+            }
             if (hpPercent == 1)
             {
                 DamageImage.color = new Color(0, 0, 0, 1);

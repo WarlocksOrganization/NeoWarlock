@@ -51,7 +51,7 @@ namespace Player.Combat
             StartCoroutine(AutoDestroy());
         }
 
-        protected void Explode()
+        protected virtual void Explode()
         {
             if (!isServer) return; // ✅ 서버에서만 실행
 

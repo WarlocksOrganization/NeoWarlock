@@ -23,15 +23,9 @@ namespace Player
         public string UserId;
         
         public LobbyPlayerCharacter playerCharacter;
-        
-        [SerializeField] private GameObject[] SSAFYPlayObject;
-        [SerializeField] private GameObject[] LavaPlayObject;
-        [SerializeField] private GameObject[] SpacePlayObject;
-        [SerializeField] private GameObject[] SeaPlayObject;
 
         private PlayerCardUI playerCardUI;
         private GamePlayUI gameplayUI;
-        private static bool gameplayObjectSpawned = false;
         public bool isPlayerSpawned = false;
         
         public override void Start()
@@ -57,41 +51,6 @@ namespace Player
         
         private void SpawnLobbyPlayerCharacter()
         {
-            if (isServer && !gameplayObjectSpawned)
-            {
-                gameplayObjectSpawned = true;
-                
-                GameRoomData gameRoomData = FindFirstObjectByType<GameRoomData>();
-                if (gameRoomData.roomMapType == Constants.RoomMapType.SSAFY)
-                {
-                    foreach (GameObject gameObject in SSAFYPlayObject)
-                    {
-                        NetworkServer.Spawn(Instantiate(gameObject), connectionToClient);
-                    }
-                }
-                else if (gameRoomData.roomMapType == Constants.RoomMapType.Lava)
-                {
-                    foreach (GameObject gameObject in LavaPlayObject)
-                    {
-                        NetworkServer.Spawn(Instantiate(gameObject), connectionToClient);
-                    }
-                }
-                else if (gameRoomData.roomMapType == Constants.RoomMapType.Space)
-                {
-                    foreach (GameObject gameObject in SpacePlayObject)
-                    {
-                        NetworkServer.Spawn(Instantiate(gameObject), connectionToClient);
-                    }
-                }
-                else if (gameRoomData.roomMapType == Constants.RoomMapType.Sea)
-                {
-                    foreach (GameObject gameObject in SeaPlayObject)
-                    {
-                        NetworkServer.Spawn(Instantiate(gameObject), connectionToClient);
-                    }
-                }
-            }
-            
             if (!isServer || isPlayerSpawned) return;
             isPlayerSpawned = true;
 
@@ -144,59 +103,49 @@ namespace Player
         private IEnumerator ShowFinalScoreAndNextRound(Constants.PlayerRecord[] allRecords, int roundIndex)
         {
             gameplayUI = FindFirstObjectByType<GamePlayUI>();
-            Debug.Log("ShowFinalScoreAndNextRound");
             yield return new WaitUntil(() => gameplayUI != null);
-            Debug.Log("ShowFinalScoreAndNextRoundEnd");
-            gameplayUI.ShowGameOverTextAndScore(allRecords, roundIndex);
-            StartCoroutine(HandleRoundTransition());
-        }
 
-        private IEnumerator HandleRoundTransition()
-        {
-            yield return new WaitForSeconds(Constants.ScoreBoardTime);
-
-            int currentRound = GameManager.Instance.currentRound;
-
-            if (currentRound < 3)
+            // ⬇️ 스코어보드 표시 + 끝나면 카드 선택 트리거
+            gameplayUI.ShowGameOverTextAndScore(allRecords, roundIndex, () =>
             {
+                Debug.Log("[GamePlayer] 스코어보드 끝! 다음 라운드 준비 요청");
+
                 if (isServer)
                 {
-                    NetworkManager.singleton.ServerChangeScene(SceneManager.GetActiveScene().name);
+                    var room = FindFirstObjectByType<GameRoomData>();
+                    if (room != null && GameManager.Instance.currentRound < 3)
+                    {
+                        room.StartNextRound(); // ⬅️ 서버에서 카드 선택 시작
+                    }
+                    else
+                    {
+                        room?.EndGame(); // 마지막 라운드라면 종료 처리
+                    }
                 }
-                else
-                {
-                    yield return new WaitUntil(() => NetworkClient.ready);
-                    CmdRequestSceneReload();
-                }
-            }
-            else
-            {
-                // ❗ 현재 isServer 조건 걸려있음
-                // 이건 ClientRpc니까 서버가 아니라도 실행되도록 호출만 서버에서 하면 돼
-                if (isServer)
-                {
-                    Debug.Log("🔔 최종 라운드 종료, 로비 버튼 표시");
-                    // 모든 플레이어에게 로비 버튼 표시
-                    RpcShowReturnToLobbyButton();
-                }
-                else
-                {
-                    FindFirstObjectByType<ScoreBoardUI>()?.ShowReturnToLobbyButton();
-                }
-            }
+            });
         }
-
-        [Command(requiresAuthority = false)]
-        public void CmdRequestSceneReload()
-        {
-            if (isServer)
-                NetworkManager.singleton.ServerChangeScene(SceneManager.GetActiveScene().name);
-        }
-
+        
         [ClientRpc]
-        public void RpcShowReturnToLobbyButton()
+        public void RpcStartCardSelection()
         {
-            FindFirstObjectByType<ScoreBoardUI>()?.ShowReturnToLobbyButton();
+            var scoreBoardUIui = FindFirstObjectByType<ScoreBoardUI>();
+            if (scoreBoardUIui != null)
+                scoreBoardUIui.gameObject.SetActive(false);
+
+            var ui = FindFirstObjectByType<PlayerCardUI>();
+            if (ui != null)
+                ui.gameObject.SetActive(true);
+
+            if (isOwned)
+            {
+                CmdStartCardSelectionPhase();
+            }
+        }
+        
+        [Command]
+        public void CmdStartCardSelectionPhase()
+        {
+            StartCoroutine(CardSelectionTimer()); // ✅ 서버에서 실행
         }
 
         private IEnumerator WaitForAllPlayersThenStartCardSelection()
@@ -204,11 +153,19 @@ namespace Player
             yield return new WaitUntil(() => NetworkServer.connections.Count >= NetworkRoomManager.singleton.numPlayers);
             yield return new WaitUntil(() => FindObjectsByType<LobbyPlayerCharacter>(sortMode: FindObjectsSortMode.None).Length >= NetworkRoomManager.singleton.numPlayers);
             yield return new WaitForSeconds(0.5f);
+            
+            if (isServer)
+            {
+                // ✅ 첫 라운드 시작 전에도 맵 오브젝트 생성
+                FindFirstObjectByType<GameRoomData>()?.SpawnGamePlayObjects();
+            }
+            
             StartCoroutine(CardSelectionTimer());
         }
 
         private IEnumerator CardSelectionTimer()
         {
+            Debug.Log("CardSelectionTimer");
             int time = Constants.CardSelectionTime;
             while (time > 0)
             {
@@ -233,7 +190,7 @@ namespace Player
             timer?.StartGameFlow(Constants.CountTime, Constants.MaxGameEventTime);
         }
 
-        [TargetRpc]
+        [ClientRpc]
         private void RpcUpdateTimer(float time)
         {
             if (playerCardUI == null)
@@ -344,42 +301,6 @@ namespace Player
             GameManager.Instance.currentRound = round;
         }
         
-        [RuntimeInitializeOnLoadMethod]
-        private static void OnLoad()
-        {
-            SceneManager.sceneLoaded += (_, _) =>
-            {
-                gameplayObjectSpawned = false;
-
-                if (GameManager.Instance != null)
-                    GameManager.Instance.ResetRoundState();
-
-                if (NetworkServer.active)
-                {
-                    var players = GameObject.FindObjectsByType<GamePlayer>(sortMode: FindObjectsSortMode.None);
-                    foreach (var player in players)
-                    {
-                        if (player.isPlayerSpawned)
-                        {
-                            player.StartCoroutine(player.DestroySelfAfterDelay());
-                        }
-                    }
-                }
-            };
-        }
-
-        private IEnumerator DestroySelfAfterDelay()
-        {
-            yield return new WaitForSeconds(1f);
-            Debug.Log($"[GamePlayer] {gameObject.name} 씬 변경 후 1초 뒤 제거됨");
-
-            if (NetworkServer.active)
-            {
-                NetworkServer.Destroy(gameObject); // ✅ 네트워크 오브젝트는 반드시 서버에서 제거
-            }
-        }
-
-        
         void OnDestroy()
         {
             StopAllCoroutines(); // or Stop specific coroutine
@@ -388,5 +309,17 @@ namespace Player
                 NetworkServer.Destroy(playerCharacter.gameObject);
             }
         }
+        
+        [ClientRpc]
+        public void RpcPrepareScoreBoard()
+        {
+            var sbUI = FindFirstObjectByType<ScoreBoardUI>();
+            if (sbUI != null)
+            {
+                sbUI.gameObject.SetActive(true); // ✅ 먼저 켜두기
+                Debug.Log("[GamePlayer] 스코어보드 미리 활성화됨");
+            }
+        }
+
     }
 }

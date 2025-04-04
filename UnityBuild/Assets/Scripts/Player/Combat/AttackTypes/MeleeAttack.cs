@@ -8,7 +8,7 @@ namespace Player.Combat
         public override void Execute(Vector3 mousePosition, Vector3 firePoint, GameObject owner, int playerid, int skillid, float attackPower)
         {
             // ✅ 공통 로직: 발사 위치 결정
-            Vector3 spawnPosition = GetSpawnPosition(firePoint);
+            Vector3 spawnPosition = owner.transform.position;
 
             Vector3 direction = (mousePosition - spawnPosition).normalized;
             direction.y = 0f; // ✅ y축 제거하여 직선 발사

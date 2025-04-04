@@ -100,6 +100,7 @@ namespace Player
 
             _characterController.enabled = true;
             canMove = true;
+            _knockbackDirection = Vector3.zero; 
         }
 
         private bool CanUseMovementSkill()

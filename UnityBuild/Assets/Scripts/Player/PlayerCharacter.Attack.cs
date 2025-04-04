@@ -26,7 +26,7 @@ namespace Player
         private Dictionary<int, IAttack> certainAttacks = new();
         private Dictionary<int, AttackBase> activeAttacks = new();
 
-        [SyncVar] public float BaseAttackPower = 1;
+        public readonly float BaseAttackPower = 1;
         [SyncVar(hook = nameof(OnAttackPowerChanged))] public float AttackPower = 1;
         public float BasePower => BaseAttackPower;
         public float CurrentAttackPower => AttackPower;
@@ -137,6 +137,7 @@ namespace Player
                 Constants.AttackType.Melee => go.AddComponent<MeleeAttack>(),
                 Constants.AttackType.Self => go.AddComponent<SelfAttack>(),
                 Constants.AttackType.Beam => go.AddComponent<BeamAttack>(),
+                Constants.AttackType.SpreadProjectile => go.AddComponent<SpreadProjectileAttack>(),
                 _ => null
             };
 

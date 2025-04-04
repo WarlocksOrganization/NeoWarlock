@@ -9,6 +9,7 @@ namespace Player
     public partial class PlayerCharacter : IMovable
     {
         [Header("Player Movement")]
+        public readonly float BaseMaxSpeed = 5f; 
         [SyncVar] public float MaxSpeed = 5f;
         [SyncVar(hook = nameof(OnMoveSpeedChanged))] public float MoveSpeed = 5.0f;
         public float KnockbackDamping = 5f;
@@ -154,8 +155,9 @@ namespace Player
         public void ApplyKnockback(Vector3 force)
         {
             _knockbackDirection = force;
-            _knockbackDirection.x *= KnockbackFactor;
-            _knockbackDirection.z *= KnockbackFactor;
+            float curKnockbackFactor = Mathf.Max(0f, KnockbackFactor);
+            _knockbackDirection.x *= curKnockbackFactor;
+            _knockbackDirection.z *= curKnockbackFactor;
             isMovingToTarget = false; // 넉백 중에는 마우스 이동 중단
         }
         

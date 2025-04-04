@@ -74,6 +74,7 @@ namespace DataSystem
             Melee,
             Self,
             Beam,
+            SpreadProjectile,
         }
 
         public enum BuffType

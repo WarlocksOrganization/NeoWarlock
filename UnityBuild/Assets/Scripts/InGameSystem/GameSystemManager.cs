@@ -16,10 +16,7 @@ public class GameSystemManager : NetworkBehaviour
 
     protected void Awake()
     {
-        if (Instance == null)
-            Instance = this;
-        else
-            Destroy(gameObject); // ✅ 중복된 Instance 제거
+        Instance = this;
     }
 
     protected virtual void Start()

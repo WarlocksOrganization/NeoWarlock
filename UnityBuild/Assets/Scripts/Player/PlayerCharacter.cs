@@ -60,6 +60,13 @@ namespace Player
 
         public virtual void Start()
         {
+            AttackPower = BaseAttackPower;
+            
+            MaxSpeed = BaseMaxSpeed;
+            MoveSpeed = BaseMaxSpeed;
+            
+            maxHp = BaseHp;
+            curHp = BaseHp;
 
             UpdateCount();
             
@@ -306,6 +313,28 @@ namespace Player
             RpcTriggerAnimation("isLive");
             RpcUpdatePlayerStatus(conn);
             RpcResetCamera(conn);
+
+            ResetStatsToBase();
+        }
+        
+        public void ResetStatsToBase()
+        {
+            AttackPower = BaseAttackPower;
+            
+            MaxSpeed = BaseMaxSpeed;
+            MoveSpeed = BaseMaxSpeed;
+            
+            maxHp = BaseHp;
+            curHp = BaseHp;
+            
+            attackPlayersId = -1;
+            attackskillid = -1;
+
+            // 필요시: availableAttacks 클론 제거 or 리셋
+            // itemSkillId = -1;
+            // availableAttacks[4] = null;
+
+            NotifyStatChanged();
         }
         
         [TargetRpc]

@@ -16,7 +16,9 @@ namespace Player
         {
             if (!isOwned) return;
             
-            foreach (var card in cards)
+            var last3Cards = cards.Skip(Mathf.Max(0, cards.Count - 3)).ToList();
+            
+            foreach (var card in last3Cards)
             {
                 if (IsBasicStat(card.StatType))
                 {

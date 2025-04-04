@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   duration: 30
   moveSpeedModifier: 1
-  attackDamageModifier: 0.25
+  attackDamageModifier: 0.5
   defenseModifier: 5
   knonkbackModifier: -0.8
   tickDamage: 1
