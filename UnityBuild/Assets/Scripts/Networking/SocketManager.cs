@@ -50,7 +50,7 @@ namespace Networking
         }
 
         void Start()
-        {   
+        {
             // 서버에 연결
             // 백그라운드 스레드로 연결
             if (PlayerPrefs.HasKey("sessionToken"))
@@ -430,6 +430,21 @@ namespace Networking
                         Debug.LogWarning("[SocketManager] 알 수 없는 클라이언트 액션: " + message);
                         break;
                 }
+                // 방 목록 업데이트 알림 이벤트
+//                if (data.SelectToken("eventName") != null)
+//                {
+//                    string eventType = data["eventName"].ToString();
+//                    switch (eventType)
+//                    {
+//                        case "roomListUpdated":
+//                            Debug.Log("[SocketManager] 실시간 방 목록 업데이트 수신");
+//                            _hasPendingRoomUpdate = true;
+//                            FindRoomUI findRoomUI = FindFirstObjectByType<FindRoomUI>();
+//                            findRoomUI?.ShowRefreshButton(true);
+//                            break;
+//                    }
+//                    return;
+//                }
             }
         
         }

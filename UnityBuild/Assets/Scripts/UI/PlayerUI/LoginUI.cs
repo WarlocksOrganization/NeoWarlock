@@ -87,5 +87,6 @@ public class LoginUI : MonoBehaviour
     {
         _OnlineUI.SetActive(true);
         gameObject.SetActive(false);
+        FindObjectOfType<FindRoomUI>().TurnOnFindRoomUI();
     }
 }
