@@ -36,10 +36,21 @@ namespace Player
 
         private void UpdateAttack()
         {
-            if (Input.GetKeyDown(KeyCode.Alpha1)) SetAttackType(1);
-            if (Input.GetKeyDown(KeyCode.Alpha2)) SetAttackType(2);
-            if (Input.GetKeyDown(KeyCode.Alpha3)) SetAttackType(3);
-            if (Input.GetKeyDown(KeyCode.Alpha4)) SetAttackType(4);
+            if (PlayerSetting.PlayerKeyType == Constants.KeyType.Classic)
+            {
+                if (Input.GetKeyDown(KeyCode.Alpha1)) SetAttackType(1);
+                if (Input.GetKeyDown(KeyCode.Alpha2)) SetAttackType(2);
+                if (Input.GetKeyDown(KeyCode.Alpha3)) SetAttackType(3);
+                if (Input.GetKeyDown(KeyCode.Alpha4)) SetAttackType(4);
+            }
+            else if (PlayerSetting.PlayerKeyType == Constants.KeyType.AOS)
+            {
+                if (Input.GetKeyDown(KeyCode.Q)) SetAttackType(1);
+                if (Input.GetKeyDown(KeyCode.W)) SetAttackType(2);
+                if (Input.GetKeyDown(KeyCode.E)) SetAttackType(3);
+                if (Input.GetKeyDown(KeyCode.R)) SetAttackType(4);
+            }
+
             if (Input.GetKeyDown(KeyCode.Escape)) SetAttackType(0);
 
             if (currentAttack == null) return;

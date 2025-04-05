@@ -812,8 +812,8 @@ MonoBehaviour:
   skillCulImage3: {fileID: 4373437577618136732}
   isSelectedImage: {fileID: 2525668494935073741}
   culText: {fileID: 4805559852301370119}
-  frameImage: {fileID: 0}
   skillButton: {fileID: 1053470915804942527}
+  skillNumText: {fileID: 3389869861748904520}
 --- !u!114 &2244602010484525329
 MonoBehaviour:
   m_ObjectHideFlags: 0

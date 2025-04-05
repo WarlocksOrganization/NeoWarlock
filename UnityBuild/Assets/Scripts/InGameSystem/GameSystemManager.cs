@@ -78,12 +78,22 @@ public class GameSystemManager : NetworkBehaviour
         noise.m_AmplitudeGain = 0f;
         noise.m_FrequencyGain = 0f;
     }
-
-
     
     [ClientRpc]
     public void PlaySFX(Constants.SoundType soundType)
     {
         AudioManager.Instance.PlaySFX(soundType);
+    }
+
+    private void OnDestroy()
+    {
+        var virtualCamera = FindFirstObjectByType<Cinemachine.CinemachineVirtualCamera>();
+        if (virtualCamera == null) return;
+
+        var noise = virtualCamera.GetCinemachineComponent<Cinemachine.CinemachineBasicMultiChannelPerlin>();
+        if (noise == null) return;
+
+        noise.m_AmplitudeGain = 0f;
+        noise.m_FrequencyGain = 0f;
     }
 }

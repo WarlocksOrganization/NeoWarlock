@@ -1,5 +1,6 @@
 using System.Collections;
 using DataSystem;
+using GameManagement;
 using Interfaces;
 using Mirror;
 using UnityEngine;
@@ -38,11 +39,21 @@ namespace Player
             ApplyKnockbackMovement(); // ✅ 넉백 감속 유지
             finalMove += _knockbackDirection;
 
-            HandleMouseMovement();
+            
+
+            float curMove = Mathf.Max(MoveSpeed, 0f);
             // ✅ 캐릭터 이동만 차단, 넉백은 계속 적용됨
-            if (attackLockTime <= 0 && canMove && MoveSpeed > 0)
+            if (attackLockTime <= 0 && canMove && curMove > 0)
             {
-                HandleKeyboardMovement();
+                if (PlayerSetting.PlayerKeyType == Constants.KeyType.Classic)
+                {
+                    HandleKeyboardMovement();
+                }
+                else if (PlayerSetting.PlayerKeyType == Constants.KeyType.AOS)
+                {
+                    HandleMouseMovement();
+                }
+                
                 finalMove += _moveDirection;
             }
 

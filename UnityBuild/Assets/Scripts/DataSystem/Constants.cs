@@ -24,6 +24,12 @@ namespace DataSystem
 
         public static string LogFilepath = "/.config/unity3d/warlocks/smashup/Logs/";
         public static string LogFilename = "room.txt";
+
+        public enum KeyType
+        {
+            Classic = 0,
+            AOS = 1,
+        }
         
         public enum RoomType
         {

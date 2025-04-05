@@ -16,4 +16,9 @@ public class showMenuModal : MonoBehaviour
     {
         menuModal.SetActive(!menuModal.activeSelf);
     }
+
+    public void OnClickExitGameButton()
+    {
+        Application.Quit();
+    }
 }

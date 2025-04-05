@@ -1,3 +1,5 @@
+using DataSystem;
+using GameManagement;
 using Player;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,7 +15,11 @@ namespace UI
         [SerializeField] private QuickSlot ghostQuickSlots;
         
         private PlayerCharacter localPlayer;
-
+        
+        private void OnEnable()
+        {
+            UpdateQuickSlotKeyLabels(); // 키 표시 반영
+        }
 
         public void SetQuickSlotData(int index, Sprite icon, float cooldown, string name, string description, Sprite upgradeIcon = null)
         {
@@ -23,6 +29,20 @@ namespace UI
             }
             quickSlots[index].SetQuickSlotData(icon, cooldown, name, description, upgradeIcon);
         }
+        
+        public void UpdateQuickSlotKeyLabels()
+        {
+            string[] classicKeys = { "Space", "1", "2", "3", "4" };
+            string[] aosKeys =     { "Space", "Q", "W", "E", "R" };
+
+            string[] keysToUse = PlayerSetting.PlayerKeyType == Constants.KeyType.Classic ? classicKeys : aosKeys;
+
+            for (int i = 1; i < quickSlots.Length; i++)
+            {
+                quickSlots[i].skillNumText.text = keysToUse[i];
+            }
+        }
+
     
         public void UseSkill(int index, float cooldown)
         {
