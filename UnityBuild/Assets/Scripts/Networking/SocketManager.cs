@@ -50,7 +50,7 @@ namespace Networking
         }
 
         void Start()
-        {   
+        {
             // 서버에 연결
             // 백그라운드 스레드로 연결
             if (PlayerPrefs.HasKey("sessionToken"))
@@ -364,15 +364,20 @@ namespace Networking
                 if (modalPopup != null)
                 {
                     string modalMessage = "서버에서 에러가 발생했습니다.\n잠시 후 다시 시도해주세요.";
-                    if (message.Contains("Invalid password") || message.Contains("Invalid username"))
+                    if (data.SelectToken("message") != null)
                     {
-                        modalMessage = "아이디 또는 비밀번호가\n잘못되었습니다.\n다시 시도해주세요.";
+                        modalMessage = data.SelectToken("message").ToString();
                     }
-                    else if (message.Contains("Invalid session token"))
-                    {
-                        modalMessage = "세션이 만료되었습니다.\n다시 로그인해주세요.";
-                    }
-         
+                    // string modalMessage = "서버에서 에러가 발생했습니다.\n잠시 후 다시 시도해주세요.";
+                    // if (message.Contains("Invalid password") || message.Contains("Invalid username"))
+                    // {
+                    //     modalMessage = "아이디 또는 비밀번호가\n잘못되었습니다.\n다시 시도해주세요.";
+                    // }
+                    // else if (message.Contains("Invalid session token"))
+                    // {
+                    //     modalMessage = "세션이 만료되었습니다.\n다시 로그인해주세요.";
+                    // }
+                    
                     modalPopup.EnqueueModalMessage(modalMessage);
                 }
                 return;
@@ -430,6 +435,21 @@ namespace Networking
                         Debug.LogWarning("[SocketManager] 알 수 없는 클라이언트 액션: " + message);
                         break;
                 }
+                // 방 목록 업데이트 알림 이벤트
+//                if (data.SelectToken("eventName") != null)
+//                {
+//                    string eventType = data["eventName"].ToString();
+//                    switch (eventType)
+//                    {
+//                        case "roomListUpdated":
+//                            Debug.Log("[SocketManager] 실시간 방 목록 업데이트 수신");
+//                            _hasPendingRoomUpdate = true;
+//                            FindRoomUI findRoomUI = FindFirstObjectByType<FindRoomUI>();
+//                            findRoomUI?.ShowRefreshButton(true);
+//                            break;
+//                    }
+//                    return;
+//                }
             }
         
         }
