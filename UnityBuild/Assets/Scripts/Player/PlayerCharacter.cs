@@ -287,7 +287,9 @@ namespace Player
         private IEnumerator DelayedResurrect(NetworkConnectionToClient conn)
         {
             // 1. 먼저 위치 이동
-            RpcMoveToSpawn(conn);
+            Vector3 spawnPos = FindFirstObjectByType<SpawnPosition>().GetSpawnPosition();
+            RpcMoveToSpawn(conn, spawnPos);
+            transform.position = spawnPos;
 
             // 2. 0.5초 대기
             yield return new WaitForSeconds(0.5f);
@@ -307,7 +309,7 @@ namespace Player
             }
 
             // 6. 위치도 서버 측에서 초기화 (동기화용)
-            transform.position =  FindFirstObjectByType<SpawnPosition>().GetSpawnPosition();
+            transform.position = spawnPos;
 
             // 7. 부활 애니메이션 & 카메라 & UI
             RpcTriggerAnimation("isLive");
@@ -338,9 +340,9 @@ namespace Player
         }
         
         [TargetRpc]
-        private void RpcMoveToSpawn(NetworkConnection target)
+        private void RpcMoveToSpawn(NetworkConnection target, Vector3 spawnPos)
         {
-            transform.position = Vector3.zero;
+            transform.position = spawnPos;
         }
         
         [TargetRpc]
