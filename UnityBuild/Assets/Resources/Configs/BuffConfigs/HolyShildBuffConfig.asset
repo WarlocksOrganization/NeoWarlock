@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe25a225da670384e89deb818f013fd8, type: 3}
   m_Name: HolyShildBuffConfig
   m_EditorClassIdentifier: 
+  buffName: ItemShild
+  BuffType: 8
   duration: 3
   moveSpeedModifier: 0
   attackDamageModifier: 0
@@ -19,4 +21,6 @@ MonoBehaviour:
   knonkbackModifier: -1
   tickDamage: 0
   moveDirection: {x: 0, y: 0, z: 0}
-  BuffType: 8
+  buffIcon: {fileID: 21300000, guid: c8256d03506ff814f8f2217de5274e00, type: 3}
+  displayName: "\uC274\uB4DC \uD3EC\uC158"
+  description: "\uBB34\uC801 \uC0C1\uD0DC\uAC00 \uB429\uB2C8\uB2E4."

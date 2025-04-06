@@ -39,10 +39,7 @@ public class GameHand : NetworkBehaviour
     
     private void Awake()
     {
-        if (Instance == null)
-            Instance = this;
-        else
-            Destroy(gameObject); // ✅ 중복된 Instance 제거
+        Instance = this;
     }
 
     [ServerCallback]

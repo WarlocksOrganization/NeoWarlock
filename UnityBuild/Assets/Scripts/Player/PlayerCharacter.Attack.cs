@@ -26,7 +26,7 @@ namespace Player
         private Dictionary<int, IAttack> certainAttacks = new();
         private Dictionary<int, AttackBase> activeAttacks = new();
 
-        [SyncVar] public float BaseAttackPower = 1;
+        public readonly float BaseAttackPower = 1;
         [SyncVar(hook = nameof(OnAttackPowerChanged))] public float AttackPower = 1;
         public float BasePower => BaseAttackPower;
         public float CurrentAttackPower => AttackPower;
@@ -36,10 +36,21 @@ namespace Player
 
         private void UpdateAttack()
         {
-            if (Input.GetKeyDown(KeyCode.Alpha1)) SetAttackType(1);
-            if (Input.GetKeyDown(KeyCode.Alpha2)) SetAttackType(2);
-            if (Input.GetKeyDown(KeyCode.Alpha3)) SetAttackType(3);
-            if (Input.GetKeyDown(KeyCode.Alpha4)) SetAttackType(4);
+            if (PlayerSetting.PlayerKeyType == Constants.KeyType.Classic)
+            {
+                if (Input.GetKeyDown(KeyCode.Alpha1)) SetAttackType(1);
+                if (Input.GetKeyDown(KeyCode.Alpha2)) SetAttackType(2);
+                if (Input.GetKeyDown(KeyCode.Alpha3)) SetAttackType(3);
+                if (Input.GetKeyDown(KeyCode.Alpha4)) SetAttackType(4);
+            }
+            else if (PlayerSetting.PlayerKeyType == Constants.KeyType.AOS)
+            {
+                if (Input.GetKeyDown(KeyCode.Q)) SetAttackType(1);
+                if (Input.GetKeyDown(KeyCode.W)) SetAttackType(2);
+                if (Input.GetKeyDown(KeyCode.E)) SetAttackType(3);
+                if (Input.GetKeyDown(KeyCode.R)) SetAttackType(4);
+            }
+
             if (Input.GetKeyDown(KeyCode.Escape)) SetAttackType(0);
 
             if (currentAttack == null) return;
@@ -136,6 +147,8 @@ namespace Player
                 Constants.AttackType.Area => go.AddComponent<AreaAttack>(),
                 Constants.AttackType.Melee => go.AddComponent<MeleeAttack>(),
                 Constants.AttackType.Self => go.AddComponent<SelfAttack>(),
+                Constants.AttackType.Beam => go.AddComponent<BeamAttack>(),
+                Constants.AttackType.SpreadProjectile => go.AddComponent<SpreadProjectileAttack>(),
                 _ => null
             };
 

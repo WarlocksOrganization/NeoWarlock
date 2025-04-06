@@ -1,4 +1,5 @@
 using System.Collections;
+using DataSystem;
 using DataSystem.Database;
 using GameManagement;
 using Player;
@@ -11,13 +12,22 @@ public class KillLogItem : MonoBehaviour
     [SerializeField] private TMP_Text killerNameText;
     [SerializeField] private TMP_Text victimNameText;
     [SerializeField] private Image killerIcon;
+    [SerializeField] private Image killerBackground;
+    
     [SerializeField] private Image victimIcon;
+    [SerializeField] private Image victimBackground;
+    
     [SerializeField] private Image skillIcon;
     [SerializeField] private Image killIcon;
 
     [SerializeField] private Sprite killSprite;
     [SerializeField] private Sprite fallSprite;
     private CanvasGroup canvasGroup;
+    
+    private Color teamAColor = new Color(1f, 0.3f, 0.3f, 0.5f); // 붉은 계열
+    private Color teamBColor = new Color(0.3f, 0.3f, 1f, 0.5f); // 푸른 계열
+    private Color defaultColor = new Color(0.5f, 0.5f, 0.5f, 0); // 예비용 중립 색
+
 
     private void Awake()
     {
@@ -91,6 +101,34 @@ public class KillLogItem : MonoBehaviour
         }
 
         killIcon.sprite = isFall ? fallSprite : killSprite;
+        
+        killerBackground.color = defaultColor;
+        victimBackground.color = defaultColor;
+        
+        // killer 배경 색상 설정
+        if (killer.playerId != victim.playerId)
+        {
+            switch (killer.team)
+            {
+                case Constants.TeamType.TeamA:
+                    killerBackground.color = teamAColor;
+                    break;
+                case Constants.TeamType.TeamB:
+                    killerBackground.color = teamBColor;
+                    break;
+            }
+        }
+
+// victim 배경 색상 설정
+        switch (victim.team)
+        {
+            case Constants.TeamType.TeamA:
+                victimBackground.color = teamAColor;
+                break;
+            case Constants.TeamType.TeamB:
+                victimBackground.color = teamBColor;
+                break;
+        }
 
         StartCoroutine(FadeInAndOut());
     }

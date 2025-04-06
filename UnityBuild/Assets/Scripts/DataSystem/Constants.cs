@@ -13,6 +13,7 @@ namespace DataSystem
         public static readonly string IconPath = "Sprites/AttackIcons/";
         public static readonly string ClassIconPath = "Sprites/ClassIcons/";
         public static readonly string CardIconPath = "Sprites/CardIcons/";
+        public static readonly string BuffConfigPath = "Configs/BuffConfigs/";
 
         public static readonly int MaxGameEventTime = 15; // 오브젝트 이벤트 시간 15
         public static readonly int ScoreBoardTime = 15; // 스코어보드 보는 시간 12
@@ -24,11 +25,24 @@ namespace DataSystem
 
         public static string LogFilepath = "/.config/unity3d/warlocks/smashup/Logs/";
         public static string LogFilename = "room.txt";
+
+        public enum KeyType
+        {
+            Classic = 0,
+            AOS = 1,
+        }
         
         public enum RoomType
         {
             Solo = 0,
             Team = 1,
+        }
+        
+        public enum TeamType
+        {
+            None,
+            TeamA,
+            TeamB
         }
 
         public enum RoomMapType
@@ -73,6 +87,8 @@ namespace DataSystem
             Area,
             Melee,
             Self,
+            Beam,
+            SpreadProjectile,
         }
 
         public enum BuffType
@@ -85,7 +101,7 @@ namespace DataSystem
             Poison,
             Charge,
             PowerBody,
-            HolyShhield,
+            ItemShhield,
             PowerPowerBody,
             PowerCharge,
             Lava,
@@ -122,7 +138,7 @@ namespace DataSystem
             Starfall,
             Dash,
             HollyAttack,
-            HollyShild,
+            HolyBeam,
             HolyRecovery,
             HolyTeleport,
             PowerSlash,
@@ -131,12 +147,16 @@ namespace DataSystem
             PhantomSmart,
             SoulSwamp,
             InfernalPoison,
+            HollyAttackPlus,
+            HolyBeamPlus,
+            HolyRecoveryPlus,
             
             Heal = 10000,
             ItemHP = 10001,
             ItemSpeed = 1002,
             ItemAttack = 1003,
             ItemDefense = 1004,
+            ItemShild = 1005,
            
             ItemBomb = 1011,
             
@@ -302,6 +322,8 @@ namespace DataSystem
             public string userId;
             public Constants.CharacterClass characterClass;
             public List<RoundStats> roundStatsList = new();
+
+            public Constants.TeamType team = TeamType.None;
 
             public int GetScoreAtRound(int roundIndex)
             {

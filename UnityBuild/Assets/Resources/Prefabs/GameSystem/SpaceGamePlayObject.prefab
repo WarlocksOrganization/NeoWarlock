@@ -786,6 +786,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4892615067623568261, guid: 66029de41cbf4314794c318ded5dabb4, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 127f987d85156bf44ac877f23ec43ecd, type: 2}
     - target: {fileID: 6225428172638876396, guid: 66029de41cbf4314794c318ded5dabb4, type: 3}
       propertyPath: m_Name
       value: SpaceGround

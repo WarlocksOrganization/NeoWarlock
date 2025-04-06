@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using DataSystem;
 using Player;
 using UnityEngine;
@@ -51,9 +52,14 @@ public class DamageBox : MonoBehaviour
     {
         while (playersInRange.Count > 0) // ✅ 실시간 업데이트 반영
         {
-            foreach (var player in playersInRange) // ✅ 리스트 복사본 없이 직접 참조
+            foreach (var player in playersInRange.ToList()) // 안전하게 복사
             {
                 player.takeDamage(damagePerTick, transform.position, 0, attackConfig, -1, 0);
+
+                if (player.curHp <= 0)
+                {
+                    playersInRange.Remove(player); // 원본에서 제거
+                }
             }
 
             yield return new WaitForSeconds(damageInterval);

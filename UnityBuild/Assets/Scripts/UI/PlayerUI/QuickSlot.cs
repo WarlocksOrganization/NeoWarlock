@@ -14,9 +14,10 @@ namespace UI
         [SerializeField] private Image skillCulImage3; // 페이드아웃 효과를 줄 이미지
         [SerializeField] private GameObject isSelectedImage;
         [SerializeField] private TMP_Text culText;
-        [SerializeField] private Image frameImage; // 스킬버튼 프레임 이미지
         
         [SerializeField] private SkillButton skillButton;
+
+        [SerializeField] public TMP_Text skillNumText;
 
         private float maxSkillCul;
         private float currentSkillCul;
@@ -60,14 +61,6 @@ namespace UI
             skinImage.sprite = null;
             skillButton.gameObject.SetActive(false);
             SelectSkill(false);
-        }
-
-        public void SetFrame(Sprite newFrame)
-        {
-            if (frameImage != null && newFrame != null)
-            {
-                frameImage.sprite = newFrame;
-            }
         }
 
         void Update()

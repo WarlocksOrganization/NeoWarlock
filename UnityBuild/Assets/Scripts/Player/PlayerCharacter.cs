@@ -7,6 +7,7 @@ using GameManagement;
 using Mirror;
 using TMPro;
 using UI;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -20,12 +21,13 @@ namespace Player
         [SyncVar(hook = nameof(SetUserIdhook))]
         public string userId;
         [SerializeField] private TMP_Text nicknameText;
+        [SerializeField] private GameObject gmText;
         [SyncVar(hook = nameof(UpdatePlayerId))] public int playerId = -1;
         private CharacterController _characterController;
         private CinemachineVirtualCamera virtualCamera;
         private BuffSystem buffSystem;
         private EffectSystem effectSystem;
-        [SerializeField]  private PlayerCharacterUI playerUI;
+        private PlayerCharacterUI playerUI;
         
         [SerializeField] private LayerMask mouseTargetLayer;
         
@@ -48,6 +50,10 @@ namespace Player
         [SerializeField] private GameObject ghostPrefab; // ✅ 유령 프리팹
         private GameObject ghostInstance;
         
+        [Header("Teal Settings")]
+        [SyncVar(hook = nameof(OnTeamChanged))] 
+        public Constants.TeamType team = Constants.TeamType.None;
+        
         public event System.Action OnStatChanged;
         private void Awake()
         {
@@ -60,6 +66,13 @@ namespace Player
 
         public virtual void Start()
         {
+            AttackPower = BaseAttackPower;
+            
+            MaxSpeed = BaseMaxSpeed;
+            MoveSpeed = BaseMaxSpeed;
+            
+            maxHp = BaseHp;
+            curHp = BaseHp;
 
             UpdateCount();
             
@@ -103,7 +116,7 @@ namespace Player
 
         private void OnDestroy()
         {
-            //UpdateCount();
+            UpdateCount();
         }
 
         private void UpdatePlayerId(int oldValue, int newValue)
@@ -120,7 +133,11 @@ namespace Player
             {
                 gameLobbyUI = FindFirstObjectByType<GameLobbyUI>();
             }
-            gameLobbyUI.UpdatePlayerInRoon();
+
+            if (gameLobbyUI != null)
+            {
+                gameLobbyUI?.UpdatePlayerInRoon();
+            }
         }
 
         public void NotifyStatChanged()
@@ -170,7 +187,10 @@ namespace Player
             userId = value;
     
             HashSet<string> highlightIds = new HashSet<string> { "1", "2", "3", "4", "5", "6" };
-            nicknameText.color = highlightIds.Contains(userId) ? Color.yellow : Color.white;
+            if (highlightIds.Contains(userId))
+            {
+                gmText.SetActive(true);
+            }
         }
 
         [Command]
@@ -258,13 +278,16 @@ namespace Player
         public void SetState_Hook(Constants.PlayerState oldValue, Constants.PlayerState newValue)
         {
             State = newValue;
+            gravityVelocity = Vector3.zero;
         }
         
         private void SpawnGhost()
         {
             if (!isServer) return; // 서버에서만 실행
-            
-            GameObject ghost = Instantiate(ghostPrefab, transform.position + Vector3.up, Quaternion.identity);
+
+            Vector3 spawnPos = transform.position;
+            spawnPos.y = Mathf.Max(spawnPos.y + 1f, 3f);
+            GameObject ghost = Instantiate(ghostPrefab, spawnPos, Quaternion.identity);
             NetworkServer.Spawn(ghost, connectionToClient); // 클라이언트와 동기화
             ghostInstance = ghost;
         }
@@ -278,7 +301,9 @@ namespace Player
         private IEnumerator DelayedResurrect(NetworkConnectionToClient conn)
         {
             // 1. 먼저 위치 이동
-            RpcMoveToSpawn(conn);
+            Vector3 spawnPos = FindFirstObjectByType<SpawnPosition>().GetSpawnPosition();
+            RpcMoveToSpawn(conn, spawnPos);
+            transform.position = spawnPos;
 
             // 2. 0.5초 대기
             yield return new WaitForSeconds(0.5f);
@@ -298,18 +323,40 @@ namespace Player
             }
 
             // 6. 위치도 서버 측에서 초기화 (동기화용)
-            transform.position = Vector3.zero;
+            transform.position = spawnPos;
 
             // 7. 부활 애니메이션 & 카메라 & UI
             RpcTriggerAnimation("isLive");
             RpcUpdatePlayerStatus(conn);
             RpcResetCamera(conn);
+
+            ResetStatsToBase();
+        }
+        
+        public void ResetStatsToBase()
+        {
+            AttackPower = BaseAttackPower;
+            
+            MaxSpeed = BaseMaxSpeed;
+            MoveSpeed = BaseMaxSpeed;
+            
+            maxHp = BaseHp;
+            curHp = BaseHp;
+            
+            attackPlayersId = -1;
+            attackskillid = -1;
+
+            // 필요시: availableAttacks 클론 제거 or 리셋
+            // itemSkillId = -1;
+            // availableAttacks[4] = null;
+
+            NotifyStatChanged();
         }
         
         [TargetRpc]
-        private void RpcMoveToSpawn(NetworkConnection target)
+        private void RpcMoveToSpawn(NetworkConnection target, Vector3 spawnPos)
         {
-            transform.position = Vector3.zero;
+            transform.position = spawnPos;
         }
         
         [TargetRpc]
@@ -335,29 +382,35 @@ namespace Player
             manager.StartGame();
         }
 
-        [ClientRpc]
-        public void RpcRefreshStat(float atk, int def, float spd, int hp)
+        private void OnTeamChanged(Constants.TeamType oldTeam, Constants.TeamType newTeam)
         {
-            AttackPower = atk;
-            defense = def;
-            MoveSpeed = spd;
-            maxHp = hp;
-            curHp = maxHp;
-            KnockbackFactor = 1f;
+            team = newTeam;
 
-            NotifyStatChanged();
+            if (newTeam == Constants.TeamType.TeamA)
+            {
+                nicknameText.color = new Color(1,0.3f,0.3f);
+            }
+            
+            if (newTeam == Constants.TeamType.TeamB)
+            {
+                nicknameText.color = new Color(0.3f,0.3f,1);
+            }
+            
+            if (gameLobbyUI == null)
+            {
+                gameLobbyUI = FindFirstObjectByType<GameLobbyUI>();
+            }
+
+            if (gameLobbyUI != null)
+            {
+                gameLobbyUI?.UpdatePlayerInRoon();
+            }
         }
-        // public void ResetStatToBase()
-        // {
-        //     AttackPower = 1;
-        //     defense = 0;
-        //     MoveSpeed = 5f;
-        //     KnockbackFactor = 1f;
-        //     maxHp = 150;
-        //     curHp = maxHp;
-
-        //     NotifyStatChanged();
-        // }
-
+        
+        [Command]
+        public void CmdSetTeam(Constants.TeamType newTeam)
+        {
+            team = newTeam;
+        }
     }
 }

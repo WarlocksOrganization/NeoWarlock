@@ -65,7 +65,8 @@ namespace GameManagement
                     playerId = pc.playerId,
                     nickname = pc.nickname,
                     characterClass = pc.PLayerCharacterClass,
-                    userId = pc.userId
+                    userId = pc.userId,
+                    team = pc.team, // ✅ 여기서 team 복사
                 };
             }
 
@@ -242,19 +243,44 @@ namespace GameManagement
         private IEnumerator DelayedGameOverCheck()
         {
             isCheckingGameOver = true;
-            yield return new WaitForSeconds(0.5f); // 🔄 여유 시간 늘리기
+            yield return new WaitForSeconds(0.5f);
 
             var alive = GetAlivePlayers();
 
-            Debug.Log($"[TryCheckGameOver] 현재 생존자 수: {alive.Count} / roundEnded: {roundEnded}");
+            var room = FindFirstObjectByType<GameRoomData>();
+            bool isTeamGame = room != null && room.roomType == Constants.RoomType.Team;
 
-            if (alive.Count > 1)
+            if (isTeamGame)
             {
-                isCheckingGameOver = false;
-                yield break;
+                // ✅ 팀 모드일 경우: 생존한 팀 수 체크
+                var aliveTeamSet = new HashSet<Constants.TeamType>();
+
+                foreach (var id in alive)
+                {
+                    var player = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None)
+                        .FirstOrDefault(p => p.playerId == id);
+                    if (player != null && player.team != Constants.TeamType.None)
+                    {
+                        aliveTeamSet.Add(player.team);
+                    }
+                }
+
+                if (aliveTeamSet.Count > 1)
+                {
+                    isCheckingGameOver = false;
+                    yield break; // 2팀 다 생존 중 → 종료 안 함
+                }
+            }
+            else
+            {
+                // ✅ 솔로 모드: 한 명 이하 생존 시 종료
+                if (alive.Count > 1)
+                {
+                    isCheckingGameOver = false;
+                    yield break;
+                }
             }
 
-            // ✅ 생존자 1명 → 게임 종료 로직 진입
             roundEnded = true;
 
             var roundRanks = GetCurrentRoundRanks();
@@ -268,12 +294,40 @@ namespace GameManagement
 
             foreach (var conn in NetworkServer.connections.Values)
             {
-                conn.identity.GetComponent<GamePlayer>()?.RpcUpdateRound(currentRound);
-                conn.identity.GetComponent<GamePlayer>()?.RpcSendFinalScore(GetAllPlayerRecords(), currentRound - 1);
+                var player = conn.identity.GetComponent<GamePlayer>();
+                player?.RpcPrepareScoreBoard(); // 미리 UI 띄우기
+                player?.RpcSendFinalScore(GetAllPlayerRecords(), currentRound - 1);
             }
+
+
+            // ✅ 서버만 실행
+            StartCoroutine(ServerRoundTransition());
 
             isCheckingGameOver = false;
         }
+        
+        private IEnumerator ServerRoundTransition()
+        {
+           yield return new WaitForSeconds(Constants.ScoreBoardTime); // UI 표시 시간 고려
+           
+           // ✅ 라운드 준비 선작업
+           FindFirstObjectByType<GameRoomData>()?.PrepareNextRound();
+           
+           yield return new WaitForSeconds(3);
+
+            var gameRoomData = FindFirstObjectByType<GameRoomData>();
+            if (gameRoomData == null) yield break;
+
+            if (currentRound < 3)
+            {
+                gameRoomData.StartNextRound();
+            }
+            else
+            {
+                gameRoomData.EndGame();
+            }
+        }
+
 
         public void SetPlayerCards(string userId, int[] cards)
         {
@@ -361,5 +415,21 @@ namespace GameManagement
             }
             FileLogger.LogGameEnd(manager.GetMapId(), playerLogs.Count(), playerLogs);
         }
+        
+        public void ResetRoundStateOnly()
+        {
+            foreach (var stats in playerStatsArray)
+            {
+                stats.kills = 0;
+                stats.outKills = 0;
+                stats.damageDone = 0;
+                stats.curHp = stats.isDead ? 0 : stats.curHp;
+                stats.isDead = false;
+            }
+
+            deathOrder.Clear();
+            roundEnded = false;
+        }
+
     }
 }

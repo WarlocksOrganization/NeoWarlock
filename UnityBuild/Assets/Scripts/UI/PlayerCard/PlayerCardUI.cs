@@ -33,17 +33,27 @@ public class PlayerCardUI : MonoBehaviour
     private Coroutine sliderRoutine;
     private float lastTargetRatio = 1f;
 
-    void Start()
+    void OnEnable()
     {
+        selectedCardsQueue.Clear();
+        
+        hasAppliedCards = false; // ✅ 초기화
+        
         LoadingImage.SetActive(true);
         LoadRandomPlayerCards();
         DisplayTopThreeCards();
+        
+        foreach (var slot in slots)
+        {
+            slot.ResetSlot(); // 🎯 리롤 버튼 다시 활성화
+        }
 
         playerCharacterUI = FindFirstObjectByType<PlayerCharacterUI>();
         playerCharacterUI.GetComponent<CanvasGroup>().alpha = 0f;
         remainingTime = maxTime;
         timerSlider.maxValue = 1f;
         timerSlider.value = 1f;
+        lastTargetRatio = 1f;
 
         myGamePlayer = FindObjectsByType<GamePlayer>(sortMode: FindObjectsSortMode.None).FirstOrDefault(gp => gp.isOwned);
     }
@@ -123,6 +133,7 @@ public class PlayerCardUI : MonoBehaviour
 
     public void UpdateTimer(float serverTime)
     {
+        gameObject.SetActive(true);
         if (!gameObject.activeInHierarchy)
         {
             Debug.LogWarning("[PlayerCardUI] 비활성화된 상태에서 UpdateTimer 호출됨, 무시합니다.");
@@ -150,8 +161,9 @@ public class PlayerCardUI : MonoBehaviour
         sliderRoutine = StartCoroutine(AnimateSlider(lastTargetRatio, nextTargetRatio, 1f));
         lastTargetRatio = nextTargetRatio;
 
-        if (serverTime <= 0f)
+        if (serverTime <= 0f && !hasAppliedCards) // ✅ 중복 방지 조건 추가
         {
+            hasAppliedCards = true;
             ApplySelectedCardsAndHide();
         }
     }
@@ -188,6 +200,8 @@ public class PlayerCardUI : MonoBehaviour
         canvasGroup.alpha = 0f;
         LoadingImage.SetActive(false);
     }
+    
+    private bool hasAppliedCards = false; 
 
     private void ApplySelectedCardsAndHide()
     {
@@ -195,6 +209,8 @@ public class PlayerCardUI : MonoBehaviour
 
         List<Database.PlayerCardData> selected = slots.Select(slot => slot.GetCurrentCard()).ToList();
         PlayerSetting.PlayerCards.AddRange(selected);
+        Debug.Log(selected.Count);
+        Debug.Log(slots.Length);
         
         // ✅ Special 카드 효과 처리
         foreach (var card in selected)

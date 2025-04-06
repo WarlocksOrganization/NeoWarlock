@@ -127,8 +127,6 @@ public class AudioManager : MonoBehaviour
     {
         if (skillSoundDict.TryGetValue(type, out var soundData) && soundData.clip != null)
             PlayClip(soundData.clip, parent);
-        else
-            Debug.LogWarning($"[AudioManager] SkillType {type} clip not found.");
     }
     
     public void PlaySFX(Constants.SoundType type, Vector3 position)
@@ -162,8 +160,6 @@ public class AudioManager : MonoBehaviour
     {
         if (skillSoundDict.TryGetValue(type, out var soundData) && soundData.hitClip != null)
             PlayClip(soundData.hitClip, parent);
-        else
-            Debug.LogWarning($"[AudioManager] SkillType {type} hitClip not found.");
     }
 
     // 공통 클립 재생 함수
