@@ -51,7 +51,7 @@ namespace Player.Combat
             StartCoroutine(AutoDestroy());
         }
 
-        protected void Explode()
+        protected virtual void Explode()
         {
             if (!isServer) return; // ✅ 서버에서만 실행
 
@@ -73,6 +73,21 @@ namespace Player.Combat
                         if (config.attackType == DataSystem.Constants.AttackType.Melee && hit.transform.gameObject == owner) continue;
                         if (config.attackType == DataSystem.Constants.AttackType.Self && hit.transform.gameObject != owner) continue;
                     }
+
+                    if (config != null && config.attackType != DataSystem.Constants.AttackType.Self && explosionDamage >= 0 && hit.transform.gameObject != owner)
+                    {
+                        // ✅ 같은 팀이면 무시
+                        var hitPlayer = hit.GetComponent<PlayerCharacter>();
+                        var ownerPlayer = owner != null ? owner.GetComponent<PlayerCharacter>() : null;
+
+                        if (hitPlayer != null && ownerPlayer != null &&
+                            hitPlayer.team != DataSystem.Constants.TeamType.None &&
+                            hitPlayer.team == ownerPlayer.team)
+                        {
+                            continue; // 같은 팀이면 패스
+                        }
+                    }
+                    
 
                     damagable.takeDamage((int)explosionDamage, transform.position, knockbackForce, config, playerid, skillid);
                 }

@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe25a225da670384e89deb818f013fd8, type: 3}
+  m_Name: PoisonLowBuffConfig
+  m_EditorClassIdentifier: 
+  buffName: Poision1
+  BuffType: 5
+  duration: 3
+  moveSpeedModifier: -1.5
+  attackDamageModifier: 0
+  defenseModifier: 0
+  knonkbackModifier: 0
+  tickDamage: 1
+  moveDirection: {x: 0, y: 0, z: 0}
+  buffIcon: {fileID: 21300000, guid: a629f4485b206e54e9824f9ab4c4a023, type: 3}
+  displayName: "\uB3C5"
+  description: "\uC9C0\uC18D\uD53C\uD574\uB97C \uC785\uACE0 \uC774\uB3D9\uC18D\uB3C4\uAC00
+    \uAC10\uC18C\uB2C8\uB2E4."

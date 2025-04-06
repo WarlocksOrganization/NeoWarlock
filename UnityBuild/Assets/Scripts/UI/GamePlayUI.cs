@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Linq;
 using DataSystem;
@@ -14,7 +15,7 @@ public class GamePlayUI : GameLobbyUI
     [SerializeField] private TextMeshProUGUI countDownText;
     [SerializeField] private Animator countDownAnimator;
     [SerializeField] private GameObject StartCube;
-    [SerializeField] private ScoreBoardUI scoreBoardUI;
+    public ScoreBoardUI scoreBoardUI;
 
     private int survivePlayers = -1;
     private Constants.GameState gameState = Constants.GameState.NotStarted;
@@ -121,11 +122,12 @@ public class GamePlayUI : GameLobbyUI
 
                 gameState = Constants.GameState.Start;
                 UpdatePlayerInRoon();
-                
+               
                 AudioManager.Instance.PlayBGM(GameSystemManager.Instance.mapConfig.bgmType);
             }
             else
             {
+                countDownText.color = Color.yellow;
                 countDownText.text = time.ToString();
                 countDownAnimator.SetTrigger("isCounting"); // ✅ 숫자 카운트 트리거
 
@@ -140,12 +142,17 @@ public class GamePlayUI : GameLobbyUI
             alamText.gameObject.SetActive(true);
             alamText.color = time <= 5 ? new Color(0.8f, 0, 0) : Color.white;
             alamText.text = $"{time}초";
+
+            if (time == 0)
+            {
+                alamText.text = "";
+            }
         }
     }
     
     public void ShowFinalScoreBoard(Constants.PlayerRecord[] records, int roundIndex)
     {
-        Debug.Log("[GamePlayUI] ShowFinalScoreBoard 진입");
+        //Debug.Log("[GamePlayUI] ShowFinalScoreBoard 진입");
         // 먼저 활성화 후 기다리도록 수정
         scoreBoardUI.gameObject.SetActive(true);
         StartCoroutine(WaitAndShowScoreBoard(records, roundIndex));
@@ -158,42 +165,41 @@ public class GamePlayUI : GameLobbyUI
 
         yield return new WaitForSeconds(0.05f); // 렌더 타이밍 안정화용
 
-        Debug.Log("[GamePlayUI] WaitAndShowScoreBoard 진입");
+        //Debug.Log("[GamePlayUI] WaitAndShowScoreBoard 진입");
         scoreBoardUI.ShowScoreBoard(records, roundIndex);
     }
 
-    public void ShowGameOverTextAndScore(Constants.PlayerRecord[] records, int roundIndex)
+    public void ShowGameOverTextAndScore(Constants.PlayerRecord[] records, int roundIndex, Action onComplete = null)
     {
-        StartCoroutine(GameOverSequence(records, roundIndex));
+        StartCoroutine(GameOverSequence(records, roundIndex, onComplete));
     }
 
-    private IEnumerator GameOverSequence(Constants.PlayerRecord[] records, int roundIndex)
+    private IEnumerator GameOverSequence(Constants.PlayerRecord[] records, int roundIndex, Action onComplete)
     {
-        Debug.Log("[GamePlayUI] GameOverSequence 진입");
-        
+        //Debug.Log("[GamePlayUI] GameOverSequence 진입");
+
         AudioManager.Instance.ApplyBGMVolumeToMixer(0);
         countDownText.gameObject.SetActive(true);
         countDownText.color = Color.green;
         countDownText.text = "Game Over";
         countDownAnimator.SetTrigger("isGameOver");
+        
+        StartCube.SetActive(true);
 
         yield return new WaitForSeconds(3f);
-        
-        Debug.Log("[GamePlayUI] GameOverSequence2 진입");
+
+        countDownText.text = "";
+    
+        //Debug.Log("[GamePlayUI] GameOverSequence2 진입");
         AudioManager.Instance.PlayBGM(Constants.SoundType.BGM_SSAFY_ScoreBoard);
         ShowFinalScoreBoard(records, roundIndex);
-    }
 
-    public void ForceStartPhase2()
-    {
-        gameState = Constants.GameState.Start;
-        UpdatePlayerInRoon();
-        AudioManager.Instance.PlayBGM(Constants.SoundType.BGM_SSAFY_GameStart);
-    }
+        // ⏳ 스코어보드 노출 시간
+        yield return new WaitForSeconds(Constants.ScoreBoardTime);
 
-    public override void UpdateMapUI(Constants.RoomMapType type)
-    {
-        return;
+        // ✅ 다음 라운드를 위해 상태 초기화
+        gameState = Constants.GameState.NotStarted;
+
+        onComplete?.Invoke(); // ✅ 완료 콜백
     }
-    
 }

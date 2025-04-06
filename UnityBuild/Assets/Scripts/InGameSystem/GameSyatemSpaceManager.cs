@@ -36,6 +36,8 @@ public class GameSyatemSpaceManager : GameSystemManager
 
     public override void StartEvent()
     {
+        base.StartEvent();
+        
         if (!NetworkServer.active) return; 
         
         if (FallGrounds == null || FallGrounds.Length == 0) return;

@@ -16,7 +16,7 @@ public class SkillItemPickup : NetworkBehaviour
         var player = other.GetComponent<PlayerCharacter>();
         if (player == null) return;
 
-        int[] skillIds = { 1001, 1002, 1003, 1004 };
+        int[] skillIds = { 1001, 1002, 1003, 1004, 1005 };
         int randomSkillId = skillIds[Random.Range(0, skillIds.Length)];
 
         player.itemSkillId = randomSkillId;

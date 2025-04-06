@@ -1,25 +1,34 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using DataSystem;
-using GameManagement;
 using DataSystem.Database;
+using GameManagement;
 using Mirror;
 using Player;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.SceneManagement;
+using UnityEngine.Animations;
 using UnityEngine.InputSystem;
 using UnityEngine.Playables;
-using UnityEngine.Animations;
+using UnityEngine.UI;
 
 public class ScoreBoardUI : MonoBehaviour
 {
     [SerializeField] private TMP_Text roundText;
-    [SerializeField] private PlayerScorePanel[] scorePanels;
-    [SerializeField] private RectTransform[] panelPositions; // 1등 ~ 6등 위치
+    
+    [SerializeField] private GameObject scorePanelPrefab;
+    [SerializeField] private Transform scorePanelParent;
+
+    private List<PlayerScorePanel> scorePanels = new();
+    
+    [SerializeField] private GameObject rankPanelPrefab;
+    [SerializeField] private Transform rankPanelParent;
+    private List<RectTransform> panelPositions = new();
+
+    [SerializeField] private GameObject teamResult;
+    [SerializeField] private TMP_Text teamResultText;
+
 
     [SerializeField] private CanvasGroup canvasGroup;
     [SerializeField] private Button returnToLobbyButton;
@@ -39,20 +48,23 @@ public class ScoreBoardUI : MonoBehaviour
     [SerializeField] private GameObject playerCharacterPrefab;
     [SerializeField] private Transform bestSpawnPoint;
     [SerializeField] private Camera bestPlayerCamera;
-    [SerializeField] Vector3 cameraOffset = new Vector3(-0.8f, 0.9f, -2.4f);
-    [SerializeField] Vector3 cameraLookOffset = new Vector3(0f, 1.8f, 0f);
-    private readonly Dictionary<Constants.CharacterClass, (string folder, string prefix)> classAnimMap =
-    new()
-    {
-        { Constants.CharacterClass.Necromancer, ("Necro", "N") },
-        { Constants.CharacterClass.Warrior, ("Warrior", "W") },
-        { Constants.CharacterClass.Mage, ("Magician", "M") },
-        { Constants.CharacterClass.Archer, ("Archer", "A") },
-        { Constants.CharacterClass.Priest, ("Priest", "P") },
-    };
-    private PlayableGraph? currentGraph = null;
+    [SerializeField] private Vector3 cameraOffset = new(-0.8f, 0.9f, -2.4f);
+    [SerializeField] private Vector3 cameraLookOffset = new(0f, 1.8f, 0f);
 
-    private bool isBestPlayerSpawned  = false;
+    private readonly Dictionary<Constants.CharacterClass, (string folder, string prefix)> classAnimMap =
+        new()
+        {
+            { Constants.CharacterClass.Necromancer, ("Necro", "N") },
+            { Constants.CharacterClass.Warrior, ("Warrior", "W") },
+            { Constants.CharacterClass.Mage, ("Magician", "M") },
+            { Constants.CharacterClass.Archer, ("Archer", "A") },
+            { Constants.CharacterClass.Priest, ("Priest", "P") }
+        };
+
+    private PlayableGraph? currentGraph;
+
+    private bool isBestPlayerSpawned;
+    
 
     private void Awake()
     {
@@ -60,7 +72,7 @@ public class ScoreBoardUI : MonoBehaviour
         resultToggleButton.gameObject.SetActive(false);
         returnToLobbyButton.onClick.AddListener(OnClickReturnToLobby);
     }
-    
+
     private void Start()
     {
         canvasGroup.alpha = 1f;
@@ -72,13 +84,13 @@ public class ScoreBoardUI : MonoBehaviour
     {
         returnToLobbyButton.gameObject.SetActive(true);
         resultToggleButton.gameObject.SetActive(true);
-        
+
         StartCoroutine(ReturnToLobbyAfterDelay());
     }
-    
+
     private IEnumerator ReturnToLobbyAfterDelay()
     {
-        float delay = 20f;
+        var delay = 20f;
         yield return new WaitForSeconds(delay);
 
         // ✅ 버튼을 누르지 않았을 경우에만 자동 복귀 실행
@@ -88,12 +100,66 @@ public class ScoreBoardUI : MonoBehaviour
             OnClickReturnToLobby();
         }
     }
+    
+    private void CreateRankPanels(int count)
+    {
+        // 기존 것 제거
+        foreach (Transform child in rankPanelParent)
+            Destroy(child.gameObject);
+        panelPositions.Clear();
+
+        for (int i = 0; i < count; i++)
+        {
+            var rankGO = Instantiate(rankPanelPrefab, rankPanelParent);
+            var rect = rankGO.GetComponent<RectTransform>();
+            var rank = rankGO.GetComponent<RankPanel>();
+
+            rank?.Init(i + 1); // 1등부터
+            panelPositions.Add(rect);
+        }
+    }
+    
+    private void CreateScorePanels(Constants.PlayerRecord[] records)
+    {
+        // 기존 것 제거
+        foreach (Transform child in scorePanelParent)
+            Destroy(child.gameObject);
+
+        scorePanels.Clear();
+
+        foreach (var record in records.OrderBy(r => r.playerId))
+        {
+            var panelGO = Instantiate(scorePanelPrefab, scorePanelParent);
+            var panel = panelGO.GetComponent<PlayerScorePanel>();
+
+            panel.id = record.playerId;
+            scorePanels.Add(panel);
+        }
+    }
 
     public void ShowScoreBoard(Constants.PlayerRecord[] records, int roundIndex)
     {
+        teamResult.gameObject.SetActive(false);
         gameObject.SetActive(true);
-        StartCoroutine(ShowRankingFlow(records, roundIndex)); // ✅ records 사용
+        CreateRankPanels(records.Length);
+        CreateScorePanels(records);
+        
+        scorePanelParent.gameObject.SetActive(false);
+
+        // 🔸 여기서 바로 시작하지 않고 한 프레임 대기
+        StartCoroutine(DelayedRankingFlow(records, roundIndex));
     }
+    
+    private IEnumerator DelayedRankingFlow(Constants.PlayerRecord[] records, int roundIndex)
+    {
+        yield return null; // 🔸 한 프레임 대기해서 레이아웃 정렬 완료를 기다림
+        yield return new WaitForEndOfFrame(); // 필요하다면 추가로 대기
+        
+        scorePanelParent.gameObject.SetActive(true);
+
+        StartCoroutine(ShowRankingFlow(records, roundIndex));
+    }
+
 
     private IEnumerator ShowRankingFlow(Constants.PlayerRecord[] records, int roundIndex)
     {
@@ -102,24 +168,26 @@ public class ScoreBoardUI : MonoBehaviour
 
         var roundSorted = records
             .OrderByDescending(r => GameManager.Instance.GetScoreAtRound(r, roundIndex))
-            .ThenByDescending(r => r.roundStatsList[roundIndex].kills + r.roundStatsList[roundIndex].outKills) // 🔥 킬수 포함
+            .ThenByDescending(r =>
+                r.roundStatsList[roundIndex].kills + r.roundStatsList[roundIndex].outKills) // 🔥 킬수 포함
             .ThenBy(r => r.playerId) // 🔥 아이디 순서
             .ToList();
 
-        for (int i = 0; i < roundSorted.Count; i++)
+        for (var i = 0; i < roundSorted.Count; i++)
         {
             var record = roundSorted[i];
             var stats = record.roundStatsList[roundIndex];
 
-        var panel = scorePanels[record.playerId];
-        panel.gameObject.SetActive(true);
-        
-        int localPlayerId = PlayerSetting.PlayerId;
+            var panel = scorePanels[record.playerId];
+            panel.gameObject.SetActive(true);
 
-        panel.SetupWithScore(record, GameManager.Instance.GetScoreAtRound(record, roundIndex), roundIndex, includeCurrentRound: false, localPlayerId );
-        panel.SetRoundRanks(record.roundStatsList.Take(roundIndex).Select(r => r.rank).ToList());
-        panel.GetComponent<RectTransform>().anchoredPosition = panelPositions[i].anchoredPosition;
-    }
+            var localPlayerId = PlayerSetting.PlayerId;
+
+            panel.SetupWithScore(record, GameManager.Instance.GetScoreAtRound(record, roundIndex), roundIndex, false,
+                localPlayerId);
+            panel.SetRoundRanks(record.roundStatsList.Take(roundIndex).Select(r => r.rank).ToList());
+            panel.GetComponent<RectTransform>().anchoredPosition = panelPositions[i].anchoredPosition;
+        }
 
         yield return new WaitForSeconds(3f);
         yield return StartCoroutine(FadeCanvasGroup(canvasGroup, 1f, 0f, 0.5f));
@@ -129,18 +197,45 @@ public class ScoreBoardUI : MonoBehaviour
 
         var preSorted = records
             .OrderByDescending(r => r.GetTotalScoreUpToRound(roundIndex - 1))
-            .ThenByDescending(r => r.roundStatsList[roundIndex].kills + r.roundStatsList[roundIndex].outKills) // 🔥 킬수 포함
+            .ThenByDescending(r =>
+                r.roundStatsList[roundIndex].kills + r.roundStatsList[roundIndex].outKills) // 🔥 킬수 포함
             .ThenBy(r => r.playerId) // 🔥 아이디 순서
             .ToList();
 
-    for (int i = 0; i < preSorted.Count; i++)
-    {
-        var panel = scorePanels[preSorted[i].playerId];
-        int preScore = preSorted[i].GetTotalScoreUpToRound(roundIndex - 1);
-        int localPlayerId = PlayerSetting.PlayerId;
-        panel.SetupWithScore(preSorted[i], preScore, roundIndex - 1, includeCurrentRound: true, localPlayerId);
-        panel.GetComponent<RectTransform>().anchoredPosition = panelPositions[i].anchoredPosition;
-    }
+        for (var i = 0; i < preSorted.Count; i++)
+        {
+            var panel = scorePanels[preSorted[i].playerId];
+            var preScore = preSorted[i].GetTotalScoreUpToRound(roundIndex - 1);
+            var localPlayerId = PlayerSetting.PlayerId;
+            panel.SetupWithScore(preSorted[i], preScore, roundIndex - 1, true, localPlayerId);
+            panel.GetComponent<RectTransform>().anchoredPosition = panelPositions[i].anchoredPosition;
+        }
+        
+        var gameRoomData = FindFirstObjectByType<GameRoomData>();
+        bool isTeamMode = gameRoomData != null && gameRoomData.roomType == Constants.RoomType.Team;
+
+        if (isTeamMode)
+        {
+            // 🔷 팀 점수 계산
+            int teamAScoreBefore = preSorted
+                .Where(p => p.team == Constants.TeamType.TeamA)
+                .Sum(p => p.GetTotalScoreUpToRound(roundIndex - 1));
+
+            int teamBScoreBefore = preSorted
+                .Where(p => p.team == Constants.TeamType.TeamB)
+                .Sum(p => p.GetTotalScoreUpToRound(roundIndex - 1));
+
+            // 🔷 팀 점수 UI 표시
+            if (teamResultText != null)
+            {
+                string colorA = ColorToHex(1f, 0.3f, 0.3f); // 밝은 붉은색
+                string colorB = ColorToHex(0.3f, 0.4f, 1f); // 파란빛
+                
+                string result = $"<color=#{colorA}>Team A</color> : {teamAScoreBefore}점 vs <color=#{colorB}>Team B</color> : {teamBScoreBefore}점";
+                teamResultText.text = result;
+                teamResult.gameObject.SetActive(true);
+            }
+        }
 
         yield return StartCoroutine(FadeCanvasGroup(canvasGroup, 0f, 1f, 0.5f));
         yield return new WaitForSeconds(1f);
@@ -149,44 +244,66 @@ public class ScoreBoardUI : MonoBehaviour
 
         var finalSorted = records
             .OrderByDescending(r => r.GetTotalScoreUpToRound(roundIndex))
-            .ThenByDescending(r => r.roundStatsList[roundIndex].kills + r.roundStatsList[roundIndex].outKills) // 🔥 킬수 포함
+            .ThenByDescending(r =>
+                r.roundStatsList[roundIndex].kills + r.roundStatsList[roundIndex].outKills) // 🔥 킬수 포함
             .ThenBy(r => r.playerId) // 🔥 아이디 순서
             .ToList();
 
-    for (int i = 0; i < finalSorted.Count; i++)
-    {
-        var panel = scorePanels.First(p => p.id == finalSorted[i].playerId);
-        int before = preSorted.First(p => p.playerId == finalSorted[i].playerId).GetTotalScoreUpToRound(roundIndex - 1);
-        int after = finalSorted[i].GetTotalScoreUpToRound(roundIndex);
-        int localPlayerId = PlayerSetting.PlayerId;
-        panel.SetupWithScore(finalSorted[i], after, roundIndex, includeCurrentRound: true, localPlayerId);
-        panel.AnimateScore(before, after);
-        panel.MoveTo(panelPositions[i].anchoredPosition);
-        
-        // ✅ 데미지 애니메이션 추가
-        int prevDamage = 0;
-        for (int r = 0; r <= roundIndex - 1; r++)
+        for (var i = 0; i < finalSorted.Count; i++)
         {
-            if (r < finalSorted[i].roundStatsList.Count)
-                prevDamage += finalSorted[i].roundStatsList[r].damageDone;
-        }
+            var panel = scorePanels.First(p => p.id == finalSorted[i].playerId);
+            var before = preSorted.First(p => p.playerId == finalSorted[i].playerId)
+                .GetTotalScoreUpToRound(roundIndex - 1);
+            var after = finalSorted[i].GetTotalScoreUpToRound(roundIndex);
+            var localPlayerId = PlayerSetting.PlayerId;
+            panel.SetupWithScore(finalSorted[i], after, roundIndex, true, localPlayerId);
+            panel.AnimateScore(before, after);
+            panel.MoveTo(panelPositions[i].anchoredPosition);
 
-            int finalDamage = prevDamage;
+            // ✅ 데미지 애니메이션 추가
+            var prevDamage = 0;
+            for (var r = 0; r <= roundIndex - 1; r++)
+                if (r < finalSorted[i].roundStatsList.Count)
+                    prevDamage += finalSorted[i].roundStatsList[r].damageDone;
+
+            var finalDamage = prevDamage;
             if (roundIndex < finalSorted[i].roundStatsList.Count)
                 finalDamage += finalSorted[i].roundStatsList[roundIndex].damageDone;
 
             panel.AnimateDamage(prevDamage, finalDamage);
         }
+        
+        if (isTeamMode)
+        {
+            int teamAScoreBefore = preSorted
+                .Where(p => p.team == Constants.TeamType.TeamA)
+                .Sum(p => p.GetTotalScoreUpToRound(roundIndex - 1));
 
-        int totalRounds = 3;
+            int teamBScoreBefore = preSorted
+                .Where(p => p.team == Constants.TeamType.TeamB)
+                .Sum(p => p.GetTotalScoreUpToRound(roundIndex - 1));
+
+            int teamAScoreFinal = finalSorted
+                .Where(p => p.team == Constants.TeamType.TeamA)
+                .Sum(p => p.GetTotalScoreUpToRound(roundIndex));
+
+            int teamBScoreFinal = finalSorted
+                .Where(p => p.team == Constants.TeamType.TeamB)
+                .Sum(p => p.GetTotalScoreUpToRound(roundIndex));
+
+            teamResult.gameObject.SetActive(true);
+            StartCoroutine(AnimateTeamScore(teamAScoreBefore, teamAScoreFinal, teamBScoreBefore, teamBScoreFinal));
+        }
+
+        var totalRounds = 3;
         if (roundIndex >= totalRounds - 1)
         {
             yield return new WaitForSeconds(3f); // 연출 간격
 
-            var ResultBoard = this.transform.Find("ResultBoard").gameObject;
-            var ScoreBoard = this.transform.Find("ScoreBoard").gameObject;
-            var ToggleButton = this.transform.Find("ToggleButton").GetComponent<Button>();
-            var LobbyButton = this.transform.Find("LobbyButton").GetComponent<Button>();
+            var ResultBoard = transform.Find("ResultBoard").gameObject;
+            var ScoreBoard = transform.Find("ScoreBoard").gameObject;
+            var ToggleButton = transform.Find("ToggleButton").GetComponent<Button>();
+            var LobbyButton = transform.Find("LobbyButton").GetComponent<Button>();
 
 
             gameObject.SetActive(true);
@@ -195,7 +312,7 @@ public class ScoreBoardUI : MonoBehaviour
             SetResultBoardData(records, out bestPlayer);
             StartCoroutine(PopIn(ResultBoard.transform));
             showBestPlayer(bestPlayer);
-                
+
             ScoreBoard.SetActive(false);
             ToggleButton.gameObject.SetActive(true);
             LobbyButton.gameObject.SetActive(true);
@@ -203,34 +320,61 @@ public class ScoreBoardUI : MonoBehaviour
             ToggleButton.onClick.RemoveAllListeners();
             ToggleButton.onClick.AddListener(() =>
             {
-                bool showResult = !ResultBoard.activeSelf;
+                var showResult = !ResultBoard.activeSelf;
                 ResultBoard.SetActive(showResult);
                 ScoreBoard.SetActive(!showResult);
                 toggleButtonText.text = showResult ? "상세 보기" : "결과 보기";
             });
             LobbyButton.onClick.AddListener(() => OnClickReturnToLobby());
-
         }
+    }
+    
+    private IEnumerator AnimateTeamScore(int fromA, int toA, int fromB, int toB, float duration = 1f)
+    {
+        string colorA = ColorToHex(1f, 0.3f, 0.3f); // 밝은 붉은색
+        string colorB = ColorToHex(0.3f, 0.4f, 1f); // 파란빛
+        
+        float time = 0f;
+        while (time < duration)
+        {
+            float t = time / duration;
+            int scoreA = Mathf.FloorToInt(Mathf.Lerp(fromA, toA, t));
+            int scoreB = Mathf.FloorToInt(Mathf.Lerp(fromB, toB, t));
+
+            teamResultText.text = $"<color=#{colorA}>Team A</color> : {scoreA}점 vs <color=#{colorB}>Team B</color> : {scoreB}점";
+            time += Time.deltaTime;
+            yield return null;
+        }
+
+        // 마지막 값 보정
+        teamResultText.text = $"<color=#{colorA}>Team A</color> : {toA}점 vs <color=#{colorB}>Team B</color> : {toB}점";
+    }
+    
+    private string ColorToHex(float r, float g, float b)
+    {
+        Color color = new Color(r, g, b);
+        return ColorUtility.ToHtmlStringRGB(color); // 예: "FF4C4C"
     }
 
     private void SetResultBoardData(Constants.PlayerRecord[] records, out Constants.PlayerRecord bestPlayer)
     {
-    Debug.Log("[ResultBoard] SetResultBoardData 진입");
+        Debug.Log("[ResultBoard] SetResultBoardData 진입");
 
-    bestPlayer = records
-        .OrderByDescending(r => r.GetTotalScoreUpToRound(GameManager.Instance.currentRound - 1))
-        .FirstOrDefault();
+        bestPlayer = records
+            .OrderByDescending(r => r.GetTotalScoreUpToRound(GameManager.Instance.currentRound - 1))
+            .FirstOrDefault();
 
-    var bestKill = records
-        .OrderByDescending(r => r.roundStatsList.Sum(rs => rs.kills + rs.outKills))     // 1차 기준: 킬 수
-        .ThenByDescending(r => r.GetTotalScoreUpToRound(GameManager.Instance.currentRound - 1)) // 2차 기준: 점수
-        .First();
+        var bestKill = records
+            .OrderByDescending(r => r.roundStatsList.Sum(rs => rs.kills + rs.outKills)) // 1차 기준: 킬 수
+            .ThenByDescending(r => r.GetTotalScoreUpToRound(GameManager.Instance.currentRound - 1)) // 2차 기준: 점수
+            .First();
 
-    var bestDamage = records
-        .OrderByDescending(r => r.roundStatsList.Sum(rs => rs.damageDone))
-        .FirstOrDefault();
+        var bestDamage = records
+            .OrderByDescending(r => r.roundStatsList.Sum(rs => rs.damageDone))
+            .FirstOrDefault();
 
-        Debug.Log($"[ResultBoard] bestPlayer = {bestPlayer?.nickname}, bestKill = {bestKill?.nickname}, bestDamage = {bestDamage?.nickname}");
+        Debug.Log(
+            $"[ResultBoard] bestPlayer = {bestPlayer?.nickname}, bestKill = {bestKill?.nickname}, bestDamage = {bestDamage?.nickname}");
 
         if (bestPlayer == null || bestKill == null || bestDamage == null)
         {
@@ -238,7 +382,8 @@ public class ScoreBoardUI : MonoBehaviour
             return;
         }
 
-        int myId = PlayerSetting.PlayerId;
+        var myId = PlayerSetting.PlayerId;
+
         string ColorizeName(string name, int id)
         {
             return id == myId ? $"<color=yellow>{name}</color>" : name;
@@ -249,25 +394,22 @@ public class ScoreBoardUI : MonoBehaviour
         bestPlayerIcon.sprite = Database.GetCharacterClassData(bestPlayer.characterClass).CharacterIcon;
 
         bestKillName.text = ColorizeName(bestKill.nickname, bestKill.playerId);
-        int bestKillCounts = bestKill.roundStatsList.Sum(rs => rs.kills + rs.outKills);
+        var bestKillCounts = bestKill.roundStatsList.Sum(rs => rs.kills + rs.outKills);
         bestKillStat.text = $"누적 처치 : {bestKillCounts}";
         bestKillIcon.sprite = Database.GetCharacterClassData(bestKill.characterClass).CharacterIcon;
 
         bestDamageName.text = ColorizeName(bestDamage.nickname, bestDamage.playerId);
-        int bestDamageDone = bestDamage.roundStatsList.Sum(rs => rs.damageDone);
+        var bestDamageDone = bestDamage.roundStatsList.Sum(rs => rs.damageDone);
         bestDamageStat.text = $"누적 데미지 : {bestDamageDone}";
         bestDamageIcon.sprite = Database.GetCharacterClassData(bestDamage.characterClass).CharacterIcon;
     }
 
     private void showBestPlayer(Constants.PlayerRecord bestPlayer)
     {
-        if (isBestPlayerSpawned )
-        {
-            return;
-        }
+        if (isBestPlayerSpawned) return;
 
-        isBestPlayerSpawned  = true;
-        
+        isBestPlayerSpawned = true;
+
         var bestPlayerInstance = Instantiate(playerCharacterPrefab, bestSpawnPoint.position, Quaternion.identity);
 
         var pc = bestPlayerInstance.GetComponent<PlayerCharacter>();
@@ -279,10 +421,11 @@ public class ScoreBoardUI : MonoBehaviour
             var comp = obj.GetComponent<T>();
             if (comp != null) Destroy(comp);
         }
+
         TryDestroy<PlayerInput>(bestPlayerInstance); // 조작 입력 제거
         TryDestroy<NetworkIdentity>(bestPlayerInstance);
 
-        Animator anim = bestPlayerInstance.transform
+        var anim = bestPlayerInstance.transform
             .Find("PlayerModel/Premade_Character")
             .GetComponent<Animator>();
 
@@ -299,8 +442,8 @@ public class ScoreBoardUI : MonoBehaviour
         bestPlayerInstance.transform.rotation = Quaternion.Euler(0f, 180f, 0f); // 아바타 정면 보정
         var camTarget = bestPlayerInstance.transform;
 
-        Vector3 camPos = camTarget.position + cameraOffset;
-        Vector3 lookAt = camTarget.position + cameraLookOffset; // 더 높은 지점 응시
+        var camPos = camTarget.position + cameraOffset;
+        var lookAt = camTarget.position + cameraLookOffset; // 더 높은 지점 응시
 
         bestPlayerCamera.transform.position = camPos;
         bestPlayerCamera.transform.LookAt(lookAt);
@@ -317,8 +460,8 @@ public class ScoreBoardUI : MonoBehaviour
             yield break; // 🔁 중요
         }
 
-        string path = $"Animation/Player/{map.folder}/{map.prefix}{motionName}";
-        AnimationClip clip = Resources.Load<AnimationClip>(path);
+        var path = $"Animation/Player/{map.folder}/{map.prefix}{motionName}";
+        var clip = Resources.Load<AnimationClip>(path);
 
         if (!clip)
         {
@@ -339,8 +482,8 @@ public class ScoreBoardUI : MonoBehaviour
         yield return new WaitForSecondsRealtime(clip.length); // 클립 길이만큼 대기
         // graph.Destroy(); // 자동 해제
     }
-    
-    IEnumerator PlaySequence(Constants.CharacterClass charClass, Animator anim)
+
+    private IEnumerator PlaySequence(Constants.CharacterClass charClass, Animator anim)
     {
         // PlayMappedMotion(charClass, "Attack3", anim);
         // yield return new WaitForSecondsRealtime(1f);
@@ -349,21 +492,21 @@ public class ScoreBoardUI : MonoBehaviour
         // yield return new WaitForSecondsRealtime(0.3f);
         yield return PlayMappedMotion(charClass, "Idle", anim);
     }
-    
+
     public IEnumerator PopIn(Transform target, float duration = 0.5f, float scaleMultiplier = 1f)
     {
-        Vector3 start = Vector3.zero;
-        Vector3 end = Vector3.one * scaleMultiplier;
-        float time = 0f;
+        var start = Vector3.zero;
+        var end = Vector3.one * scaleMultiplier;
+        var time = 0f;
 
         target.localScale = start;
         target.gameObject.SetActive(true);
 
         while (time < duration)
         {
-            float t = time / duration;
+            var t = time / duration;
             // EaseOutBack 느낌 주기
-            float eased = 1f - Mathf.Pow(1f - t, 3);
+            var eased = 1f - Mathf.Pow(1f - t, 3);
             target.localScale = Vector3.LerpUnclamped(start, end, eased);
             time += Time.deltaTime;
             yield return null;
@@ -371,21 +514,17 @@ public class ScoreBoardUI : MonoBehaviour
 
         target.localScale = end;
     }
+
     private void OnClickReturnToLobby()
     {
         if (NetworkServer.active && NetworkClient.isConnected)
-        {
             NetworkManager.singleton.StopHost(); // 서버와 클라이언트 모두 종료
-        }
-        else if (NetworkClient.isConnected)
-        {
-            NetworkManager.singleton.StopClient(); // 클라이언트만 종료
-        }
+        else if (NetworkClient.isConnected) NetworkManager.singleton.StopClient(); // 클라이언트만 종료
     }
 
     private IEnumerator FadeCanvasGroup(CanvasGroup cg, float from, float to, float duration)
     {
-        float time = 0f;
+        var time = 0f;
         cg.alpha = from;
         while (time < duration)
         {
@@ -393,10 +532,13 @@ public class ScoreBoardUI : MonoBehaviour
             time += Time.deltaTime;
             yield return null;
         }
+
         cg.alpha = to;
     }
+
     private void OnDestroy()
     {
+        teamResult.SetActive(false);
         currentGraph?.Destroy(); // 씬 종료 시 혹시 남아 있는 그래프도 해제
     }
 }

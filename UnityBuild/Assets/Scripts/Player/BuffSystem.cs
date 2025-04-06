@@ -1,20 +1,19 @@
 using System.Collections;
 using System.Collections.Generic;
 using DataSystem;
+using DataSystem.Database;
 using Mirror;
 using Player;
 using Player.Combat;
-using Unity.Mathematics;
-using Unity.VisualScripting;
+using UI;
 using UnityEngine;
-using UnityEngine.Animations;
 
 public class BuffSystem : NetworkBehaviour
 {
-    private Dictionary<Constants.BuffType, Coroutine> activeBuffs = new Dictionary<Constants.BuffType, Coroutine>();
-    private Dictionary<Constants.BuffType, Coroutine> activeTickDamage = new Dictionary<Constants.BuffType, Coroutine>();
-    private Dictionary<string, float> activeBuffValues = new Dictionary<string, float>();
-    
+    private Dictionary<string, Coroutine> activeBuffs = new();             // buffName → Coroutine
+    private Dictionary<string, Coroutine> activeTickDamage = new();       // buffName → Coroutine
+    private Dictionary<string, Dictionary<string, float>> activeBuffValues = new(); // buffName → (statName → value)
+
     private PlayerCharacter playerCharacter;
     private EffectSystem effectSystem;
 
@@ -25,259 +24,193 @@ public class BuffSystem : NetworkBehaviour
     }
 
     [Command(requiresAuthority = false)]
-    public void CmdApplyBuff(BuffData buffData, int attackPlayerId, int attackskillid)
+    public void CmdApplyBuff(BuffData buffData, int attackPlayerId, int attackSkillId)
     {
-        if (activeBuffs.ContainsKey(buffData.BuffType))
-        { 
-            StopCoroutine(activeBuffs[buffData.BuffType]);
-            RemoveBuffEffect(buffData.BuffType);
-            activeBuffs.Remove(buffData.BuffType); 
+        if (!isServer) return;
+        ApplyBuffServerSide(buffData, attackPlayerId, attackSkillId);
+    }
+
+    public void ServerApplyBuff(BuffData buffData, int attackPlayerId, int attackSkillId)
+    {
+        if (!isServer) return;
+        ApplyBuffServerSide(buffData, attackPlayerId, attackSkillId);
+    }
+
+    private void ApplyBuffServerSide(BuffData buffData, int attackPlayerId, int attackSkillId)
+    {
+        if (activeBuffs.ContainsKey(buffData.buffName))
+        {
+            StopCoroutine(activeBuffs[buffData.buffName]);
+            RemoveBuffEffect(buffData.buffName);
+            activeBuffs.Remove(buffData.buffName);
         }
 
         RpcPlayBuffEffect(buffData.BuffType, true);
-
-        Coroutine buffCoroutine = StartCoroutine(ApplyBuff(buffData, attackPlayerId, attackskillid));
-        activeBuffs[buffData.BuffType] = buffCoroutine;
+        Coroutine buffCoroutine = StartCoroutine(ApplyBuff(buffData, attackPlayerId, attackSkillId));
+        activeBuffs[buffData.buffName] = buffCoroutine;
     }
 
-    private IEnumerator ApplyBuff(BuffData buffData, int attackPlayerId, int attackskillid)
+    private IEnumerator ApplyBuff(BuffData buffData, int attackPlayerId, int attackSkillId)
     {
         ApplyBuffEffect(buffData);
 
-        Coroutine tickDamageCoroutine = null;
+        Coroutine tickCoroutine = null;
         if (buffData.tickDamage != 0)
         {
-            tickDamageCoroutine = StartCoroutine(TickDamage(buffData, attackPlayerId, attackskillid));
-            activeTickDamage[buffData.BuffType] = tickDamageCoroutine;
+            tickCoroutine = StartCoroutine(TickDamage(buffData, attackPlayerId, attackSkillId));
+            activeTickDamage[buffData.buffName] = tickCoroutine;
         }
 
         if (buffData.moveDirection != Vector3.zero)
-        {
-            RpcForcedMove(buffData);
-        }
-        
+            RpcForcedMove(buffData.moveDirection, buffData.duration);
 
         if (isServer && (buffData.BuffType == Constants.BuffType.Charge || buffData.BuffType == Constants.BuffType.PowerCharge))
-        {
-            ApplyCharge(attackskillid);
-        }
+            ApplyCharge(attackSkillId);
+
+        RpcShowBuffUI(buffData.buffName, buffData.duration);
 
         yield return new WaitForSeconds(buffData.duration);
 
-        RemoveBuffEffect(buffData.BuffType);
+        RemoveBuffEffect(buffData.buffName);
         RpcPlayBuffEffect(buffData.BuffType, false);
-        activeBuffs.Remove(buffData.BuffType);
+        activeBuffs.Remove(buffData.buffName);
 
-        if (tickDamageCoroutine != null)
+        if (tickCoroutine != null)
         {
-            StopCoroutine(tickDamageCoroutine);
-            activeTickDamage.Remove(buffData.BuffType);
+            StopCoroutine(tickCoroutine);
+            activeTickDamage.Remove(buffData.buffName);
+        }
+    }
+
+    [ClientRpc]
+    private void RpcShowBuffUI(string buffName, float duration)
+    {
+        if (!playerCharacter.isOwned) return;
+
+        var ui = FindFirstObjectByType<PlayerCharacterUI>();
+        if (ui == null) return;
+
+        if (Database.buffDictionary.TryGetValue(buffName, out var buffData))
+        {
+            ui.ShowBuff(buffName, buffData.buffIcon, duration, buffData.description);
+        }
+        else
+        {
+            Debug.LogWarning($"[BuffSystem] buffName({buffName})에 해당하는 데이터가 Database에 없습니다.");
         }
     }
 
     private void ApplyBuffEffect(BuffData buffData)
     {
-        Constants.BuffType buffType = buffData.BuffType;
+        var statMap = new Dictionary<string, float>();
 
         if (buffData.defenseModifier != 0)
         {
             playerCharacter.defense += (int)buffData.defenseModifier;
-            activeBuffValues[BuffKey(buffType, "def")] = buffData.defenseModifier;
+            statMap["def"] = buffData.defenseModifier;
         }
 
         if (buffData.knonkbackModifier != 0)
         {
             playerCharacter.KnockbackFactor += buffData.knonkbackModifier;
-            activeBuffValues[BuffKey(buffType, "knock")] = buffData.knonkbackModifier;
+            statMap["knock"] = buffData.knonkbackModifier;
         }
 
         if (buffData.moveSpeedModifier != 0)
         {
             playerCharacter.MoveSpeed += buffData.moveSpeedModifier;
-            activeBuffValues[BuffKey(buffType, "move")] = buffData.moveSpeedModifier;
+            statMap["move"] = buffData.moveSpeedModifier;
         }
 
-        if (buffData.attackDamageModifier != 0f)
+        if (buffData.attackDamageModifier != 0)
         {
             playerCharacter.AttackPower += buffData.attackDamageModifier;
-            activeBuffValues[BuffKey(buffType, "atk")] = buffData.attackDamageModifier;
+            statMap["atk"] = buffData.attackDamageModifier;
         }
+
+        if (statMap.Count > 0)
+        {
+            activeBuffValues[buffData.buffName] = statMap;
+            playerCharacter.NotifyStatChanged();
+        }
+    }
+
+    private void RemoveBuffEffect(string buffName)
+    {
+        if (!activeBuffValues.TryGetValue(buffName, out var statMap)) return;
+
+        foreach (var kv in statMap)
+        {
+            switch (kv.Key)
+            {
+                case "def":
+                    playerCharacter.defense -= (int)kv.Value;
+                    break;
+                case "knock":
+                    playerCharacter.KnockbackFactor -= kv.Value;
+                    break;
+                case "move":
+                    playerCharacter.MoveSpeed -= kv.Value;
+                    break;
+                case "atk":
+                    playerCharacter.AttackPower -= kv.Value;
+                    break;
+            }
+        }
+
+        activeBuffValues.Remove(buffName);
         playerCharacter.NotifyStatChanged();
     }
 
-    private void RemoveBuffEffect(Constants.BuffType buffType)
+    private IEnumerator TickDamage(BuffData buffData, int attackPlayerId, int attackSkillId)
     {
-        var suffixes = new[] { "def", "knock", "move", "atk" };
-
-        foreach (var suffix in suffixes)
+        float elapsed = 0f;
+        while (elapsed < buffData.duration)
         {
-            string key = BuffKey(buffType, suffix);
-            if (activeBuffValues.TryGetValue(key, out float value))
-            {
-                switch (suffix)
-                {
-                    case "def":
-                        playerCharacter.defense -= (int)value;
-                        break;
-                    case "knock":
-                        playerCharacter.KnockbackFactor -= value;
-                        break;
-                    case "move":
-                        playerCharacter.MoveSpeed -= value;
-                        break;
-                    case "atk":
-                        playerCharacter.AttackPower -= value;
-                        break;
-                }
-                activeBuffValues.Remove(key);
-                playerCharacter.NotifyStatChanged();
-            }
+            yield return new WaitForSeconds(1f);
+            playerCharacter.DecreaseHp(buffData.tickDamage, attackPlayerId, attackSkillId);
+            elapsed += 1f;
         }
-    }
-
-    private IEnumerator TickDamage(BuffData buffData, int attackPlayerId, int attackskillid)
-    {
-        float elapsedTime = 0f;
-
-        while (elapsedTime < buffData.duration)
-        {
-            yield return new WaitForSeconds(0.5f);
-
-            if (playerCharacter != null)
-            {
-                playerCharacter.DecreaseHp(buffData.tickDamage, attackPlayerId, attackskillid);
-            }
-
-            elapsedTime += 0.5f;
-        }
-
-        activeTickDamage.Remove(buffData.BuffType);
     }
 
     [ClientRpc]
-    private void RpcForcedMove(BuffData buffData)
+    private void RpcForcedMove(Vector3 moveDirection, float duration)
     {
-        StartCoroutine(ForcedMove(buffData));
+        StartCoroutine(ForcedMove(moveDirection, duration));
     }
 
-    private IEnumerator ForcedMove(BuffData buffData)
+    private IEnumerator ForcedMove(Vector3 moveDirection, float duration)
     {
-        float elapsedTime = 0f;
-        float syncInterval = 0.1f; // 서버 위치 동기화 주기
+        float elapsed = 0f;
         float syncTimer = 0f;
+        CharacterController cc = playerCharacter.GetComponent<CharacterController>();
 
-        CharacterController characterController = playerCharacter.GetComponent<CharacterController>();
-
-        if (characterController == null)
+        if (cc == null)
         {
-            Debug.LogError("[BuffSystem] CharacterController가 없음! 이동 불가능!");
+            Debug.LogError("[BuffSystem] CharacterController가 없습니다.");
             yield break;
         }
 
-        while (elapsedTime < buffData.duration)
+        while (elapsed < duration)
         {
             yield return null;
+            Quaternion rot = playerCharacter.transform.GetChild(2).rotation;
+            Vector3 moveDir = rot * moveDirection;
+            moveDir.y = 0f;
 
-            if (playerCharacter != null && characterController.enabled)
+            cc.Move(moveDir * Time.deltaTime);
+
+            syncTimer += Time.deltaTime;
+            if (syncTimer >= 0.1f)
             {
-                Quaternion quaternion = playerCharacter.gameObject.transform.GetChild(2).rotation;
-                Vector3 moveDirection = quaternion * buffData.moveDirection;
-                moveDirection.y = 0f;
-
-                characterController.Move(moveDirection * Time.deltaTime);
-
-                syncTimer += Time.deltaTime;
-                if (syncTimer >= syncInterval)
-                {
-                    playerCharacter.CmdUpdatePosition(playerCharacter.transform.position);
-                    syncTimer = 0f;
-                }
+                playerCharacter.CmdUpdatePosition(playerCharacter.transform.position);
+                syncTimer = 0f;
             }
 
-            elapsedTime += Time.deltaTime;
+            elapsed += Time.deltaTime;
         }
     }
 
-
-    [Command(requiresAuthority = false)]
-    public void CmdClearAllBuffs()
-    {
-        RpcClearAllBuffs();
-    }
-
-    public void ServerClearAllBuffs()
-    {
-        if (!isServer)
-        {
-            return;
-        }
-
-        RpcClearAllBuffs();
-    }
-
-    [ClientRpc]
-    private void RpcClearAllBuffs()
-    {
-        ClearAllBuffs();
-    }
-
-    private void ClearAllBuffs()
-    {
-        foreach (var buffKey in new List<string>(activeBuffValues.Keys))
-        {
-            if (buffKey.EndsWith("_atk"))
-            {
-                playerCharacter.AttackPower -= activeBuffValues[buffKey];
-            }
-            else if (buffKey.EndsWith("_move"))
-            {
-                playerCharacter.MoveSpeed -= activeBuffValues[buffKey];
-            }
-            else if (buffKey.EndsWith("_def"))
-            {
-                playerCharacter.defense -= (int)activeBuffValues[buffKey];
-            }
-            else if (buffKey.EndsWith("_knock"))
-            {
-                playerCharacter.KnockbackFactor -= activeBuffValues[buffKey];
-            }
-        }
-        activeBuffValues.Clear();
-
-        foreach (var buffType in new List<Constants.BuffType>(activeBuffs.Keys))
-        {
-            StopCoroutine(activeBuffs[buffType]);
-        }
-        activeBuffs.Clear();
-
-        foreach (var buffType in new List<Constants.BuffType>(activeTickDamage.Keys))
-        {
-            StopCoroutine(activeTickDamage[buffType]);
-        }
-        activeTickDamage.Clear();
-    }
-    
-    public void ServerApplyBuff(BuffData buffData, int attackPlayerId, int attackskillid)
-    {
-        if (!isServer)
-        {
-            return;
-        }
-
-        if (activeBuffs.ContainsKey(buffData.BuffType))
-        {
-            StopCoroutine(activeBuffs[buffData.BuffType]);
-            RemoveBuffEffect(buffData.BuffType); 
-            activeBuffs.Remove(buffData.BuffType);
-        }
-
-        // ✅ 클라이언트에서 버프 이펙트 실행
-        RpcPlayBuffEffect(buffData.BuffType, true);
-
-        Coroutine buffCoroutine = StartCoroutine(ApplyBuff(buffData, attackPlayerId, attackskillid));
-        activeBuffs[buffData.BuffType] = buffCoroutine;
-    }
-    
     [ClientRpc]
     private void RpcPlayBuffEffect(Constants.BuffType buffType, bool isActive)
     {
@@ -289,22 +222,72 @@ public class BuffSystem : NetworkBehaviour
 
     private void ApplyCharge(int skillId)
     {
-        GameObject holder = new GameObject("ChargeAttackZone");
+        GameObject holder = new("ChargeAttackZone");
         holder.transform.SetParent(transform);
         holder.transform.localPosition = Vector3.zero;
 
         var zone = holder.AddComponent<ChargeAttackZone>();
-
         zone.Initialize(gameObject, playerCharacter.playerId, skillId);
 
         if (isServer)
+            zone.StartAttack();
+    }
+
+    [Command(requiresAuthority = false)]
+    public void CmdClearAllBuffs()
+    {
+        if (!isServer) return;
+        RpcClearAllBuffs();
+    }
+
+    public void ServerClearAllBuffs()
+    {
+        if (isServer)
+            RpcClearAllBuffs();
+    }
+
+    [ClientRpc]
+    private void RpcClearAllBuffs()
+    {
+        ClearAllBuffs();
+    }
+
+    private void ClearAllBuffs()
+    {
+        // 이펙트와 스탯 제거
+        var buffNames = new List<string>(activeBuffValues.Keys);
+        foreach (var buffName in buffNames)
         {
-            zone.StartAttack(); 
+            if (Database.buffDictionary.TryGetValue(buffName, out var buffData))
+            {
+                RpcPlayBuffEffect(buffData.BuffType, false);  // 이펙트 끄기
+            }
+            RemoveBuffEffect(buffName);
         }
+
+        activeBuffValues.Clear();
+
+        foreach (var buff in activeBuffs.Values)
+            StopCoroutine(buff);
+        activeBuffs.Clear();
+
+        foreach (var tick in activeTickDamage.Values)
+            StopCoroutine(tick);
+        activeTickDamage.Clear();
+
+        // UI에서 모든 버프 제거 요청
+        RpcClearAllBuffUI();
     }
     
-    private string BuffKey(Constants.BuffType type, string stat)
+    [ClientRpc]
+    private void RpcClearAllBuffUI()
     {
-        return $"{type}_{stat}";
+        if (!playerCharacter.isOwned) return;
+
+        var ui = FindFirstObjectByType<PlayerCharacterUI>();
+        if (ui == null) return;
+
+        ui.ClearAllBuffs(); // 이 함수는 모든 버프 UI를 제거하도록 구현해야 함
     }
+
 }

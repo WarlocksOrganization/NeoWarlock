@@ -1,6 +1,7 @@
 using System.Collections;
 using DataSystem;
 using DataSystem.Database;
+using GameManagement;
 using Interfaces;
 using kcp2k;
 using Mirror;
@@ -28,11 +29,18 @@ namespace Player
                     CmdTriggerAnimation("isMoveSkill");
 
                     Vector3 targetPos = Vector3.zero;
-                    if (moveKeyboard.magnitude > 0.1f)
+
+                    if (PlayerSetting.PlayerKeyType == Constants.KeyType.Classic)
                     {
+                        float moveX = Input.GetAxis("Horizontal");
+                        float moveZ = Input.GetAxis("Vertical");
+                    
+                        moveKeyboard = transform.right * moveX + transform.forward * moveZ;
+                        moveKeyboard = moveKeyboard.normalized;
+
                         targetPos = transform.position + moveKeyboard * movementSkill.maxDistance;
                     }
-                    else
+                    else if (PlayerSetting.PlayerKeyType == Constants.KeyType.AOS)
                     {
                         Vector3 direction = (hit.point - transform.position).normalized;
                         float distanceToTarget = Vector3.Distance(transform.position, hit.point);
@@ -93,6 +101,7 @@ namespace Player
 
             _characterController.enabled = true;
             canMove = true;
+            _knockbackDirection = Vector3.zero; 
         }
 
         private bool CanUseMovementSkill()

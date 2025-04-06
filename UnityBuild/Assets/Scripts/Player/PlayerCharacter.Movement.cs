@@ -1,5 +1,6 @@
 using System.Collections;
 using DataSystem;
+using GameManagement;
 using Interfaces;
 using Mirror;
 using UnityEngine;
@@ -9,6 +10,7 @@ namespace Player
     public partial class PlayerCharacter : IMovable
     {
         [Header("Player Movement")]
+        public readonly float BaseMaxSpeed = 5f; 
         [SyncVar] public float MaxSpeed = 5f;
         [SyncVar(hook = nameof(OnMoveSpeedChanged))] public float MoveSpeed = 5.0f;
         public float KnockbackDamping = 5f;
@@ -37,11 +39,21 @@ namespace Player
             ApplyKnockbackMovement(); // ✅ 넉백 감속 유지
             finalMove += _knockbackDirection;
 
-            HandleMouseMovement();
+            
+
+            float curMove = Mathf.Max(MoveSpeed, 0f);
             // ✅ 캐릭터 이동만 차단, 넉백은 계속 적용됨
-            if (attackLockTime <= 0 && canMove && MoveSpeed > 0)
+            if (attackLockTime <= 0 && canMove && curMove > 0)
             {
-                HandleKeyboardMovement();
+                if (PlayerSetting.PlayerKeyType == Constants.KeyType.Classic)
+                {
+                    HandleKeyboardMovement();
+                }
+                else if (PlayerSetting.PlayerKeyType == Constants.KeyType.AOS)
+                {
+                    HandleMouseMovement();
+                }
+                
                 finalMove += _moveDirection;
             }
 
@@ -154,8 +166,9 @@ namespace Player
         public void ApplyKnockback(Vector3 force)
         {
             _knockbackDirection = force;
-            _knockbackDirection.x *= KnockbackFactor;
-            _knockbackDirection.z *= KnockbackFactor;
+            float curKnockbackFactor = Mathf.Max(0f, KnockbackFactor);
+            _knockbackDirection.x *= curKnockbackFactor;
+            _knockbackDirection.z *= curKnockbackFactor;
             isMovingToTarget = false; // 넉백 중에는 마우스 이동 중단
         }
         

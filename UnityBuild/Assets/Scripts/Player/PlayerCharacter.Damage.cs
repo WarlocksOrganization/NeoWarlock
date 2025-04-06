@@ -15,6 +15,8 @@ namespace Player
         [SerializeField] private PlayerHUD playerHUD;
         [SerializeField] private GameObject floatingDamageTextPrefab;
 
+        public readonly int BaseHp = 150;
+
         [SyncVar(hook = nameof(OnHpChanged))] // ✅ Hook 추가
         public int curHp = 150;
 

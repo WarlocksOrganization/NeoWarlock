@@ -13,6 +13,8 @@ public class AttackConfig : ScriptableObject
     public Vector3 attackTrans;
     public GameObject Prefab;
     public GameObject explosionEffectPrefab; // ✅ 공격별 파티클 프리팹
+    public GameObject particlePrefab;
+    public GameObject particlePrefab2;
     public Constants.SkillType skillType;
     public BuffData appliedBuff;
 }

@@ -21,6 +21,7 @@ public class GameSyatemLavaManager : GameSystemManager
 
     public override void StartEvent()
     {
+        base.StartEvent();
         if (!NetworkServer.active || lavaTrans == null) return;
         
         eventnum++; // 다음 이벤트로 증가

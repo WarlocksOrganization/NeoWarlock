@@ -38,10 +38,38 @@
         private void Awake()
         {
             playerCardUI = FindFirstObjectByType<PlayerCardUI>();
+
+            ResetSlot();
+        }
         
+        public void ResetSlot()
+        {
             reRollButton.gameObject.SetActive(true);
             reRollButton.onClick.RemoveAllListeners();
             reRollButton.onClick.AddListener(Reroll);
+
+            // ✅ 회전값 초기화 (회전 도중 꺼졌다가 다시 켜질 때 대비)
+            transform.rotation = Quaternion.identity;
+
+            // ✨ 이펙트 리셋
+            if (glowCoroutine != null)
+            {
+                StopCoroutine(glowCoroutine);
+                glowCoroutine = null;
+            }
+
+            if (glowImage != null)
+            {
+                glowImage.SetActive(false);
+                glowImage.transform.localScale = Vector3.one;
+            }
+
+            if (explosionImage != null)
+            {
+                explosionImage.gameObject.SetActive(false);
+                explosionImage.transform.localScale = Vector3.one;
+                explosionImage.color = new Color(1f, 1f, 1f, 1f); // 불투명한 기본값
+            }
         }
 
         private void Initialize()
