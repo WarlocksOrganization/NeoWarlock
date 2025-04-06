@@ -278,6 +278,7 @@ namespace Player
         public void SetState_Hook(Constants.PlayerState oldValue, Constants.PlayerState newValue)
         {
             State = newValue;
+            gravityVelocity = Vector3.zero;
         }
         
         private void SpawnGhost()

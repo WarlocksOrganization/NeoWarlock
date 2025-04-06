@@ -101,6 +101,11 @@ public class GameLobbyUI : MonoBehaviour
                     PlayerSetting.TeamType = assignedTeam;
                 }
             }
+            
+            if (gameRoomData != null && gameRoomData.roomType == Constants.RoomType.Solo)
+            {
+                ChangeTeamButton.gameObject.SetActive(false);
+            }
         }
         
         playerStatusUI.Setup(foundCharacters, PlayerSetting.PlayerId);

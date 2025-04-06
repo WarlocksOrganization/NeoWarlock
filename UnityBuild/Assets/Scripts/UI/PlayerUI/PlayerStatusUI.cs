@@ -1,37 +1,49 @@
+using System.Collections.Generic;
 using Player;
 using UnityEngine;
 
 public class PlayerStatusUI : MonoBehaviour
 {
-    [SerializeField] private PlayerPanel[] playerPanel;
+    [SerializeField] private GameObject playerPanelPrefab; // 🔹 프리팹 참조
+    [SerializeField] private Transform panelParent; // 🔹 부모 트랜스폼 (Vertical/Horizontal Layout Group 등)
+
+    private readonly List<PlayerPanel> playerPanels = new();
 
     public void Setup(PlayerCharacter[] players, int playerid)
     {
-        for (int i = 0; i < playerPanel.Length; i++)
+        // 기존 UI 정리
+        foreach (Transform child in panelParent)
         {
-            if (i >= players.Length)
+            Destroy(child.gameObject);
+        }
+        playerPanels.Clear();
+
+        // 플레이어 수만큼 동적 생성
+        foreach (var player in players)
+        {
+            var panelGO = Instantiate(playerPanelPrefab, panelParent);
+            var panel = panelGO.GetComponent<PlayerPanel>();
+            if (panel != null)
             {
-                playerPanel[i].GetComponent<CanvasGroup>().alpha = 0;
-                continue;
+                panel.Setup(player, playerid);
+                playerPanels.Add(panel);
             }
-            playerPanel[i].GetComponent<CanvasGroup>().alpha = 1;
-            playerPanel[i].Setup(players[i], playerid);
         }
     }
     
     public void OpenPanels()
     {
-        for (int i = 0; i < playerPanel.Length; i++)
+        foreach (var panel in playerPanels)
         {
-            playerPanel[i].gameObject.SetActive(true);
+            panel.gameObject.SetActive(true);
         }
     }
 
     public void ClosePanels()
     {
-        for (int i = 0; i < playerPanel.Length; i++)
+        foreach (var panel in playerPanels)
         {
-            playerPanel[i].gameObject.SetActive(false);
+            panel.gameObject.SetActive(false);
         }
     }
 }

@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe25a225da670384e89deb818f013fd8, type: 3}
   m_Name: ChargeBuffConfig
   m_EditorClassIdentifier: 
+  buffName: Charge
+  BuffType: 6
   duration: 1.5
   moveSpeedModifier: 0
   attackDamageModifier: 0
@@ -19,4 +21,6 @@ MonoBehaviour:
   knonkbackModifier: -1
   tickDamage: 0
   moveDirection: {x: 0, y: 0, z: 10}
-  BuffType: 6
+  buffIcon: {fileID: 21300000, guid: a0d430942d9d2224caacb0484e23d5b2, type: 3}
+  displayName: "\uAD11\uD3ED \uB3CC\uC9C4"
+  description: "\uC815\uBA74\uC73C\uB85C \uB3CC\uC9C4\uD569\uB2C8\uB2E4."

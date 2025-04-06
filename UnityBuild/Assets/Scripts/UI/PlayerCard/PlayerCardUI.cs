@@ -35,6 +35,10 @@ public class PlayerCardUI : MonoBehaviour
 
     void OnEnable()
     {
+        selectedCardsQueue.Clear();
+        
+        hasAppliedCards = false; // ✅ 초기화
+        
         LoadingImage.SetActive(true);
         LoadRandomPlayerCards();
         DisplayTopThreeCards();
@@ -157,8 +161,9 @@ public class PlayerCardUI : MonoBehaviour
         sliderRoutine = StartCoroutine(AnimateSlider(lastTargetRatio, nextTargetRatio, 1f));
         lastTargetRatio = nextTargetRatio;
 
-        if (serverTime <= 0f)
+        if (serverTime <= 0f && !hasAppliedCards) // ✅ 중복 방지 조건 추가
         {
+            hasAppliedCards = true;
             ApplySelectedCardsAndHide();
         }
     }
@@ -195,6 +200,8 @@ public class PlayerCardUI : MonoBehaviour
         canvasGroup.alpha = 0f;
         LoadingImage.SetActive(false);
     }
+    
+    private bool hasAppliedCards = false; 
 
     private void ApplySelectedCardsAndHide()
     {
@@ -202,6 +209,8 @@ public class PlayerCardUI : MonoBehaviour
 
         List<Database.PlayerCardData> selected = slots.Select(slot => slot.GetCurrentCard()).ToList();
         PlayerSetting.PlayerCards.AddRange(selected);
+        Debug.Log(selected.Count);
+        Debug.Log(slots.Length);
         
         // ✅ Special 카드 효과 처리
         foreach (var card in selected)

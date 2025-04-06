@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe25a225da670384e89deb818f013fd8, type: 3}
   m_Name: FireBuffConfig
   m_EditorClassIdentifier: 
+  buffName: Fire
+  BuffType: 11
   duration: 3
   moveSpeedModifier: 0
   attackDamageModifier: 0
@@ -19,4 +21,6 @@ MonoBehaviour:
   knonkbackModifier: 0
   tickDamage: 4
   moveDirection: {x: 0, y: 0, z: 0}
-  BuffType: 11
+  buffIcon: {fileID: 21300000, guid: d6b71faa24abdc34eb071dc4cf983a14, type: 3}
+  displayName: "\uBD88"
+  description: "\uC9C0\uC18D\uD53C\uD574\uB97C \uC785\uC2B5\uB2C8\uB2E4."

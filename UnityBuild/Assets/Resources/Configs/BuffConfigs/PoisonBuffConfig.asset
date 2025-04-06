@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe25a225da670384e89deb818f013fd8, type: 3}
   m_Name: PoisonBuffConfig
   m_EditorClassIdentifier: 
+  buffName: Poision3
+  BuffType: 5
   duration: 5
   moveSpeedModifier: -2.5
   attackDamageModifier: 0
@@ -19,4 +21,7 @@ MonoBehaviour:
   knonkbackModifier: 0
   tickDamage: 3
   moveDirection: {x: 0, y: 0, z: 0}
-  BuffType: 5
+  buffIcon: {fileID: 21300000, guid: a629f4485b206e54e9824f9ab4c4a023, type: 3}
+  displayName: "\uB3C5"
+  description: "\uC9C0\uC18D\uD53C\uD574\uB97C \uC785\uACE0 \uC774\uB3D9\uC18D\uB3C4\uAC00
+    \uAC10\uC18C\uB2C8\uB2E4."

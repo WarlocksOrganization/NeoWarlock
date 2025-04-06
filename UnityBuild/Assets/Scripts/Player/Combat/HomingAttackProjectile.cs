@@ -26,6 +26,17 @@ namespace Player
             foreach (Collider col in hitColliders)
             {
                 IDamagable player = col.GetComponent<IDamagable>();
+                
+                var colPlayer = col.GetComponent<PlayerCharacter>();
+                var ownerPlayer = owner != null ? owner.GetComponent<PlayerCharacter>() : null;
+
+                if (colPlayer != null && ownerPlayer != null &&
+                    colPlayer.team != Constants.TeamType.None &&
+                    colPlayer.team == ownerPlayer.team)
+                {
+                    return; // 같은 팀이므로 무시
+                }
+                
                 if (player != null && ((MonoBehaviour)player).gameObject != owner)
                 {
                     Transform potentialTarget = ((MonoBehaviour)player).transform;

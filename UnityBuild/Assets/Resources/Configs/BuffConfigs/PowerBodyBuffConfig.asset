@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe25a225da670384e89deb818f013fd8, type: 3}
   m_Name: PowerBodyBuffConfig
   m_EditorClassIdentifier: 
+  buffName: PowerBody
+  BuffType: 7
   duration: 10
   moveSpeedModifier: 0
   attackDamageModifier: 0
@@ -19,4 +21,7 @@ MonoBehaviour:
   knonkbackModifier: -0.5
   tickDamage: -3
   moveDirection: {x: 0, y: 0, z: 0}
-  BuffType: 7
+  buffIcon: {fileID: 21300000, guid: 375525eee5ef91c45b2e2eff1c6bad65, type: 3}
+  displayName: "\uAC15\uD654\uC758 \uBE44\uC57D"
+  description: "\uCCB4\uB825\uC744 \uD68C\uBCF5\uD558\uACE0 \uBC29\uC5B4\uB825\uACFC
+    \uB109\uBC31 \uC800\uD56D\uB825\uC774 \uC99D\uAC00\uD569\uB2C8\uB2E4."

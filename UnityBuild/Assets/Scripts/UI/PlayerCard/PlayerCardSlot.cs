@@ -47,7 +47,10 @@
             reRollButton.gameObject.SetActive(true);
             reRollButton.onClick.RemoveAllListeners();
             reRollButton.onClick.AddListener(Reroll);
-            
+
+            // ✅ 회전값 초기화 (회전 도중 꺼졌다가 다시 켜질 때 대비)
+            transform.rotation = Quaternion.identity;
+
             // ✨ 이펙트 리셋
             if (glowCoroutine != null)
             {

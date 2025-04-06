@@ -13,6 +13,7 @@ namespace DataSystem
         public static readonly string IconPath = "Sprites/AttackIcons/";
         public static readonly string ClassIconPath = "Sprites/ClassIcons/";
         public static readonly string CardIconPath = "Sprites/CardIcons/";
+        public static readonly string BuffConfigPath = "Configs/BuffConfigs/";
 
         public static readonly int MaxGameEventTime = 15; // 오브젝트 이벤트 시간 15
         public static readonly int ScoreBoardTime = 15; // 스코어보드 보는 시간 12

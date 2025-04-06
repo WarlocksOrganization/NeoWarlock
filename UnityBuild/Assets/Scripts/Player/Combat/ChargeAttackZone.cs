@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using DataSystem.Database;
 using Interfaces;
 using Mirror;
+using Player;
 using UnityEngine;
 
 public class ChargeAttackZone : NetworkBehaviour
@@ -58,6 +59,17 @@ public class ChargeAttackZone : NetworkBehaviour
                 var damagable = hit.GetComponent<IDamagable>();
                 if (damagable != null)
                 {
+                    // ✅ 같은 팀이면 무시
+                    var hitPlayer = hit.GetComponent<PlayerCharacter>();
+                    var ownerPlayer = owner != null ? owner.GetComponent<PlayerCharacter>() : null;
+
+                    if (hitPlayer != null && ownerPlayer != null &&
+                        hitPlayer.team != DataSystem.Constants.TeamType.None &&
+                        hitPlayer.team == ownerPlayer.team)
+                    {
+                        continue; // 같은 팀이면 패스
+                    }
+                    
                     damagable.takeDamage(damage, transform.position, knockbackForce, null, attackerId, skillId);
                     lastHitTime[hit.gameObject] = Time.time; // 마지막 공격 시간 갱신
                 }

@@ -109,19 +109,6 @@ namespace Player
             gameplayUI.ShowGameOverTextAndScore(allRecords, roundIndex, () =>
             {
                 Debug.Log("[GamePlayer] 스코어보드 끝! 다음 라운드 준비 요청");
-
-                if (isServer)
-                {
-                    var room = FindFirstObjectByType<GameRoomData>();
-                    if (room != null && GameManager.Instance.currentRound < 3)
-                    {
-                        room.StartNextRound(); // ⬅️ 서버에서 카드 선택 시작
-                    }
-                    else
-                    {
-                        room?.EndGame(); // 마지막 라운드라면 종료 처리
-                    }
-                }
             });
         }
         

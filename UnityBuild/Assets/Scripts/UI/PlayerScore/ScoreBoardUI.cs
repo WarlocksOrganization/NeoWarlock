@@ -538,6 +538,7 @@ public class ScoreBoardUI : MonoBehaviour
 
     private void OnDestroy()
     {
+        teamResult.SetActive(false);
         currentGraph?.Destroy(); // 씬 종료 시 혹시 남아 있는 그래프도 해제
     }
 }
