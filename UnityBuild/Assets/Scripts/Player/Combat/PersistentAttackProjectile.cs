@@ -28,6 +28,16 @@ namespace Player
             {
                 if ((layerMask & (1 << col.gameObject.layer)) == 0) return;
                 if (col.gameObject == this.owner) return;
+                
+                var colPlayer = col.GetComponent<PlayerCharacter>();
+                var ownerPlayer = owner != null ? owner.GetComponent<PlayerCharacter>() : null;
+
+                if (colPlayer != null && ownerPlayer != null &&
+                    colPlayer.team != Constants.TeamType.None &&
+                    colPlayer.team == ownerPlayer.team)
+                {
+                    return; // 같은 팀이므로 무시
+                }
             }
 
             // ✅ 중복 폭발 방지

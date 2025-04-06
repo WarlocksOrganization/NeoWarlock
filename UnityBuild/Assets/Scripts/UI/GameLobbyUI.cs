@@ -9,6 +9,7 @@ using Player;
 using Telepathy;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem.HID;
 using UnityEngine.UI;
 
 public class GameLobbyUI : MonoBehaviour
@@ -18,7 +19,7 @@ public class GameLobbyUI : MonoBehaviour
     [SerializeField] protected GameObject PlayerSelection;
     [SerializeField] protected PlayerStatusUI playerStatusUI;
     
-    [Header("맵 선택 관련")]
+    [Header("Map")]
     [SerializeField] protected Button StartGameButton;
     [SerializeField] protected Button ChangeMapNextButton;
     [SerializeField] protected Button ChangeMapBeforeButton;
@@ -35,6 +36,9 @@ public class GameLobbyUI : MonoBehaviour
     [SerializeField] private TMP_Text warningText;
     private Coroutine warningCoroutine;
 
+    [Header("Team")] 
+    [SerializeField] protected Button ChangeTeamButton; 
+
     private void Start()
     {
         if (NetworkClient.active)
@@ -43,6 +47,8 @@ public class GameLobbyUI : MonoBehaviour
         }
         CheckIfHost();
         AudioManager.Instance.PlayBGM(Constants.SoundType.BGM_Lobby);
+        
+        ChangeTeamButton.onClick.AddListener(OnClickChangeTeam);
     }
 
     public void OpenPlayerSelection()
@@ -77,6 +83,24 @@ public class GameLobbyUI : MonoBehaviour
         {
             int maxPlayers = gameRoomData.maxPlayerCount; // ✅ 최대 인원 가져오기
             PlayerInRoonText.text = $"현재 인원 {PlayerCharacters.Length} / {maxPlayers}";
+            
+            if (gameRoomData.roomType == Constants.RoomType.Team)
+            {
+                var localPlayer = foundCharacters.FirstOrDefault(p => p.isOwned);
+
+                if (localPlayer != null && localPlayer.team == Constants.TeamType.None)
+                {
+                    int teamACount = foundCharacters.Count(p => p.team == Constants.TeamType.TeamA);
+                    int teamBCount = foundCharacters.Count(p => p.team == Constants.TeamType.TeamB);
+
+                    Constants.TeamType assignedTeam = teamACount > teamBCount
+                        ? Constants.TeamType.TeamB
+                        : Constants.TeamType.TeamA;
+
+                    localPlayer.CmdSetTeam(assignedTeam);
+                    PlayerSetting.TeamType = assignedTeam;
+                }
+            }
         }
         
         playerStatusUI.Setup(foundCharacters, PlayerSetting.PlayerId);
@@ -200,5 +224,19 @@ public class GameLobbyUI : MonoBehaviour
 
         MapImage.sprite = config.mapSprite; // 또는 따로 image 설정
         MapName.text = config.mapName;
+    }
+    
+    private void OnClickChangeTeam()
+    {
+        var localPlayer = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None)
+            .FirstOrDefault(p => p.isOwned);
+
+        if (localPlayer != null)
+        {
+            // 현재 팀 반대로 전환
+            var newTeam = localPlayer.team == Constants.TeamType.TeamA ? Constants.TeamType.TeamB : Constants.TeamType.TeamA;
+            localPlayer.CmdSetTeam(newTeam);
+            PlayerSetting.TeamType = newTeam;
+        }
     }
 }

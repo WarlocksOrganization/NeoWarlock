@@ -10,6 +10,7 @@ public class GameSyatemSSafyManager : GameSystemManager
     
     public override void StartEvent()
     {
+        base.StartEvent();
         if (FallGrounds == null || FallGrounds.Length == 0) return;
         //Debug.Log($"[GameSystemManager] StartEvent() {NetworkServer.active} {FallGrounds[eventnum] != null}");
         

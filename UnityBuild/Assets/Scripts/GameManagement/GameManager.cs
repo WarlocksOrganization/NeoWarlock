@@ -65,7 +65,8 @@ namespace GameManagement
                     playerId = pc.playerId,
                     nickname = pc.nickname,
                     characterClass = pc.PLayerCharacterClass,
-                    userId = pc.userId
+                    userId = pc.userId,
+                    team = pc.team, // ✅ 여기서 team 복사
                 };
             }
 
@@ -246,10 +247,38 @@ namespace GameManagement
 
             var alive = GetAlivePlayers();
 
-            if (alive.Count > 1)
+            var room = FindFirstObjectByType<GameRoomData>();
+            bool isTeamGame = room != null && room.roomType == Constants.RoomType.Team;
+
+            if (isTeamGame)
             {
-                isCheckingGameOver = false;
-                yield break;
+                // ✅ 팀 모드일 경우: 생존한 팀 수 체크
+                var aliveTeamSet = new HashSet<Constants.TeamType>();
+
+                foreach (var id in alive)
+                {
+                    var player = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None)
+                        .FirstOrDefault(p => p.playerId == id);
+                    if (player != null && player.team != Constants.TeamType.None)
+                    {
+                        aliveTeamSet.Add(player.team);
+                    }
+                }
+
+                if (aliveTeamSet.Count > 1)
+                {
+                    isCheckingGameOver = false;
+                    yield break; // 2팀 다 생존 중 → 종료 안 함
+                }
+            }
+            else
+            {
+                // ✅ 솔로 모드: 한 명 이하 생존 시 종료
+                if (alive.Count > 1)
+                {
+                    isCheckingGameOver = false;
+                    yield break;
+                }
             }
 
             roundEnded = true;

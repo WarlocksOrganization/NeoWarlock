@@ -11,6 +11,7 @@ public class PlayerPanel : MonoBehaviour
     [SerializeField] private Image playerImage;
     [SerializeField] private Image isDeadImage;
     [SerializeField] private TMP_Text playerName;
+    [SerializeField] private Image backGround;
     public void Setup(PlayerCharacter playerCharacter, int playerid)
     {
         if (playerCharacter.PLayerCharacterClass != Constants.CharacterClass.None)
@@ -20,6 +21,15 @@ public class PlayerPanel : MonoBehaviour
     
         playerName.text = playerCharacter.nickname;
         playerName.color = playerCharacter.playerId == playerid ? Color.yellow : Color.white;
+        
+        if (playerCharacter.team == Constants.TeamType.TeamA)
+        {
+            backGround.color = new Color(1,0.3f,0.3f,0.8f);
+        }
+        else if (playerCharacter.team == Constants.TeamType.TeamB)
+        {
+            backGround.color = new Color(0.3f,0.3f,1,0.8f);
+        }
     
         // ✅ 강제 UI 업데이트
         UpdateIsDeadImage(playerCharacter.isDead);

@@ -69,8 +69,11 @@ public class NetworkTimer : NetworkBehaviour
     private void RpcTriggerEvent()
     {
         GamePlayUI?.UpdateCountdownUI(0, 2);
-        
-        GameSystemManager.Instance.StartEvent();
+
+        if (!isServer)
+        {
+            GameSystemManager.Instance.StartEvent();
+        }
     }
 
     // Phase2 타이머 시작 (서버 기준)

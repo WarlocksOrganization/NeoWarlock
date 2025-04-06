@@ -7,6 +7,7 @@ using GameManagement;
 using Mirror;
 using TMPro;
 using UI;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -20,12 +21,13 @@ namespace Player
         [SyncVar(hook = nameof(SetUserIdhook))]
         public string userId;
         [SerializeField] private TMP_Text nicknameText;
+        [SerializeField] private GameObject gmText;
         [SyncVar(hook = nameof(UpdatePlayerId))] public int playerId = -1;
         private CharacterController _characterController;
         private CinemachineVirtualCamera virtualCamera;
         private BuffSystem buffSystem;
         private EffectSystem effectSystem;
-        [SerializeField]  private PlayerCharacterUI playerUI;
+        private PlayerCharacterUI playerUI;
         
         [SerializeField] private LayerMask mouseTargetLayer;
         
@@ -47,6 +49,10 @@ namespace Player
         [Header("Ghost Settings")]
         [SerializeField] private GameObject ghostPrefab; // ✅ 유령 프리팹
         private GameObject ghostInstance;
+        
+        [Header("Teal Settings")]
+        [SyncVar(hook = nameof(OnTeamChanged))] 
+        public Constants.TeamType team = Constants.TeamType.None;
         
         public event System.Action OnStatChanged;
         private void Awake()
@@ -110,7 +116,7 @@ namespace Player
 
         private void OnDestroy()
         {
-            //UpdateCount();
+            UpdateCount();
         }
 
         private void UpdatePlayerId(int oldValue, int newValue)
@@ -127,7 +133,11 @@ namespace Player
             {
                 gameLobbyUI = FindFirstObjectByType<GameLobbyUI>();
             }
-            gameLobbyUI.UpdatePlayerInRoon();
+
+            if (gameLobbyUI != null)
+            {
+                gameLobbyUI?.UpdatePlayerInRoon();
+            }
         }
 
         public void NotifyStatChanged()
@@ -177,7 +187,10 @@ namespace Player
             userId = value;
     
             HashSet<string> highlightIds = new HashSet<string> { "1", "2", "3", "4", "5", "6" };
-            nicknameText.color = highlightIds.Contains(userId) ? Color.yellow : Color.white;
+            if (highlightIds.Contains(userId))
+            {
+                gmText.SetActive(true);
+            }
         }
 
         [Command]
@@ -368,29 +381,35 @@ namespace Player
             manager.StartGame();
         }
 
-        [ClientRpc]
-        public void RpcRefreshStat(float atk, int def, float spd, int hp)
+        private void OnTeamChanged(Constants.TeamType oldTeam, Constants.TeamType newTeam)
         {
-            AttackPower = atk;
-            defense = def;
-            MoveSpeed = spd;
-            maxHp = hp;
-            curHp = maxHp;
-            KnockbackFactor = 1f;
+            team = newTeam;
 
-            NotifyStatChanged();
+            if (newTeam == Constants.TeamType.TeamA)
+            {
+                nicknameText.color = new Color(1,0.3f,0.3f);
+            }
+            
+            if (newTeam == Constants.TeamType.TeamB)
+            {
+                nicknameText.color = new Color(0.3f,0.3f,1);
+            }
+            
+            if (gameLobbyUI == null)
+            {
+                gameLobbyUI = FindFirstObjectByType<GameLobbyUI>();
+            }
+
+            if (gameLobbyUI != null)
+            {
+                gameLobbyUI?.UpdatePlayerInRoon();
+            }
         }
-        // public void ResetStatToBase()
-        // {
-        //     AttackPower = 1;
-        //     defense = 0;
-        //     MoveSpeed = 5f;
-        //     KnockbackFactor = 1f;
-        //     maxHp = 150;
-        //     curHp = maxHp;
-
-        //     NotifyStatChanged();
-        // }
-
+        
+        [Command]
+        public void CmdSetTeam(Constants.TeamType newTeam)
+        {
+            team = newTeam;
+        }
     }
 }

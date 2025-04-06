@@ -14,6 +14,8 @@ public class GameSystemManager : NetworkBehaviour
 
     public MapConfig mapConfig;
 
+    protected static bool isStarted = false;
+
     protected void Awake()
     {
         Instance = this;
@@ -29,7 +31,14 @@ public class GameSystemManager : NetworkBehaviour
 
     public virtual void StartEvent()
     {
-       
+       if(isStarted) return;
+       isStarted = true;
+       Invoke(nameof(StartTime), 1f);
+    }
+
+    protected void StartTime()
+    {
+        isStarted = false;
     }
     
     public virtual void NetEvent()
@@ -95,5 +104,7 @@ public class GameSystemManager : NetworkBehaviour
 
         noise.m_AmplitudeGain = 0f;
         noise.m_FrequencyGain = 0f;
+
+        isStarted = false;
     }
 }

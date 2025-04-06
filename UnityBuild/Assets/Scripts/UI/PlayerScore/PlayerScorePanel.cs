@@ -18,6 +18,7 @@ public class PlayerScorePanel : MonoBehaviour
     [SerializeField] private TMP_Text outKillText;
     [SerializeField] private TMP_Text damageText;
     [SerializeField] public TMP_Text totalScoreText;
+    [SerializeField] public Image BackGround;
 
     public void SetupWithScore(Constants.PlayerRecord record, int score, int upToRoundIndex, bool includeCurrentRound, int localPlayerId )
     {
@@ -57,6 +58,11 @@ public class PlayerScorePanel : MonoBehaviour
         killText.text = kills.ToString();
         outKillText.text = outKills.ToString();
         damageText.text = damage.ToString();
+        
+        if (record.team == Constants.TeamType.TeamA)
+            BackGround.color = new Color(1, 0.3f, 0.3f, 0.8f); // 빨간색
+        else if (record.team == Constants.TeamType.TeamB)
+            BackGround.color = new Color(0.3f, 0.3f, 1, 0.8f); // 파란색
 
         var ranks = record.roundStatsList.Select(r => r.rank).ToList();
         SetRoundRanks(ranks);

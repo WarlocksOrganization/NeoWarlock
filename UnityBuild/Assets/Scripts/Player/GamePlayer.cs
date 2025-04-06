@@ -225,6 +225,9 @@ namespace Player
                 PlayerSetting.MoveSkill,
                 PlayerSetting.AttackSkillIDs
             );
+            
+            playerCharacter.CmdSetTeam(PlayerSetting.TeamType);
+            
             StartCoroutine(DelayedStatSetup());
             int[] selectedCardIds = PlayerSetting.PlayerCards.Select(card => card.ID).ToArray();
             CmdSetPlayerCards(UserId, selectedCardIds);

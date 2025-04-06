@@ -36,6 +36,13 @@ namespace DataSystem
             Solo = 0,
             Team = 1,
         }
+        
+        public enum TeamType
+        {
+            None,
+            TeamA,
+            TeamB
+        }
 
         public enum RoomMapType
         {
@@ -314,6 +321,8 @@ namespace DataSystem
             public string userId;
             public Constants.CharacterClass characterClass;
             public List<RoundStats> roundStatsList = new();
+
+            public Constants.TeamType team = TeamType.None;
 
             public int GetScoreAtRound(int roundIndex)
             {

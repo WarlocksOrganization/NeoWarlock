@@ -127,6 +127,7 @@ public class GamePlayUI : GameLobbyUI
             }
             else
             {
+                countDownText.color = Color.yellow;
                 countDownText.text = time.ToString();
                 countDownAnimator.SetTrigger("isCounting"); // ✅ 숫자 카운트 트리거
 
