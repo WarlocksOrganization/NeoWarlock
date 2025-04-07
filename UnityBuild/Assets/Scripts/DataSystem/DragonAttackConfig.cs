@@ -8,6 +8,9 @@ public class DragonAttackConfig : ScriptableObject
     public float attackDuration = 1f; // 전체 애니메이션 시간
     public float cooldown = 2f;       // 공격 쿨타임
     public float range = 2f;          // 공격 거리
+    public float radius = 2f;
+    public float speed = 10f;
     public int damage = 10;
     public float knockback = 1f;
+    public AttackConfig config;
 }

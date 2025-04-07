@@ -162,6 +162,8 @@ namespace DataSystem
            
             ItemBomb = 1011,
             
+            DragonBlade = 2001,
+            
             None = 100,
         }
         
