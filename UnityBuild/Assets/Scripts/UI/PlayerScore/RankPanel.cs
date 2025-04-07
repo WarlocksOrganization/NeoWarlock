@@ -24,5 +24,9 @@ public class RankPanel : MonoBehaviour
             // 동색 느낌
             rankText.color = new Color(205f / 255f, 127f / 255f, 50f / 255f);
         }
+        else
+        {
+            rankText.color = new Color(1, 1, 1);
+        }
     }
 }

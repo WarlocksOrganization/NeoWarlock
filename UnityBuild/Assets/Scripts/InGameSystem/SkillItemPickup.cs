@@ -3,7 +3,7 @@ using UnityEngine;
 using Player;
 using System.Collections.Generic;
 using DataSystem;
-using DataSystem.Database; // ← DisplayName 가져오기 위해 필요
+using DataSystem.Database;
 
 public class SkillItemPickup : NetworkBehaviour
 {
@@ -19,9 +19,9 @@ public class SkillItemPickup : NetworkBehaviour
         int[] skillIds = { 1001, 1002, 1003, 1004, 1005 };
         int randomSkillId = skillIds[Random.Range(0, skillIds.Length)];
 
-        player.itemSkillId = randomSkillId;
+        // ✅ 서버에서 스킬 등록과 동기화까지 처리 (SyncVar + SetAvailableAttack 포함)
+        player.CmdSetItemSkill(randomSkillId);
 
-        // 🔹 DisplayName 표시
         var skillData = Database.GetAttackData(randomSkillId);
         if (skillData != null)
         {

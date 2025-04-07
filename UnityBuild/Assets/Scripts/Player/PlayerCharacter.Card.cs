@@ -27,6 +27,14 @@ namespace Player
                 else if (IsAttackStat(card.StatType))
                 {
                     CmdModifyPlayerAttackStat(card.AppliedSkill, card.StatType, card.BonusStat);
+
+                    // ✅ 강화된 스킬 ID로 재등록 (강화카드니까 skill + 100임)
+                    int upgradedSkillId = card.AppliedSkill + 100;
+                    int index = System.Array.IndexOf(AttackSkills, card.AppliedSkill);
+                    if (index != -1)
+                    {
+                        CmdSetAvailableAttack(index, upgradedSkillId); // 서버도 강화된 스킬로 갱신
+                    }
                 }
             }
             NotifyStatChanged();
@@ -59,7 +67,7 @@ namespace Player
                     break;
             }
 
-            Debug.Log($"[서버] 기본 스탯 {statType} +{bonusPercent}% 적용됨");
+            Debug.Log($"[서버] id : {playerId} 기본 스탯 {statType} +{bonusPercent}% 적용됨");
         }
 
         // ✅ 공격 관련 스탯 강화 적용 (서버 전용)
@@ -104,7 +112,7 @@ namespace Player
                     break;
             }
 
-            Debug.Log($"[서버] 스킬 {attackData.Name} → {statType} +{bonusPercent}%");
+            Debug.Log($"[서버]  id : {playerId} 스킬 {attackData.Name} → {statType} +{bonusPercent}%");
         }
 
         // ✅ 스탯 타입 판별 유틸

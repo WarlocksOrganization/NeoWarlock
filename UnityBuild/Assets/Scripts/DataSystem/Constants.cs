@@ -299,12 +299,12 @@ namespace DataSystem
         }
         
         [Serializable]
-        public class RoundStats
-        {
+        public class RoundStats {
             public int kills;
             public int outKills;
             public int damageDone;
             public int rank;
+            public int score; // ✅ 서버에서 계산한 점수 저장
         }
         
         [System.Serializable]
@@ -315,29 +315,26 @@ namespace DataSystem
             public AudioClip hitClip;
         }
 
-        public class PlayerRecord
-        {
+        [System.Serializable]
+        public class PlayerRecord {
             public int playerId;
             public string nickname;
+            public CharacterClass characterClass;
             public string userId;
-            public Constants.CharacterClass characterClass;
+            public TeamType team;
             public List<RoundStats> roundStatsList = new();
 
-            public Constants.TeamType team = TeamType.None;
-
-            public int GetScoreAtRound(int roundIndex)
-            {
+            public int GetScoreAtRound(int roundIndex) {
                 if (roundIndex >= roundStatsList.Count) return 0;
-                var r = roundStatsList[roundIndex];
-                return r.kills * 200 + r.outKills * 300 + r.damageDone + GameManager.Instance.GetRankBonus(r.rank);
+                return roundStatsList[roundIndex].score;
             }
 
-            public int GetTotalScoreUpToRound(int roundInclusive)
-            {
-                int score = 0;
-                for (int i = 0; i <= roundInclusive && i < roundStatsList.Count; i++)
-                    score += GetScoreAtRound(i);
-                return score;
+            public int GetTotalScoreUpToRound(int roundIndex) {
+                int total = 0;
+                for (int i = 0; i <= roundIndex && i < roundStatsList.Count; i++) {
+                    total += roundStatsList[i].score;
+                }
+                return total;
             }
         }
     }

@@ -41,7 +41,6 @@ public class GameSyatemSSafyManager : GameSystemManager
             
             // 🔹 5초 뒤 지형 파괴 실행 (Coroutine 사용)
             StartCoroutine(DelayedFall(selectedGround, 4f));
-            Debug.Log("[GameSystemManager] StartEvent()");
         }
     }
     

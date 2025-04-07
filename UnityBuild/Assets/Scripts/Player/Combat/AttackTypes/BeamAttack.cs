@@ -50,6 +50,17 @@ namespace Player.Combat
                     IDamagable damagable = hit.transform.GetComponent<IDamagable>();
                     if (damagable != null)
                     {
+                        // ✅ 같은 팀이면 무시
+                        var hitPlayer = hit.GetComponent<PlayerCharacter>();
+                        var ownerPlayer = owner != null ? owner.GetComponent<PlayerCharacter>() : null;
+
+                        if (hitPlayer != null && ownerPlayer != null &&
+                            hitPlayer.team != DataSystem.Constants.TeamType.None &&
+                            hitPlayer.team == ownerPlayer.team)
+                        {
+                            continue; // 같은 팀이면 패스
+                        }
+                        
                         damagable.takeDamage((int)attackData.Damage, owner.transform.position, attackData.KnockbackForce, attackData.config, playerid, skillid);
 
                         // 개별 피격 이펙트
