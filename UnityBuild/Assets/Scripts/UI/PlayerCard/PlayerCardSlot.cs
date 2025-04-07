@@ -28,6 +28,9 @@
 
         [SerializeField] private GameObject glowImage;
         [SerializeField] private Image explosionImage;
+
+        [SerializeField] private TMP_Text scoreText;
+        [SerializeField] private TMP_Text rankText;
         private Coroutine glowCoroutine;
 
         private Database.PlayerCardData currentCard;
@@ -41,7 +44,7 @@
 
             ResetSlot();
         }
-        
+
         public void ResetSlot()
         {
             reRollButton.gameObject.SetActive(true);
@@ -213,6 +216,12 @@
                     break;
             }
         }
+
+    public void ApplyEvaluationVisuals(float score, float rank)
+    {
+        scoreText.text = score.ToString("F2");
+        rankText.text = rank < 0 ? "-" : rank.ToString("P1");
+    }
 
     public IEnumerator PlayExplosionEffect(Image effectImage)
     {
