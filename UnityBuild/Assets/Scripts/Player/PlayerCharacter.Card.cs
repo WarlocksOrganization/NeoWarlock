@@ -1,8 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using DataSystem;
 using DataSystem.Database;
-using GameManagement;
 using Mirror;
 using UI;
 using UnityEngine;
@@ -15,11 +14,10 @@ namespace Player
         public void ApplyCardBonuses(List<Database.PlayerCardData> cards)
         {
             if (!isOwned) return;
-            
+
             var last3Cards = cards.Skip(Mathf.Max(0, cards.Count - 3)).ToList();
-            
+
             foreach (var card in last3Cards)
-            {
                 if (IsBasicStat(card.StatType))
                 {
                     CmdModifyPlayerStat(card.StatType, card.BonusStat);
@@ -29,18 +27,15 @@ namespace Player
                     CmdModifyPlayerAttackStat(card.AppliedSkill, card.StatType, card.BonusStat);
 
                     // ✅ 강화된 스킬 ID로 재등록 (강화카드니까 skill + 100임)
-                    int upgradedSkillId = card.AppliedSkill + 100;
-                    int index = System.Array.IndexOf(AttackSkills, card.AppliedSkill);
-                    if (index != -1)
-                    {
-                        CmdSetAvailableAttack(index, upgradedSkillId); // 서버도 강화된 스킬로 갱신
-                    }
+                    var upgradedSkillId = card.AppliedSkill + 100;
+                    var index = Array.IndexOf(AttackSkills, card.AppliedSkill);
+                    if (index != -1) CmdSetAvailableAttack(index, upgradedSkillId); // 서버도 강화된 스킬로 갱신
                 }
-            }
+
             NotifyStatChanged();
-            
+
             var ui = FindFirstObjectByType<PlayerCharacterUI>();
-            
+
             UpdateCount();
         }
 
@@ -48,7 +43,7 @@ namespace Player
         [Command]
         private void CmdModifyPlayerStat(PlayerStatType statType, float bonusPercent)
         {
-            float multiplier = 1 + (bonusPercent / 100f);
+            var multiplier = 1 + bonusPercent / 100f;
             switch (statType)
             {
                 case PlayerStatType.Health:
@@ -74,18 +69,14 @@ namespace Player
         [Command]
         private void CmdModifyPlayerAttackStat(int skillId, PlayerStatType statType, float bonusPercent)
         {
-            int skillIndex = System.Array.IndexOf(AttackSkills, skillId);
-            if (skillIndex == -1 || skillIndex >= availableAttacks.Length || availableAttacks[skillIndex] == null)
-            {
-                Debug.LogWarning($"[CmdModifyPlayerAttackStat] 유효하지 않은 스킬 ID: {skillId}, {PlayerSetting.AttackSkillIDs}");
-                return;
-            }
+            var skillIndex = Array.IndexOf(AttackSkills, skillId);
+            if (skillIndex == -1 || availableAttacks[skillIndex] == null) return;
 
             var attackData = availableAttacks[skillIndex].GetAttackData();
             if (attackData == null) return;
 
-            float multiplier = 1 + (bonusPercent / 100f);
-            float inverseMultiplier = 1 - (bonusPercent / 100f);
+            var multiplier = 1 + bonusPercent / 100f;
+            var inverseMultiplier = 1 - bonusPercent / 100f;
 
             switch (statType)
             {
@@ -107,12 +98,50 @@ namespace Player
                 case PlayerStatType.Cooldown:
                     attackData.Cooldown = Mathf.Max(0.5f, attackData.Cooldown * inverseMultiplier);
                     break;
-                default:
-                    Debug.LogWarning($"[CmdModifyPlayerAttackStat] 처리되지 않은 공격 스탯: {statType}");
+            }
+
+            Debug.Log($"[서버] id : {playerId} 스킬 {attackData.Name} → {statType} +{bonusPercent}%");
+
+            // 🔁 클라이언트에도 똑같이 반영
+            TargetModifyPlayerAttackStat(connectionToClient, skillId, statType, bonusPercent);
+        }
+
+        [TargetRpc]
+        private void TargetModifyPlayerAttackStat(NetworkConnection target, int skillId, PlayerStatType statType,
+            float bonusPercent)
+        {
+            var skillIndex = Array.IndexOf(AttackSkills, skillId);
+            if (skillIndex == -1 || availableAttacks[skillIndex] == null) return;
+
+            var attackData = availableAttacks[skillIndex].GetAttackData();
+            if (attackData == null) return;
+
+            var multiplier = 1 + bonusPercent / 100f;
+            var inverseMultiplier = 1 - bonusPercent / 100f;
+
+            switch (statType)
+            {
+                case PlayerStatType.AttackSpeed:
+                    attackData.Speed *= multiplier;
+                    break;
+                case PlayerStatType.Range:
+                    attackData.Range *= multiplier;
+                    break;
+                case PlayerStatType.Radius:
+                    attackData.Radius *= multiplier;
+                    break;
+                case PlayerStatType.Damage:
+                    attackData.Damage *= multiplier;
+                    break;
+                case PlayerStatType.KnockbackForce:
+                    attackData.KnockbackForce *= multiplier;
+                    break;
+                case PlayerStatType.Cooldown:
+                    attackData.Cooldown = Mathf.Max(0.5f, attackData.Cooldown * inverseMultiplier);
                     break;
             }
 
-            Debug.Log($"[서버]  id : {playerId} 스킬 {attackData.Name} → {statType} +{bonusPercent}%");
+            Debug.Log($"[클라] id : {playerId} 스킬 {attackData.Name} → {statType} +{bonusPercent}%");
         }
 
         // ✅ 스탯 타입 판별 유틸

@@ -298,23 +298,23 @@ namespace Player
                 availableAttacks[4] = null;
             }
         }
-
         
-        [Command(requiresAuthority = false)]
-        public void CmdSetItemSkill(int skillId)
+        [Server]
+        public void ServerSetItemSkill(int skillId)
         {
             itemSkillId = skillId;
+            SetAvailableAttack(4, skillId);
             Debug.Log($"[서버] id : {playerId} 아이템 스킬 설정됨 → {skillId}");
 
-            SetAvailableAttack(4, skillId); // 서버에도 인스턴스 할당
-            TargetUpdateAvailableAttack(connectionToClient, 4, skillId);
-        }
-        
-        [TargetRpc]
-        public void TargetReceiveItemSkill(NetworkConnection target, int skillId)
-        {
-            CmdSetItemSkill(skillId); // 클라이언트에서 Command 호출
+            // ✅ 클라이언트에도 알려줘야 함
+            TargetSetItemSkill(connectionToClient, skillId);
         }
 
+        [TargetRpc]
+        private void TargetSetItemSkill(NetworkConnection target, int skillId)
+        {
+            PlayerSetting.ItemSkillID = skillId;
+            Debug.Log($"[클라이언트] 아이템 스킬 ID 설정됨: {skillId}");
+        }
     }
 }

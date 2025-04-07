@@ -14,21 +14,25 @@ public class SkillItemPickup : NetworkBehaviour
         if (!isServer) return;
 
         var player = other.GetComponent<PlayerCharacter>();
-        if (player == null) return;
-
-        int[] skillIds = { 1001, 1002, 1003, 1004, 1005 };
-        int randomSkillId = skillIds[Random.Range(0, skillIds.Length)];
-
-        // ✅ 서버에서 스킬 등록과 동기화까지 처리 (SyncVar + SetAvailableAttack 포함)
-        player.CmdSetItemSkill(randomSkillId);
-
-        var skillData = Database.GetAttackData(randomSkillId);
-        if (skillData != null)
+        // SkillItemPickup.cs
+        if (player != null)
         {
-            RpcShowFloatingText(player.netIdentity, skillData.DisplayName);
-        }
+            int[] skillIds = { 1001, 1002, 1003, 1004, 1005 };
+            int randomSkillId = skillIds[Random.Range(0, skillIds.Length)];
 
-        NetworkServer.Destroy(gameObject);
+            // ❌ 잘못된 방법: player.CmdSetItemSkill(randomSkillId); ← 클라 없으니까 에러
+            // ✅ 올바른 방법:
+            player.ServerSetItemSkill(randomSkillId);
+
+            // 보여주기용 텍스트는 그대로
+            var skillData = Database.GetAttackData(randomSkillId);
+            if (skillData != null)
+            {
+                RpcShowFloatingText(player.netIdentity, skillData.DisplayName);
+            }
+
+            NetworkServer.Destroy(gameObject);
+        }
     }
 
     [ClientRpc]
