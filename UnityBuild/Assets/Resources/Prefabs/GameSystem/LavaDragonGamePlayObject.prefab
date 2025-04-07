@@ -278,7 +278,7 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
-  mapConfig: {fileID: 0}
+  mapConfig: {fileID: 11400000, guid: 8a4ceff07591b2b419c183b61736f691, type: 2}
   lavaTrans: {fileID: 0}
   riseDuration: 5
   risePerEvent: 0.5
@@ -569,7 +569,7 @@ Transform:
   m_GameObject: {fileID: 8714994186733857918}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -5, z: 0}
+  m_LocalPosition: {x: 0, y: -7.5, z: 0}
   m_LocalScale: {x: 100, y: 10, z: 100}
   m_ConstrainProportionsScale: 0
   m_Children: []

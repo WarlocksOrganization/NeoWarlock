@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Cinemachine;
 using DataSystem;
 using GameManagement;
@@ -25,6 +26,8 @@ namespace Player
         [SyncVar(hook = nameof(UpdatePlayerId))] public int playerId = -1;
         private CharacterController _characterController;
         private CinemachineVirtualCamera virtualCamera;
+        private Transform cameraTargetGroupTransform;
+        
         private BuffSystem buffSystem;
         private EffectSystem effectSystem;
         private PlayerCharacterUI playerUI;
@@ -82,11 +85,26 @@ namespace Player
                 playerLight.SetActive(true);
                 
                 virtualCamera = FindFirstObjectByType<CinemachineVirtualCamera>();
-                if (virtualCamera != null)
+                
+                var targetGroup = FindFirstObjectByType<CinemachineTargetGroup>();
+                cameraTargetGroupTransform = targetGroup?.transform;
+                
+                if (targetGroup != null)
                 {
-                    virtualCamera.Follow = CinemachineCameraTarget.transform;
-                }
+                    virtualCamera.Follow = targetGroup.transform;
+                    virtualCamera.LookAt = targetGroup.transform;
 
+                    // 이 플레이어의 마우스-중심 타겟 오브젝트 등록
+                    var targets = targetGroup.m_Targets.ToList();
+                    targets.Add(new CinemachineTargetGroup.Target
+                    {
+                        target = CinemachineCameraTarget.transform, // 여전히 움직이는 타겟!
+                        weight = 1f,
+                        radius = 2f
+                    });
+                    targetGroup.m_Targets = targets.ToArray();
+                }
+                
                 playerUI = FindFirstObjectByType<PlayerCharacterUI>();
                 if (playerUI == null)
                 {

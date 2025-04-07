@@ -26,6 +26,8 @@ namespace GameManagement
         [SerializeField] private GameObject[] SpaceObjects;
         [SerializeField] private GameObject[] SeaObjects;
         
+        [SerializeField] private GameObject[] LavaDragonObjects;
+        
         [SerializeField] private List<GameObject> spawnedObjects = new();
         
         [SyncVar] public int currentRound = 0;
@@ -107,6 +109,7 @@ namespace GameManagement
                 Constants.RoomMapType.Lava => LavaObjects,
                 Constants.RoomMapType.Space => SpaceObjects,
                 Constants.RoomMapType.Sea => SeaObjects,
+                Constants.RoomMapType.LavaDragon => LavaDragonObjects,
                 _ => null
             };
 

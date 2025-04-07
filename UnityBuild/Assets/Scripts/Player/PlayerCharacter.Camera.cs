@@ -1,3 +1,5 @@
+using System.Linq;
+using Cinemachine;
 using UnityEngine;
 
 namespace Player
@@ -17,6 +19,8 @@ namespace Player
 
         private void UpdateCameraTarget()
         {
+            if (cameraTargetGroupTransform == null) return;
+
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(ray, out RaycastHit hitInfo, Mathf.Infinity, mouseTargetLayer))
             {
@@ -28,7 +32,6 @@ namespace Player
 
                 Vector3 offset = targetPosition - playerPosition;
 
-                // 🔹 아래쪽(-Z)에 있을 경우 최대 거리 증가
                 float dynamicMaxDistance = maxCameraDistance;
                 if (offset.z < 0)
                 {
@@ -46,25 +49,44 @@ namespace Player
 
                 Vector3 limitedTargetPosition = playerPosition + offset;
 
-                // 🔹 위치 보간 이동
+                // ✅ TargetGroup의 위치 보간 이동
                 CinemachineCameraTarget.transform.position = Vector3.Lerp(
                     CinemachineCameraTarget.transform.position,
                     limitedTargetPosition,
                     Time.deltaTime * cameraOffset
                 );
 
-                // 🔹 기울기 조정 (X축 회전)
+                // ✅ TargetGroup의 X축 회전 조절
                 float zOffset = offset.z;
-                float tiltFactor = Mathf.Clamp01(-zOffset / 10f); // -10 이하에서 최대
+                float tiltFactor = Mathf.Clamp01(-zOffset / 10f);
                 float targetTilt = Mathf.Lerp(baseTilt, maxTilt, tiltFactor);
 
-                Quaternion targetRotation = Quaternion.Euler(targetTilt, 0f, 0f); // X축만 회전
-                CinemachineCameraTarget.transform.rotation = Quaternion.Slerp(
-                    CinemachineCameraTarget.transform.rotation,
+                Quaternion targetRotation = Quaternion.Euler(targetTilt, 0f, 0f);
+                cameraTargetGroupTransform.rotation = Quaternion.Slerp(
+                    cameraTargetGroupTransform.rotation,
                     targetRotation,
                     Time.deltaTime * tiltLerpSpeed
                 );
             }
         }
+        
+        public void AddTargetToCamera(Transform target)
+        {
+            var group = FindFirstObjectByType<Cinemachine.CinemachineTargetGroup>();
+            if (group == null) return;
+
+            var targets = group.m_Targets.ToList();
+            if (targets.Any(t => t.target == target)) return;
+
+            targets.Add(new CinemachineTargetGroup.Target
+            {
+                target = target,
+                weight = 1f,
+                radius = 6f
+            });
+
+            group.m_Targets = targets.ToArray();
+        }
+
     }
 }
