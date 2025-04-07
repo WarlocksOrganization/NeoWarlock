@@ -19,7 +19,7 @@ namespace Player
         private Vector3 aimPosition;
 
         [SyncVar(hook = nameof(OnCurrentAttackChanged))]
-        [SerializeField] private int currentAttackIndex = -1;
+        private int currentAttackIndex = -1;
         private IAttack currentAttack;
 
         public IAttack[] availableAttacks = new IAttack[5];
@@ -264,22 +264,57 @@ namespace Player
         [Command(requiresAuthority = false)]
         public void CmdAttack(Vector3 target, int index, int id, int skillId)
         {
+            var serverSkillId = availableAttacks[index]?.GetAttackData()?.ID ?? -1;
+
+            if (serverSkillId != skillId)
+            {
+                Debug.LogWarning($"[CmdAttack] 서버와 클라이언트 스킬 ID 불일치! 서버: {serverSkillId}, 클라: {skillId}");
+
+                // ✅ 서버도 일치하도록 다시 생성해줌
+                var data = Database.GetAttackData(skillId);
+                if (data != null)
+                {
+                    availableAttacks[index] = CreateAttackInstance(data);
+                    Debug.Log($"[CmdAttack] 서버 스킬 재등록: index {index}, skillId {skillId}");
+                }
+            }
+
+            if (availableAttacks[index] == null)
+            {
+                Debug.LogError($"[CmdAttack] 서버에서 스킬ID {skillId} 데이터 찾을 수 없음");
+                return;
+            }
+
             Vector3 dir = (target - transform.position).normalized;
             Vector3 firePos = attackTransform.position + dir;
-            availableAttacks[index]?.Execute(target, firePos, gameObject, id, skillId, AttackPower);
+            availableAttacks[index].Execute(target, firePos, gameObject, id, skillId, AttackPower);
 
+            // 아이템 스킬 처리
             if (index == 4)
             {
-                // ✅ 사용 후 제거
                 itemSkillId = -1;
-
                 if (availableAttacks[4] is MonoBehaviour oldAttack)
-                {
-                    Destroy(oldAttack.gameObject); // 인스턴스 제거
-                }
-
+                    Destroy(oldAttack.gameObject);
                 availableAttacks[4] = null;
             }
+        }
+        
+        [Server]
+        public void ServerSetItemSkill(int skillId)
+        {
+            itemSkillId = skillId;
+            SetAvailableAttack(4, skillId);
+            Debug.Log($"[서버] id : {playerId} 아이템 스킬 설정됨 → {skillId}");
+
+            // ✅ 클라이언트에도 알려줘야 함
+            TargetSetItemSkill(connectionToClient, skillId);
+        }
+
+        [TargetRpc]
+        private void TargetSetItemSkill(NetworkConnection target, int skillId)
+        {
+            PlayerSetting.ItemSkillID = skillId;
+            Debug.Log($"[클라이언트] 아이템 스킬 ID 설정됨: {skillId}");
         }
     }
 }

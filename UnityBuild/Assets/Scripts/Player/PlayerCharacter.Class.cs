@@ -44,29 +44,33 @@ namespace Player
                 { Constants.CharacterClass.Priest, priestModel }
             };
         }
+        
+        public void SetCharacterData(Constants.CharacterClass cls, Constants.SkillType moveSkill, int[] attackSkills)
+        {
+            PLayerCharacterClass = cls;
+            MoveSkill = moveSkill;
+            AttackSkills = attackSkills;
+        }
 
         // 서버에서 동기화된 데이터를 설정
         [Command]
         public void CmdSetCharacterData(Constants.CharacterClass newClass, Constants.SkillType newMoveSkill, int[] newAttackSkills)
         {
-            if (!NetworkClient.active)
-            {
-                OnCharacterClassChanged(PLayerCharacterClass, newClass);
-                OnMoveSkillChanged(MoveSkill, newMoveSkill);
-                OnAttackSkillsChanged(AttackSkills, newAttackSkills);
-            }
+            var oldClass = PLayerCharacterClass;
+            var oldMove = MoveSkill;
+            var oldAttacks = AttackSkills;
+
             PLayerCharacterClass = newClass;
+            MoveSkill = Constants.SkillType.None;
             MoveSkill = newMoveSkill;
+
+            AttackSkills = null;
             AttackSkills = newAttackSkills;
 
-            if (NetworkClient.active)
-            {
-                buffSystem?.CmdClearAllBuffs();
-            }
-            else
-            {
-                buffSystem?.ServerClearAllBuffs();
-            }
+            // 수동 호출 보장 (SyncVar가 같은 값이면 hook 안 불러짐)
+            OnCharacterClassChanged(oldClass, newClass);
+            OnMoveSkillChanged(oldMove, newMoveSkill);
+            OnAttackSkillsChanged(oldAttacks, newAttackSkills);
         }
 
         // 캐릭터 클래스 변경 시 호출될 동기화 함수
