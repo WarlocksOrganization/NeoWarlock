@@ -16,6 +16,14 @@
         [SerializeField] private TMP_Text cardDetailText;
         [SerializeField] private Button reRollButton;
 
+        // [SerializeField] private TMP_Text scoreText;
+        [SerializeField] private TMP_Text rankText;
+        [SerializeField] private Image cardRankIcon;
+        [SerializeField] private Sprite luckyRankIcon;
+        [SerializeField] private Sprite cautionRankIcon;
+        [SerializeField] private Sprite okayRankIcon;
+        [SerializeField] private Sprite goodRankIcon;
+
         [SerializeField] private Sprite healthIcon;
         [SerializeField] private Sprite speedIcon;
         [SerializeField] private Sprite attackIcon;
@@ -34,6 +42,7 @@
         private Database.AttackData[] SkillData;
         private PlayerCardUI playerCardUI;
         private Database.AttackData aD;
+        private Database.PlayerCardData cardData;
 
         private void Awake()
         {
@@ -213,7 +222,31 @@
                     break;
             }
         }
-
+    public void SetCardScore(Database.PlayerCardData cardData, double score = 0, double rank = 0)
+    {
+        this.cardData = cardData;
+        bool isConditional = cardData.ID >= 10100 && cardData.ID < 10200;
+        if (isConditional && rank > 0.5f)
+        {
+            cardRankIcon.sprite = luckyRankIcon;
+            rankText.text = $"<color=#D500FF>{rank * 100:F0}%</color>";
+        }
+        else if (!isConditional && rank > 0.5f)
+        {
+            cardRankIcon.sprite = cautionRankIcon;
+            rankText.text = $"<color=#FFFD55>{rank * 100:F0}%</color>";
+        }
+        else if (rank >= 0.3f)
+        {
+            cardRankIcon.sprite = okayRankIcon; 
+            rankText.text = $"{rank * 100:F0}%";
+        }
+        else
+        {
+            cardRankIcon.sprite = goodRankIcon;
+            rankText.text = $"<color=#00FF28>{rank * 100:F0}%</color>";
+        }
+    }
     public IEnumerator PlayExplosionEffect(Image effectImage)
     {
         float duration = 0.4f;
@@ -318,17 +351,23 @@
         {
             return currentCard;
         }
+private void Reroll()
+    {
+        int slotIndex = Array.IndexOf(playerCardUI.slots, this);
 
-        private void Reroll()
+        var newCard = playerCardUI.TryGetNewCardAndUpdateRank(slotIndex);
+        if (newCard != null)
         {
-            if (playerCardUI.TryGetNewCard(out Database.PlayerCardData newCard))
-            {
-                AudioManager.Instance.PlaySFX(Constants.SoundType.SFX_Reroll);
-                
-                reRollButton.gameObject.SetActive(false); // 리롤 버튼 비활성화
-                StartCoroutine(CardRotation(newCard));
-            }
+            AudioManager.Instance.PlaySFX(Constants.SoundType.SFX_Reroll);
+
+            reRollButton.gameObject.SetActive(false);
+            StartCoroutine(CardRotation(newCard));
         }
+        else
+        {
+            Debug.LogWarning("[PlayerCardSlot] 리롤 실패: 교체 가능한 카드가 없습니다.");
+        }
+    }
 
         private IEnumerator CardRotation(Database.PlayerCardData newCard)
         {

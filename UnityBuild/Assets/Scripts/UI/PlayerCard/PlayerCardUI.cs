@@ -7,6 +7,7 @@ using System.Linq;
 using DataSystem;
 using DataSystem.Database;
 using GameManagement;
+using GameManagement.Data;
 using Mirror;
 using Player;
 using TMPro;
@@ -40,6 +41,12 @@ public class PlayerCardUI : MonoBehaviour
         hasAppliedCards = false; // ✅ 초기화
         
         LoadingImage.SetActive(true);
+        if (MatrixManager.Instance == null)
+        {
+            Debug.LogError("[PlayerCardUI] MatrixManager 인스턴스가 존재하지 않습니다. 씬에 MatrixManager가 포함되어 있는지 확인하세요.");
+            return;
+        }
+        MatrixManager.Instance.LoadMatrixFromResources();
         LoadRandomPlayerCards();
         DisplayTopThreeCards();
         
@@ -101,16 +108,67 @@ public class PlayerCardUI : MonoBehaviour
 
     private void DisplayTopThreeCards()
     {
-        for (int i = 0; i < slots.Length; i++)
+
+        // var resultMap = EvaluateCurrentSlots();
+        // RenderSlotScores(resultMap);
+        var selectedCards = selectedCardsQueue.ToList();
+        var openCardIDs = selectedCards.Take(3).Select(card => card.ID).ToList();
+        var mergedCardIDs = PlayerSetting.PlayerCards.Select(card => card.ID).ToList();
+
+        var evaluator = new CardEvaluator();
+        var matrix = MatrixManager.Instance.GetMatrix((int)PlayerSetting.PlayerCharacterClass);
+        if (matrix == null)
         {
-            if (selectedCardsQueue.Count > 0)
+            Debug.LogError("[PlayerCardUI] 매트릭스 데이터가 로드되지 않았습니다.");
+            return;
+        }
+
+        var results = evaluator.CardOpen(
+            mergedCardIDs,
+            openCardIDs,
+            new List<MatrixDocument> { matrix },
+            (int)PlayerSetting.PlayerCharacterClass
+            );
+        for (int i = 0; i < slots.Length; i++)
             {
-                Database.PlayerCardData card = selectedCardsQueue.Dequeue();
+                if (selectedCardsQueue.Count > 0)
+                {
+                var card = selectedCardsQueue.Dequeue();
+                double[] scoreRank = results.ContainsKey(card.ID) ? results[card.ID] : new double[] { 0, 0 };
                 slots[i].SetCardData(card);
-            }
+                slots[i].SetCardScore(card, scoreRank[0], scoreRank[1]);
+                }
         }
     }
+public Database.PlayerCardData TryGetNewCardAndUpdateRank(int slotIndex)
+    {
+        if (!TryGetNewCard(out var newCard)) return null;
 
+        var openCardIDs = new List<int> { newCard.ID };
+        var mergedCardIDs = PlayerSetting.PlayerCards.Select(card => card.ID).ToList();
+
+        var matrix = MatrixManager.Instance.GetMatrix((int)PlayerSetting.PlayerCharacterClass);
+        if (matrix == null)
+        {
+            Debug.LogError("[PlayerCardUI] 매트릭스 데이터가 로드되지 않았습니다.");
+            return null;
+        }
+
+        var evaluator = new CardEvaluator();
+        var results = evaluator.CardOpen(
+            mergedCardIDs,
+            openCardIDs,
+            new List<MatrixDocument> { matrix },
+            (int)PlayerSetting.PlayerCharacterClass
+        );
+
+        double[] scoreRank = results.ContainsKey(newCard.ID) ? results[newCard.ID] : new double[] { 0, 0 };
+
+        slots[slotIndex].SetCardData(newCard);
+        slots[slotIndex].SetCardScore(newCard, scoreRank[0], scoreRank[1]);
+
+        return newCard;
+    }
     public bool TryGetNewCard(out Database.PlayerCardData newCard)
     {
         while (selectedCardsQueue.Count > 0)
