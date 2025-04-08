@@ -188,10 +188,11 @@ namespace Networking
                 Debug.LogWarning("[RoomManager] roomDataInstance가 null입니다. 방 데이터를 설정할 수 없습니다.");
                 return;
             }
+            Constants.RoomType roomType = data["roomType"] == "Team" ? Constants.RoomType.Team : Constants.RoomType.Solo;
             int maxPlayerCount = int.TryParse(data["maxPlayerCount"], out maxPlayerCount) ? maxPlayerCount : 6;
             int gId = int.TryParse(data["gameId"], out gId) ? gId : 0;
             int rId = int.TryParse(data["roomId"], out rId) ? rId : 0;
-            roomDataInstance.SetRoomData(data["roomName"], Constants.RoomType.Solo, maxPlayerCount, gId, rId);
+            roomDataInstance.SetRoomData(data["roomName"], roomType, maxPlayerCount, gId, rId);
         }
         
         public int GetMapId()
