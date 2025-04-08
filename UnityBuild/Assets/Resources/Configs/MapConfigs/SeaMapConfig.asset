@@ -14,5 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mapType: 4
   mapName: "\uBC14\uB2E4"
+  mapSprite: {fileID: 21300000, guid: 9cd13430dbb619146a3beccd96d45ed7, type: 3}
   bgmType: 1110
   skyboxMaterial: {fileID: 2100000, guid: 2039a0ad0a9d05549928b70362f54902, type: 2}

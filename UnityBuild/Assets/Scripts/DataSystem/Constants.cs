@@ -42,6 +42,7 @@ namespace DataSystem
         {
             Solo = 0,
             Team = 1,
+            Raid = 2,
         }
         
         public enum TeamType
@@ -169,6 +170,7 @@ namespace DataSystem
             ItemBomb = 1011,
             
             DragonBlade = 2001,
+            DragonWind = 2002,
             
             None = 100,
         }
@@ -213,6 +215,10 @@ namespace DataSystem
             
             SFX_GhostAttack = 2300,
             SFX_PlayerDead = 2301,
+            
+            SFX_DragonRoar = 2400,
+            SFX_DragonFire = 2401,
+            SFX_DragonWing = 2402,
         }
         
         [System.Serializable]

@@ -44,6 +44,8 @@ public partial class DragonAI
 
     private IEnumerator PerformAttack()
     {
+        RotateTowardsTarget(); 
+        
         isAttacking = true;
 
         animator.SetBool("isMoving", false);
@@ -59,12 +61,16 @@ public partial class DragonAI
             {
                 FireRandomProjectile();
             }
+            RpcPlaySound(Constants.SkillType.PowerSlash);
 
             yield return new WaitForSeconds(1.5f); // 4초까지 대기
+            RotateTowardsTarget(); 
+            
             for (int i = 0; i < 5; i++)
             {
                 FireRandomProjectile();
             }
+            RpcPlaySound(Constants.SkillType.PowerSlash);
 
             float remainTime = selectedAttack.attackDuration - 4f;
             if (remainTime > 0)
@@ -72,11 +78,35 @@ public partial class DragonAI
         }
         else if (selectedAttack.attackName == "메테오공격")
         {
-            yield return new WaitForSeconds(2.5f);
+            yield return new WaitForSeconds(1.5f);
             GameSyatemDragonManager gameSyatemDragonManager = GameSystemManager.Instance as GameSyatemDragonManager;
             gameSyatemDragonManager?.MeteorAttack(transform.position);
+            RpcPlaySound(Constants.SoundType.SFX_DragonRoar);
 
-            float remainTime = selectedAttack.attackDuration - 2.5f;
+            float remainTime = selectedAttack.attackDuration - 1.5f;
+            if (remainTime > 0)
+                yield return new WaitForSeconds(remainTime);
+        }
+        else if (selectedAttack.attackName == "바람공격")
+        {
+            yield return new WaitForSeconds(2f);
+
+            RpcPlaySound(Constants.SoundType.SFX_DragonRoar);
+            
+            FireProjectilesIn8Directions(); // ✅ 8방향 발사
+            RpcPlaySound(Constants.SkillType.Slash); // 원하시는 효과음으로 교체 가능
+
+            float remainTime = selectedAttack.attackDuration - 2f;
+            if (remainTime > 0)
+                yield return new WaitForSeconds(remainTime);
+        }
+
+        else if (selectedAttack.attackName == "불공격")
+        {
+            yield return new WaitForSeconds(1.5f);
+            RpcPlaySound(Constants.SkillType.Fire);
+
+            float remainTime = selectedAttack.attackDuration - 1.5f;
             if (remainTime > 0)
                 yield return new WaitForSeconds(remainTime);
         }
@@ -91,13 +121,13 @@ public partial class DragonAI
         totalAttackCounter++;
         flyAttackCounter++;
 
-        if (totalAttackCounter >= 5)
+        if (totalAttackCounter >= 8)
         {
             totalAttackCounter = 0;
             flyAttackCounter = 0;
             StartCoroutine(FlyAndAttack2Sequence()); // ✅ Fly2 공격 우선 실행
         }
-        else if (flyAttackCounter >= 3)
+        else if (flyAttackCounter >= 5)
         {
             flyAttackCounter = 0;
             StartCoroutine(FlyAndAttackSequence()); // ✅ Fly 공격
@@ -110,7 +140,9 @@ public partial class DragonAI
         animator.SetTrigger("isFly");
         RpcPlayAnimation("isFly");
 
-        SetInvincible(true);
+        SetCollider(false);
+        
+        RpcPlaySound(Constants.SoundType.SFX_DragonWing);
 
         yield return new WaitForSeconds(2f);
 
@@ -132,7 +164,7 @@ public partial class DragonAI
         animator.SetTrigger("isFly");
         RpcPlayAnimation("isFly");
 
-        SetInvincible(true);
+        SetCollider(false);
 
         yield return new WaitForSeconds(2f);
 
@@ -182,6 +214,42 @@ public partial class DragonAI
         }
 
         NetworkServer.Spawn(projectile);
+    }
+    
+    [Server]
+    private void FireProjectilesIn8Directions()
+    {
+        Transform firePoint = firePoints[0]; // 기준 발사 위치
+        GameObject prefab = projectilePrefabs[0];
+
+        for (int i = 0; i < 8; i++)
+        {
+            float angle = i * 45f; // 360 / 8 = 45도씩
+            Quaternion rotation = Quaternion.Euler(0f, angle, 0f);
+            Vector3 dir = rotation * Vector3.forward;
+
+            GameObject projectile = Instantiate(prefab, firePoint.position, Quaternion.LookRotation(dir));
+
+            AttackProjectile projComponent = projectile.GetComponent<AttackProjectile>();
+            if (projComponent != null)
+            {
+                float lifetime = 10f;
+
+                projComponent.SetProjectileData(
+                    selectedAttack.damage,
+                    selectedAttack.speed,
+                    selectedAttack.radius,
+                    selectedAttack.range,
+                    lifetime,
+                    selectedAttack.knockback,
+                    selectedAttack.config,
+                    gameObject,
+                    -1, -1
+                );
+            }
+
+            NetworkServer.Spawn(projectile);
+        }
     }
 
     private void RotateTowardsTarget()

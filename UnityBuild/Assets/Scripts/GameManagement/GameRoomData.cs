@@ -216,6 +216,12 @@ namespace GameManagement
             SpawnGamePlayObjects();      // 맵 오브젝트 미리 생성
             RespawnAllPlayers();         // 미리 부활
         }
+        
+        [Server]
+        public void SetRoomType(Constants.RoomType newType)
+        {
+            roomType = newType;
+        }
 
     }
 }

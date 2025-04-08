@@ -182,7 +182,7 @@ public class GameSyatemDragonManager : GameSystemManager
         // 5초 간격으로 3회 낙하 공격
         for (int i = 0; i < 6; i++)
         {
-            int attackCount = Random.Range(5, 10);
+            int attackCount = Random.Range(10, 15);
             StartCoroutine(SpawnFallingAttacks(attackCount, Vector3.zero));
             yield return new WaitForSeconds(5f);
         }
@@ -197,7 +197,7 @@ public class GameSyatemDragonManager : GameSystemManager
     [ClientRpc]
     private void StartFlyingDragon(Vector3 dir)
     {
-        AudioManager.Instance.PlaySFX(Constants.SoundType.SFX_FlyingDragon, FlyingDragonSoundObject);
+        AudioManager.Instance.PlaySFX(Constants.SoundType.SFX_DragonFire, FlyingDragonSoundObject);
         FlyingDragon.transform.rotation = Quaternion.LookRotation(dir);
         FlyingDragon.GetComponent<Animator>().SetTrigger("isFlyAttack");
     }
@@ -205,6 +205,7 @@ public class GameSyatemDragonManager : GameSystemManager
     [ClientRpc]
     private void StartFlyAttack2()
     {
+        AudioManager.Instance.PlaySFX(Constants.SoundType.SFX_DragonRoar);
         FlyingDragon.GetComponent<Animator>().SetTrigger("isFlyAttack2");
     }
 }

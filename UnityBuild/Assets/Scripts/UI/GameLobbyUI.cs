@@ -228,10 +228,10 @@ public class GameLobbyUI : MonoBehaviour
     public virtual void UpdateMapUI(Constants.RoomMapType type)
     {
         var config = Database.GetMapConfig(type);
-        if (config == null) return;
 
-        MapImage.sprite = config.mapSprite; // 또는 따로 image 설정
-        MapName.text = config.mapName;
+        Debug.Log(config?.mapName);
+        MapImage.sprite = config?.mapSprite; // 또는 따로 image 설정
+        MapName.text = config?.mapName;
     }
     
     private void OnClickChangeTeam()
