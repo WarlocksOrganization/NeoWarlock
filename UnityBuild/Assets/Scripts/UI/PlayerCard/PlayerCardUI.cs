@@ -134,24 +134,70 @@ public class PlayerCardUI : MonoBehaviour
                 if (selectedCardsQueue.Count > 0)
                 {
                 var card = selectedCardsQueue.Dequeue();
-                double[] scoreRank = results.ContainsKey(card.ID) ? results[card.ID] : new double[] { 0, 0 };
                 slots[i].SetCardData(card);
-                slots[i].SetCardScore(card, scoreRank[0], scoreRank[1]);
+                if (results.TryGetValue(card.ID, out var scoreRank))
+                {
+                    slots[i].SetCardScore(card, scoreRank[0], scoreRank[1]);
                 }
+            }
         }
     }
-public Database.PlayerCardData TryGetNewCardAndUpdateRank(int slotIndex)
+    // public Database.PlayerCardData TryGetNewCardAndUpdateRank(int slotIndex)
+    // {
+    //     if (!TryGetNewCard(out var newCard)) return null;
+
+    //     // 🎯 현재 슬롯들에서 slotIndex를 제외한 카드들의 ID 수집
+    //     var otherCardIDs = slots
+    //         .Where((slot, idx) => idx != slotIndex)
+    //         .Select(slot => slot.GetCurrentCard()?.ID ?? -1) // null 방지
+    //         .Where(id => id >= 0)
+    //         .ToList();
+
+    //     var openCardIDs = otherCardIDs.Append(newCard.ID).ToList();
+    //     var mergedCardIDs = PlayerSetting.PlayerCards.Select(card => card.ID).ToList();
+
+    //     var matrix = MatrixManager.Instance.GetMatrix((int)PlayerSetting.PlayerCharacterClass);
+    //     if (matrix == null)
+    //     {
+    //         Debug.LogError("[PlayerCardUI] 매트릭스 데이터가 로드되지 않았습니다.");
+    //         return null;
+    //     }
+
+    //     var evaluator = new CardEvaluator();
+    //     var results = evaluator.CardOpen(
+    //         mergedCardIDs,
+    //         openCardIDs,
+    //         new List<MatrixDocument> { matrix },
+    //         (int)PlayerSetting.PlayerCharacterClass
+    //     );
+
+    //     for (int i = 0; i < slots.Length; i++)
+    //     {
+    //         var card = slots[i].GetCurrentCard();
+    //         if (card == null) continue;
+
+    //         if (results.TryGetValue(card.ID, out var scoreRank))
+    //         {
+    //             slots[i].SetCardScore(card, scoreRank[0], scoreRank[1]);
+    //         }
+    //     }
+
+    //     return newCard;
+    // }
+
+    public void RecalculateAllRanks()
     {
-        if (!TryGetNewCard(out var newCard)) return null;
+        var openCardIDs = slots
+            .Select(slot => slot.GetCurrentCard()?.ID ?? -1)
+            .Where(id => id >= 0)
+            .ToList();
 
-        var openCardIDs = new List<int> { newCard.ID };
         var mergedCardIDs = PlayerSetting.PlayerCards.Select(card => card.ID).ToList();
-
         var matrix = MatrixManager.Instance.GetMatrix((int)PlayerSetting.PlayerCharacterClass);
         if (matrix == null)
         {
-            Debug.LogError("[PlayerCardUI] 매트릭스 데이터가 로드되지 않았습니다.");
-            return null;
+            Debug.LogError("[PlayerCardUI] 매트릭스 데이터가 없습니다.");
+            return;
         }
 
         var evaluator = new CardEvaluator();
@@ -162,13 +208,18 @@ public Database.PlayerCardData TryGetNewCardAndUpdateRank(int slotIndex)
             (int)PlayerSetting.PlayerCharacterClass
         );
 
-        double[] scoreRank = results.ContainsKey(newCard.ID) ? results[newCard.ID] : new double[] { 0, 0 };
+        foreach (var slot in slots)
+        {
+            var card = slot.GetCurrentCard();
+            if (card == null) continue;
 
-        slots[slotIndex].SetCardData(newCard);
-        slots[slotIndex].SetCardScore(newCard, scoreRank[0], scoreRank[1]);
-
-        return newCard;
+            if (results.TryGetValue(card.ID, out var scoreRank))
+            {
+                slot.SetCardScore(card, scoreRank[0], scoreRank[1]);
+            }
+        }
     }
+
     public bool TryGetNewCard(out Database.PlayerCardData newCard)
     {
         while (selectedCardsQueue.Count > 0)

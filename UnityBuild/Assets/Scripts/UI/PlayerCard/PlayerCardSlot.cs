@@ -226,25 +226,25 @@
     {
         this.cardData = cardData;
         bool isConditional = cardData.ID >= 10100 && cardData.ID < 10200;
-        if (isConditional && rank > 0.5f)
+        if (isConditional && rank >= 0.3f)
         {
             cardRankIcon.sprite = luckyRankIcon;
-            rankText.text = $"<color=#D500FF>{rank * 100:F0}%</color>";
+            rankText.text = $"<color=#D500FF>{rank * 10:등급}%</color>";
         }
-        else if (!isConditional && rank > 0.5f)
-        {
-            cardRankIcon.sprite = cautionRankIcon;
-            rankText.text = $"<color=#FFFD55>{rank * 100:F0}%</color>";
-        }
+        // else if (!isConditional && rank > 0.5f)
+        // {
+        //     cardRankIcon.sprite = cautionRankIcon;
+        //     rankText.text = $"<color=#FFFD55>{rank * 10:F0}등급</color>";
+        // }
         else if (rank >= 0.3f)
         {
             cardRankIcon.sprite = okayRankIcon; 
-            rankText.text = $"{rank * 100:F0}%";
+            rankText.text = $"{rank * 10:F0}등급";
         }
         else
         {
             cardRankIcon.sprite = goodRankIcon;
-            rankText.text = $"<color=#00FF28>{rank * 100:F0}%</color>";
+            rankText.text = $"<color=#00FF28>{rank * 10:F0}등급</color>";
         }
     }
     public IEnumerator PlayExplosionEffect(Image effectImage)
@@ -351,23 +351,34 @@
         {
             return currentCard;
         }
-private void Reroll()
-    {
-        int slotIndex = Array.IndexOf(playerCardUI.slots, this);
+// private void Reroll()
+//     {
+//         int slotIndex = Array.IndexOf(playerCardUI.slots, this);
 
-        var newCard = playerCardUI.TryGetNewCardAndUpdateRank(slotIndex);
-        if (newCard != null)
+//         var newCard = playerCardUI.TryGetNewCardAndUpdateRank(slotIndex);
+//         if (newCard != null)
+//         {
+//             AudioManager.Instance.PlaySFX(Constants.SoundType.SFX_Reroll);
+
+//             reRollButton.gameObject.SetActive(false);
+//             StartCoroutine(CardRotation(newCard));
+//         }
+//         else
+//         {
+//             Debug.LogWarning("[PlayerCardSlot] 리롤 실패: 교체 가능한 카드가 없습니다.");
+//         }
+//     }
+
+        private void Reroll()
         {
+            if (playerCardUI.TryGetNewCard(out var newCard))
+            {           
             AudioManager.Instance.PlaySFX(Constants.SoundType.SFX_Reroll);
-
             reRollButton.gameObject.SetActive(false);
             StartCoroutine(CardRotation(newCard));
+            }
         }
-        else
-        {
-            Debug.LogWarning("[PlayerCardSlot] 리롤 실패: 교체 가능한 카드가 없습니다.");
-        }
-    }
+
 
         private IEnumerator CardRotation(Database.PlayerCardData newCard)
         {
@@ -393,7 +404,8 @@ private void Reroll()
             transform.rotation = midRot;
             SetCardData(newCard); // 카드 교체
             yield return new WaitForSeconds(0.05f); // 자연스러운 텀
-
+            playerCardUI.RecalculateAllRanks();
+            
             // ▶ 2단계: 여러 바퀴 돌면서 정면으로 정착
             float spinAngle = 360f * 3; // 3바퀴
             elapsed = 0f;
