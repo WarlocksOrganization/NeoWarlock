@@ -64,15 +64,16 @@ public class NicknameUI : MonoBehaviour
     public void SyncLocalNickname()
     {
         string _nicknameText = _nicknameInputField.GetComponent<TMP_InputField>().text.Trim();
-        PlayerPrefs.SetString("nickName", _nicknameText);
+        // PlayerPrefs.SetString("nickName", _nicknameText);
+        Networking.SocketManager.singleton.nickName = _nicknameText;
     }
 
     public void SyncNicknameShower()
     {
         // 로컬 닉네임 동기화
-        if (PlayerPrefs.HasKey("nickName"))
+        if (Networking.SocketManager.singleton != null)
         {
-            PlayerSetting.Nickname = PlayerPrefs.GetString("nickName");
+            PlayerSetting.Nickname = Networking.SocketManager.singleton.nickName;
         }
         _nickNameShowText.GetComponent<TextMeshProUGUI>().text = PlayerSetting.Nickname;
         TurnOffNicknameUI();

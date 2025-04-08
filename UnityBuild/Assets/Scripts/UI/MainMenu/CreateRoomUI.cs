@@ -84,7 +84,7 @@ namespace UI
             var manager = RoomManager.singleton as RoomManager;
             string roomTypeTrail = roomData.roomType == Constants.RoomType.Team ? "$" : string.Empty;
 
-            if (PlayerPrefs.HasKey("sessionToken"))
+            if (Networking.SocketManager.singleton.IsSessionValid())
             {
                 // 로그인 상태에서 방 생성
                 Networking.SocketManager.singleton.RequestCreateRoom(roomData.roomName + roomTypeTrail, roomData.maxPlayerCount);

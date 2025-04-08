@@ -79,7 +79,7 @@ namespace UI
         public void OnClickEnterGameRoomButton()
         {
             AudioManager.Instance.PlaySFX(Constants.SoundType.SFX_Button);
-            if (PlayerPrefs.HasKey("sessionToken"))
+            if (Networking.SocketManager.singleton.IsSessionValid())
             {
                 findRoomUIComponent.TurnOnFindRoomUI();
             }

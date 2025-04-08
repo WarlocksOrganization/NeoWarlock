@@ -15838,9 +15838,21 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 11500000, guid: 97dac0f9a0f2fd649b6a0245c8f39a97, type: 3}
-        m_TargetAssemblyTypeName: UnityEngine.Object, UnityEngine
-        m_MethodName: 
+      - m_Target: {fileID: 1354562372}
+        m_TargetAssemblyTypeName: ButtonDisabler, Assembly-CSharp
+        m_MethodName: ButtonDisable
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 792171835}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Button, UnityEngine.UI
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1281179375}
+        m_TargetAssemblyTypeName: FindRoomUI, Assembly-CSharp
+        m_MethodName: TurnOnFindRoomUI
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -20722,6 +20734,8 @@ MonoBehaviour:
   socketServerPort: 8082
   bufferSize: 8192
   maxRetries: 5
+  nickName: 
+  userId: 
 --- !u!4 &1082126109
 Transform:
   m_ObjectHideFlags: 0
