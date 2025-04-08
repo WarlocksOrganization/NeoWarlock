@@ -48,9 +48,10 @@ public class FindRoomUI : MonoBehaviour
         {
             GameObject roomContainer = Instantiate(_roomContainerPrefab, _contentParent.transform);
             int roomId = int.TryParse(room.SelectToken("roomId").ToString(), out int result) ? result : 0;
+            string roomName = room.SelectToken("roomName").ToString();
             roomContainer.transform.Find("RoomId").GetComponent<TextMeshProUGUI>().text = roomId.ToString();
-            roomContainer.transform.Find("RoomType").GetComponent<TextMeshProUGUI>().text = "개인전";
-            roomContainer.transform.Find("RoomName").GetComponent<TextMeshProUGUI>().text = room.SelectToken("roomName").ToString();
+            roomContainer.transform.Find("RoomType").GetComponent<TextMeshProUGUI>().text = roomName.EndsWith("$") ? "팀전" : "개인전";
+            roomContainer.transform.Find("RoomName").GetComponent<TextMeshProUGUI>().text = roomName.TrimEnd('$');
             roomContainer.transform.Find("RoomCount").GetComponent<TextMeshProUGUI>().text = room.SelectToken("currentPlayers").ToString() + " / " + room.SelectToken("maxPlayers").ToString();
             _roomPortDict[roomId] = room.SelectToken("port").ToObject<ushort>();
             Button roomButton = roomContainer.GetComponentInChildren<Button>();

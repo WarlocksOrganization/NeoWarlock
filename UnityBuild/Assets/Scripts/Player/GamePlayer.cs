@@ -118,36 +118,28 @@ namespace Player
             var scoreBoardUIui = FindFirstObjectByType<ScoreBoardUI>();
             if (scoreBoardUIui != null)
                 scoreBoardUIui.gameObject.SetActive(false);
-
-            var ui = FindFirstObjectByType<PlayerCardUI>();
-            if (ui != null)
-                ui.gameObject.SetActive(true);
-
-            if (isOwned)
-            {
-                CmdStartCardSelectionPhase();
-            }
-        }
-        
-        [Command]
-        public void CmdStartCardSelectionPhase()
-        {
-            StartCoroutine(CardSelectionTimer()); // ✅ 서버에서 실행
+            
+            playerCardUI?.gameObject.SetActive(true);
         }
 
-        private IEnumerator WaitForAllPlayersThenStartCardSelection()
+        public IEnumerator WaitForAllPlayersThenStartCardSelection()
         {
             yield return new WaitUntil(() => NetworkServer.connections.Count >= NetworkRoomManager.singleton.numPlayers);
             yield return new WaitUntil(() => FindObjectsByType<LobbyPlayerCharacter>(sortMode: FindObjectsSortMode.None).Length >= NetworkRoomManager.singleton.numPlayers);
             yield return new WaitForSeconds(0.5f);
-            
+
             if (isServer)
             {
                 // ✅ 첫 라운드 시작 전에도 맵 오브젝트 생성
                 FindFirstObjectByType<GameRoomData>()?.SpawnGamePlayObjects();
+
+                // ✅ 서버에서 단 한 번만 타이머 실행
+                if (GameManager.Instance.isCardSelectionStarted == false)
+                {
+                    GameManager.Instance.isCardSelectionStarted = true;
+                    StartCoroutine(CardSelectionTimer());
+                }
             }
-            
-            StartCoroutine(CardSelectionTimer());
         }
 
         private IEnumerator CardSelectionTimer()
@@ -207,19 +199,38 @@ namespace Player
                 return;
             }
 
-            playerCharacter.CmdSetCharacterData(
+            int[] selectedCardIds = PlayerSetting.PlayerCards.Select(card => card.ID).ToArray();
+            CmdSetCharacterDataOnServer(
                 PlayerSetting.PlayerCharacterClass,
                 PlayerSetting.MoveSkill,
-                PlayerSetting.AttackSkillIDs
+                PlayerSetting.AttackSkillIDs,
+                PlayerSetting.TeamType,
+                selectedCardIds
             );
             
-            playerCharacter.CmdSetTeam(PlayerSetting.TeamType);
-            
             StartCoroutine(DelayedStatSetup());
-            int[] selectedCardIds = PlayerSetting.PlayerCards.Select(card => card.ID).ToArray();
             CmdSetPlayerCards(UserId, selectedCardIds);
             CmdMarkPlayerReady(selectedCardIds);
         }
+        
+        [Command]
+        public void CmdSetCharacterDataOnServer(Constants.CharacterClass cls, Constants.SkillType moveSkill, int[] attackSkills, Constants.TeamType team, int[] cardIDs)
+        {
+            var target = FindObjectsByType<LobbyPlayerCharacter>(FindObjectsSortMode.None)
+                .FirstOrDefault(pc => pc.connectionToClient == connectionToClient);
+
+            if (target == null)
+            {
+                Debug.LogWarning("[CmdSetCharacterDataOnServer] 해당 connection의 캐릭터를 찾을 수 없습니다.");
+                return;
+            }
+
+            target.SetCharacterData(cls, moveSkill, attackSkills);
+            target.team = team;
+
+            Debug.Log($"[CmdSetCharacterDataOnServer] 캐릭터 설정 완료: {cls}, {moveSkill}, {string.Join(",", attackSkills)}");
+        }
+
 
         private IEnumerator DelayedStatSetup()
         {
@@ -233,26 +244,19 @@ namespace Player
         [Command]
         public void CmdSetPlayerCards(string userId, int[] selectedCardIds)
         {
-            if (string.IsNullOrEmpty(userId))
-            {
-                Debug.LogError("[CmdSetPlayerCards] userId가 null이거나 빈 문자열입니다.");
-                return;
-            }
+            if (string.IsNullOrEmpty(userId)) return;
 
-            var gameManager = GameManagement.GameManager.Instance;
-            if (gameManager == null)
-            {
-                Debug.LogError("[GamePlayer] GameManager is null.");
-                return;
-            }
-
-            gameManager.SetPlayerCards(userId, selectedCardIds);
+            GameManager.Instance.SetPlayerCards(userId, selectedCardIds);
         }
 
         [Command]
         public void CmdMarkPlayerReady(int[] selectedCardIds)
         {
             if (playerCharacter == null) return;
+
+            // ✅ 서버에서도 카드 강화 적용
+            var cardList = selectedCardIds.Select(id => Database.GetPlayerCardData(id)).ToList();
+            playerCharacter.ApplyCardBonuses(cardList);
 
             playerCharacter.State = Constants.PlayerState.Ready;
 
@@ -274,7 +278,19 @@ namespace Player
         public void RpcGameStart()
         {
             if (isOwned)
-                FindFirstObjectByType<GamePlayUI>()?.CallGameStart();
+            {
+                StartCoroutine(EnsureCharacterSetupThenStart());
+            }
+        }
+        
+        private IEnumerator EnsureCharacterSetupThenStart()
+        {
+            yield return new WaitUntil(() =>
+                playerCharacter != null &&
+                playerCharacter.PLayerCharacterClass != Constants.CharacterClass.None);
+
+            FindFirstObjectByType<GamePlayUI>()?.CallGameStart();
+            FindFirstObjectByType<GamePlayUI>()?.ShowCards(PlayerSetting.PlayerCards);
         }
 
         public void CheckGameOver()
@@ -283,21 +299,11 @@ namespace Player
             Debug.Log("CheckGameOver");
             GameManager.Instance.TryCheckGameOver(); // ✅ 이제 여기서만 실행
         }
-
-
-        [ClientRpc]
-        public void RpcUpdateRound(int round)
-        {
-            GameManager.Instance.currentRound = round;
-        }
+        
         
         void OnDestroy()
         {
             StopAllCoroutines(); // or Stop specific coroutine
-            if (playerCharacter != null)
-            {
-                NetworkServer.Destroy(playerCharacter.gameObject);
-            }
         }
         
         [ClientRpc]

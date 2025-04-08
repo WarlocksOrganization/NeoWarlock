@@ -56,14 +56,20 @@ namespace Player
 
         public void SetMovementSkill(Constants.SkillType skillType)
         {
+            Debug.Log(skillType);
             movementSkill = Database.GetMovementSkillData(skillType);
+            Debug.Log(movementSkill);
             playerUI?.SetQuickSlotData(0, movementSkill.skillIcon, movementSkill.cooldown, movementSkill.skillName, movementSkill.Description);
         }
 
         [Command]
         private void CmdUseMovementSkill(Vector3 targetPosition)
         {
-            if (movementSkill == null) return;
+            //Debug.Log(movementSkill);
+            if (movementSkill == null)
+            {
+                movementSkill = Database.GetMovementSkillData(MoveSkill);
+            }
 
             playerModel.transform.rotation = Quaternion.LookRotation((targetPosition - transform.position).normalized);
             RpcPlaySkillEffect(movementSkill.skillType);
@@ -72,6 +78,8 @@ namespace Player
 
         private IEnumerator CastAndMove(Vector3 targetPosition, float castTime)
         {
+            //Debug.Log(castTime);
+            
             yield return new WaitForSeconds(castTime);
             RpcUseMovementSkill(targetPosition, movementSkill.moveDuration, movementSkill.endTime);
         }
@@ -80,10 +88,13 @@ namespace Player
         private void RpcUseMovementSkill(Vector3 targetPosition, float moveDuration, float endLag)
         {
             StartCoroutine(MovementSkillRoutine(targetPosition, moveDuration, endLag));
+            //Debug.Log("RpcUseMovementSkill");
         }
 
         private IEnumerator MovementSkillRoutine(Vector3 targetPosition, float moveDuration, float endLag)
         {
+            //Debug.Log("MovementSkillRoutine1");
+            
             canMove = false;
             _characterController.enabled = false;
 
@@ -96,6 +107,8 @@ namespace Player
                 transform.position = Vector3.Lerp(startPosition, targetPosition, elapsed / moveDuration);
                 yield return null;
             }
+
+            //Debug.Log("MovementSkillRoutine2");
 
             transform.position = targetPosition;
 

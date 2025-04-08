@@ -3,7 +3,7 @@ using UnityEngine;
 using Player;
 using System.Collections.Generic;
 using DataSystem;
-using DataSystem.Database; // ← DisplayName 가져오기 위해 필요
+using DataSystem.Database;
 
 public class SkillItemPickup : NetworkBehaviour
 {
@@ -14,21 +14,25 @@ public class SkillItemPickup : NetworkBehaviour
         if (!isServer) return;
 
         var player = other.GetComponent<PlayerCharacter>();
-        if (player == null) return;
-
-        int[] skillIds = { 1001, 1002, 1003, 1004, 1005 };
-        int randomSkillId = skillIds[Random.Range(0, skillIds.Length)];
-
-        player.itemSkillId = randomSkillId;
-
-        // 🔹 DisplayName 표시
-        var skillData = Database.GetAttackData(randomSkillId);
-        if (skillData != null)
+        // SkillItemPickup.cs
+        if (player != null)
         {
-            RpcShowFloatingText(player.netIdentity, skillData.DisplayName);
-        }
+            int[] skillIds = { 1001, 1002, 1003, 1004, 1005 };
+            int randomSkillId = skillIds[Random.Range(0, skillIds.Length)];
 
-        NetworkServer.Destroy(gameObject);
+            // ❌ 잘못된 방법: player.CmdSetItemSkill(randomSkillId); ← 클라 없으니까 에러
+            // ✅ 올바른 방법:
+            player.ServerSetItemSkill(randomSkillId);
+
+            // 보여주기용 텍스트는 그대로
+            var skillData = Database.GetAttackData(randomSkillId);
+            if (skillData != null)
+            {
+                RpcShowFloatingText(player.netIdentity, skillData.DisplayName);
+            }
+
+            NetworkServer.Destroy(gameObject);
+        }
     }
 
     [ClientRpc]

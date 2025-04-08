@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using DataSystem;
+using DataSystem.Database;
 using GameManagement;
 using Mirror;
 using Player;
@@ -19,6 +21,10 @@ public class GamePlayUI : GameLobbyUI
 
     private int survivePlayers = -1;
     private Constants.GameState gameState = Constants.GameState.NotStarted;
+    
+    [SerializeField] private Transform cardSlotParent; // HorizontalLayoutGroup 붙은 곳
+    [SerializeField] private CardSlot cardSlotPrefab;
+    private readonly List<CardSlot> activeCardSlots = new();
 
     private void Start()
     {
@@ -201,5 +207,20 @@ public class GamePlayUI : GameLobbyUI
         gameState = Constants.GameState.NotStarted;
 
         onComplete?.Invoke(); // ✅ 완료 콜백
+    }
+    
+    public void ShowCards(List<Database.PlayerCardData> cards)
+    {
+        // 기존 카드 제거
+        foreach (var slot in activeCardSlots)
+            Destroy(slot.gameObject);
+        activeCardSlots.Clear();
+
+        foreach (var card in cards)
+        {
+            var slot = Instantiate(cardSlotPrefab, cardSlotParent);
+            slot.Init(card);
+            activeCardSlots.Add(slot);
+        }
     }
 }

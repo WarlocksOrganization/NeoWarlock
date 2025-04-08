@@ -237,20 +237,35 @@ public class BuffSystem : NetworkBehaviour
     public void CmdClearAllBuffs()
     {
         if (!isServer) return;
-        RpcClearAllBuffs();
+        
+        RpcClearAllBuffEffects();
+        RpcClearAllBuffUI();
     }
 
     public void ServerClearAllBuffs()
     {
-        if (isServer)
-            RpcClearAllBuffs();
+        if (!isServer) return;
+
+        // 실제 제거 로직
+        ClearAllBuffs();
+
+        // 클라이언트에 이펙트 종료 + UI 제거 명령
+        RpcClearAllBuffEffects();
+        RpcClearAllBuffUI();
+    }
+    
+    [ClientRpc]
+    private void RpcClearAllBuffEffects()
+    {
+        foreach (var buffName in activeBuffValues.Keys)
+        {
+            if (Database.buffDictionary.TryGetValue(buffName, out var buffData))
+            {
+                RpcPlayBuffEffect(buffData.BuffType, false);
+            }
+        }
     }
 
-    [ClientRpc]
-    private void RpcClearAllBuffs()
-    {
-        ClearAllBuffs();
-    }
 
     private void ClearAllBuffs()
     {

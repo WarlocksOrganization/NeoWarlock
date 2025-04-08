@@ -209,8 +209,6 @@ public class PlayerCardUI : MonoBehaviour
 
         List<Database.PlayerCardData> selected = slots.Select(slot => slot.GetCurrentCard()).ToList();
         PlayerSetting.PlayerCards.AddRange(selected);
-        Debug.Log(selected.Count);
-        Debug.Log(slots.Length);
         
         // ✅ Special 카드 효과 처리
         foreach (var card in selected)

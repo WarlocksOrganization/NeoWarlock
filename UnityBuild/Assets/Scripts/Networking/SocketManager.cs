@@ -441,23 +441,8 @@ namespace Networking
                         Debug.LogWarning("[SocketManager] 알 수 없는 클라이언트 액션: " + message);
                         break;
                 }
-                // 방 목록 업데이트 알림 이벤트
-//                if (data.SelectToken("eventName") != null)
-//                {
-//                    string eventType = data["eventName"].ToString();
-//                    switch (eventType)
-//                    {
-//                        case "roomListUpdated":
-//                            Debug.Log("[SocketManager] 실시간 방 목록 업데이트 수신");
-//                            _hasPendingRoomUpdate = true;
-//                            FindRoomUI findRoomUI = FindFirstObjectByType<FindRoomUI>();
-//                            findRoomUI?.ShowRefreshButton(true);
-//                            break;
-//                    }
-//                    return;
-//                }
             }
-        
+
         }
 
         private void ServerResponseHandler(string message)
@@ -561,10 +546,11 @@ namespace Networking
                 }
             }
 
+
             if (_lastAlivePingTime > 0 && _lastAlivePingTime + 10 < Time.time)
             {
                 // 10초마다 서버에 AlivePing 요청
-                _lastAlivePingTime = (int)Time.time;
+                Debug.Log("[SocketManager] 서버에 AlivePing 요청");
                 AlivePing();
             }
         }
