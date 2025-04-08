@@ -17,7 +17,7 @@ public class LoginUI : MonoBehaviour
     void Start()
     {
         _loginButton.GetComponent<Button>().onClick.AddListener(OnClickLogin);
-        if (PlayerPrefs.HasKey("sessionToken"))
+        if (Networking.SocketManager.singleton.IsSessionValid())
         {
             TurnOnOnlineUI();
         }
@@ -69,7 +69,7 @@ public class LoginUI : MonoBehaviour
         Networking.SocketManager.singleton.RequestAuth(_userNameText, _passwordText);
         
         float elapsedTime = 0;
-        while (PlayerPrefs.GetString("sessionToken") == "")
+        while (!Networking.SocketManager.singleton.IsSessionValid())
         {
             elapsedTime += Time.deltaTime;
             if (elapsedTime > 5)
