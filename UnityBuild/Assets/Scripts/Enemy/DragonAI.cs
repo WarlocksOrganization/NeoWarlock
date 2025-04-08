@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Linq;
+using Cinemachine;
 using DataSystem;
+using GameManagement;
 using Interfaces;
 using Mirror;
 using Player;
@@ -26,8 +28,9 @@ public partial class DragonAI : NetworkBehaviour, IDamagable
     [SerializeField] private Transform EnemyModel;
 
     [Header("Health UI")]
-    [SerializeField] private Canvas healthCanvas;
     [SerializeField] private Slider healthSlider;
+    
+    [SerializeField] private CapsuleCollider capsuleCollider;
 
     [Header("ETC")]
     [SerializeField] private GameObject floatingDamageTextPrefab;
@@ -36,8 +39,12 @@ public partial class DragonAI : NetworkBehaviour, IDamagable
 
     private void Awake()
     {
+        if (isServer)
+        {
+            SetInvincible(false); // 🛡️ 무적 설정은 서버에서만
+        }
+        
         Instance = this;
-        curHp = maxHp;
         UpdateHealthUI();
     }
 
@@ -49,12 +56,33 @@ public partial class DragonAI : NetworkBehaviour, IDamagable
 
     public void Init()
     {
+        if (GameManager.Instance.dragonState.curHp <= 0)
+        {
+            return;
+        }
+        
+        int baseHp = 500;
+        int bonusPerPlayer = 500;
+        int playerCount = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None).Length;
+
+        int newMaxHp = baseHp + bonusPerPlayer * playerCount;
+
+        if (GameManager.Instance.dragonState.maxHp < newMaxHp)
+        {
+            GameManager.Instance.dragonState.curHp += (newMaxHp - GameManager.Instance.dragonState.maxHp);
+            GameManager.Instance.dragonState.maxHp = newMaxHp;
+        }
+
+        maxHp = GameManager.Instance.dragonState.maxHp;
+        curHp = Mathf.Min(GameManager.Instance.dragonState.curHp, maxHp);
+        
+        EnemyModel.rotation = Quaternion.Euler(0, 180, 0);
         transform.position = new Vector3(0, 2.78f, 0);
         RpcAddToTargetGroup(transform);
         StartCoroutine(StartLandingSequence());
     }
 
-    private IEnumerator StartLandingSequence()
+    public IEnumerator StartLandingSequence()
     {
         SelectRandomTarget();
 
@@ -63,7 +91,10 @@ public partial class DragonAI : NetworkBehaviour, IDamagable
             animator.SetTrigger("isLanding");
             RpcPlayAnimation("isLanding");
 
-            yield return new WaitForSeconds(10f); // 착지 애니메이션 시간
+            yield return new WaitForSeconds(5f); // 착지 애니메이션 시간
+            SetInvincible(true);
+            yield return new WaitForSeconds(3f); // 착지 애니메이션 시간
+            isFlying = false;
 
             isLanded = true;
         }
@@ -72,7 +103,7 @@ public partial class DragonAI : NetworkBehaviour, IDamagable
     [ServerCallback]
     private void FixedUpdate()
     {
-        if (!isServer || !isLanded || curHp <= 0) return;
+        if (!isServer || !isLanded || curHp <= 0 || isFlying) return;
 
         if (attackCooldownTimer > 0f)
             attackCooldownTimer -= Time.fixedDeltaTime;
@@ -107,7 +138,22 @@ public partial class DragonAI : NetworkBehaviour, IDamagable
         }
         else
         {
-            MoveTowardsTarget();
+            if (dist > 10)
+            {
+                MoveTowardsTarget();
+            }
+            else
+            {
+                var validAttacks = attackPatterns
+                    .Where(a => dist <= a.range)
+                    .ToList();
+
+                if (validAttacks.Count > 0)
+                {
+                    selectedAttack = validAttacks[Random.Range(0, validAttacks.Count)];
+                    StartCoroutine(PerformAttack());
+                }
+            }
         }
     }
 
@@ -117,8 +163,11 @@ public partial class DragonAI : NetworkBehaviour, IDamagable
         if (curHp <= 0) return 0;
 
         curHp -= damage;
+        Debug.Log("용체력 : " + curHp);
 
         RpcShowFloatingDamage(damage);
+        
+        GameManager.Instance.dragonState.curHp = curHp;
 
         if (curHp <= 0)
         {
@@ -143,14 +192,28 @@ public partial class DragonAI : NetworkBehaviour, IDamagable
 
     private void UpdateHealthUI()
     {
+        if (healthSlider == null)
+        {
+            GameObject hpBarObj = GameObject.Find("DragonHPBar");
+            if (hpBarObj != null)
+            {
+                healthSlider = hpBarObj.GetComponent<Slider>();
+                healthSlider.GetComponent<CanvasGroup>().alpha = 1;
+            }
+            else
+            {
+                Debug.LogWarning("DragonHPBar 오브젝트를 찾을 수 없습니다.");
+            }
+        }
+        
         if (healthSlider != null)
         {
             healthSlider.value = (float)curHp / maxHp;
         }
 
-        if (healthCanvas != null)
+        if (healthSlider != null)
         {
-            healthCanvas.enabled = curHp > 0;
+            healthSlider.enabled = curHp > 0;
         }
     }
 
@@ -167,5 +230,40 @@ public partial class DragonAI : NetworkBehaviour, IDamagable
     private void RpcPlayAnimation(string anim)
     {
         animator.SetTrigger(anim);
+    }
+    
+    [Server]
+    public void SetInvincible(bool isInvincible)
+    {
+        Debug.Log("SetInvincible" + isInvincible);
+        capsuleCollider.enabled = isInvincible; // 서버에서 콜라이더 먼저 적용
+        RpcSetColliderState(isInvincible);      // 클라이언트에게도 전파
+    }
+
+    [ClientRpc]
+    private void RpcSetColliderState(bool enabled)
+    {
+        if (capsuleCollider != null)
+            capsuleCollider.enabled = enabled;
+    }
+    
+    [ClientRpc]
+    public void RpcRemoveFromTargetGroup()
+    {
+        var group = GameObject.FindFirstObjectByType<CinemachineTargetGroup>();
+        if (group == null)
+        {
+            Debug.LogWarning("CinemachineTargetGroup을 찾을 수 없습니다.");
+            return;
+        }
+
+        // 기존 타겟 리스트 가져오기
+        var targets = group.m_Targets.ToList();
+
+        // 이 오브젝트의 트랜스폼을 가진 항목 제거
+        targets.RemoveAll(t => t.target == transform);
+
+        // 다시 설정
+        group.m_Targets = targets.ToArray();
     }
 }

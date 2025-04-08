@@ -28,11 +28,11 @@ public class GameSyatemDragonManager : GameSystemManager
         float targetY = eventnum * risePerEvent;
         //StartCoroutine(RaiseLava(targetY, riseDuration));
         
-        NetEvent();
+        //NetEvent();
         
-        RpcShakeCameraWhileLavaRises(1f, 1.5f, riseDuration);
+        //RpcShakeCameraWhileLavaRises(1f, 1.5f, riseDuration);
         
-        //GameSystemManager.Instance.EndEventAndStartNextTimer(); // 다음 타이머 시작
+        GameSystemManager.Instance.EndEventAndStartNextTimer(); // 다음 타이머 시작
     }
 
     private IEnumerator RaiseLava(float targetY, float duration)
@@ -77,7 +77,7 @@ public class GameSyatemDragonManager : GameSystemManager
                 NetworkServer.Spawn(pickup);
             }
         }
-        else
+        /*else
         {
             Vector3 randomDirection = new Vector3(Random.Range(-1f, 1f), 0f, Random.Range(-1f, 1f)).normalized;
             
@@ -86,25 +86,33 @@ public class GameSyatemDragonManager : GameSystemManager
             int attackCount = Random.Range(5, 10); // 🔹 2~4개 낙하 공격 소환
             
             // ✅ Coroutine으로 시간차 낙하 공격 시작
-            StartCoroutine(SpawnFallingAttacks(attackCount));
-        }
+            //StartCoroutine(SpawnFallingAttacks(attackCount));
+        }*/
+    }
+
+    public void MeteorAttack(Vector3 pos)
+    {
+        int attackCount = Random.Range(5, 10); // 🔹 2~4개 낙하 공격 소환
+            
+        // ✅ Coroutine으로 시간차 낙하 공격 시작
+        StartCoroutine(SpawnFallingAttacks(attackCount, pos));
     }
     
-    private IEnumerator SpawnFallingAttacks(int count)
+    private IEnumerator SpawnFallingAttacks(int count, Vector3 pos)
     {
         yield return new WaitForSeconds(1.5f);
         
         for (int i = 0; i < count; i++)
         {
             Vector3 spawnPosition = new Vector3(
-                Random.Range(-50f + eventnum * 4, 50f - eventnum * 4),
+                Random.Range(-50f, 50f),
                 40f,
-                Random.Range(-50f + eventnum * 4, 50f - eventnum * 4)
+                Random.Range(-50f, 50f)
             );
 
             Quaternion downRotation = Quaternion.LookRotation(Vector3.down);
 
-            GameObject attack = Instantiate(AttackPrefab, spawnPosition, downRotation);
+            GameObject attack = Instantiate(AttackPrefab, pos + spawnPosition, downRotation);
 
             attack.GetComponent<AttackProjectile>().SetProjectileData(
                 10,  // damage
@@ -114,7 +122,7 @@ public class GameSyatemDragonManager : GameSystemManager
                 10,  // duration
                 3,   // knockback
                 attackConfig,
-                null,
+                DragonAI.Instance.gameObject,
                 -1,
                 -1
             );
@@ -126,11 +134,77 @@ public class GameSyatemDragonManager : GameSystemManager
         }
     }
 
+    public void DragonFlyAttack()
+    {
+        StartCoroutine(FlyAndAttackSequence());
+    }
+
+    private IEnumerator FlyAndAttackSequence()
+    {
+        // 드래곤 이륙 방향 설정 및 애니메이션
+        
+
+        // 5초 간격으로 3회 낙하 공격
+        for (int i = 0; i < 3; i++)
+        {
+            Vector3 dir = new Vector3(Random.Range(-1f, 1f), 0f, Random.Range(-1f, 1f)).normalized;
+            StartFlyingDragon(dir);
+        
+            AudioManager.Instance.PlaySFX(Constants.SoundType.SFX_FlyingDragon, FlyingDragonSoundObject);
+            FlyingDragon.transform.rotation = Quaternion.LookRotation(dir);
+            FlyingDragon.GetComponent<Animator>().SetTrigger("isFlyAttack");
+            
+            
+            int attackCount = Random.Range(5, 10);
+            StartCoroutine(SpawnFallingAttacks(attackCount, Vector3.zero));
+            yield return new WaitForSeconds(5f);
+        }
+
+        // 착지 준비
+        if (DragonAI.Instance != null)
+        {
+            DragonAI.Instance.Init();
+        }
+    }
+    
+    public void DragonFlyAttack2()
+    {
+        StartCoroutine(FlyAndAttackSequence2());
+    }
+
+    private IEnumerator FlyAndAttackSequence2()
+    {
+        // 드래곤 이륙 방향 설정 및 애니메이션
+        
+        FlyingDragon.GetComponent<Animator>().SetTrigger("isFlyAttack2");
+        StartFlyAttack2();
+
+        // 5초 간격으로 3회 낙하 공격
+        for (int i = 0; i < 6; i++)
+        {
+            int attackCount = Random.Range(5, 10);
+            StartCoroutine(SpawnFallingAttacks(attackCount, Vector3.zero));
+            yield return new WaitForSeconds(5f);
+        }
+
+        // 착지 준비
+        if (DragonAI.Instance != null)
+        {
+            DragonAI.Instance.Init();
+        }
+    }
+
     [ClientRpc]
     private void StartFlyingDragon(Vector3 dir)
     {
         AudioManager.Instance.PlaySFX(Constants.SoundType.SFX_FlyingDragon, FlyingDragonSoundObject);
         FlyingDragon.transform.rotation = Quaternion.LookRotation(dir);
-        FlyingDragon.GetComponent<Animator>().SetTrigger("isStart");
+        FlyingDragon.GetComponent<Animator>().SetTrigger("isFlyAttack");
+    }
+    
+    [ClientRpc]
+    private void StartFlyAttack2()
+    {
+        FlyingDragon.GetComponent<Animator>().SetTrigger("isFlyAttack2");
     }
 }

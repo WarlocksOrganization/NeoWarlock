@@ -25,6 +25,12 @@ namespace DataSystem
 
         public static string LogFilepath = "/.config/unity3d/warlocks/smashup/Logs/";
         public static string LogFilename = "room.txt";
+        
+        public class DragonState
+        {
+            public int maxHp = 500;
+            public int curHp = 500;
+        }
 
         public enum KeyType
         {
@@ -53,7 +59,7 @@ namespace DataSystem
             Space = 3,
             Sea = 4,
             
-            LavaDragon = 11,
+            LavaDragon = 12,
         }
 
         public enum PlayerState
@@ -180,6 +186,8 @@ namespace DataSystem
             BGM_Lava_GameStart = 1105,
             BGM_Space_GameStart = 1110,
             BGM_Sea_GameStart = 1115,
+            
+            BGM_Dragon_GameStart = 1120,
 
             // SFX UI
             SFX_Button = 2001,

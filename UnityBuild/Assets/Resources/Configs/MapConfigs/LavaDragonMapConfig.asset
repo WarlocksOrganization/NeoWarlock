@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: da50ede5f68917f4c9067a2e3fa82538, type: 3}
   m_Name: LavaDragonMapConfig
   m_EditorClassIdentifier: 
-  mapType: 2
-  mapName: "\uC6A9\uC758 \uB465\uC9C0(\uB808\uC774\uB4DC)"
+  mapType: 12
+  mapName: "\uC6A9\uC758 \uB465\uC9C0(\uD611\uB3D9 \uBAA8\uB4DC)"
   mapSprite: {fileID: 21300000, guid: e82adfa9fa71d2d43b72427fa177b296, type: 3}
-  bgmType: 1102
+  bgmType: 1120
   skyboxMaterial: {fileID: 2100000, guid: 5d133deeaa66ed445853e946ff25e073, type: 2}

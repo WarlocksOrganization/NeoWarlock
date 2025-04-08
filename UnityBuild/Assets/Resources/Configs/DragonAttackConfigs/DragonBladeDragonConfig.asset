@@ -13,10 +13,11 @@ MonoBehaviour:
   m_Name: DragonBladeDragonConfig
   m_EditorClassIdentifier: 
   attackName: "\uCE7C\uB0A0\uACF5\uACA9"
-  animTrigger: isAttack1
+  animTrigger: isAttack
+  blendnum: 0
   attackDuration: 7
   cooldown: 10
-  range: 15
+  range: 20
   radius: 5
   speed: 30
   damage: 10

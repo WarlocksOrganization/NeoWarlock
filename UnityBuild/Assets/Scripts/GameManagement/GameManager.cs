@@ -24,6 +24,8 @@ namespace GameManagement
         private List<int> deathOrder = new();
         private Dictionary<int, Constants.PlayerRecord> playerRecords = new();
         public int currentRound = 0;
+        
+        public Constants.DragonState dragonState = new();
 
         private void Awake()
         {

@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Linq;
 using DataSystem;
+using DataSystem.Database;
 using GameManagement;
 using Mirror;
 using Networking;
@@ -223,12 +224,10 @@ public class GameLobbyUI : MonoBehaviour
         player.CmdChangeMap(next);
         AudioManager.Instance.PlaySFX(Constants.SoundType.SFX_Button);
     }
-    
-    [SerializeField] private MapConfig[] mapConfigs;
 
     public virtual void UpdateMapUI(Constants.RoomMapType type)
     {
-        var config = mapConfigs.FirstOrDefault(m => m.mapType == type);
+        var config = Database.GetMapConfig(type);
         if (config == null) return;
 
         MapImage.sprite = config.mapSprite; // 또는 따로 image 설정

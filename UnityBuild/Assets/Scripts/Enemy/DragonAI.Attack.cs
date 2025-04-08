@@ -21,7 +21,13 @@ public partial class DragonAI
     
     public GameObject[] projectilePrefabs;              // 발사체 프리팹
     public Transform[] firePoints;                      // 발사 기준점
-
+    
+    private bool isFlying = false;
+    
+    private int flyAttackCounter = 0; // ✅ 추가: Fly 공격 누적 카운터
+    private int totalAttackCounter = 0; // ✅ 추가: 전체 공격 횟수 카운터
+    
+    private Vector3 centerPoint =  new Vector3(0, 2.78f, 0);
     
     [Server]
     private void SelectRandomTarget()
@@ -41,6 +47,7 @@ public partial class DragonAI
         isAttacking = true;
 
         animator.SetBool("isMoving", false);
+        animator.SetFloat("Blend", selectedAttack.blendnum);
         animator.SetTrigger(selectedAttack.animTrigger);
         RpcPlayAnimation(selectedAttack.animTrigger);
 
@@ -48,12 +55,28 @@ public partial class DragonAI
         if (selectedAttack.attackName == "칼날공격")
         {
             yield return new WaitForSeconds(2.5f);
-            FireRandomProjectile();
+            for (int i = 0; i < 5; i++)
+            {
+                FireRandomProjectile();
+            }
 
             yield return new WaitForSeconds(1.5f); // 4초까지 대기
-            FireRandomProjectile();
+            for (int i = 0; i < 5; i++)
+            {
+                FireRandomProjectile();
+            }
 
             float remainTime = selectedAttack.attackDuration - 4f;
+            if (remainTime > 0)
+                yield return new WaitForSeconds(remainTime);
+        }
+        else if (selectedAttack.attackName == "메테오공격")
+        {
+            yield return new WaitForSeconds(2.5f);
+            GameSyatemDragonManager gameSyatemDragonManager = GameSystemManager.Instance as GameSyatemDragonManager;
+            gameSyatemDragonManager?.MeteorAttack(transform.position);
+
+            float remainTime = selectedAttack.attackDuration - 2.5f;
             if (remainTime > 0)
                 yield return new WaitForSeconds(remainTime);
         }
@@ -64,6 +87,70 @@ public partial class DragonAI
 
         attackCooldownTimer = selectedAttack.cooldown;
         isAttacking = false;
+        
+        totalAttackCounter++;
+        flyAttackCounter++;
+
+        if (totalAttackCounter >= 5)
+        {
+            totalAttackCounter = 0;
+            flyAttackCounter = 0;
+            StartCoroutine(FlyAndAttack2Sequence()); // ✅ Fly2 공격 우선 실행
+        }
+        else if (flyAttackCounter >= 3)
+        {
+            flyAttackCounter = 0;
+            StartCoroutine(FlyAndAttackSequence()); // ✅ Fly 공격
+        }
+    }
+    
+    private IEnumerator FlyAndAttackSequence()
+    {
+        isFlying = true;
+        animator.SetTrigger("isFly");
+        RpcPlayAnimation("isFly");
+
+        SetInvincible(true);
+
+        yield return new WaitForSeconds(2f);
+
+        RpcRemoveFromTargetGroup();
+        transform.position = centerPoint;
+
+        yield return new WaitForSeconds(1f);
+        EnemyModel.rotation = Quaternion.Euler(0, 180, 0);
+
+        if (GameSystemManager.Instance is GameSyatemDragonManager dragonManager)
+        {
+            dragonManager.DragonFlyAttack();
+        }
+    }
+    
+    private IEnumerator FlyAndAttack2Sequence()
+    {
+        isFlying = true;
+        animator.SetTrigger("isFly");
+        RpcPlayAnimation("isFly");
+
+        SetInvincible(true);
+
+        yield return new WaitForSeconds(2f);
+
+        RpcRemoveFromTargetGroup();
+        transform.position = centerPoint;
+
+        yield return new WaitForSeconds(1f);
+        EnemyModel.rotation = Quaternion.Euler(0, 180, 0);
+        
+        animator.SetTrigger("isFlyAttack");
+        RpcPlayAnimation("isFlyAttack");
+        
+        yield return new WaitForSeconds(3f);
+
+        if (GameSystemManager.Instance is GameSyatemDragonManager dragonManager)
+        {
+            dragonManager.DragonFlyAttack2();
+        }
     }
     
     [Server]

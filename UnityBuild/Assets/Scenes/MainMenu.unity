@@ -41141,6 +41141,8 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: c59aa37163b19f5428e230325da72b78, type: 3}
   - type: 1115
     clip: {fileID: 8300000, guid: aacdac1fd68180f458bd27a995e19fd2, type: 3}
+  - type: 1120
+    clip: {fileID: 8300000, guid: d6c4f497954bc4942a501a0c0f4706b5, type: 3}
   uiSFXList:
   - type: 2001
     clip: {fileID: 8300000, guid: 91553fd9dcf9e7948968f6a3273017a6, type: 3}

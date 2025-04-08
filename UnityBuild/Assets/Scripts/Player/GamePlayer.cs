@@ -306,6 +306,7 @@ namespace Player
         void OnDestroy()
         {
             StopAllCoroutines(); // or Stop specific coroutine
+            GameManager.Instance.isCardSelectionStarted =false;
         }
         
         [ClientRpc]

@@ -51,7 +51,7 @@ MonoBehaviour:
   roomName: 
   roomType: 0
   maxPlayerCount: 0
-  roomMapType: 11
+  roomMapType: 0
   gameId: 0
   roomId: 0
   SSAFYObjects:
