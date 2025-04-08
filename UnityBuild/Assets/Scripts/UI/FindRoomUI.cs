@@ -26,8 +26,8 @@ public class FindRoomUI : MonoBehaviour
         // gameObject.SetActive(true);
         // onlineUI.SetActive(false);
         Networking.SocketManager.singleton.RequestListRooms();
-        _refreshButton.onClick.AddListener(OnClickRefresh);
-        ShowRefreshButton(false);
+        // _refreshButton.onClick.AddListener(OnClickRefresh);
+        // ShowRefreshButton(false);
     }
 
     public void ShowRefreshButton(bool show)

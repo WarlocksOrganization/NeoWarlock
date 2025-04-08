@@ -33,10 +33,11 @@ namespace Networking
         private int _lastAlivePingTime = 0;
 
         public string socketServerIP = "127.0.0.1"; // 서버 IP 주소
-        public ushort socketServerPort = 8080; // 서버 포트 번호
+        public ushort socketServerPort = 8082; // 서버 포트 번호 8080
         public int bufferSize = 8192; // 버퍼 크기
         public int maxRetries = 5; // 최대 재시도 횟수
         public static SocketManager singleton;
+        public event Action<string> OnMessageReceived;
 
         void Awake()
         {
@@ -382,7 +383,12 @@ namespace Networking
                 }
                 return;
             }
-
+            OnlineUI onlineUI = FindFirstObjectByType<OnlineUI>();
+            if (onlineUI != null)
+            {
+                onlineUI.OnMessageReceived(message);
+                Debug.Log("[SocketManager] OnlineUI에서 메시지 수신: " + message);
+            }
             if (data.SelectToken("action") != null)
             {
                 // 요청식 응답 처리
