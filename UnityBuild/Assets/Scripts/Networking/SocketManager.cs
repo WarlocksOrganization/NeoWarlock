@@ -33,10 +33,11 @@ namespace Networking
         private int _lastAlivePingTime = 0;
 
         public string socketServerIP = "127.0.0.1"; // 서버 IP 주소
-        public ushort socketServerPort = 8080; // 서버 포트 번호
+        public ushort socketServerPort = 8082; // 서버 포트 번호 8080
         public int bufferSize = 8192; // 버퍼 크기
         public int maxRetries = 5; // 최대 재시도 횟수
         public static SocketManager singleton;
+        public event Action<string> OnMessageReceived;
 
         void Awake()
         {
@@ -382,7 +383,12 @@ namespace Networking
                 }
                 return;
             }
-
+            OnlineUI onlineUI = FindFirstObjectByType<OnlineUI>();
+            if (onlineUI != null)
+            {
+                onlineUI.OnMessageReceived(message);
+                Debug.Log("[SocketManager] OnlineUI에서 메시지 수신: " + message);
+            }
             if (data.SelectToken("action") != null)
             {
                 // 요청식 응답 처리
@@ -435,23 +441,8 @@ namespace Networking
                         Debug.LogWarning("[SocketManager] 알 수 없는 클라이언트 액션: " + message);
                         break;
                 }
-                // 방 목록 업데이트 알림 이벤트
-//                if (data.SelectToken("eventName") != null)
-//                {
-//                    string eventType = data["eventName"].ToString();
-//                    switch (eventType)
-//                    {
-//                        case "roomListUpdated":
-//                            Debug.Log("[SocketManager] 실시간 방 목록 업데이트 수신");
-//                            _hasPendingRoomUpdate = true;
-//                            FindRoomUI findRoomUI = FindFirstObjectByType<FindRoomUI>();
-//                            findRoomUI?.ShowRefreshButton(true);
-//                            break;
-//                    }
-//                    return;
-//                }
             }
-        
+
         }
 
         private void ServerResponseHandler(string message)
@@ -555,10 +546,11 @@ namespace Networking
                 }
             }
 
+
             if (_lastAlivePingTime > 0 && _lastAlivePingTime + 10 < Time.time)
             {
                 // 10초마다 서버에 AlivePing 요청
-                _lastAlivePingTime = (int)Time.time;
+                Debug.Log("[SocketManager] 서버에 AlivePing 요청");
                 AlivePing();
             }
         }

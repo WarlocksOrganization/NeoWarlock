@@ -44,13 +44,12 @@ namespace Networking
             if (!Application.platform.Equals(RuntimePlatform.LinuxServer))
             {
                 Debug.LogWarning("[LogManager] 서버 모드에서 실행 중이 아닙니다.");
-                //Debug.unityLogger.logEnabled = false;
-                //Application.logMessageReceived += HandleLog;
+                #if !UNITY_EDITOR
+                Application.logMessageReceived += HandleLog;
+                Debug.unityLogger.logEnabled = false;
+                #endif
                 return;
             }
-            
-            Debug.unityLogger.logEnabled = false;
-            Application.logMessageReceived += HandleLog;
 
             var args = System.Environment.GetCommandLineArgs();
             for (int i = 0; i < args.Length; i++)
