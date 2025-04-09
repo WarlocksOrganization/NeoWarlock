@@ -56,7 +56,7 @@ public class NicknameUI : MonoBehaviour
             var modal = ModalPopupUI.singleton as ModalPopupUI;
             if (modal != null)
             {
-                modal.ShowModalMessage("닉네임 변경 성공\n" + PlayerSetting.Nickname + " 님!");
+                modal.ShowModalMessage("닉네임 변경 성공\n" + PlayerSetting.Nickname + " 님!\n접속자 목록에는 재로그인 시 적용됩니다!");
             }
         }
     }
