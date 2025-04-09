@@ -46,7 +46,7 @@ public class PlayerCardUI : MonoBehaviour
             Debug.LogError("[PlayerCardUI] MatrixManager 인스턴스가 존재하지 않습니다. 씬에 MatrixManager가 포함되어 있는지 확인하세요.");
             return;
         }
-        MatrixManager.Instance.LoadMatrixFromResources();
+        MatrixManager.Instance.LoadMatrixFromPersistentOrResources();
         LoadRandomPlayerCards();
         DisplayTopThreeCards();
         
@@ -108,15 +108,12 @@ public class PlayerCardUI : MonoBehaviour
 
     private void DisplayTopThreeCards()
     {
-
-        // var resultMap = EvaluateCurrentSlots();
-        // RenderSlotScores(resultMap);
         var selectedCards = selectedCardsQueue.ToList();
         var openCardIDs = selectedCards.Take(3).Select(card => card.ID).ToList();
         var mergedCardIDs = PlayerSetting.PlayerCards.Select(card => card.ID).ToList();
 
         var evaluator = new CardEvaluator();
-        var matrix = MatrixManager.Instance.GetMatrix((int)PlayerSetting.PlayerCharacterClass);
+        var matrix = MatrixManager.Instance.GetMatrix();
         if (matrix == null)
         {
             Debug.LogError("[PlayerCardUI] 매트릭스 데이터가 로드되지 않았습니다.");
@@ -193,7 +190,8 @@ public class PlayerCardUI : MonoBehaviour
             .ToList();
 
         var mergedCardIDs = PlayerSetting.PlayerCards.Select(card => card.ID).ToList();
-        var matrix = MatrixManager.Instance.GetMatrix((int)PlayerSetting.PlayerCharacterClass);
+
+        var matrix = MatrixManager.Instance.GetMatrix();
         if (matrix == null)
         {
             Debug.LogError("[PlayerCardUI] 매트릭스 데이터가 없습니다.");

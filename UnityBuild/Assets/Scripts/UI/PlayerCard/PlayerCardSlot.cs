@@ -380,26 +380,26 @@
         }
 
 
-        private IEnumerator CardRotation(Database.PlayerCardData newCard)
+    private IEnumerator CardRotation(Database.PlayerCardData newCard)
+    {
+        float flipDuration = 0.15f;   // 앞면으로 가기까지 시간
+        float spinDuration = 0.6f;   // 바뀐 뒤 전체 회전 시간
+        float totalDuration = flipDuration + spinDuration;
+
+        Quaternion startRot = transform.rotation;
+        Quaternion midRot = Quaternion.Euler(0, 90f, 0);
+        Quaternion endRot = Quaternion.Euler(0, 0, 0);
+
+        // ▶ 1단계: 빠르게 반 바퀴 돌며 사라짐
+        float elapsed = 0f;
+        while (elapsed < flipDuration)
         {
-            float flipDuration = 0.15f;   // 앞면으로 가기까지 시간
-            float spinDuration = 0.6f;   // 바뀐 뒤 전체 회전 시간
-            float totalDuration = flipDuration + spinDuration;
-
-            Quaternion startRot = transform.rotation;
-            Quaternion midRot = Quaternion.Euler(0, 90f, 0);
-            Quaternion endRot = Quaternion.Euler(0, 0, 0);
-
-            // ▶ 1단계: 빠르게 반 바퀴 돌며 사라짐
-            float elapsed = 0f;
-            while (elapsed < flipDuration)
-            {
-                float t = elapsed / flipDuration;
-                t = EaseInOut(t);
-                transform.rotation = Quaternion.Slerp(startRot, midRot, t);
-                elapsed += Time.deltaTime;
-                yield return null;
-            }
+            float t = elapsed / flipDuration;
+            t = EaseInOut(t);
+            transform.rotation = Quaternion.Slerp(startRot, midRot, t);
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
 
             transform.rotation = midRot;
             SetCardData(newCard); // 카드 교체
@@ -414,27 +414,27 @@
                 float t = elapsed / spinDuration;
                 t = EaseOutBack(t); // 살짝 튀어나오는 느낌의 easing
 
-                float angle = Mathf.Lerp(90f, 0f, t) + spinAngle * (1 - t);
-                transform.rotation = Quaternion.Euler(0, angle, 0);
+            float angle = Mathf.Lerp(90f, 0f, t) + spinAngle * (1 - t);
+            transform.rotation = Quaternion.Euler(0, angle, 0);
 
-                elapsed += Time.deltaTime;
-                yield return null;
-            }
-
-            transform.rotation = endRot;
-        }
-        private float EaseInOut(float t)
-        {
-            return t < 0.5f
-                ? 2f * t * t
-                : -1f + (4f - 2f * t) * t;
+            elapsed += Time.deltaTime;
+            yield return null;
         }
 
-        private float EaseOutBack(float t)
-        {
-            float c1 = 1.70158f;
-            float c3 = c1 + 1;
-            return 1 + c3 * Mathf.Pow(t - 1, 3) + c1 * Mathf.Pow(t - 1, 2);
-        }
-
+        transform.rotation = endRot;
     }
+    private float EaseInOut(float t)
+    {
+        return t < 0.5f
+            ? 2f * t * t
+            : -1f + (4f - 2f * t) * t;
+    }
+
+    private float EaseOutBack(float t)
+    {
+        float c1 = 1.70158f;
+        float c3 = c1 + 1;
+        return 1 + c3 * Mathf.Pow(t - 1, 3) + c1 * Mathf.Pow(t - 1, 2);
+    }
+
+}
