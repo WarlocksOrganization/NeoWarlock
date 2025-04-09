@@ -57,20 +57,15 @@ public partial class DragonAI : NetworkBehaviour, IDamagable
 
     public void Init()
     {
-
         var gameRoomData = FindFirstObjectByType<GameRoomData>();
         if (gameRoomData != null && isServer)
         {
             gameRoomData.SetRoomType(Constants.RoomType.Raid);
 
-            // ✅ 모든 플레이어 팀을 TeamA로 설정
-            var players = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None);
-            foreach (var player in players)
-            {
-                player.team = Constants.TeamType.TeamA;
-            }
+            // ✅ 팀 설정을 Coroutine으로 분리
+            StartCoroutine(DelaySetTeam());
         }
-        
+
         int baseHp = 0;
         int bonusPerPlayer = 500;
         int playerCount = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None).Length;
@@ -82,12 +77,24 @@ public partial class DragonAI : NetworkBehaviour, IDamagable
             maxHp = newMaxHp;
             curHp = maxHp;
         }
-        
+
         EnemyModel.rotation = Quaternion.Euler(0, 180, 0);
         transform.position = new Vector3(0, 2.78f, 0);
         RpcAddToTargetGroup(transform);
         StartCoroutine(StartLandingSequence());
     }
+    
+    private IEnumerator DelaySetTeam()
+    {
+        yield return new WaitForSeconds(1f);
+
+        var players = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None);
+        foreach (var player in players)
+        {
+            player.team = Constants.TeamType.TeamA;
+        }
+    }
+
 
     public IEnumerator StartLandingSequence()
     {

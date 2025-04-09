@@ -266,7 +266,7 @@ namespace Player
             State = newValue;
             gravityVelocity = Vector3.zero;
 
-            if (newValue == Constants.PlayerState.Start && isOwned && PLayerCharacterClass == Constants.CharacterClass.None)
+            if ((newValue == Constants.PlayerState.Start || newValue == Constants.PlayerState.Counting) && isOwned && PLayerCharacterClass == Constants.CharacterClass.None)
             {
                 // 클라이언트에서 자기 PlayerSetting 기반으로 서버에 캐릭터 정보 요청
                 CmdApplyPlayerSettings(
