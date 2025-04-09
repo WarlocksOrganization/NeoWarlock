@@ -20,6 +20,7 @@ public class PlayerCardUI : MonoBehaviour
 {
     public PlayerCardSlot[] slots;
     [SerializeField] private TMP_Text timerText;
+    [SerializeField] private GameObject matrixStateText;
     [SerializeField] private GameObject LoadingImage;
     [SerializeField] private Slider timerSlider;
 
@@ -39,7 +40,7 @@ public class PlayerCardUI : MonoBehaviour
         selectedCardsQueue.Clear();
         
         hasAppliedCards = false; // ✅ 초기화
-        
+        matrixStateText.gameObject.SetActive(false);
         LoadingImage.SetActive(true);
         if (MatrixManager.Instance == null)
         {
@@ -63,11 +64,6 @@ public class PlayerCardUI : MonoBehaviour
         lastTargetRatio = 1f;
 
         myGamePlayer = FindObjectsByType<GamePlayer>(sortMode: FindObjectsSortMode.None).FirstOrDefault(gp => gp.isOwned);
-    }
-
-    void Update()
-    {
-        // 서버 타이머 기준으로 동작하므로 Update에서 처리하지 않음
     }
 
     private void LoadRandomPlayerCards()
@@ -107,36 +103,45 @@ public class PlayerCardUI : MonoBehaviour
     }
 
     private void DisplayTopThreeCards()
-    {
-        var selectedCards = selectedCardsQueue.ToList();
-        var openCardIDs = selectedCards.Take(3).Select(card => card.ID).ToList();
-        var mergedCardIDs = PlayerSetting.PlayerCards.Select(card => card.ID).ToList();
-
-        var evaluator = new CardEvaluator();
-        var matrix = MatrixManager.Instance.GetMatrix();
-        if (matrix == null)
+    {       
+    if (MatrixLoadState.HasMatrixData == true)
         {
-            Debug.LogError("[PlayerCardUI] 매트릭스 데이터가 로드되지 않았습니다.");
-            return;
-        }
+            var selectedCards = selectedCardsQueue.ToList();
+            var openCardIDs = selectedCards.Take(3).Select(card => card.ID).ToList();
+            var mergedCardIDs = PlayerSetting.PlayerCards.Select(card => card.ID).ToList();
 
-        var results = evaluator.CardOpen(
-            mergedCardIDs,
-            openCardIDs,
-            new List<MatrixDocument> { matrix },
-            (int)PlayerSetting.PlayerCharacterClass
-            );
-        for (int i = 0; i < slots.Length; i++)
+            var evaluator = new CardEvaluator();
+
+            var matrix = MatrixManager.Instance.GetMatrix();
+            if (matrix == null)
             {
-                if (selectedCardsQueue.Count > 0)
+                Debug.LogError("[PlayerCardUI] 매트릭스 데이터가 로드되지 않았습니다.");
+                return;
+            }
+
+            var results = evaluator.CardOpen(
+                mergedCardIDs,
+                openCardIDs,
+                new List<MatrixDocument> { matrix },
+                (int)PlayerSetting.PlayerCharacterClass
+                );
+            for (int i = 0; i < slots.Length; i++)
                 {
-                var card = selectedCardsQueue.Dequeue();
-                slots[i].SetCardData(card);
-                if (results.TryGetValue(card.ID, out var scoreRank))
-                {
-                    slots[i].SetCardScore(card, scoreRank[0], scoreRank[1]);
+                    if (selectedCardsQueue.Count > 0)
+                    {
+                    var card = selectedCardsQueue.Dequeue();
+                    slots[i].SetCardData(card);
+                    if (results.TryGetValue(card.ID, out var scoreRank))
+                    {
+                        slots[i].SetCardScore(card, scoreRank[0], scoreRank[1]);
+                    }
                 }
             }
+        }
+        else
+        {
+            matrixStateText.gameObject.SetActive(true);
+            Debug.LogError("[PlayerCardUI] 매트릭스 데이터가 로드되지 않았습니다.");
         }
     }
     // public Database.PlayerCardData TryGetNewCardAndUpdateRank(int slotIndex)
@@ -190,7 +195,11 @@ public class PlayerCardUI : MonoBehaviour
             .ToList();
 
         var mergedCardIDs = PlayerSetting.PlayerCards.Select(card => card.ID).ToList();
-
+        if (MatrixLoadState.HasMatrixData == false)
+        {
+            Debug.LogError("[PlayerCardUI] 매트릭스 데이터가 로드되지 않았습니다.");
+            return;
+        }
         var matrix = MatrixManager.Instance.GetMatrix();
         if (matrix == null)
         {

@@ -225,26 +225,34 @@
     public void SetCardScore(Database.PlayerCardData cardData, double score = 0, double rank = 0)
     {
         this.cardData = cardData;
-        bool isConditional = cardData.ID >= 10100 && cardData.ID < 10200;
-        if (isConditional && rank >= 0.3f)
+        if (MatrixLoadState.HasMatrixData == true)
         {
-            cardRankIcon.sprite = luckyRankIcon;
-            rankText.text = $"<color=#D500FF>{rank * 10:등급}%</color>";
-        }
-        // else if (!isConditional && rank > 0.5f)
-        // {
-        //     cardRankIcon.sprite = cautionRankIcon;
-        //     rankText.text = $"<color=#FFFD55>{rank * 10:F0}등급</color>";
-        // }
-        else if (rank >= 0.3f)
-        {
-            cardRankIcon.sprite = okayRankIcon; 
-            rankText.text = $"{rank * 10:F0}등급";
+            bool isConditional = cardData.ID >= 10100 && cardData.ID < 10200;
+            if (isConditional && rank >= 0.3f)
+            {
+                cardRankIcon.sprite = luckyRankIcon;
+                rankText.text = $"<color=#D500FF>{rank * 10:F0}등급</color>";
+            }
+            // else if (!isConditional && rank > 0.5f)
+            // {
+            //     cardRankIcon.sprite = cautionRankIcon;
+            //     rankText.text = $"<color=#FFFD55>{rank * 10:F0}등급</color>";
+            // }
+            else if (rank >= 0.3f)
+            {
+                cardRankIcon.sprite = okayRankIcon; 
+                rankText.text = $"{rank * 10:F0}등급";
+            }
+            else
+            {
+                cardRankIcon.sprite = goodRankIcon;
+                rankText.text = $"<color=#00FF28>{rank * 10:F0}등급</color>";
+            }
         }
         else
         {
-            cardRankIcon.sprite = goodRankIcon;
-            rankText.text = $"<color=#00FF28>{rank * 10:F0}등급</color>";
+            cardRankIcon.sprite = okayRankIcon; 
+            rankText.text = $"?등급";
         }
     }
     public IEnumerator PlayExplosionEffect(Image effectImage)
@@ -404,7 +412,11 @@
             transform.rotation = midRot;
             SetCardData(newCard); // 카드 교체
             yield return new WaitForSeconds(0.05f); // 자연스러운 텀
-            playerCardUI.RecalculateAllRanks();
+            if (MatrixLoadState.HasMatrixData == true)
+            {
+                playerCardUI.RecalculateAllRanks();
+            }
+
             
             // ▶ 2단계: 여러 바퀴 돌면서 정면으로 정착
             float spinAngle = 360f * 3; // 3바퀴

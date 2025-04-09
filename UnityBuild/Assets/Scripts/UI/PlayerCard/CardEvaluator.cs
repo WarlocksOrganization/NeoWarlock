@@ -38,8 +38,8 @@ public class CardEvaluator
 
         HashSet<int> replaceCardPool = new(doc.cardPool);
         replaceCardPool.ExceptWith(mergedList);
-        Debug.Log($"[RankDebug] replaceCardPool.Count = {replaceCardPool.Count}");
-        Debug.Log($"[RankDebug] mergedList={string.Join(",", mergedList)}");
+        // Debug.Log($"[RankDebug] replaceCardPool.Count = {replaceCardPool.Count}");
+        // Debug.Log($"[RankDebug] mergedList={string.Join(",", mergedList)}");
         // var matrix = doc.matrixMap["-1/-1"];
         var cardPoolIndex = doc.cardPool
             .Select((cardId, idx) => new { cardId, idx })
@@ -58,7 +58,7 @@ public class CardEvaluator
                 double localScore = CalculateScoreMean(mergedList, openCard, replaceCard, matrix, cardPoolIndex);
                 scoreMeanList.Add(localScore);
             }
-            Debug.Log($"[RankDebug] card={openCard}, scoreMean={scoreMean}, list={string.Join(",", scoreMeanList)}");
+            // Debug.Log($"[RankDebug] card={openCard}, scoreMean={scoreMean}, list={string.Join(",", scoreMeanList)}");
             int greaterCount = scoreMeanList.Count(s => s > scoreMean);
             result[1] = scoreMeanList.Count == 0 ? 0 : (double)greaterCount / scoreMeanList.Count;
 

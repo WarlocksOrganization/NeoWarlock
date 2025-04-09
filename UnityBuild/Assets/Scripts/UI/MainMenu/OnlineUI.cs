@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using DataSystem;
 using Mirror;
 using Networking;
-using UnityEngine.Networking;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
@@ -39,7 +38,6 @@ namespace UI
             lobbyButton.GetComponentInChildren<Button>().onClick.AddListener(socketManager.OnClickLogout);
             quitButton.GetComponentInChildren<Button>().onClick.AddListener(QuitGame);
             refreshButton.GetComponentInChildren<Button>().onClick.AddListener(findRoomUIComponent.TurnOnFindRoomUI);
-            StartCoroutine(TryFetchMatrixFromServer());
 
             Debug.Log("[OnlineUI] Start 완료");
         }
@@ -172,28 +170,6 @@ namespace UI
 
             Debug.Log("[HandleCCUMessage] UI 렌더링 시작");
             ccuDisplay.UpdateCCUDisplay(ccuList.users);
-        }
-
-        private IEnumerator TryFetchMatrixFromServer()
-        {
-            if (!MatrixUpdateTracker.ShouldUpdateAfterHours(1)) yield break;
-
-            string url = "http://j12a509.p.ssafy.io:8081/hints";
-
-            UnityWebRequest request = UnityWebRequest.Get(url);
-            yield return request.SendWebRequest();
-
-            if (request.result == UnityWebRequest.Result.Success)
-            {
-                string json = request.downloadHandler.text;
-                MatrixFileManager.SaveMatrixJson(json);
-                MatrixUpdateTracker.SaveNow();
-                MatrixManager.Instance.LoadMatrixFromJson(json);
-            }
-            else
-            {
-                Debug.LogError("데이터 요청 실패: " + request.error);
-            }
         }
 
         public void QuitGame()
