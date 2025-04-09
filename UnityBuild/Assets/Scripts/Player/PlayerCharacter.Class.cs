@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Cinemachine;
 using DataSystem;
 using DataSystem.Database;
@@ -82,7 +83,6 @@ namespace Player
             }
             animator.SetFloat("Blend", (int)newClass);
             ApplyCharacterClass(newClass);
-            UpdateCount();
             if (isOwned)
             {
                 var statUI = FindFirstObjectByType<PlayerStatUI>();
@@ -92,6 +92,9 @@ namespace Player
                 }
             }
             lastMovementSkillTime = -Mathf.Infinity;
+            
+            var ui = FindFirstObjectByType<GameLobbyUI>();
+            ui?.UpdatePlayerInRoon(); // ✅ 팀 바뀌면 내 UI 갱신
         }
 
         private void ApplyCharacterClass(Constants.CharacterClass newClass)

@@ -9,8 +9,6 @@ using Random = UnityEngine.Random;
 public class GameSyatemDragonManager : GameSystemManager
 {
     [SerializeField] private Transform lavaTrans;
-    [SerializeField] private float riseDuration = 5f; // 5초
-    [SerializeField] private float risePerEvent = 0.5f;
 
     [SerializeField] private GameObject FlyingDragon;
     [SerializeField] private GameObject FlyingDragonSoundObject;
@@ -25,7 +23,6 @@ public class GameSyatemDragonManager : GameSystemManager
         
         eventnum++; // 다음 이벤트로 증가
 
-        float targetY = eventnum * risePerEvent;
         //StartCoroutine(RaiseLava(targetY, riseDuration));
         
         //NetEvent();

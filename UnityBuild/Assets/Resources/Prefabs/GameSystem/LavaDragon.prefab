@@ -3793,7 +3793,7 @@ MonoBehaviour:
   - {fileID: 5427001185167510217, guid: 1675226a2b8765042b676e5baed9094e, type: 3}
   firePoints:
   - {fileID: 4426209861950161061}
-  curHp: 0
+  curHp: 500
   maxHp: 500
   moveSpeed: 3
   attackRange: 3

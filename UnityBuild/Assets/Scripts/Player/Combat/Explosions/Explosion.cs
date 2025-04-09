@@ -57,7 +57,7 @@ namespace Player.Combat
 
             // ✅ 원기둥(캡슐) 충돌 범위 설정
             Vector3 bottom = transform.position + Vector3.down * 0.5f;  // 바닥 위치
-            Vector3 top = transform.position + Vector3.up * 2.0f;       // 원기둥 높이 조절
+            Vector3 top = transform.position + Vector3.up * 5.0f;       // 원기둥 높이 조절
             float radius = explosionRadius; // 원기둥 반지름 (기존의 반지름 유지)
 
             Collider[] hitColliders = Physics.OverlapCapsule(bottom, top, radius);

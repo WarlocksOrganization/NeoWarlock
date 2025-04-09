@@ -78,25 +78,25 @@ public partial class DragonAI
         }
         else if (selectedAttack.attackName == "메테오공격")
         {
-            yield return new WaitForSeconds(1.5f);
+            yield return new WaitForSeconds(1f);
             GameSyatemDragonManager gameSyatemDragonManager = GameSystemManager.Instance as GameSyatemDragonManager;
             gameSyatemDragonManager?.MeteorAttack(transform.position);
             RpcPlaySound(Constants.SoundType.SFX_DragonRoar);
 
-            float remainTime = selectedAttack.attackDuration - 1.5f;
+            float remainTime = selectedAttack.attackDuration - 1f;
             if (remainTime > 0)
                 yield return new WaitForSeconds(remainTime);
         }
         else if (selectedAttack.attackName == "바람공격")
         {
-            yield return new WaitForSeconds(2f);
+            yield return new WaitForSeconds(1.5f);
 
             RpcPlaySound(Constants.SoundType.SFX_DragonRoar);
             
             FireProjectilesIn8Directions(); // ✅ 8방향 발사
             RpcPlaySound(Constants.SkillType.Slash); // 원하시는 효과음으로 교체 가능
 
-            float remainTime = selectedAttack.attackDuration - 2f;
+            float remainTime = selectedAttack.attackDuration - 1.5f;
             if (remainTime > 0)
                 yield return new WaitForSeconds(remainTime);
         }
@@ -189,7 +189,7 @@ public partial class DragonAI
     private void FireRandomProjectile()
     {
         Transform firePoint = firePoints[0]; // 기준점 (입, 앞 등)
-        float randomAngle = Random.Range(-45f, 45f);
+        float randomAngle = Random.Range(-90f, 90f);
         Quaternion rotation = Quaternion.Euler(0f, randomAngle, 0f) * firePoint.rotation;
 
         GameObject prefab = projectilePrefabs[0]; // 칼날공격 전용 프리팹 사용 시 인덱스 맞추기

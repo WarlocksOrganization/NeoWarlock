@@ -25,12 +25,6 @@ namespace DataSystem
 
         public static string LogFilepath = "/.config/unity3d/warlocks/smashup/Logs/";
         public static string LogFilename = "room.txt";
-        
-        public class DragonState
-        {
-            public int maxHp = 500;
-            public int curHp = 500;
-        }
 
         public enum KeyType
         {

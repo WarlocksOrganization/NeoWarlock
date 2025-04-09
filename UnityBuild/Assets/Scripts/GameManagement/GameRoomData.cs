@@ -32,6 +32,9 @@ namespace GameManagement
         
         [SyncVar] public int currentRound = 0;
         
+        [SyncVar(hook = nameof(OnPlayerListChanged))]
+        public string playerNetIdsString;
+        
         private void Start()
         {
             GameLobbyUI gameLobbyUI = FindFirstObjectByType<GameLobbyUI>();
@@ -222,6 +225,26 @@ namespace GameManagement
         {
             roomType = newType;
         }
+        
+        [Server]
+        public void UpdatePlayerList()
+        {
+            var players = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None)
+                .OrderBy(p => p.GetComponent<NetworkIdentity>().netId)
+                .ToArray();
 
+            for (int i = 0; i < players.Length; i++)
+            {
+                players[i].playerId = i; // 직접 playerId 설정
+            }
+
+            playerNetIdsString = string.Join(",", players.Select(p => p.GetComponent<NetworkIdentity>().netId));
+        }
+
+        private void OnPlayerListChanged(string oldVal, string newVal)
+        {
+            // 클라이언트에서 필요 시 처리
+            FindFirstObjectByType<GameLobbyUI>()?.OnServerPlayerListUpdated(newVal);
+        }
     }
 }

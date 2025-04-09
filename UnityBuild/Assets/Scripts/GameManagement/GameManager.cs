@@ -24,8 +24,6 @@ namespace GameManagement
         private List<int> deathOrder = new();
         private Dictionary<int, Constants.PlayerRecord> playerRecords = new();
         public int currentRound = 0;
-        
-        public Constants.DragonState dragonState = new();
 
         private List<(int playerId, int rank)> roundRanks;
         private List<(int playerId, int kills, int outKills, int damageDone, int rank)> roundData;
@@ -46,6 +44,8 @@ namespace GameManagement
             {
                 Destroy(gameObject);
             }
+            
+            Screen.SetResolution(1280, 720, false);
         }
 
         public void ResetRoundState() => roundEnded = false;
@@ -329,7 +329,6 @@ namespace GameManagement
                 stats.roundRanks.Clear();
             }
             deathOrder.Clear();
-            dragonState = new();
         }
 
         public void ResetRoundStateOnly()
@@ -343,7 +342,6 @@ namespace GameManagement
                 stats.isDead = false;
             }
             deathOrder.Clear();
-            dragonState = new();
             roundEnded = false;
         }
 

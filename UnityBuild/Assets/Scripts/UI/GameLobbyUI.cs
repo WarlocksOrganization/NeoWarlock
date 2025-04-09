@@ -7,10 +7,8 @@ using GameManagement;
 using Mirror;
 using Networking;
 using Player;
-using Telepathy;
 using TMPro;
 using UnityEngine;
-using UnityEngine.InputSystem.HID;
 using UnityEngine.UI;
 
 public class GameLobbyUI : MonoBehaviour
@@ -19,9 +17,8 @@ public class GameLobbyUI : MonoBehaviour
     [SerializeField] protected TMP_Text PlayerInRoonText;
     [SerializeField] protected GameObject PlayerSelection;
     [SerializeField] protected PlayerStatusUI playerStatusUI;
-    
-    [Header("Map")]
-    [SerializeField] protected Button StartGameButton;
+
+    [Header("Map")] [SerializeField] protected Button StartGameButton;
     [SerializeField] protected Button ChangeMapNextButton;
     [SerializeField] protected Button ChangeMapBeforeButton;
     [SerializeField] protected Image MapImage;
@@ -30,25 +27,28 @@ public class GameLobbyUI : MonoBehaviour
     public GameObject[] PlayerCharacters;
     protected PlayerCharacter[] foundCharacters;
 
-    private int hostNum = 0;
-    
+    private readonly int hostNum = 0;
+
     [SerializeField] protected KillLogUI killLogUI;
-    
+
     [SerializeField] private TMP_Text warningText;
     private Coroutine warningCoroutine;
 
-    [Header("Team")] 
-    [SerializeField] protected Button ChangeTeamButton; 
+    [Header("Team")] [SerializeField] protected Button ChangeTeamButton;
 
     private void Start()
     {
-        if (NetworkClient.active)
-        {
-            PlayerSelection.SetActive(true);
-        }
+        if (NetworkClient.active) PlayerSelection.SetActive(true);
         CheckIfHost();
-        AudioManager.Instance.PlayBGM(Constants.SoundType.BGM_Lobby);
         
+        if (NetworkServer.active)
+        {
+            AudioManager.Instance.SetBGMVolume(0f); // BGM 볼륨 0
+            AudioManager.Instance.SetSFXVolume(0f); // SFX 볼륨 0
+        }
+        
+        AudioManager.Instance.PlayBGM(Constants.SoundType.BGM_Lobby);
+
         ChangeTeamButton.onClick.AddListener(OnClickChangeTeam);
     }
 
@@ -59,76 +59,126 @@ public class GameLobbyUI : MonoBehaviour
 
     public virtual void UpdatePlayerInRoon()
     {
-        // ✅ 현재 씬에서 모든 PlayerCharacter 찾기
+        // ✅ 모든 PlayerCharacter 가져오기
         foundCharacters = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None)
-            .OrderBy(player => player.GetComponent<NetworkIdentity>().netId)
-            .ToArray();
-        
-        PlayerCharacters = foundCharacters
-            .Select(player => player.gameObject) // GameObject만 배열에 저장
+            .Where(p => p.playerId >= 0)
+            .OrderBy(p => p.playerId)
             .ToArray();
 
+        // ✅ PlayerCharacters 배열 재구성
+        var maxPlayerId = foundCharacters.Length > 0 ? foundCharacters.Max(p => p.playerId) : 0;
+        PlayerCharacters = new GameObject[maxPlayerId + 1];
 
-        // ✅ 본인의 플레이어 번호 찾기
+        foreach (var player in foundCharacters)
+            if (player.playerId >= 0 && player.playerId < PlayerCharacters.Length)
+                PlayerCharacters[player.playerId] = player.gameObject;
+
+        // ✅ 내 플레이어 찾기
         var myPlayer = foundCharacters.FirstOrDefault(p => p.isOwned);
-        if (myPlayer != null)
-        {
-            int myIndex = Array.IndexOf(PlayerCharacters, myPlayer.gameObject);
-            PlayerSetting.PlayerId = myIndex;
-            //Debug.Log($"[GameLobbyUI] 내 PlayerNum: {PlayerSetting.PlayerNum}");
-        }
+        if (myPlayer != null) PlayerSetting.PlayerId = myPlayer.playerId;
 
-        // ✅ 게임 방 인원 수 업데이트
-        GameRoomData gameRoomData = FindFirstObjectByType<GameRoomData>();
+        // ✅ GameRoomData 가져와서 최대 인원, 팀 타입 확인
+        var gameRoomData = FindFirstObjectByType<GameRoomData>();
         if (gameRoomData != null)
         {
-            int maxPlayers = gameRoomData.maxPlayerCount; // ✅ 최대 인원 가져오기
-            PlayerInRoonText.text = $"현재 인원 {PlayerCharacters.Length} / {maxPlayers}";
-            
-            if (gameRoomData.roomType == Constants.RoomType.Team)
+            PlayerInRoonText.text = $"현재 인원 {foundCharacters.Length} / {gameRoomData.maxPlayerCount}";
+
+            if (gameRoomData.roomType == Constants.RoomType.Team && myPlayer != null)
             {
-                var localPlayer = foundCharacters.FirstOrDefault(p => p.isOwned);
-
-                if (localPlayer != null && localPlayer.team == Constants.TeamType.None)
+                if (myPlayer.team == Constants.TeamType.None)
                 {
-                    int teamACount = foundCharacters.Count(p => p.team == Constants.TeamType.TeamA);
-                    int teamBCount = foundCharacters.Count(p => p.team == Constants.TeamType.TeamB);
+                    var teamACount = foundCharacters.Count(p => p.team == Constants.TeamType.TeamA);
+                    var teamBCount = foundCharacters.Count(p => p.team == Constants.TeamType.TeamB);
 
-                    Constants.TeamType assignedTeam = teamACount > teamBCount
-                        ? Constants.TeamType.TeamB
-                        : Constants.TeamType.TeamA;
-
-                    localPlayer.CmdSetTeam(assignedTeam);
+                    var assignedTeam = teamACount > teamBCount ? Constants.TeamType.TeamB : Constants.TeamType.TeamA;
+                    myPlayer.CmdSetTeam(assignedTeam);
                     PlayerSetting.TeamType = assignedTeam;
+                }
+                else
+                {
+                    PlayerSetting.TeamType = myPlayer.team;
                 }
             }
             else
             {
                 PlayerSetting.TeamType = Constants.TeamType.None;
             }
-            
-            if (gameRoomData != null && gameRoomData.roomType == Constants.RoomType.Solo)
-            {
-                ChangeTeamButton.gameObject.SetActive(false);
-            }
+
+            // 팀 변경 버튼 숨기기 (solo 방인 경우)
+            if (gameRoomData.roomType == Constants.RoomType.Solo) ChangeTeamButton.gameObject.SetActive(false);
         }
-        
+
+        // ✅ 상태창 UI 초기화
         playerStatusUI.Setup(foundCharacters, PlayerSetting.PlayerId);
 
-        // ✅ 방장인지 확인 후 버튼 활성화
+        // ✅ 방장 여부 확인하여 버튼 활성화
+        CheckIfHost(PlayerSetting.PlayerId);
+
+        if (myPlayer)
+        {
+            Debug.Log("UpdatePlayerInRoon : " + myPlayer.playerId + ", " + myPlayer.nickname + ", " + foundCharacters.Length);
+        }
+    }
+
+
+    public void OnServerPlayerListUpdated(string netIdListStr)
+    {
+        var parts = netIdListStr.Split(',');
+        var netIds = parts.Select(p => uint.TryParse(p, out var id) ? id : 0).ToArray();
+
+        var allPlayers = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None);
+        var orderedPlayers = netIds
+            .Select(id => allPlayers.FirstOrDefault(p => p.GetComponent<NetworkIdentity>().netId == id))
+            .Where(p => p != null)
+            .ToArray();
+
+        PlayerCharacters = orderedPlayers.Select(p => p.gameObject).ToArray();
+        foundCharacters = orderedPlayers;
+
+        // 내 플레이어 식별
+        var myPlayer = orderedPlayers.FirstOrDefault(p => p.isOwned);
+        if (myPlayer != null)
+        {
+            var myIndex = Array.IndexOf(PlayerCharacters, myPlayer.gameObject);
+            PlayerSetting.PlayerId = myIndex;
+        }
+
+        // UI 표시
+        var roomData = FindFirstObjectByType<GameRoomData>();
+        PlayerInRoonText.text = $"현재 인원 {PlayerCharacters.Length} / {roomData.maxPlayerCount}";
+
+        // 팀 자동 설정
+        if (roomData.roomType == Constants.RoomType.Team && myPlayer != null &&
+            myPlayer.team == Constants.TeamType.None)
+        {
+            var teamACount = orderedPlayers.Count(p => p.team == Constants.TeamType.TeamA);
+            var teamBCount = orderedPlayers.Count(p => p.team == Constants.TeamType.TeamB);
+
+            var assignedTeam = teamACount > teamBCount ? Constants.TeamType.TeamB : Constants.TeamType.TeamA;
+            myPlayer.CmdSetTeam(assignedTeam);
+            PlayerSetting.TeamType = assignedTeam;
+        }
+
+        playerStatusUI.Setup(orderedPlayers, PlayerSetting.PlayerId);
         CheckIfHost(PlayerSetting.PlayerId);
     }
-    
+
     // ✅ 방장인지 확인 후 버튼 활성화
     private void CheckIfHost(int playerNum = -1)
-    {   
-        if (NetworkServer.active || playerNum == hostNum) // ✅ 방장인지 확인
+    {
+        if (StartGameButton == null || ChangeMapNextButton == null || ChangeMapBeforeButton == null)
+        {
+            Debug.LogWarning("[CheckIfHost] UI 요소가 아직 초기화되지 않음");
+            return;
+        }
+
+        if (NetworkServer.active || playerNum == hostNum)
         {
             StartGameButton.gameObject.SetActive(true);
             ChangeMapNextButton.gameObject.SetActive(true);
             ChangeMapBeforeButton.gameObject.SetActive(true);
-            
-            StartGameButton.onClick.AddListener(StartGame); // ✅ 버튼 클릭 이벤트 추가
+
+            StartGameButton.onClick.AddListener(StartGame);
         }
         else
         {
@@ -145,13 +195,10 @@ public class GameLobbyUI : MonoBehaviour
         {
             // ✅ 게임 시작 전에 플레이어 정보로 Stats 초기화
             var allPlayers = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None);
-            if (GameManager.Instance != null)
-            {
-                GameManager.Instance.Init(allPlayers);
-            }
-            
-            var players = FindObjectsByType<PlayerCharacter>(sortMode: FindObjectsSortMode.None);
-            bool allReady = players.All(p => p.State == Constants.PlayerState.Start);
+            if (GameManager.Instance != null) GameManager.Instance.Init(allPlayers);
+
+            var players = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None);
+            var allReady = players.All(p => p.State == Constants.PlayerState.Start);
 
             if (!allReady)
             {
@@ -169,24 +216,20 @@ public class GameLobbyUI : MonoBehaviour
 
     public void UpdateKillLog(int deadId, int skillid, int killerId, bool isFall)
     {
-        if (killerId < 0)
-        {
-            killerId = deadId;
-        }
+        if (killerId < 0) killerId = deadId;
 
-        if (foundCharacters == null || 
-            deadId < 0 || deadId >= foundCharacters.Length || 
+        if (foundCharacters == null ||
+            deadId < 0 || deadId >= foundCharacters.Length ||
             killerId < 0 || killerId >= foundCharacters.Length)
         {
-            Debug.LogWarning($"[UpdateKillLog] 잘못된 인덱스 접근: deadId={deadId}, killerId={killerId}, foundCharacters.Length={foundCharacters?.Length}");
+            Debug.LogWarning(
+                $"[UpdateKillLog] 잘못된 인덱스 접근: deadId={deadId}, killerId={killerId}, foundCharacters.Length={foundCharacters?.Length}");
             return;
         }
 
         killLogUI?.AddKillLog(foundCharacters[killerId], foundCharacters[deadId], skillid, isFall);
-
-        UpdatePlayerInRoon();
     }
-    
+
     private void ShowWarningMessage(string message)
     {
         if (warningCoroutine != null)
@@ -194,28 +237,28 @@ public class GameLobbyUI : MonoBehaviour
 
         warningCoroutine = StartCoroutine(FadeOutWarning(message));
     }
-    
+
     private IEnumerator FadeOutWarning(string message)
     {
         warningText.text = message;
-        Color originalColor = warningText.color;
+        var originalColor = warningText.color;
         originalColor.a = 1f;
         warningText.color = originalColor;
 
-        float duration = 2.5f; // 사라지는 데 걸리는 시간
-        float elapsed = 0f;
+        var duration = 2.5f; // 사라지는 데 걸리는 시간
+        var elapsed = 0f;
 
         while (elapsed < duration)
         {
             elapsed += Time.deltaTime;
-            float alpha = Mathf.Lerp(1f, 0f, elapsed / duration);
+            var alpha = Mathf.Lerp(1f, 0f, elapsed / duration);
             warningText.color = new Color(originalColor.r, originalColor.g, originalColor.b, alpha);
             yield return null;
         }
 
         warningText.text = "";
     }
-    
+
     public void OnClickChangeMap(bool next)
     {
         if (!NetworkClient.active) return;
@@ -228,8 +271,9 @@ public class GameLobbyUI : MonoBehaviour
     public virtual void UpdateMapUI(Constants.RoomMapType type)
     {
         var config = Database.GetMapConfig(type);
-        
-        if (config == null || MapImage == null || MapName == null) {
+
+        if (config == null || MapImage == null || MapName == null)
+        {
             Debug.LogWarning("[UpdateMapUI] UI 요소가 아직 준비되지 않았습니다.");
             return;
         }
@@ -238,7 +282,7 @@ public class GameLobbyUI : MonoBehaviour
         MapImage.sprite = config?.mapSprite; // 또는 따로 image 설정
         MapName.text = config?.mapName;
     }
-    
+
     private void OnClickChangeTeam()
     {
         var localPlayer = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None)
@@ -247,7 +291,9 @@ public class GameLobbyUI : MonoBehaviour
         if (localPlayer != null)
         {
             // 현재 팀 반대로 전환
-            var newTeam = localPlayer.team == Constants.TeamType.TeamA ? Constants.TeamType.TeamB : Constants.TeamType.TeamA;
+            var newTeam = localPlayer.team == Constants.TeamType.TeamA
+                ? Constants.TeamType.TeamB
+                : Constants.TeamType.TeamA;
             localPlayer.CmdSetTeam(newTeam);
             PlayerSetting.TeamType = newTeam;
         }
