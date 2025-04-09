@@ -7525,7 +7525,6 @@ RectTransform:
   m_Children:
   - {fileID: 1410454529}
   - {fileID: 116826357}
-  - {fileID: 1714490281}
   m_Father: {fileID: 1342887727}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -18135,6 +18134,7 @@ MonoBehaviour:
   - {fileID: 378403131}
   - {fileID: 737530096}
   - {fileID: 1764562648}
+  CloseButtons: []
 --- !u!1 &923625547
 GameObject:
   m_ObjectHideFlags: 0
@@ -24508,7 +24508,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1342887727
 RectTransform:
   m_ObjectHideFlags: 0
@@ -25543,6 +25543,7 @@ RectTransform:
   - {fileID: 1096821191}
   - {fileID: 1071716539}
   - {fileID: 389164150}
+  - {fileID: 1714490281}
   m_Father: {fileID: 352319838}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0.5}
@@ -31933,11 +31934,11 @@ RectTransform:
   m_LocalScale: {x: 0.76137, y: 0.76137, z: 0.76137}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 352319838}
+  m_Father: {fileID: 1410454529}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 841, y: 158}
+  m_AnchoredPosition: {x: 297.833, y: 81.67114}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1714490282
@@ -40604,6 +40605,7 @@ MonoBehaviour:
   isCardSelectionStarted: 0
   roundEnded: 0
   currentRound: 0
+  isLan: 0
 --- !u!224 &48476832153300763
 RectTransform:
   m_ObjectHideFlags: 0

@@ -6,10 +6,10 @@
   <component name="ChangeListManager">
     <list default="true" id="cc3f9180-20e1-46e1-b7c9-eeeaba4f5e46" name="Changes" comment="Changes">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UnityBuild/Assets/Scenes/MainMenu.unity" beforeDir="false" afterPath="$PROJECT_DIR$/UnityBuild/Assets/Scenes/MainMenu.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UnityBuild/Assets/Scripts/Networking/SocketManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/UnityBuild/Assets/Scripts/Networking/SocketManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UnityBuild/Assets/Scripts/UI/FindRoomUI.cs" beforeDir="false" afterPath="$PROJECT_DIR$/UnityBuild/Assets/Scripts/UI/FindRoomUI.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UnityBuild/Assets/Scripts/UI/MainMenu/OnlineUI.cs" beforeDir="false" afterPath="$PROJECT_DIR$/UnityBuild/Assets/Scripts/UI/MainMenu/OnlineUI.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UnityBuild/Assets/Resources/Prefabs/UI/PlayerCard.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/UnityBuild/Assets/Resources/Prefabs/UI/PlayerCard.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UnityBuild/Assets/Scenes/GamePlay.unity" beforeDir="false" afterPath="$PROJECT_DIR$/UnityBuild/Assets/Scenes/GamePlay.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UnityBuild/Assets/Scripts/UI/PlayerCard/PlayerCardSlot.cs" beforeDir="false" afterPath="$PROJECT_DIR$/UnityBuild/Assets/Scripts/UI/PlayerCard/PlayerCardSlot.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UnityBuild/Assets/Scripts/UI/PlayerCard/PlayerCardUI.cs" beforeDir="false" afterPath="$PROJECT_DIR$/UnityBuild/Assets/Scripts/UI/PlayerCard/PlayerCardUI.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UnityBuild/Assets/UniversalRenderPipelineGlobalSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/UnityBuild/Assets/UniversalRenderPipelineGlobalSettings.asset" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />

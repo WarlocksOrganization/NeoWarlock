@@ -16,6 +16,14 @@
         [SerializeField] private TMP_Text cardDetailText;
         [SerializeField] private Button reRollButton;
 
+        // [SerializeField] private TMP_Text scoreText;
+        [SerializeField] private TMP_Text rankText;
+        [SerializeField] private Image cardRankIcon;
+        [SerializeField] private Sprite luckyRankIcon;
+        [SerializeField] private Sprite cautionRankIcon;
+        [SerializeField] private Sprite okayRankIcon;
+        [SerializeField] private Sprite goodRankIcon;
+
         [SerializeField] private Sprite healthIcon;
         [SerializeField] private Sprite speedIcon;
         [SerializeField] private Sprite attackIcon;
@@ -34,6 +42,7 @@
         private Database.AttackData[] SkillData;
         private PlayerCardUI playerCardUI;
         private Database.AttackData aD;
+        private Database.PlayerCardData cardData;
 
         private void Awake()
         {
@@ -213,7 +222,39 @@
                     break;
             }
         }
-
+    public void SetCardScore(Database.PlayerCardData cardData, double score = 0, double rank = 0)
+    {
+        this.cardData = cardData;
+        if (MatrixLoadState.HasMatrixData == true)
+        {
+            bool isConditional = cardData.ID >= 10100 && cardData.ID < 10200;
+            if (isConditional && rank >= 0.3f)
+            {
+                cardRankIcon.sprite = luckyRankIcon;
+                rankText.text = $"<color=#D500FF>{rank * 10:F0}등급</color>";
+            }
+            // else if (!isConditional && rank > 0.5f)
+            // {
+            //     cardRankIcon.sprite = cautionRankIcon;
+            //     rankText.text = $"<color=#FFFD55>{rank * 10:F0}등급</color>";
+            // }
+            else if (rank >= 0.3f)
+            {
+                cardRankIcon.sprite = okayRankIcon; 
+                rankText.text = $"{rank * 10:F0}등급";
+            }
+            else
+            {
+                cardRankIcon.sprite = goodRankIcon;
+                rankText.text = $"<color=#00FF28>{rank * 10:F0}등급</color>";
+            }
+        }
+        else
+        {
+            cardRankIcon.sprite = okayRankIcon; 
+            rankText.text = $"?등급";
+        }
+    }
     public IEnumerator PlayExplosionEffect(Image effectImage)
     {
         float duration = 0.4f;
@@ -318,43 +359,65 @@
         {
             return currentCard;
         }
+// private void Reroll()
+//     {
+//         int slotIndex = Array.IndexOf(playerCardUI.slots, this);
+
+//         var newCard = playerCardUI.TryGetNewCardAndUpdateRank(slotIndex);
+//         if (newCard != null)
+//         {
+//             AudioManager.Instance.PlaySFX(Constants.SoundType.SFX_Reroll);
+
+//             reRollButton.gameObject.SetActive(false);
+//             StartCoroutine(CardRotation(newCard));
+//         }
+//         else
+//         {
+//             Debug.LogWarning("[PlayerCardSlot] 리롤 실패: 교체 가능한 카드가 없습니다.");
+//         }
+//     }
 
         private void Reroll()
         {
-            if (playerCardUI.TryGetNewCard(out Database.PlayerCardData newCard))
-            {
-                AudioManager.Instance.PlaySFX(Constants.SoundType.SFX_Reroll);
-                
-                reRollButton.gameObject.SetActive(false); // 리롤 버튼 비활성화
-                StartCoroutine(CardRotation(newCard));
+            if (playerCardUI.TryGetNewCard(out var newCard))
+            {           
+            AudioManager.Instance.PlaySFX(Constants.SoundType.SFX_Reroll);
+            reRollButton.gameObject.SetActive(false);
+            StartCoroutine(CardRotation(newCard));
             }
         }
 
-        private IEnumerator CardRotation(Database.PlayerCardData newCard)
+
+    private IEnumerator CardRotation(Database.PlayerCardData newCard)
+    {
+        float flipDuration = 0.15f;   // 앞면으로 가기까지 시간
+        float spinDuration = 0.6f;   // 바뀐 뒤 전체 회전 시간
+        float totalDuration = flipDuration + spinDuration;
+
+        Quaternion startRot = transform.rotation;
+        Quaternion midRot = Quaternion.Euler(0, 90f, 0);
+        Quaternion endRot = Quaternion.Euler(0, 0, 0);
+
+        // ▶ 1단계: 빠르게 반 바퀴 돌며 사라짐
+        float elapsed = 0f;
+        while (elapsed < flipDuration)
         {
-            float flipDuration = 0.15f;   // 앞면으로 가기까지 시간
-            float spinDuration = 0.6f;   // 바뀐 뒤 전체 회전 시간
-            float totalDuration = flipDuration + spinDuration;
-
-            Quaternion startRot = transform.rotation;
-            Quaternion midRot = Quaternion.Euler(0, 90f, 0);
-            Quaternion endRot = Quaternion.Euler(0, 0, 0);
-
-            // ▶ 1단계: 빠르게 반 바퀴 돌며 사라짐
-            float elapsed = 0f;
-            while (elapsed < flipDuration)
-            {
-                float t = elapsed / flipDuration;
-                t = EaseInOut(t);
-                transform.rotation = Quaternion.Slerp(startRot, midRot, t);
-                elapsed += Time.deltaTime;
-                yield return null;
-            }
+            float t = elapsed / flipDuration;
+            t = EaseInOut(t);
+            transform.rotation = Quaternion.Slerp(startRot, midRot, t);
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
 
             transform.rotation = midRot;
             SetCardData(newCard); // 카드 교체
             yield return new WaitForSeconds(0.05f); // 자연스러운 텀
+            if (MatrixLoadState.HasMatrixData == true)
+            {
+                playerCardUI.RecalculateAllRanks();
+            }
 
+            
             // ▶ 2단계: 여러 바퀴 돌면서 정면으로 정착
             float spinAngle = 360f * 3; // 3바퀴
             elapsed = 0f;
@@ -363,27 +426,27 @@
                 float t = elapsed / spinDuration;
                 t = EaseOutBack(t); // 살짝 튀어나오는 느낌의 easing
 
-                float angle = Mathf.Lerp(90f, 0f, t) + spinAngle * (1 - t);
-                transform.rotation = Quaternion.Euler(0, angle, 0);
+            float angle = Mathf.Lerp(90f, 0f, t) + spinAngle * (1 - t);
+            transform.rotation = Quaternion.Euler(0, angle, 0);
 
-                elapsed += Time.deltaTime;
-                yield return null;
-            }
-
-            transform.rotation = endRot;
-        }
-        private float EaseInOut(float t)
-        {
-            return t < 0.5f
-                ? 2f * t * t
-                : -1f + (4f - 2f * t) * t;
+            elapsed += Time.deltaTime;
+            yield return null;
         }
 
-        private float EaseOutBack(float t)
-        {
-            float c1 = 1.70158f;
-            float c3 = c1 + 1;
-            return 1 + c3 * Mathf.Pow(t - 1, 3) + c1 * Mathf.Pow(t - 1, 2);
-        }
-
+        transform.rotation = endRot;
     }
+    private float EaseInOut(float t)
+    {
+        return t < 0.5f
+            ? 2f * t * t
+            : -1f + (4f - 2f * t) * t;
+    }
+
+    private float EaseOutBack(float t)
+    {
+        float c1 = 1.70158f;
+        float c3 = c1 + 1;
+        return 1 + c3 * Mathf.Pow(t - 1, 3) + c1 * Mathf.Pow(t - 1, 2);
+    }
+
+}
