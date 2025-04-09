@@ -1,10 +1,12 @@
 using DataSystem;
+using System.Collections;
 using GameManagement;
 using kcp2k;
 using Mirror;
 using Networking;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Networking;
 
 namespace UI
 {
@@ -36,6 +38,7 @@ namespace UI
             displayModeText.text = displayModeMessage;
             
             AudioManager.Instance.PlayBGM(Constants.SoundType.BGM_MainMenu);
+            StartCoroutine(TryFetchMatrixFromServer());
         }
         public void OnClickGameStartButtion()
         {
@@ -62,6 +65,26 @@ namespace UI
             lanUI.SetActive(true);
             gameObject.SetActive(false);
         }
-        
+        private IEnumerator TryFetchMatrixFromServer()
+        {
+            if (!MatrixUpdateTracker.ShouldUpdateAfterHours(1)) yield break;
+
+            string url = "http://j12a509.p.ssafy.io:8081/hints";
+
+            UnityWebRequest request = UnityWebRequest.Get(url);
+            yield return request.SendWebRequest();
+
+            if (request.result == UnityWebRequest.Result.Success)
+            {
+                string json = request.downloadHandler.text;
+                MatrixFileManager.SaveMatrixJson(json);
+                MatrixUpdateTracker.SaveNow();
+                // MatrixManager.Instance.LoadMatrixFromJson(json);
+            }
+            else
+            {
+                Debug.LogError("데이터 요청 실패: " + request.error);
+            }
+        }
     }
 }
