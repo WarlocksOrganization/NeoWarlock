@@ -1,3 +1,4 @@
+using System;
 using DataSystem;
 using GameManagement;
 using kcp2k;
@@ -15,7 +16,12 @@ namespace UI
 
         [SerializeField] private Button createRoomButton;
         [SerializeField] private Button enterRoomButton;
-        
+
+        private void OnEnable()
+        {
+            GameManager.Instance.isLan = true;
+        }
+
         public void OnCreateRoomButtion()
         {
             AudioManager.Instance.PlaySFX(Constants.SoundType.SFX_Button);

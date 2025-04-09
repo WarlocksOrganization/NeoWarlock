@@ -29,6 +29,8 @@ namespace GameManagement
 
         private List<(int playerId, int rank)> roundRanks;
         private List<(int playerId, int kills, int outKills, int damageDone, int rank)> roundData;
+
+        public bool isLan = false;
         
 
         private void Awake()

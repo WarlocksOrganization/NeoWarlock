@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using DataSystem;
+using GameManagement;
 using Mirror;
 using Networking;
 using Unity.VisualScripting;
@@ -45,6 +46,8 @@ namespace UI
         public void OnEnable()
         {
             Debug.Log("[OnlineUI] OnEnable 진입");
+            
+            GameManager.Instance.isLan = true;
 
             nicknameUI.GetComponent<NicknameUI>().SyncNicknameShower();
 

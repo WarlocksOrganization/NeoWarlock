@@ -228,6 +228,11 @@ public class GameLobbyUI : MonoBehaviour
     public virtual void UpdateMapUI(Constants.RoomMapType type)
     {
         var config = Database.GetMapConfig(type);
+        
+        if (config == null || MapImage == null || MapName == null) {
+            Debug.LogWarning("[UpdateMapUI] UI 요소가 아직 준비되지 않았습니다.");
+            return;
+        }
 
         Debug.Log(config?.mapName);
         MapImage.sprite = config?.mapSprite; // 또는 따로 image 설정
