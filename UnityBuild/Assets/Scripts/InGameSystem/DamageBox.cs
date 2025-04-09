@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,10 +9,35 @@ using UnityEngine;
 public class DamageBox : MonoBehaviour
 {
     [SerializeField] private int damagePerTick = 10; // ✅ 0.5초마다 줄 데미지
+    [SerializeField] private int knockPerTick = 0;
+    [SerializeField] private Transform ownerTrans;
+    
+    
     [SerializeField] private float damageInterval = 0.5f; // ✅ 데미지 간격 (0.5초)
     [SerializeField] private AttackConfig attackConfig;
     private HashSet<PlayerCharacter> playersInRange = new HashSet<PlayerCharacter>(); // ✅ 감지된 플레이어 저장
     private Coroutine damageCoroutine; // ✅ 개별 데미지 코루틴 추적
+
+    private void OnEnable()
+    {
+        if (ownerTrans == null)
+        {
+            ownerTrans = transform;
+        }
+
+        playersInRange.Clear(); // ✅ 이전에 감지된 플레이어 초기화
+    }
+
+    private void OnDisable()
+    {
+        if (damageCoroutine != null)
+        {
+            StopCoroutine(damageCoroutine); // ✅ 코루틴 종료
+            damageCoroutine = null;
+        }
+
+        playersInRange.Clear(); // ✅ 상태 정리
+    }
 
     private void OnTriggerEnter(Collider other)
     {
@@ -54,7 +80,7 @@ public class DamageBox : MonoBehaviour
         {
             foreach (var player in playersInRange.ToList()) // 안전하게 복사
             {
-                player.takeDamage(damagePerTick, transform.position, 0, attackConfig, -1, 0);
+                player.takeDamage(damagePerTick, ownerTrans.position, knockPerTick, attackConfig, -1, 0);
 
                 if (player.curHp <= 0)
                 {

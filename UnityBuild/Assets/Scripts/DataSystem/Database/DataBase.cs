@@ -13,6 +13,7 @@ namespace DataSystem.Database
             LoadCardIcons();
             LoadCharacterClassData();
             LoadBuffData();
+            LoadMapConfigs();
         }
         
         public static Dictionary<string, BuffData> buffDictionary = new();

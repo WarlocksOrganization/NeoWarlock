@@ -194,6 +194,9 @@ public class BuffSystem : NetworkBehaviour
         while (elapsed < duration)
         {
             yield return null;
+            
+            if (!cc.enabled) yield break;
+            
             Quaternion rot = playerCharacter.transform.GetChild(2).rotation;
             Vector3 moveDir = rot * moveDirection;
             moveDir.y = 0f;

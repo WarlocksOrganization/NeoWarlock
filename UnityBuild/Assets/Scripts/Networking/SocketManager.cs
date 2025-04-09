@@ -38,6 +38,9 @@ namespace Networking
         public int maxRetries = 5; // 최대 재시도 횟수
         public static SocketManager singleton;
         public event Action<string> OnMessageReceived;
+        public string nickName = "Player";
+        private string sessionToken = "INVALID";
+        public string userId = "-1";
 
         void Awake()
         {
@@ -54,15 +57,6 @@ namespace Networking
         {
             // 서버에 연결
             // 백그라운드 스레드로 연결
-            if (PlayerPrefs.HasKey("sessionToken"))
-            {
-                PlayerPrefs.DeleteKey("sessionToken");
-            }
-            if (PlayerPrefs.HasKey("userId"))
-            {
-                PlayerPrefs.DeleteKey("userId");
-            }
-
             if (UnityEngine.Application.platform.Equals(RuntimePlatform.LinuxServer))
             {
                 // 리눅스 서버에서 실행 중인 경우 명령행 인수로 소켓 서버 IP 및 포트 변경
@@ -280,7 +274,7 @@ namespace Networking
         {
             // 로그아웃 버튼 클릭 시 호출
             var modalPopup = ModalPopupUI.singleton;
-            if (modalPopup != null && PlayerPrefs.HasKey("sessionToken"))
+            if (modalPopup != null && IsSessionValid())
             {
                 modalPopup.ShowModalMessage("로그아웃 되었습니다.");
             }
@@ -297,22 +291,21 @@ namespace Networking
         public void CloseConnection(bool calledFromClient = false)
         {
             // 로컬 저장소 초기화
-            if (PlayerPrefs.HasKey("sessionToken"))
+            if (sessionToken != "INVALID")
             {
                 if (_client != null &&_client.Connected)
                 {
                     RequestLogout();
                 }
-                PlayerPrefs.DeleteKey("sessionToken");
+                sessionToken = "INVALID";
             }
-            if (PlayerPrefs.HasKey("userId"))
+            if (userId != "-1")
             {
-                PlayerPrefs.DeleteKey("userId");
+                userId = "-1";
             }
-            if (PlayerPrefs.HasKey("nickName"))
+            if (nickName != null)
             {
-                PlayerPrefs.DeleteKey("nickName");
-                PlayerPrefs.SetString("nickName", "Player" + UnityEngine.Random.Range(1000, 9999));
+                nickName = "Player" + UnityEngine.Random.Range(1000, 9999);
             }
 
             // 연결 해제
@@ -580,6 +573,11 @@ namespace Networking
         public bool IsConnected()
         {
             return _client != null && _client.Connected;
+        }
+
+        public bool IsSessionValid()
+        {
+            return sessionToken != null && sessionToken != "INVALID";
         }
     }
 }

@@ -26,6 +26,8 @@ namespace GameManagement
         [SerializeField] private GameObject[] SpaceObjects;
         [SerializeField] private GameObject[] SeaObjects;
         
+        [SerializeField] private GameObject[] LavaDragonObjects;
+        
         [SerializeField] private List<GameObject> spawnedObjects = new();
         
         [SyncVar] public int currentRound = 0;
@@ -66,14 +68,28 @@ namespace GameManagement
         
         public void ChangeMap(bool next)
         {
-            int current = (int)roomMapType;
-            int totalMaps = 4; // 0~3까지 4개만 순환
+            // 순회할 맵 타입 리스트
+            Constants.RoomMapType[] mapCycle = new Constants.RoomMapType[]
+            {
+                Constants.RoomMapType.Random,
+                Constants.RoomMapType.SSAFY,
+                Constants.RoomMapType.Lava,
+                Constants.RoomMapType.Space,
+                Constants.RoomMapType.LavaDragon,
+            };
 
-            current += next ? 1 : -1;
-            if (current < 0) current = totalMaps - 1;
-            if (current >= totalMaps) current = 0;
+            int currentIndex = System.Array.IndexOf(mapCycle, roomMapType);
 
-            roomMapType = (Constants.RoomMapType)current;
+            // 만약 현재 타입이 리스트에 없다면 0으로 초기화
+            if (currentIndex == -1) currentIndex = 0;
+
+            currentIndex += next ? 1 : -1;
+
+            // 순환 처리
+            if (currentIndex < 0) currentIndex = mapCycle.Length - 1;
+            if (currentIndex >= mapCycle.Length) currentIndex = 0;
+
+            roomMapType = mapCycle[currentIndex];
         }
 
         private void OnMapTypeChanged(Constants.RoomMapType oldVal, Constants.RoomMapType newVal)
@@ -107,6 +123,7 @@ namespace GameManagement
                 Constants.RoomMapType.Lava => LavaObjects,
                 Constants.RoomMapType.Space => SpaceObjects,
                 Constants.RoomMapType.Sea => SeaObjects,
+                Constants.RoomMapType.LavaDragon => LavaDragonObjects,
                 _ => null
             };
 
@@ -198,6 +215,12 @@ namespace GameManagement
             GameManager.Instance.ResetRoundStateOnly();
             SpawnGamePlayObjects();      // 맵 오브젝트 미리 생성
             RespawnAllPlayers();         // 미리 부활
+        }
+        
+        [Server]
+        public void SetRoomType(Constants.RoomType newType)
+        {
+            roomType = newType;
         }
 
     }

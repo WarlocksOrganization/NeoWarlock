@@ -24,6 +24,14 @@ namespace GameManagement
         private List<int> deathOrder = new();
         private Dictionary<int, Constants.PlayerRecord> playerRecords = new();
         public int currentRound = 0;
+        
+        public Constants.DragonState dragonState = new();
+
+        private List<(int playerId, int rank)> roundRanks;
+        private List<(int playerId, int kills, int outKills, int damageDone, int rank)> roundData;
+
+        public bool isLan = false;
+        
 
         private void Awake()
         {
@@ -188,8 +196,47 @@ namespace GameManagement
 
             var room = FindFirstObjectByType<GameRoomData>();
             bool isTeamGame = room != null && room.roomType == Constants.RoomType.Team;
+            bool isRaidGame = room != null && room.roomType == Constants.RoomType.Raid;
+            
+            if (alivePlayers.Count == 0)
+            {
+                Debug.Log("[GameOverCheck] 모든 플레이어 사망 → 게임 종료");
 
-            if (isTeamGame)
+                roundEnded = true;
+                roundRanks = GetCurrentRoundRanks();
+                roundData = roundRanks.Select(tuple =>
+                {
+                    var stats = GetPlayerStats(tuple.playerId);
+                    return (tuple.playerId, stats.kills, stats.outKills, stats.damageDone, tuple.rank);
+                }).ToList();
+
+                AddRoundResult(roundData);
+
+                foreach (var conn in NetworkServer.connections.Values)
+                {
+                    var player = conn.identity.GetComponent<GamePlayer>();
+                    player?.RpcPrepareScoreBoard();
+                    player?.RpcSendFinalScore(GetAllPlayerRecords(), currentRound - 1);
+                }
+
+                StartCoroutine(ServerRoundTransition());
+                isCheckingGameOver = false;
+                yield break;
+            }
+
+            if (isRaidGame)
+            {
+                bool isDragonAlive = DragonAI.Instance != null && DragonAI.Instance.curHp > 0;
+                int alivePlayerCount = alivePlayers.Count;
+
+                if ((isDragonAlive && alivePlayerCount >= 1) || (!isDragonAlive && alivePlayerCount > 1))
+                {
+                    // 아직 게임 끝나지 않음
+                    isCheckingGameOver = false;
+                    yield break;
+                }
+            }
+            else if (isTeamGame)
             {
                 var aliveTeamSet = new HashSet<Constants.TeamType>(
                     alivePlayers.Select(p => p.team).Where(t => t != Constants.TeamType.None)
@@ -211,8 +258,8 @@ namespace GameManagement
             }
 
             roundEnded = true;
-            var roundRanks = GetCurrentRoundRanks();
-            var roundData = roundRanks.Select(tuple =>
+            roundRanks = GetCurrentRoundRanks();
+            roundData = roundRanks.Select(tuple =>
             {
                 var stats = GetPlayerStats(tuple.playerId);
                 return (tuple.playerId, stats.kills, stats.outKills, stats.damageDone, tuple.rank);
@@ -282,6 +329,7 @@ namespace GameManagement
                 stats.roundRanks.Clear();
             }
             deathOrder.Clear();
+            dragonState = new();
         }
 
         public void ResetRoundStateOnly()
@@ -295,6 +343,7 @@ namespace GameManagement
                 stats.isDead = false;
             }
             deathOrder.Clear();
+            dragonState = new();
             roundEnded = false;
         }
 

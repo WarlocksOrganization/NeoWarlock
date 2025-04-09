@@ -67,17 +67,6 @@ namespace Networking
 
             SendMessageToServer(authData.ToString());
         }
-
-        public void RequestRefreshSession()
-        {
-            // 세션 갱신 요청
-            JToken refreshData = new JObject();
-            refreshData["action"] = "refreshSession";
-            refreshData["sessionId"] = PlayerPrefs.GetString("sessionId");
-
-            SendRequestToServer(refreshData);
-        }
-
         public void RequestUpdateNickname(string nickname)
         {
             // 닉네임 변경 요청
@@ -95,9 +84,12 @@ namespace Networking
             {
                 Debug.Log("[SocketManager] 인증 성공");
                 // 인증 성공 시 처리
-                PlayerPrefs.SetString("sessionToken", data.SelectToken("sessionToken").ToString());
-                PlayerPrefs.SetString("userId", data.SelectToken("userId").ToString());
-                PlayerPrefs.SetString("nickName", data.SelectToken("nickName").ToString());
+                sessionToken = data.SelectToken("sessionToken").ToString();
+                userId = data.SelectToken("userId").ToString();
+                nickName = data.SelectToken("nickName").ToString();
+                // PlayerPrefs.SetString("sessionToken", data.SelectToken("sessionToken").ToString());
+                // PlayerPrefs.SetString("userId", data.SelectToken("userId").ToString());
+                // PlayerPrefs.SetString("nickName", data.SelectToken("nickName").ToString());
 
                 PlayerSetting.Nickname = data.SelectToken("nickName").ToString();
                 PlayerSetting.UserId = data.SelectToken("userId").ToString();
@@ -124,8 +116,8 @@ namespace Networking
                 }
                 Debug.LogWarning("[SocketManager] 인증 실패");
                 // 인증 실패 시 처리
-                PlayerPrefs.DeleteKey("sessionToken");
-                PlayerPrefs.DeleteKey("userId");
+                // PlayerPrefs.DeleteKey("sessionToken");
+                // PlayerPrefs.DeleteKey("userId");
             }
         }
 

@@ -9,6 +9,7 @@ using kcp2k;
 using Mirror;
 using Networking;
 using Newtonsoft.Json.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -271,6 +272,7 @@ namespace Player
                 timer?.StartGameFlow(Constants.CountTime, Constants.MaxGameEventTime);
 
                 GameHand.Instance?.SwitchTarget();
+                DragonAI.Instance?.Init();
             }
         }
 
@@ -304,6 +306,7 @@ namespace Player
         void OnDestroy()
         {
             StopAllCoroutines(); // or Stop specific coroutine
+            GameManager.Instance.isCardSelectionStarted =false;
         }
         
         [ClientRpc]

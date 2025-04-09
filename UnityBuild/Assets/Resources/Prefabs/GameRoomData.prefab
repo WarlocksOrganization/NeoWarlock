@@ -51,7 +51,6 @@ MonoBehaviour:
   roomName: 
   roomType: 0
   maxPlayerCount: 0
-  Round: 3
   roomMapType: 0
   gameId: 0
   roomId: 0
@@ -64,6 +63,11 @@ MonoBehaviour:
   - {fileID: 5686090464823823962, guid: f7568a4ee603c8d429b335064de24a78, type: 3}
   SeaObjects:
   - {fileID: 0}
+  LavaDragonObjects:
+  - {fileID: 7201318047736419435, guid: 024d21bf68670324e9fd2dbda7bb6507, type: 3}
+  - {fileID: 5686090464823823962, guid: 385ed141775e6b2459b013bbbca3ec78, type: 3}
+  spawnedObjects: []
+  currentRound: 0
 --- !u!114 &26060392058629745
 MonoBehaviour:
   m_ObjectHideFlags: 0

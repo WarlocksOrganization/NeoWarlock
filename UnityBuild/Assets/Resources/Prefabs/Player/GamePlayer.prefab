@@ -54,6 +54,8 @@ MonoBehaviour:
   PlayerNickname: 
   stats:
     nickname: 
+    userId: 
+    selectedCards: 
     characterClass: 0
     kills: 0
     deaths: 0
@@ -71,6 +73,10 @@ MonoBehaviour:
   - {fileID: 5686090464823823962, guid: f7568a4ee603c8d429b335064de24a78, type: 3}
   SeaPlayObject:
   - {fileID: 5686090464823823962, guid: 606df0497a136824b8de681a0a5ab317, type: 3}
+  LavaDragonPlayObject:
+  - {fileID: 5686090464823823962, guid: 385ed141775e6b2459b013bbbca3ec78, type: 3}
+  - {fileID: 7201318047736419435, guid: 024d21bf68670324e9fd2dbda7bb6507, type: 3}
+  isPlayerSpawned: 0
 --- !u!114 &6368749677994769231
 MonoBehaviour:
   m_ObjectHideFlags: 0

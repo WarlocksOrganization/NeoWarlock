@@ -313,7 +313,6 @@ namespace Networking
                 Dictionary<string, string> roomData = new Dictionary<string, string>
                 {
                     {"roomName", roomName.TrimEnd('$')},
-                    {"currentPlayerCount", data.SelectToken("currentPlayers").ToString()},
                     {"roomType", roomName.EndsWith("$") ? Constants.RoomType.Team.ToString() : Constants.RoomType.Solo.ToString()},
                     {"maxPlayerCount", data.SelectToken("maxPlayers").ToString()},
                     {"gameId", null},

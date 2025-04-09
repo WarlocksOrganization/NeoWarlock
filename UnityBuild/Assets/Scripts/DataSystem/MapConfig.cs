@@ -4,7 +4,7 @@ using System;
 namespace DataSystem
 {
     [CreateAssetMenu(fileName = "MapConfig", menuName = "GameData/MapConfig", order = 1)]
-    public class MapConfig : ScriptableObject
+    public class MapConfig : ScriptableObject 
     {
         public Constants.RoomMapType mapType;
         public string mapName;

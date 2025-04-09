@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Linq;
 using DataSystem;
+using DataSystem.Database;
 using GameManagement;
 using Mirror;
 using Networking;
@@ -223,16 +224,19 @@ public class GameLobbyUI : MonoBehaviour
         player.CmdChangeMap(next);
         AudioManager.Instance.PlaySFX(Constants.SoundType.SFX_Button);
     }
-    
-    [SerializeField] private MapConfig[] mapConfigs;
 
     public virtual void UpdateMapUI(Constants.RoomMapType type)
     {
-        var config = mapConfigs.FirstOrDefault(m => m.mapType == type);
-        if (config == null) return;
+        var config = Database.GetMapConfig(type);
+        
+        if (config == null || MapImage == null || MapName == null) {
+            Debug.LogWarning("[UpdateMapUI] UI 요소가 아직 준비되지 않았습니다.");
+            return;
+        }
 
-        MapImage.sprite = config.mapSprite; // 또는 따로 image 설정
-        MapName.text = config.mapName;
+        Debug.Log(config?.mapName);
+        MapImage.sprite = config?.mapSprite; // 또는 따로 image 설정
+        MapName.text = config?.mapName;
     }
     
     private void OnClickChangeTeam()

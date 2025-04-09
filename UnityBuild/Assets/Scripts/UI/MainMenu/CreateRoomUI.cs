@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using DataSystem;
 using GameManagement;
@@ -16,6 +17,8 @@ namespace UI
         [SerializeField] private TMP_InputField roomNameInput;
         [SerializeField] private Button[] roomTypeButtons;
         [SerializeField] private Button[] maxPlayerCountButtons;
+        
+        [SerializeField] private GameObject[] CloseButtons;
 
         private const int MIN_PLAYER = 2;
         Color blackWithAlpha = new Color(0f, 0f, 0f, 200f / 255f);
@@ -36,6 +39,20 @@ namespace UI
             roomData.maxPlayerCount = 6;
 
             roomNameInput.text = roomData.roomName;
+        }
+
+        private void OnEnable()
+        {
+            if (GameManager.Instance.isLan)
+            {
+                CloseButtons[0].SetActive(true);
+                CloseButtons[1].SetActive(false);
+            }
+            else
+            {
+                CloseButtons[0].SetActive(false);
+                CloseButtons[1].SetActive(true);
+            }
         }
 
 
@@ -84,7 +101,7 @@ namespace UI
             var manager = RoomManager.singleton as RoomManager;
             string roomTypeTrail = roomData.roomType == Constants.RoomType.Team ? "$" : string.Empty;
 
-            if (PlayerPrefs.HasKey("sessionToken"))
+            if (Networking.SocketManager.singleton.IsSessionValid())
             {
                 // 로그인 상태에서 방 생성
                 Networking.SocketManager.singleton.RequestCreateRoom(roomData.roomName + roomTypeTrail, roomData.maxPlayerCount);

@@ -46,6 +46,7 @@ public class GameHand : NetworkBehaviour
     private void Start()
     {
         isAttacking = false;
+        transform.position = new Vector3(0, 5f, 0);
         animator.SetBool("isReady", true);
     }
 
@@ -321,7 +322,7 @@ public class GameHand : NetworkBehaviour
         
         foreach (var anim in Screenanimators)
         {
-            anim.SetBool("isBlackout", true);
+            anim.SetBool("isBlackout", false);
         }
         
         AudioManager.Instance.SetBGMPitch(1f);

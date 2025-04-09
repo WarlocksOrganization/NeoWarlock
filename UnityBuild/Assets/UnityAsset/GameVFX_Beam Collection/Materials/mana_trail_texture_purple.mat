@@ -53,8 +53,9 @@ Material:
     - _Usecenterglow: 0
     - _Usedepth: 0
     m_Colors:
-    - _Color: {r: 0.6156863, g: 0.24705878, b: 0.654902, a: 0.69411767}
+    - _Color: {r: 0.654902, g: 0.6467188, b: 0.24705881, a: 0.69411767}
     - _DistortionSpeedXYPowerZ: {r: 0, g: 0, b: 0, a: 0}
     - _SpeedMainTexUVNoiseZW: {r: 0, g: 0, b: 0, a: 0}
     - _TintColor: {r: 0.6156863, g: 0.24705882, b: 0.654902, a: 0.29803923}
   m_BuildTextureStacks: []
+  m_AllowLocking: 1

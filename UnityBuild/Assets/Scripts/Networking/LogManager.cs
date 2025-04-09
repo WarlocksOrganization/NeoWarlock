@@ -207,7 +207,7 @@ namespace Networking
 
         private void HandleLog(string logString, string stackTrace, LogType type)
         {
-            // 일반 로그는 무시시
+            // 일반 로그는 무시
             if (type == LogType.Log)
             {
                 return;
