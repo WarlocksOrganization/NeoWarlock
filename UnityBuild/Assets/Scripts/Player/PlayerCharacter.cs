@@ -237,6 +237,20 @@ namespace Player
             
             var ui = FindFirstObjectByType<GameLobbyUI>();
             ui?.UpdatePlayerInRoon(); // ✅ 죽었을 때 내 UI 갱신
+            
+            if (newValue)
+            {
+                // 아이템 스킬 제거 처리
+                itemSkillId = -1;
+                if (availableAttacks[4] is MonoBehaviour oldAttack)
+                    Destroy(oldAttack.gameObject);
+                availableAttacks[4] = null;
+
+                if (isOwned)
+                {
+                    PlayerSetting.ItemSkillID = -1; // 클라이언트도 동기화
+                }
+            }
         }
         
         public void SetState(Constants.PlayerState value)
