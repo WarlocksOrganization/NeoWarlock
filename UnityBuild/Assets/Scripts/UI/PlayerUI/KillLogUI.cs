@@ -40,7 +40,11 @@ public class KillLogUI : MonoBehaviour
     // 🔹 킬 로그 추가
     public void AddKillLog(PlayerCharacter killer, PlayerCharacter victim, int skillId, bool isFall)
     {
-        if (logPool.Count == 0) return; // 사용할 수 있는 로그 아이템이 없으면 리턴
+        if (logPool.Count == 0)
+        {
+            Debug.LogWarning("[KillLogUI] 로그 풀 부족! 로그가 생성되지 않았습니다.");
+            return;
+        }
 
         KillLogItem logItem = logPool.Dequeue();
         logItem.gameObject.SetActive(true);

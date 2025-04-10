@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Player;
 using UnityEngine;
 
@@ -9,7 +10,7 @@ public class PlayerStatusUI : MonoBehaviour
 
     private readonly List<PlayerPanel> playerPanels = new();
 
-    public void Setup(PlayerCharacter[] players, int playerid)
+    public void Setup(Dictionary<int, PlayerCharacter> playersDict, int myPlayerId)
     {
         // 기존 UI 정리
         foreach (Transform child in panelParent)
@@ -19,13 +20,14 @@ public class PlayerStatusUI : MonoBehaviour
         playerPanels.Clear();
 
         // 플레이어 수만큼 동적 생성
-        foreach (var player in players)
+        foreach (var kv in playersDict.OrderBy(kv => kv.Key))
         {
+            var player = kv.Value;
             var panelGO = Instantiate(playerPanelPrefab, panelParent);
             var panel = panelGO.GetComponent<PlayerPanel>();
             if (panel != null)
             {
-                panel.Setup(player, playerid);
+                panel.Setup(player, myPlayerId);
                 playerPanels.Add(panel);
             }
         }

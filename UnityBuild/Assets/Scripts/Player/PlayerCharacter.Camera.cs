@@ -81,8 +81,8 @@ namespace Player
             targets.Add(new CinemachineTargetGroup.Target
             {
                 target = target,
-                weight = 1f,
-                radius = 6f
+                weight = 0.5f,
+                radius = 3f
             });
 
             group.m_Targets = targets.ToArray();

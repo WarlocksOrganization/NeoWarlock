@@ -33,7 +33,7 @@ namespace GameManagement
         [SyncVar] public int currentRound = 0;
         
         [SyncVar(hook = nameof(OnPlayerListChanged))]
-        public string playerNetIdsString;
+        public string playerIdsString;
         
         private void Start()
         {
@@ -230,16 +230,12 @@ namespace GameManagement
         public void UpdatePlayerList()
         {
             var players = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None)
-                .OrderBy(p => p.GetComponent<NetworkIdentity>().netId)
+                .OrderBy(p => p.playerId) // 이제 playerId 기준
                 .ToArray();
 
-            for (int i = 0; i < players.Length; i++)
-            {
-                players[i].playerId = i; // 직접 playerId 설정
-            }
-
-            playerNetIdsString = string.Join(",", players.Select(p => p.GetComponent<NetworkIdentity>().netId.ToString() + ":" + p.playerId.ToString()));
+            playerIdsString = string.Join(",", players.Select(p => p.playerId));
         }
+
 
         private void OnPlayerListChanged(string oldVal, string newVal)
         {

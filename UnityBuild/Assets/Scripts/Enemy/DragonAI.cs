@@ -211,6 +211,16 @@ public partial class DragonAI : NetworkBehaviour, IDamagable
                 player.team = Constants.TeamType.None;
             }
         }
+        RpcHideHealthUI(); // 체력바 숨기기 호출
+    }
+    
+    // 체력바 숨기기 Rpc 추가
+    [ClientRpc]
+    private void RpcHideHealthUI()
+    {
+        var hpBar = FindFirstObjectByType<DragonHPBar>();
+        if (hpBar != null)
+            hpBar.HideHpBar();
     }
 
     private void OnHpChanged(int oldHp, int newHp)

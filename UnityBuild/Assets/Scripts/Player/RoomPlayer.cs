@@ -15,11 +15,14 @@ namespace Player
 
         [SyncVar]
         public string PlayerNickname;
+        
+        [SyncVar] public int playerId;
 
         [SyncVar]
         public string UserId;
 
         public LobbyPlayerCharacter LobbyPlayer;
+        
 
         public override void Start()
         {
@@ -56,8 +59,15 @@ namespace Player
             }
             
             Vector3 spawnPos = FindFirstObjectByType<SpawnPosition>().GetSpawnPosition();
-            LobbyPlayer = Instantiate((NetworkRoomManager.singleton as RoomManager).spawnPrefabs[0], spawnPos, Quaternion.identity).GetComponent<LobbyPlayerCharacter>();
-            NetworkServer.Spawn(LobbyPlayer.gameObject, connectionToClient);
+            var lobbyPlayer = Instantiate((NetworkRoomManager.singleton as RoomManager).spawnPrefabs[0], spawnPos, Quaternion.identity)
+                .GetComponent<LobbyPlayerCharacter>();
+
+            // ✅ RoomPlayer의 netId를 그대로 playerId로 지정
+            lobbyPlayer.playerId = (int)netId;
+            playerId  = (int)netId;
+
+            LobbyPlayer = lobbyPlayer;
+            NetworkServer.Spawn(lobbyPlayer.gameObject, connectionToClient);
         }
 
         public override void OnStartClient()
@@ -75,7 +85,7 @@ namespace Player
         [Command]
         public void CmdSetNickname(string nickname)
         {
-            Debug.Log(PlayerSetting.Nickname);
+            Debug.Log(PlayerSetting.Nickname + " : " + netId);
             PlayerNickname = nickname;
             LobbyPlayer.nickname = PlayerNickname;
         }

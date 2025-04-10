@@ -148,14 +148,21 @@ namespace Player
                     RpcTransmitKillLog(-1, -1, false);
                 }
 
-                PlayerCharacter[] playerCharacters = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None)
-                    .OrderBy(player => player.GetComponent<NetworkIdentity>().netId)
-                    .ToArray();
-                if (playerCharacters.Count() > attackPlayerId)
+                var playerCharacterDict = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None)
+                    .ToDictionary(p => p.playerId, p => p);
+                
+                string attackerUserId = "0";
+
+                if (attackPlayerId != -1 && playerCharacterDict.TryGetValue(attackPlayerId, out var attacker))
                 {
-                    string attackerUserId = attackPlayerId == -1 ? (attackPlayersId == -1 ? "0" : playerCharacters[attackPlayersId].userId) : playerCharacters[attackPlayerId].userId;
-                    FileLogger.LogKill(attackerUserId, userId, attackskillid == 0 ? "outside" : "skill", attackskillid.ToString());
+                    attackerUserId = attacker.userId;
                 }
+                else if (attackPlayersId != -1 && playerCharacterDict.TryGetValue(attackPlayersId, out var fallbackAttacker))
+                {
+                    attackerUserId = fallbackAttacker.userId;
+                }
+                
+                FileLogger.LogKill(attackerUserId, userId, attackskillid == 0 ? "outside" : "skill", attackskillid.ToString());
             }
         }
         
