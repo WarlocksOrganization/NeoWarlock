@@ -225,7 +225,7 @@
     public void SetCardScore(Database.PlayerCardData cardData, double score = 0, double rank = 0)
     {
         this.cardData = cardData;
-        if (MatrixLoadState.HasMatrixData == true)
+        if (MatrixLoadState.HasMatrixData == true && MatrixLoadState.IsMatrixValid == true)
         {
             bool isConditional = cardData.ID >= 10100 && cardData.ID < 10200;
             if (isConditional && rank >= 0.3f)
