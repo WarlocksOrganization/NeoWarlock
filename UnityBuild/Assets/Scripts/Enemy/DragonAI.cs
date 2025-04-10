@@ -11,8 +11,6 @@ using UnityEngine.UI;
 
 public partial class DragonAI : NetworkBehaviour, IDamagable
 {
-    public static DragonAI Instance;
-
     [Header("Stats")]
     [SyncVar(hook = nameof(OnHpChanged))] public int curHp;
     [SyncVar] public int maxHp = 50;
@@ -44,7 +42,6 @@ public partial class DragonAI : NetworkBehaviour, IDamagable
             SetCollider(false); // 🛡️ 무적 설정은 서버에서만
         }
         
-        Instance = this;
         UpdateHealthUI();
         animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
     }

@@ -226,7 +226,8 @@ namespace GameManagement
 
             if (isRaidGame)
             {
-                bool isDragonAlive = DragonAI.Instance != null && DragonAI.Instance.curHp > 0;
+                DragonAI dragon = FindFirstObjectByType<DragonAI>();
+                bool isDragonAlive = dragon != null && dragon.curHp > 0;
                 int alivePlayerCount = alivePlayers.Count;
 
                 if ((isDragonAlive && alivePlayerCount >= 1) || (!isDragonAlive && alivePlayerCount > 1))

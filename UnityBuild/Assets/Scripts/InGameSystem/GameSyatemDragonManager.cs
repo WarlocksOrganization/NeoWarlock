@@ -110,16 +110,18 @@ public class GameSyatemDragonManager : GameSystemManager
             Quaternion downRotation = Quaternion.LookRotation(Vector3.down);
 
             GameObject attack = Instantiate(AttackPrefab, pos + spawnPosition, downRotation);
+            
+            GameObject dragon = FindFirstObjectByType<DragonAI>().gameObject;
 
             attack.GetComponent<AttackProjectile>().SetProjectileData(
-                10,  // damage
-                20,  // speed
-                7.5f,   // radius
-                5,   // range
-                10,  // duration
-                3,   // knockback
+                10, // damage
+                20, // speed
+                7.5f, // radius
+                5, // range
+                10, // duration
+                3, // knockback
                 attackConfig,
-                DragonAI.Instance.gameObject,
+                dragon,
                 -1,
                 -1
             );
@@ -158,10 +160,7 @@ public class GameSyatemDragonManager : GameSystemManager
         }
 
         // 착지 준비
-        if (DragonAI.Instance != null)
-        {
-            DragonAI.Instance.Init();
-        }
+        FindFirstObjectByType<DragonAI>()?.Init();
     }
     
     public void DragonFlyAttack2()
@@ -184,11 +183,7 @@ public class GameSyatemDragonManager : GameSystemManager
             yield return new WaitForSeconds(5f);
         }
 
-        // 착지 준비
-        if (DragonAI.Instance != null)
-        {
-            DragonAI.Instance.Init();
-        }
+        FindFirstObjectByType<DragonAI>()?.Init();
     }
 
     [ClientRpc]

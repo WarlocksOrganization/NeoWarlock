@@ -272,7 +272,8 @@ namespace Player
                 timer?.StartGameFlow(Constants.CountTime, Constants.MaxGameEventTime);
 
                 GameHand.Instance?.SwitchTarget();
-                DragonAI.Instance?.Init();
+                
+                FindFirstObjectByType<DragonAI>()?.Init();
             }
         }
 
