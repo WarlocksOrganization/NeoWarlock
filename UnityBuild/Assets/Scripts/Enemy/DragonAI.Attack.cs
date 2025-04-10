@@ -78,25 +78,25 @@ public partial class DragonAI
         }
         else if (selectedAttack.attackName == "메테오공격")
         {
-            yield return new WaitForSeconds(1.5f);
+            yield return new WaitForSeconds(1f);
             GameSyatemDragonManager gameSyatemDragonManager = GameSystemManager.Instance as GameSyatemDragonManager;
             gameSyatemDragonManager?.MeteorAttack(transform.position);
             RpcPlaySound(Constants.SoundType.SFX_DragonRoar);
 
-            float remainTime = selectedAttack.attackDuration - 1.5f;
+            float remainTime = selectedAttack.attackDuration - 1f;
             if (remainTime > 0)
                 yield return new WaitForSeconds(remainTime);
         }
         else if (selectedAttack.attackName == "바람공격")
         {
-            yield return new WaitForSeconds(2f);
+            yield return new WaitForSeconds(1.5f);
 
             RpcPlaySound(Constants.SoundType.SFX_DragonRoar);
             
             FireProjectilesIn8Directions(); // ✅ 8방향 발사
             RpcPlaySound(Constants.SkillType.Slash); // 원하시는 효과음으로 교체 가능
 
-            float remainTime = selectedAttack.attackDuration - 2f;
+            float remainTime = selectedAttack.attackDuration - 1.5f;
             if (remainTime > 0)
                 yield return new WaitForSeconds(remainTime);
         }
@@ -189,7 +189,14 @@ public partial class DragonAI
     private void FireRandomProjectile()
     {
         Transform firePoint = firePoints[0]; // 기준점 (입, 앞 등)
-        float randomAngle = Random.Range(-45f, 45f);
+        
+        float randomAngle = Random.Range(-90f, 90f);
+        
+        if (curHp <= maxHp / 2f)
+        {
+            randomAngle = Random.Range(-180f, 180f);
+        }
+        
         Quaternion rotation = Quaternion.Euler(0f, randomAngle, 0f) * firePoint.rotation;
 
         GameObject prefab = projectilePrefabs[0]; // 칼날공격 전용 프리팹 사용 시 인덱스 맞추기
@@ -250,6 +257,38 @@ public partial class DragonAI
 
             NetworkServer.Spawn(projectile);
         }
+
+        if (curHp <= maxHp / 2f)
+        {
+            for (int i = 0; i < 8; i++)
+            {
+                float angle = i * 45f + 22.5f; // 360 / 8 = 45도씩
+                Quaternion rotation = Quaternion.Euler(0f, angle, 0f);
+                Vector3 dir = rotation * Vector3.forward;
+
+                GameObject projectile = Instantiate(prefab, firePoint.position, Quaternion.LookRotation(dir));
+
+                AttackProjectile projComponent = projectile.GetComponent<AttackProjectile>();
+                if (projComponent != null)
+                {
+                    float lifetime = 10f;
+
+                    projComponent.SetProjectileData(
+                        selectedAttack.damage,
+                        selectedAttack.speed,
+                        selectedAttack.radius,
+                        selectedAttack.range,
+                        lifetime,
+                        selectedAttack.knockback,
+                        selectedAttack.config,
+                        gameObject,
+                        -1, -1
+                    );
+                }
+
+                NetworkServer.Spawn(projectile);
+            }
+        }
     }
 
     private void RotateTowardsTarget()
@@ -265,7 +304,13 @@ public partial class DragonAI
     private void MoveTowardsTarget()
     {
         Vector3 dir = (target.transform.position - transform.position).normalized;
+        
         transform.position += dir * moveSpeed * Time.deltaTime;
+        
+        if (curHp <= maxHp / 2)
+        {
+            transform.position += dir * moveSpeed * Time.deltaTime * 0.5f;
+        }
 
         animator.SetBool("isMoving", true);
     }

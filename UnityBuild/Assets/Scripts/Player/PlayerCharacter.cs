@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Cinemachine;
 using DataSystem;
+using DataSystem.Database;
 using GameManagement;
 using Mirror;
 using TMPro;
@@ -76,8 +77,6 @@ namespace Player
             
             maxHp = BaseHp;
             curHp = BaseHp;
-
-            UpdateCount();
             
             if (isOwned)
             {
@@ -132,30 +131,12 @@ namespace Player
             }
         }
 
-        private void OnDestroy()
-        {
-            UpdateCount();
-        }
-
         private void UpdatePlayerId(int oldValue, int newValue)
         {
-            if (isServer) return; // 서버에서는 직접 할당되므로 클라이언트에서만 실행
-
             playerId = newValue;
-            UpdateCount();
-        }
-
-        private void UpdateCount()
-        {
-            if (gameLobbyUI == null)
-            {
-                gameLobbyUI = FindFirstObjectByType<GameLobbyUI>();
-            }
-
-            if (gameLobbyUI != null)
-            {
-                gameLobbyUI?.UpdatePlayerInRoon();
-            }
+                
+            var ui = FindFirstObjectByType<GameLobbyUI>();
+            ui?.UpdatePlayerInRoon(); // ✅ 죽었을 때 내 UI 갱신
         }
 
         public void NotifyStatChanged()
@@ -198,6 +179,9 @@ namespace Player
         {
             nicknameText.text = value;
             nickname = value;
+            
+            var ui = FindFirstObjectByType<GameLobbyUI>();
+            ui?.UpdatePlayerInRoon(); // ✅ 팀 바뀌면 내 UI 갱신
         }
         
         public void SetUserIdhook(string _, string value)
@@ -236,39 +220,37 @@ namespace Player
             {
                 isDead = value;
                 if (value) SpawnGhost();
-                RpcUpdatePlayerStatus(connectionToClient); // ✅ 서버에서 실행 시 TargetRpc 호출
             }
         }
 
         [Command]
         private void CmdSetIsDead(bool value)
         {
+            _characterController.enabled = !value;
             isDead = value;
-    
-            // ✅ 서버에서 클라이언트에게 UI 업데이트 전송
-            RpcUpdatePlayerStatus(connectionToClient);
         }
 
         public void SetIsDead_Hook(bool oldValue, bool newValue)
         {
             isDead = newValue;
             _characterController.enabled = !newValue;
-
-            //Debug.Log($"[SetIsDead_Hook] {PlayerSetting.PlayerId} 플레이어 {playerId} isDead 값 변경됨: {newValue}");
-
-            // ✅ UI 강제 업데이트
-            UpdateCount();
-        }
-
-        [TargetRpc]
-        private void RpcUpdatePlayerStatus(NetworkConnection target)
-        {
-            if (gameLobbyUI == null)
+            
+            var ui = FindFirstObjectByType<GameLobbyUI>();
+            ui?.UpdatePlayerInRoon(); // ✅ 죽었을 때 내 UI 갱신
+            
+            if (newValue)
             {
-                gameLobbyUI = FindFirstObjectByType<GameLobbyUI>();
-            }
+                // 아이템 스킬 제거 처리
+                itemSkillId = -1;
+                if (availableAttacks[4] is MonoBehaviour oldAttack)
+                    Destroy(oldAttack.gameObject);
+                availableAttacks[4] = null;
 
-            gameLobbyUI.UpdatePlayerInRoon();
+                if (isOwned)
+                {
+                    PlayerSetting.ItemSkillID = -1; // 클라이언트도 동기화
+                }
+            }
         }
         
         public void SetState(Constants.PlayerState value)
@@ -297,6 +279,40 @@ namespace Player
         {
             State = newValue;
             gravityVelocity = Vector3.zero;
+
+            if ((newValue == Constants.PlayerState.Start || newValue == Constants.PlayerState.Counting) && isOwned && PLayerCharacterClass == Constants.CharacterClass.None)
+            {
+                Constants.TeamType team = PlayerSetting.TeamType;
+
+                GameRoomData gameRoomData = FindFirstObjectByType<GameRoomData>();
+                if (gameRoomData != null && gameRoomData.roomType == Constants.RoomType.Raid)
+                {
+                    team = Constants.TeamType.TeamA;
+                }
+                
+                
+                // 클라이언트에서 자기 PlayerSetting 기반으로 서버에 캐릭터 정보 요청
+                CmdApplyPlayerSettings(
+                    PlayerSetting.PlayerCharacterClass,
+                    PlayerSetting.MoveSkill,
+                    PlayerSetting.AttackSkillIDs,
+                    PlayerSetting.TeamType,
+                    PlayerSetting.PlayerCards.Select(c => c.ID).ToArray()
+                );
+            }
+        }
+
+        [Command]
+        public void CmdApplyPlayerSettings(Constants.CharacterClass characterClass, Constants.SkillType moveSkill, int[] attackSkills, Constants.TeamType team, int[] cardIds)
+        {
+            // 이 메서드 안에서 SetCharacterData, ApplyCardBonuses 등 적용
+            SetCharacterData(characterClass, moveSkill, attackSkills);
+            this.team = team;
+
+            var cardList = cardIds.Select(id => Database.GetPlayerCardData(id)).ToList();
+            ApplyCardBonuses(cardList);
+
+            Debug.Log($"[CmdApplyPlayerSettings] 적용 완료: {characterClass}, {moveSkill}, {string.Join(",", attackSkills)}");
         }
         
         private void SpawnGhost()
@@ -345,7 +361,6 @@ namespace Player
 
             // 7. 부활 애니메이션 & 카메라 & UI
             RpcTriggerAnimation("isLive");
-            RpcUpdatePlayerStatus(conn);
             RpcResetCamera(conn);
 
             ResetStatsToBase();
@@ -390,10 +405,12 @@ namespace Player
         [Command]
         public void CmdStartGame()
         {
-            var allPlayers = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None);
+            var players = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None)
+                .OrderBy(p => p.GetComponent<NetworkIdentity>().netId)
+                .ToArray();
             if (GameManager.Instance != null)
             {
-                GameManager.Instance.Init(allPlayers);
+                GameManager.Instance.Init(players);
             }
             
             var manager = Networking.RoomManager.singleton as Networking.RoomManager;
@@ -414,21 +431,39 @@ namespace Player
                 nicknameText.color = new Color(0.3f,0.3f,1);
             }
             
-            if (gameLobbyUI == null)
-            {
-                gameLobbyUI = FindFirstObjectByType<GameLobbyUI>();
-            }
-
-            if (gameLobbyUI != null)
-            {
-                gameLobbyUI?.UpdatePlayerInRoon();
-            }
+            var ui = FindFirstObjectByType<GameLobbyUI>();
+            ui?.UpdatePlayerInRoon(); // ✅ 팀 바뀌면 내 UI 갱신
         }
         
         [Command]
         public void CmdSetTeam(Constants.TeamType newTeam)
         {
+            Debug.Log($"{playerId} 팀 : {newTeam}");
             team = newTeam;
         }
+        
+        public override void OnStartServer()
+        {
+            base.OnStartServer();
+
+            GameRoomData data = FindFirstObjectByType<GameRoomData>();
+            data?.Invoke(nameof(GameRoomData.UpdatePlayerList), 0.1f); // 약간 지연해서 호출
+        }
+        
+        public override void OnStartClient()
+        {
+            base.OnStartClient();
+
+            // 💡 나중에 들어온 클라이언트에서 자신 포함 모든 플레이어 확인
+            StartCoroutine(DelayedUpdatePlayerInRoom());
+        }
+        private IEnumerator DelayedUpdatePlayerInRoom()
+        {
+            yield return new WaitForSeconds(0.1f); // 동기화 기다림
+
+            var ui = FindFirstObjectByType<GameLobbyUI>();
+            ui?.UpdatePlayerInRoon();
+        }
+
     }
 }

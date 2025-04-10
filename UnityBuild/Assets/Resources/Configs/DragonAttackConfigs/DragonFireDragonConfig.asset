@@ -20,6 +20,6 @@ MonoBehaviour:
   range: 15
   radius: 5
   speed: 30
-  damage: 10
+  damage: 20
   knockback: 1
   config: {fileID: 11400000, guid: f44b8a4f8c3f1e54db622d44a9554638, type: 2}

@@ -31,8 +31,8 @@ namespace Player.Combat
                     skillid
                 );
 
-                SphereCollider meleeColider = bullet.gameObject.GetComponentInChildren<SphereCollider>();
-                meleeColider.radius = attackData.Radius;
+                //SphereCollider meleeColider = bullet.gameObject.GetComponentInChildren<SphereCollider>();
+                //meleeColider.radius = attackData.Radius;
                 
                 NetworkServer.Spawn(projectile);
             }

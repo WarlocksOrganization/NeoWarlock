@@ -35,8 +35,6 @@ namespace Player
             NotifyStatChanged();
 
             var ui = FindFirstObjectByType<PlayerCharacterUI>();
-
-            UpdateCount();
         }
 
         // ✅ 기본 스탯 적용 (서버 전용)

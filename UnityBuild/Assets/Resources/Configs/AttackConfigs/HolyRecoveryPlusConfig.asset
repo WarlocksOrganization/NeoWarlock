@@ -24,4 +24,4 @@ MonoBehaviour:
   particlePrefab: {fileID: 0}
   particlePrefab2: {fileID: 0}
   skillType: 34
-  appliedBuff: {fileID: 11400000, guid: 548a9d336a0a1494c8d8db960fb07174, type: 2}
+  appliedBuff: {fileID: 11400000, guid: bff42e77db519034d8278d95ae7fb6a5, type: 2}

@@ -32,7 +32,6 @@ namespace Player
 
             if (isOwned)
             {
-                CmdSetPlayerNumber(); // ✅ 이제 서버에서 자동으로 playerId 할당
                 CmdSetNickname(PlayerSetting.Nickname);
                 CmdSetUserId(PlayerSetting.UserId);
                 if (PlayerSetting.PlayerCharacterClass != Constants.CharacterClass.None)
@@ -86,44 +85,6 @@ namespace Player
         {
             UserId = userId;
             LobbyPlayer.userId = userId;
-        }
-        
-        [Command]
-        public void CmdSetPlayerNumber()
-        {
-            if (!isServer) return; // 서버에서만 실행
-
-            // ✅ 현재 존재하는 모든 RoomPlayer의 ID 목록 생성
-            var allPlayers = FindObjectsByType<RoomPlayer>(FindObjectsSortMode.None);
-            HashSet<int> assignedIds = new HashSet<int>();
-
-            foreach (var player in allPlayers)
-            {
-                assignedIds.Add(player.LobbyPlayer.playerId);
-            }
-
-            // ✅ 중복되지 않는 가장 작은 ID 찾기
-            int newId = 0;
-            while (assignedIds.Contains(newId))
-            {
-                newId++;
-            }
-
-            // ✅ 중복되지 않는 ID 설정
-            LobbyPlayer.playerId = newId;
-
-            // ✅ 클라이언트의 PlayerSetting에도 적용
-            RpcUpdatePlayerSetting(newId);
-        }
-
-        [ClientRpc]
-        private void RpcUpdatePlayerSetting(int newId)
-        {
-            if (isOwned) // 본인 클라이언트만 적용
-            {
-                PlayerSetting.PlayerId = newId;
-                Debug.Log($"[RoomPlayer] 내 PlayerNum이 {newId}로 설정됨");
-            }
         }
         
         [Command]

@@ -24,8 +24,6 @@ namespace GameManagement
         private List<int> deathOrder = new();
         private Dictionary<int, Constants.PlayerRecord> playerRecords = new();
         public int currentRound = 0;
-        
-        public Constants.DragonState dragonState = new();
 
         private List<(int playerId, int rank)> roundRanks;
         private List<(int playerId, int kills, int outKills, int damageDone, int rank)> roundData;
@@ -226,7 +224,8 @@ namespace GameManagement
 
             if (isRaidGame)
             {
-                bool isDragonAlive = DragonAI.Instance != null && DragonAI.Instance.curHp > 0;
+                DragonAI dragon = FindFirstObjectByType<DragonAI>();
+                bool isDragonAlive = dragon != null && dragon.curHp > 0;
                 int alivePlayerCount = alivePlayers.Count;
 
                 if ((isDragonAlive && alivePlayerCount >= 1) || (!isDragonAlive && alivePlayerCount > 1))
@@ -329,7 +328,6 @@ namespace GameManagement
                 stats.roundRanks.Clear();
             }
             deathOrder.Clear();
-            dragonState = new();
         }
 
         public void ResetRoundStateOnly()
@@ -343,7 +341,6 @@ namespace GameManagement
                 stats.isDead = false;
             }
             deathOrder.Clear();
-            dragonState = new();
             roundEnded = false;
         }
 

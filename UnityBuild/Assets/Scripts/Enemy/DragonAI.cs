@@ -11,11 +11,9 @@ using UnityEngine.UI;
 
 public partial class DragonAI : NetworkBehaviour, IDamagable
 {
-    public static DragonAI Instance;
-
     [Header("Stats")]
     [SyncVar(hook = nameof(OnHpChanged))] public int curHp;
-    public int maxHp = 50;
+    [SyncVar] public int maxHp = 50;
     public float moveSpeed = 2f;
     public float attackRange = 2f;
     public int damage = 10;
@@ -27,8 +25,8 @@ public partial class DragonAI : NetworkBehaviour, IDamagable
     [SerializeField] private NetworkAnimator networkAnimator;
     [SerializeField] private Transform EnemyModel;
 
-    [Header("Health UI")]
-    [SerializeField] private Slider healthSlider;
+    [Header("Health UI")] 
+    [SerializeField] private DragonHPBar hpBarUI;
     
     [SerializeField] private CapsuleCollider capsuleCollider;
 
@@ -44,8 +42,8 @@ public partial class DragonAI : NetworkBehaviour, IDamagable
             SetCollider(false); // 🛡️ 무적 설정은 서버에서만
         }
         
-        Instance = this;
         UpdateHealthUI();
+        animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
     }
 
     public override void OnStartClient()
@@ -56,44 +54,44 @@ public partial class DragonAI : NetworkBehaviour, IDamagable
 
     public void Init()
     {
-        if (GameManager.Instance.dragonState.curHp <= 0)
-        {
-            return;
-        }
-
         var gameRoomData = FindFirstObjectByType<GameRoomData>();
         if (gameRoomData != null && isServer)
         {
             gameRoomData.SetRoomType(Constants.RoomType.Raid);
 
-            // ✅ 모든 플레이어 팀을 TeamA로 설정
-            var players = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None);
-            foreach (var player in players)
-            {
-                player.team = Constants.TeamType.TeamA;
-            }
+            // ✅ 팀 설정을 Coroutine으로 분리
+            StartCoroutine(DelaySetTeam());
         }
-        
+
         int baseHp = 0;
         int bonusPerPlayer = 500;
         int playerCount = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None).Length;
 
         int newMaxHp = baseHp + bonusPerPlayer * playerCount;
 
-        if (GameManager.Instance.dragonState.maxHp < newMaxHp)
+        if (maxHp < newMaxHp)
         {
-            GameManager.Instance.dragonState.curHp += (newMaxHp - GameManager.Instance.dragonState.maxHp);
-            GameManager.Instance.dragonState.maxHp = newMaxHp;
+            maxHp = newMaxHp;
+            curHp = maxHp;
         }
 
-        maxHp = GameManager.Instance.dragonState.maxHp;
-        curHp = Mathf.Min(GameManager.Instance.dragonState.curHp, maxHp);
-        
         EnemyModel.rotation = Quaternion.Euler(0, 180, 0);
         transform.position = new Vector3(0, 2.78f, 0);
         RpcAddToTargetGroup(transform);
         StartCoroutine(StartLandingSequence());
     }
+    
+    private IEnumerator DelaySetTeam()
+    {
+        yield return new WaitForSeconds(1f);
+
+        var players = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None);
+        foreach (var player in players)
+        {
+            player.team = Constants.TeamType.TeamA;
+        }
+    }
+
 
     public IEnumerator StartLandingSequence()
     {
@@ -176,14 +174,13 @@ public partial class DragonAI : NetworkBehaviour, IDamagable
     [Server]
     public int takeDamage(int damage, Vector3 attackTran, float knockbackForce, AttackConfig attackConfig, int playerid, int skillid)
     {
-        if (curHp <= 0) return 0;
+        if (curHp <= 0 || damage <= 0) return 0;
 
         curHp -= damage;
         Debug.Log("용체력 : " + curHp);
 
         RpcShowFloatingDamage(damage);
         
-        GameManager.Instance.dragonState.curHp = curHp;
         GameManager.Instance.RecordDamage(playerid, damage);
 
         if (curHp <= 0)
@@ -223,33 +220,19 @@ public partial class DragonAI : NetworkBehaviour, IDamagable
 
     private void UpdateHealthUI()
     {
-        if (healthSlider == null)
+        Debug.Log(curHp + " / " + maxHp);
+        if (hpBarUI == null)
         {
-            GameObject hpBarObj = GameObject.Find("DragonHPBar");
-            if (hpBarObj != null && curHp > 0)
-            {
-                healthSlider = hpBarObj.GetComponent<Slider>();
-                healthSlider.GetComponent<CanvasGroup>().alpha = 1;
-            }
-            else
-            {
-                Debug.LogWarning("DragonHPBar 오브젝트를 찾을 수 없습니다.");
-            }
+            hpBarUI = FindFirstObjectByType<DragonHPBar>();
         }
         
-        if (healthSlider != null)
+        if (hpBarUI != null && curHp > 0)
         {
-            healthSlider.value = (float)curHp / maxHp;
+            hpBarUI.UpdateHpBar(curHp, maxHp);
         }
-
-        if (healthSlider != null)
+        else
         {
-            healthSlider.enabled = curHp > 0;
-        }
-
-        if (healthSlider != null && curHp <= 0)
-        {
-            healthSlider.GetComponent<CanvasGroup>().alpha = 0;
+            Debug.LogWarning("DragonHPBar 오브젝트를 찾을 수 없습니다.");
         }
     }
 
