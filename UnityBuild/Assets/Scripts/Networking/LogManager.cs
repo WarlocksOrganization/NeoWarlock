@@ -46,7 +46,6 @@ namespace Networking
                 Debug.LogWarning("[LogManager] 서버 모드에서 실행 중이 아닙니다.");
                 #if !UNITY_EDITOR
                 Application.logMessageReceived += HandleLog;
-                Debug.unityLogger.logEnabled = false;
                 #endif
                 return;
             }
@@ -95,7 +94,7 @@ namespace Networking
         [Server]            
         public IEnumerator SendLogsToServer()
         {
-            if (!Application.platform.Equals(RuntimePlatform.LinuxServer))
+            if (Constants.IsTestMode || !Application.platform.Equals(RuntimePlatform.LinuxServer))
             {
                 Debug.LogWarning("[LogManager] 서버 모드에서 실행 중이 아닙니다.");
                 yield break;

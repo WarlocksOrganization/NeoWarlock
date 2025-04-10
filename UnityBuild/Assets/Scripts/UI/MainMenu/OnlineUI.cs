@@ -47,7 +47,7 @@ namespace UI
         {
             Debug.Log("[OnlineUI] OnEnable 진입");
             
-            GameManager.Instance.isLan = true;
+            GameManager.Instance.isLan = false;
 
             nicknameUI.GetComponent<NicknameUI>().SyncNicknameShower();
 
