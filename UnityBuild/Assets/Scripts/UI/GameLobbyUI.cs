@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using DataSystem;
 using DataSystem.Database;
@@ -63,7 +64,7 @@ public class GameLobbyUI : MonoBehaviour
         // ✅ 모든 PlayerCharacter 가져오기
         foundCharacters = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None)
             .Where(p => p.playerId >= 0)
-            .OrderBy(p => p.playerId)
+            .OrderBy(p => p.GetComponent<NetworkIdentity>().netId)
             .ToArray();
 
         // ✅ PlayerCharacters 배열 재구성
@@ -121,22 +122,38 @@ public class GameLobbyUI : MonoBehaviour
     public void OnServerPlayerListUpdated(string netIdListStr)
     {
         var parts = netIdListStr.Split(',');
-        var netIds = parts.Select(p => uint.TryParse(p, out var id) ? id : 0).ToArray();
+        Dictionary<uint, int> netIdsDict = new Dictionary<uint, int>();
+        List<uint> netIds = new List<uint>(parts.Length);
+        int idx = 0;
+        foreach (var part in parts)
+        {
+            var subParts = part.Split(':');
+            if (subParts.Length == 2 && uint.TryParse(subParts[0], out var netId) && int.TryParse(subParts[1], out var playerId))
+            {
+                netIdsDict[netId] = playerId;
+                netIds[idx++] = netId;
+            }
+        }
 
+        netIds.Sort();
         var allPlayers = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None);
         var orderedPlayers = netIds
             .Select(id => allPlayers.FirstOrDefault(p => p.GetComponent<NetworkIdentity>().netId == id))
             .Where(p => p != null)
+            .OrderBy(p => p.GetComponent<NetworkIdentity>().netId)
             .ToArray();
-
-        PlayerCharacters = orderedPlayers.Select(p => p.gameObject).ToArray();
+            
+        PlayerCharacters = orderedPlayers.Select(p => p.gameObject)
+            .OrderBy(p => p.GetComponent<NetworkIdentity>().netId)
+            .ToArray();
         foundCharacters = orderedPlayers;
 
         // 내 플레이어 식별
         var myPlayer = orderedPlayers.FirstOrDefault(p => p.isOwned);
         if (myPlayer != null)
         {
-            var myIndex = Array.IndexOf(PlayerCharacters, myPlayer.gameObject);
+            // var myIndex = Array.IndexOf(PlayerCharacters, myPlayer.gameObject);
+            int myIndex = netIdsDict[myPlayer.GetComponent<NetworkIdentity>().netId];
             PlayerSetting.PlayerId = myIndex;
         }
 

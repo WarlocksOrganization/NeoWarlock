@@ -345,6 +345,6 @@ namespace GameManagement
         }
 
         public Constants.PlayerStats GetPlayerStats(int playerId) => playerStatsArray.First(p => p.playerId == playerId);
-        public Constants.PlayerRecord[] GetAllPlayerRecords() => playerRecords.Values.ToArray();
+        public Constants.PlayerRecord[] GetAllPlayerRecords() => playerRecords.Values.ToArray().OrderBy(r => r.playerId).ToArray();
     }
 }

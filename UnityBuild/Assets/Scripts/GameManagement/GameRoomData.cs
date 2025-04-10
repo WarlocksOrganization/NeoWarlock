@@ -238,7 +238,7 @@ namespace GameManagement
                 players[i].playerId = i; // 직접 playerId 설정
             }
 
-            playerNetIdsString = string.Join(",", players.Select(p => p.GetComponent<NetworkIdentity>().netId));
+            playerNetIdsString = string.Join(",", players.Select(p => p.GetComponent<NetworkIdentity>().netId.ToString() + ":" + p.playerId.ToString()));
         }
 
         private void OnPlayerListChanged(string oldVal, string newVal)
