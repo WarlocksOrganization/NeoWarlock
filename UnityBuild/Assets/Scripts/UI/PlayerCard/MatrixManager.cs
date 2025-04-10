@@ -6,6 +6,7 @@ using UnityEngine;
 using GameManagement;
 using GameManagement.Data;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 public class MatrixManager : MonoBehaviour
 {    
@@ -41,22 +42,23 @@ public class MatrixManager : MonoBehaviour
             var jObject = JsonConvert.DeserializeObject<Newtonsoft.Json.Linq.JObject>(jsonText);
             var dataToken = jObject["data"];
 
-            if (dataToken == null || dataToken.Type != Newtonsoft.Json.Linq.JTokenType.Array || !dataToken.HasValues)
+            if (dataToken == null || dataToken.Type != JTokenType.Array)
             {
                 MatrixLoadState.HasMatrixData = false;
-                Debug.LogError("[MatrixManager] data 항목이 유효한 배열이 아닙니다.");
-                return null;
-            }
-            {
-                MatrixLoadState.HasMatrixData = false;
-                Debug.LogError("[MatrixManager] data 항목이 유효한 배열이 아닙니다.");
+                Debug.LogError("[MatrixManager] data 항목이 배열이 아니거나 존재하지 않음.");
                 return null;
             }
 
             var wrapper = new MatrixDocumentWrapper
             {
-                data = dataToken.ToObject<List<MatrixDocument>>()
+                data = dataToken.ToObject<List<MatrixDocument>>() ?? new List<MatrixDocument>()
             };
+
+            if (wrapper.data.Count == 0)
+            {
+                Debug.LogWarning("[MatrixManager] data 배열은 존재하지만 비어있음.");
+                // 필요하면 여기서 return null 해도 됨
+            }
 
             int classCode = (int)PlayerSetting.PlayerCharacterClass;
 
