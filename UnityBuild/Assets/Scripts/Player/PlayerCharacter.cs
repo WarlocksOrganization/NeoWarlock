@@ -282,6 +282,15 @@ namespace Player
 
             if ((newValue == Constants.PlayerState.Start || newValue == Constants.PlayerState.Counting) && isOwned && PLayerCharacterClass == Constants.CharacterClass.None)
             {
+                Constants.TeamType team = PlayerSetting.TeamType;
+
+                GameRoomData gameRoomData = FindFirstObjectByType<GameRoomData>();
+                if (gameRoomData != null && gameRoomData.roomType == Constants.RoomType.Raid)
+                {
+                    team = Constants.TeamType.TeamA;
+                }
+                
+                
                 // 클라이언트에서 자기 PlayerSetting 기반으로 서버에 캐릭터 정보 요청
                 CmdApplyPlayerSettings(
                     PlayerSetting.PlayerCharacterClass,
@@ -396,10 +405,12 @@ namespace Player
         [Command]
         public void CmdStartGame()
         {
-            var allPlayers = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None);
+            var players = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None)
+                .OrderBy(p => p.GetComponent<NetworkIdentity>().netId)
+                .ToArray();
             if (GameManager.Instance != null)
             {
-                GameManager.Instance.Init(allPlayers);
+                GameManager.Instance.Init(players);
             }
             
             var manager = Networking.RoomManager.singleton as Networking.RoomManager;
@@ -427,6 +438,7 @@ namespace Player
         [Command]
         public void CmdSetTeam(Constants.TeamType newTeam)
         {
+            Debug.Log($"{playerId} 팀 : {newTeam}");
             team = newTeam;
         }
         
@@ -451,15 +463,6 @@ namespace Player
 
             var ui = FindFirstObjectByType<GameLobbyUI>();
             ui?.UpdatePlayerInRoon();
-        }
-        
-        private void OnDestroy()
-        {
-            if (isServer)
-            {
-                var room = FindFirstObjectByType<GameRoomData>();
-                room?.Invoke(nameof(GameRoomData.UpdatePlayerList), 0.1f); // 약간 딜레이 줘도 좋음
-            }
         }
 
     }

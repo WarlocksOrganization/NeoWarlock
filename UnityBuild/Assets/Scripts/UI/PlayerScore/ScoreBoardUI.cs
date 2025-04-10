@@ -224,7 +224,7 @@ public class ScoreBoardUI : MonoBehaviour
                 string colorA = ColorToHex(1f, 0.3f, 0.3f); // 밝은 붉은색
                 string colorB = ColorToHex(0.3f, 0.4f, 1f); // 파란빛
                 
-                string result = $"<color=#{colorA}>Team A</color> : {teamAScoreBefore}점 vs <color=#{colorB}>Team B</color> : {teamBScoreBefore}점";
+                string result = $"<color=#{colorA}>Team A</color> : {teamAScoreBefore}점\n<color=#{colorB}>Team B</color> : {teamBScoreBefore}점";
                 teamResultText.text = result;
                 teamResult.gameObject.SetActive(true);
             }
@@ -332,13 +332,13 @@ public class ScoreBoardUI : MonoBehaviour
             int scoreA = Mathf.FloorToInt(Mathf.Lerp(fromA, toA, t));
             int scoreB = Mathf.FloorToInt(Mathf.Lerp(fromB, toB, t));
 
-            teamResultText.text = $"<color=#{colorA}>Team A</color> : {scoreA}점 vs <color=#{colorB}>Team B</color> : {scoreB}점";
+            teamResultText.text = $"<color=#{colorA}>Team A</color> : {scoreA}점\n<color=#{colorB}>Team B</color> : {scoreB}점";
             time += Time.deltaTime;
             yield return null;
         }
 
         // 마지막 값 보정
-        teamResultText.text = $"<color=#{colorA}>Team A</color> : {toA}점 vs <color=#{colorB}>Team B</color> : {toB}점";
+        teamResultText.text = $"<color=#{colorA}>Team A</color> : {toA}점\n<color=#{colorB}>Team B</color> : {toB}점";
     }
     
     private string ColorToHex(float r, float g, float b)

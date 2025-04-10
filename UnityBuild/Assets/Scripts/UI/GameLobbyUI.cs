@@ -59,6 +59,7 @@ public class GameLobbyUI : MonoBehaviour
 
     public virtual void UpdatePlayerInRoon()
     {
+        Debug.Log("UpdatePlayerInRoon 실행");
         // ✅ 모든 PlayerCharacter 가져오기
         foundCharacters = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None)
             .Where(p => p.playerId >= 0)
@@ -93,10 +94,6 @@ public class GameLobbyUI : MonoBehaviour
                     var assignedTeam = teamACount > teamBCount ? Constants.TeamType.TeamB : Constants.TeamType.TeamA;
                     myPlayer.CmdSetTeam(assignedTeam);
                     PlayerSetting.TeamType = assignedTeam;
-                }
-                else
-                {
-                    PlayerSetting.TeamType = myPlayer.team;
                 }
             }
             else
@@ -146,18 +143,6 @@ public class GameLobbyUI : MonoBehaviour
         // UI 표시
         var roomData = FindFirstObjectByType<GameRoomData>();
         PlayerInRoonText.text = $"현재 인원 {PlayerCharacters.Length} / {roomData.maxPlayerCount}";
-
-        // 팀 자동 설정
-        if (roomData.roomType == Constants.RoomType.Team && myPlayer != null &&
-            myPlayer.team == Constants.TeamType.None)
-        {
-            var teamACount = orderedPlayers.Count(p => p.team == Constants.TeamType.TeamA);
-            var teamBCount = orderedPlayers.Count(p => p.team == Constants.TeamType.TeamB);
-
-            var assignedTeam = teamACount > teamBCount ? Constants.TeamType.TeamB : Constants.TeamType.TeamA;
-            myPlayer.CmdSetTeam(assignedTeam);
-            PlayerSetting.TeamType = assignedTeam;
-        }
 
         playerStatusUI.Setup(orderedPlayers, PlayerSetting.PlayerId);
         CheckIfHost(PlayerSetting.PlayerId);
@@ -216,7 +201,6 @@ public class GameLobbyUI : MonoBehaviour
 
     public void UpdateKillLog(int deadId, int skillid, int killerId, bool isFall)
     {
-        Debug.Log("UpdateKillLog");
         if (killerId < 0) killerId = deadId;
 
         if (foundCharacters == null ||
