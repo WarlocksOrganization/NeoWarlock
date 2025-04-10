@@ -64,7 +64,7 @@ public class GameLobbyUI : MonoBehaviour
         // ✅ 모든 PlayerCharacter 가져오기
         foundCharacters = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None)
             .Where(p => p.playerId >= 0)
-            .OrderBy(p => p.GetComponent<NetworkIdentity>().netId)
+            .OrderBy(p => p.playerId)
             .ToArray();
 
         // ✅ PlayerCharacters 배열 재구성
@@ -168,13 +168,18 @@ public class GameLobbyUI : MonoBehaviour
     // ✅ 방장인지 확인 후 버튼 활성화
     private void CheckIfHost(int playerNum = -1)
     {
-        if (StartGameButton == null || ChangeMapNextButton == null || ChangeMapBeforeButton == null)
+        if (StartGameButton == null || ChangeMapNextButton == null || ChangeMapBeforeButton == null || playerNum == -1)
         {
             Debug.LogWarning("[CheckIfHost] UI 요소가 아직 초기화되지 않음");
             return;
         }
 
-        if (NetworkServer.active || playerNum == hostNum)
+        var players = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None)
+            .OrderBy(p => p.playerId)
+            .ToArray();
+
+        int hostNumber = players[0].playerId; // 방장 ID는 제일 작은 ID로 설정
+        if (NetworkServer.active || playerNum == hostNumber)
         {
             StartGameButton.gameObject.SetActive(true);
             ChangeMapNextButton.gameObject.SetActive(true);
@@ -196,7 +201,9 @@ public class GameLobbyUI : MonoBehaviour
         if (NetworkServer.active)
         {
             // ✅ 게임 시작 전에 플레이어 정보로 Stats 초기화
-            var allPlayers = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None);
+            var allPlayers = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None)
+                .OrderBy(p => p.playerId)
+                .ToArray();
             if (GameManager.Instance != null) GameManager.Instance.Init(allPlayers);
 
             var players = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None);

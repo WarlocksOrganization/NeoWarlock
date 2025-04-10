@@ -77,9 +77,14 @@ namespace Player
             
             maxHp = BaseHp;
             curHp = BaseHp;
-            
+
             if (isOwned)
             {
+                Debug.Log($"{PlayerSetting.PlayerId} 플레이어 {playerId} 시작");
+                if (PlayerSetting.PlayerId == -1)
+                {
+                    CmdSetPlayerNumbers();
+                }
                 EnableOnlyThisAudioListener();
                 playerLight.SetActive(true);
                 
@@ -406,7 +411,7 @@ namespace Player
         public void CmdStartGame()
         {
             var players = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None)
-                .OrderBy(p => p.GetComponent<NetworkIdentity>().netId)
+                .OrderBy(p => p.playerId)
                 .ToArray();
             if (GameManager.Instance != null)
             {
@@ -442,13 +447,13 @@ namespace Player
             team = newTeam;
         }
         
-        public override void OnStartServer()
-        {
-            base.OnStartServer();
+        // public override void OnStartServer()
+        // {
+        //     base.OnStartServer();
 
-            GameRoomData data = FindFirstObjectByType<GameRoomData>();
-            data?.Invoke(nameof(GameRoomData.UpdatePlayerList), 0.1f); // 약간 지연해서 호출
-        }
+        //     GameRoomData data = FindFirstObjectByType<GameRoomData>();
+        //     data?.Invoke(nameof(GameRoomData.UpdatePlayerList), 0.1f); // 약간 지연해서 호출
+        // }
         
         public override void OnStartClient()
         {
@@ -465,5 +470,17 @@ namespace Player
             ui?.UpdatePlayerInRoon();
         }
 
+        [Command]
+        public void CmdSetPlayerNumbers()
+        {
+            var players = FindObjectsByType<PlayerCharacter>(sortMode: FindObjectsSortMode.None)
+                .OrderBy(p => p.netId)
+                .ToArray();
+            
+            for (int i = 0; i < players.Length; i++)
+            {
+                players[i].playerId = i;
+            }
+        }
     }
 }

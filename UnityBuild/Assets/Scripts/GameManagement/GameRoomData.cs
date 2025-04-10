@@ -246,5 +246,12 @@ namespace GameManagement
             // 클라이언트에서 필요 시 처리
             FindFirstObjectByType<GameLobbyUI>()?.OnServerPlayerListUpdated(newVal);
         }
+
+        [ClientRpc]
+        public void RpcUpdatePlayer()
+        {
+            var ui = FindFirstObjectByType<GameLobbyUI>();
+            ui?.UpdatePlayerInRoon(); // ✅ 팀 바뀌면 내 UI 갱신
+        }
     }
 }

@@ -43,7 +43,7 @@ namespace Player
             if (isOwned)
             {
                 CmdSetNickname(PlayerSetting.Nickname);
-                //CmdSetPlayerNumber(PlayerSetting.PlayerId);
+                CmdSetPlayerNumber(PlayerSetting.PlayerId);
                 CmdSetUserId(PlayerSetting.UserId);
                 playerCardUI = FindFirstObjectByType<PlayerCardUI>();
                 gameplayUI = FindFirstObjectByType<GamePlayUI>();

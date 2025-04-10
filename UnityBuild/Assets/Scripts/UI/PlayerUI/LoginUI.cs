@@ -17,6 +17,7 @@ public class LoginUI : MonoBehaviour
     void Start()
     {
         _loginButton.GetComponent<Button>().onClick.AddListener(OnClickLogin);
+        GameManagement.PlayerSetting.PlayerId = -1;
         if (Networking.SocketManager.singleton.IsSessionValid())
         {
             TurnOnOnlineUI();

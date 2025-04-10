@@ -11,6 +11,7 @@ using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.InputSystem;
 using UnityEngine.Playables;
+using UnityEngine.Profiling;
 using UnityEngine.UI;
 
 public class ScoreBoardUI : MonoBehaviour
@@ -352,12 +353,12 @@ public class ScoreBoardUI : MonoBehaviour
         Debug.Log("[ResultBoard] SetResultBoardData 진입");
 
         bestPlayer = records
-            .OrderByDescending(r => r.GetTotalScoreUpToRound(GameManager.Instance.currentRound - 1))
+            .OrderByDescending(r => r.GetTotalScoreUpToRound(2))
             .FirstOrDefault();
 
         var bestKill = records
             .OrderByDescending(r => r.roundStatsList.Sum(rs => rs.kills + rs.outKills)) // 1차 기준: 킬 수
-            .ThenByDescending(r => r.GetTotalScoreUpToRound(GameManager.Instance.currentRound - 1)) // 2차 기준: 점수
+            .ThenByDescending(r => r.GetTotalScoreUpToRound(2)) // 2차 기준: 점수
             .First();
 
         var bestDamage = records
