@@ -349,5 +349,7 @@ namespace DataSystem
                 return total;
             }
         }
+
+        public static readonly bool IsTestMode = true; // true: 테스트 모드, false: 정식 모드
     }
 }
