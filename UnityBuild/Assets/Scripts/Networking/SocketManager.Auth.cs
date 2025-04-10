@@ -167,7 +167,7 @@ namespace Networking
                 nicknameUI.SyncNicknameShower();
 
                 Debug.Log("[SocketManager] 닉네임 변경 성공");
-                modal.ShowModalMessage("닉네임 변경 성공\n" + PlayerSetting.Nickname + " 님!\n\n"+"접속자 목록에는 재로그인 시 적용됩니다!");
+                modal.ShowModalMessage("닉네임 변경 성공\n" + PlayerSetting.Nickname + " 님!");
             }
             else
             {
