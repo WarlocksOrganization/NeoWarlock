@@ -38,9 +38,7 @@ public class PlayerCardUI : MonoBehaviour
     void OnEnable()
     {
         selectedCardsQueue.Clear();
-        
         hasAppliedCards = false; // ✅ 초기화
-        matrixStateText.gameObject.SetActive(false);
         LoadingImage.SetActive(true);
         if (MatrixManager.Instance == null)
         {
@@ -48,6 +46,15 @@ public class PlayerCardUI : MonoBehaviour
             return;
         }
         MatrixManager.Instance.LoadMatrixFromPersistentOrResources();
+        if (!MatrixLoadState.HasMatrixData)
+        {
+            matrixStateText.SetActive(true);
+            Debug.LogError("[PlayerCardUI] 매트릭스 데이터가 로드되지 않았습니다.");
+        }
+        else
+        {
+            matrixStateText.SetActive(false);
+        }
         LoadRandomPlayerCards();
         DisplayTopThreeCards();
         
@@ -142,6 +149,14 @@ public class PlayerCardUI : MonoBehaviour
         {
             matrixStateText.gameObject.SetActive(true);
             Debug.LogError("[PlayerCardUI] 매트릭스 데이터가 로드되지 않았습니다.");
+            for (int i = 0; i < slots.Length; i++)
+                {
+                    if (selectedCardsQueue.Count > 0)
+                    {
+                    var card = selectedCardsQueue.Dequeue();
+                    slots[i].SetCardData(card);
+                }
+            }
         }
     }
     // public Database.PlayerCardData TryGetNewCardAndUpdateRank(int slotIndex)

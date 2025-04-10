@@ -41,7 +41,12 @@ public class MatrixManager : MonoBehaviour
             var jObject = JsonConvert.DeserializeObject<Newtonsoft.Json.Linq.JObject>(jsonText);
             var dataToken = jObject["data"];
 
-            if (dataToken == null || dataToken.Type != Newtonsoft.Json.Linq.JTokenType.Array)
+            if (dataToken == null || dataToken.Type != Newtonsoft.Json.Linq.JTokenType.Array || !dataToken.HasValues)
+            {
+                MatrixLoadState.HasMatrixData = false;
+                Debug.LogError("[MatrixManager] data 항목이 유효한 배열이 아닙니다.");
+                return null;
+            }
             {
                 MatrixLoadState.HasMatrixData = false;
                 Debug.LogError("[MatrixManager] data 항목이 유효한 배열이 아닙니다.");
