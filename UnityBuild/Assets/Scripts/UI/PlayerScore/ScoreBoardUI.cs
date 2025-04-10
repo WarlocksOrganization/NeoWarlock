@@ -352,16 +352,19 @@ public class ScoreBoardUI : MonoBehaviour
         Debug.Log("[ResultBoard] SetResultBoardData 진입");
 
         bestPlayer = records
-            .OrderByDescending(r => r.GetTotalScoreUpToRound(GameManager.Instance.currentRound - 1))
-            .FirstOrDefault();
+            .OrderByDescending(r => r.GetTotalScoreUpToRound(2))
+            .ThenByDescending(r => r.roundStatsList.Sum(rs => rs.kills + rs.outKills))
+            .ThenByDescending(r => r.roundStatsList.Sum(rs => rs.damageDone))
+            .First();
 
         var bestKill = records
             .OrderByDescending(r => r.roundStatsList.Sum(rs => rs.kills + rs.outKills)) // 1차 기준: 킬 수
-            .ThenByDescending(r => r.GetTotalScoreUpToRound(GameManager.Instance.currentRound - 1)) // 2차 기준: 점수
+            .ThenByDescending(r => r.GetTotalScoreUpToRound(2)) // 2차 기준: 점수
             .First();
 
         var bestDamage = records
             .OrderByDescending(r => r.roundStatsList.Sum(rs => rs.damageDone))
+            .ThenByDescending(r => r.GetTotalScoreUpToRound(2))
             .FirstOrDefault();
 
         Debug.Log(
