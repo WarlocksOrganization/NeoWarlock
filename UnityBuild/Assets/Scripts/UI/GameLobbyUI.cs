@@ -216,6 +216,7 @@ public class GameLobbyUI : MonoBehaviour
 
     public void UpdateKillLog(int deadId, int skillid, int killerId, bool isFall)
     {
+        Debug.Log("UpdateKillLog");
         if (killerId < 0) killerId = deadId;
 
         if (foundCharacters == null ||

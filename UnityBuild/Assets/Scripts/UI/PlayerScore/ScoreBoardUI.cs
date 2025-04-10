@@ -147,7 +147,21 @@ public class ScoreBoardUI : MonoBehaviour
         for (int i = 0; i < roundSorted.Count; i++)
         {
             var record = roundSorted[i];
-            var panel = scorePanels[record.playerId];
+            var panel = scorePanels.FirstOrDefault(p => p.id == record.playerId);
+            if (panel != null)
+            {
+                panel.SetupWithScore(
+                    record,
+                    record.GetScoreAtRound(roundIndex),
+                    roundIndex,
+                    includeCurrentRound: false,
+                    localPlayerId: PlayerSetting.PlayerId
+                );
+            }
+            else
+            {
+                Debug.LogWarning($"[ScoreBoard] playerId {record.playerId}에 해당하는 패널이 없습니다.");
+            }
             panel.gameObject.SetActive(true);
 
             panel.SetupWithScore(record, record.GetScoreAtRound(roundIndex), roundIndex, false, PlayerSetting.PlayerId);
@@ -168,7 +182,23 @@ public class ScoreBoardUI : MonoBehaviour
         for (int i = 0; i < preSorted.Count; i++)
         {
             var record = preSorted[i];
-            var panel = scorePanels[record.playerId];
+            
+            var panel = scorePanels.FirstOrDefault(p => p.id == record.playerId);
+            if (panel != null)
+            {
+                panel.SetupWithScore(
+                    record,
+                    record.GetScoreAtRound(roundIndex),
+                    roundIndex,
+                    includeCurrentRound: false,
+                    localPlayerId: PlayerSetting.PlayerId
+                );
+            }
+            else
+            {
+                Debug.LogWarning($"[ScoreBoard] playerId {record.playerId}에 해당하는 패널이 없습니다.");
+            }
+
             var score = record.GetTotalScoreUpToRound(roundIndex - 1);
             panel.SetupWithScore(record, score, roundIndex - 1, true, PlayerSetting.PlayerId);
             panel.GetComponent<RectTransform>().anchoredPosition = panelPositions[i].anchoredPosition;

@@ -212,7 +212,14 @@ namespace Player
         [ClientRpc]
         private void RpcTransmitKillLog(int killID, int skillid, bool isFall)
         {
+            Debug.Log($"RpcTransmitKillLog {gameLobbyUI} {killID} {skillid} {isFall}");
             playerProjector?.CloseProjectile();
+
+            if (gameLobbyUI == null)
+            {
+                gameLobbyUI = FindFirstObjectByType<GameLobbyUI>();
+            }
+            
             if (playerId == killID || killID < 0)
             {
                 gameLobbyUI?.UpdateKillLog(playerId, skillid, attackPlayersId, isFall);
