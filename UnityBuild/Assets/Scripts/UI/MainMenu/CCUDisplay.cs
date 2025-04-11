@@ -115,6 +115,7 @@ public class CCUDisplay : MonoBehaviour
             targetArrow.localRotation = Quaternion.Euler(0, 0, isAscending ? 90 : 270);
         }
     }
+}
 
 //     private void SortAndRefresh()
 //         DebugUI.Instance?.Log($"[UI] 렌더링 시작 - {users.Count}명");
