@@ -20,7 +20,7 @@ namespace GameManagement
         public bool roundEnded = false;
         private bool isCheckingGameOver = false;
 
-        private Constants.PlayerStats[] playerStatsArray;
+        private Dictionary<int, Constants.PlayerStats> playerStatsDict = new();
         private List<int> deathOrder = new();
         private Dictionary<int, Constants.PlayerRecord> playerRecords = new();
         public int currentRound = 0;
@@ -51,13 +51,12 @@ namespace GameManagement
 
         public void Init(PlayerCharacter[] characters)
         {
-            playerStatsArray = new Constants.PlayerStats[characters.Length];
-            playerRecords = new();
+            playerStatsDict.Clear();
+            playerRecords.Clear();
 
-            for (int i = 0; i < characters.Length; i++)
+            foreach (var pc in characters)
             {
-                var pc = characters[i];
-                playerStatsArray[i] = new Constants.PlayerStats
+                playerStatsDict[pc.playerId] = new Constants.PlayerStats
                 {
                     playerId = pc.playerId,
                     characterClass = pc.PLayerCharacterClass,
@@ -82,13 +81,13 @@ namespace GameManagement
 
         public void RecordDamage(int attackerId, int damage)
         {
-            var stats = playerStatsArray.FirstOrDefault(p => p.playerId == attackerId);
+            playerStatsDict.TryGetValue(attackerId, out var stats);
             if (stats != null) stats.damageDone += damage;
         }
 
         public void RecordKill(int attackerId, bool isOutKill)
         {
-            var stats = playerStatsArray.FirstOrDefault(p => p.playerId == attackerId);
+            playerStatsDict.TryGetValue(attackerId, out var stats);
             if (stats != null)
             {
                 if (isOutKill) stats.outKills++;
@@ -108,7 +107,7 @@ namespace GameManagement
         public List<(int playerId, int rank)> GetCurrentRoundRanks()
         {
             var result = new List<(int playerId, int rank)>();
-            int totalPlayers = playerStatsArray.Length;
+            int totalPlayers = playerStatsDict.Count;
             int rank = totalPlayers;
 
             foreach (var id in deathOrder)
@@ -117,10 +116,10 @@ namespace GameManagement
                 rank--;
             }
 
-            foreach (var stats in playerStatsArray)
+            foreach (var (playerId, stats) in playerStatsDict)
             {
-                if (!deathOrder.Contains(stats.playerId))
-                    result.Add((stats.playerId, 1));
+                if (!deathOrder.Contains(playerId))
+                    result.Add((playerId, 1));
             }
 
             return result.OrderBy(r => r.rank).ToList();
@@ -147,7 +146,7 @@ namespace GameManagement
 
             currentRound++;
 
-            foreach (var stats in playerStatsArray)
+            foreach (var (playerId, stats) in playerStatsDict)
             {
                 stats.kills = 0;
                 stats.outKills = 0;
@@ -319,7 +318,7 @@ namespace GameManagement
 
         public void Reset()
         {
-            foreach (var stats in playerStatsArray)
+            foreach (var (playerId, stats) in playerStatsDict)
             {
                 stats.kills = 0;
                 stats.outKills = 0;
@@ -332,7 +331,7 @@ namespace GameManagement
 
         public void ResetRoundStateOnly()
         {
-            foreach (var stats in playerStatsArray)
+            foreach (var (playerId, stats) in playerStatsDict)
             {
                 stats.kills = 0;
                 stats.outKills = 0;
@@ -344,7 +343,15 @@ namespace GameManagement
             roundEnded = false;
         }
 
-        public Constants.PlayerStats GetPlayerStats(int playerId) => playerStatsArray.First(p => p.playerId == playerId);
-        public Constants.PlayerRecord[] GetAllPlayerRecords() => playerRecords.Values.ToArray();
+        public Constants.PlayerStats GetPlayerStats(int playerId)
+        {
+            if (playerStatsDict.TryGetValue(playerId, out var stats))
+                return stats;
+
+            Debug.LogWarning($"[GameManager] GetPlayerStats - 존재하지 않는 playerId 요청: {playerId}");
+            return null; // 또는 예외 처리
+        }
+
+        public Constants.PlayerRecord[] GetAllPlayerRecords() => playerRecords.Values.ToArray().OrderBy(r => r.playerId).ToArray();
     }
 }

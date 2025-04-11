@@ -55,22 +55,36 @@ namespace Player
             if (!isServer || isPlayerSpawned) return;
             isPlayerSpawned = true;
 
-            // ✅ 이미 connectionToClient로 캐릭터 생성됐는지 확인
             bool alreadySpawned = FindObjectsByType<LobbyPlayerCharacter>(FindObjectsSortMode.None)
                 .Any(p => p.connectionToClient == this.connectionToClient);
+            if (alreadySpawned) return;
 
-            if (alreadySpawned)
+            // ✅ RoomPlayer에서 playerId 얻기 (connection 매칭)
+            int playerId = -1;
+            var roomPlayers = (NetworkRoomManager.singleton as RoomManager).roomSlots;
+            foreach (var roomPlayer in roomPlayers)
             {
-                Debug.LogWarning($"[GamePlayer] 캐릭터 중복 생성 방지 - connId: {connectionToClient.connectionId}");
-                return;
+                if (roomPlayer.connectionToClient == connectionToClient)
+                {
+                    var rp = roomPlayer.GetComponent<RoomPlayer>();
+                    if (rp != null)
+                    {
+                        playerId = rp.playerId;
+                        Debug.Log($"[GamePlayer] RoomPlayer에서 playerId 가져옴: {playerId}");
+                        break;
+                    }
+                }
             }
 
-            // ✅ 스폰
             Vector3 spawnPos = FindFirstObjectByType<SpawnPosition>().GetSpawnPosition();
             GameObject pcObj = Instantiate((NetworkRoomManager.singleton as RoomManager).spawnPrefabs[0], spawnPos, Quaternion.identity);
+
             playerCharacter = pcObj.GetComponent<LobbyPlayerCharacter>();
+            playerCharacter.playerId = playerId; // ✅ 정확히 RoomPlayer와 동일한 playerId 설정
+
             NetworkServer.Spawn(pcObj, connectionToClient);
         }
+
 
         [Command]
         public void CmdSetNickname(string nickname)
@@ -191,7 +205,7 @@ namespace Player
             if (playerCharacter == null)
             {
                 playerCharacter = FindObjectsByType<LobbyPlayerCharacter>(FindObjectsSortMode.None)
-                    .FirstOrDefault(pc => pc.playerId == PlayerSetting.PlayerId);
+                    .FirstOrDefault(pc => pc.isOwned);
             }
 
             if (playerCharacter == null)
@@ -320,6 +334,11 @@ namespace Player
                 Debug.Log("[GamePlayer] 스코어보드 미리 활성화됨");
             }
         }
-
+        
+        public static int GetLocalPlayerId()
+        {
+            return FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None)
+                .FirstOrDefault(p => p.isOwned)?.playerId ?? -1;
+        }
     }
 }

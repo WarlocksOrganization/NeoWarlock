@@ -95,4 +95,20 @@ public class DragonHPBar : MonoBehaviour
 
         canvasGroup.alpha = 0f;
     }
+    
+    public void HideHpBar()
+    {
+        if (canvasGroup == null)
+            canvasGroup = GetComponent<CanvasGroup>();
+
+        if (canvasGroup != null)
+            canvasGroup.alpha = 0f;
+
+        if (delayedRoutine != null)
+            StopCoroutine(delayedRoutine);
+
+        if (fadeOutRoutine != null)
+            StopCoroutine(fadeOutRoutine);
+    }
+
 }

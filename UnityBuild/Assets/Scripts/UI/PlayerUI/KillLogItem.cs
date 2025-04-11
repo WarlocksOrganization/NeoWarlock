@@ -44,10 +44,10 @@ public class KillLogItem : MonoBehaviour
         }
 
         killerNameText.text = killer.nickname ?? "???";
-        killerNameText.color = killer.playerId == PlayerSetting.PlayerId ? Color.yellow : Color.white;
+        killerNameText.color = killer.isOwned ? Color.yellow : Color.white;
 
         victimNameText.text = victim.nickname ?? "???";
-        victimNameText.color = victim.playerId == PlayerSetting.PlayerId ? Color.yellow : Color.white;
+        victimNameText.color = victim.isOwned ? Color.yellow : Color.white;
 
         var killerClassData = Database.GetCharacterClassData(killer.PLayerCharacterClass);
         var victimClassData = Database.GetCharacterClassData(victim.PLayerCharacterClass);

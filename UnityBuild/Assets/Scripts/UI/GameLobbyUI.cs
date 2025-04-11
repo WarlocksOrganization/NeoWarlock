@@ -1,5 +1,5 @@
-using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using DataSystem;
 using DataSystem.Database;
@@ -24,8 +24,7 @@ public class GameLobbyUI : MonoBehaviour
     [SerializeField] protected Image MapImage;
     [SerializeField] protected TMP_Text MapName;
 
-    public GameObject[] PlayerCharacters;
-    protected PlayerCharacter[] foundCharacters;
+    protected Dictionary<int, PlayerCharacter> foundCharactersDict = new();
 
     private readonly int hostNum = 0;
 
@@ -39,14 +38,13 @@ public class GameLobbyUI : MonoBehaviour
     private void Start()
     {
         if (NetworkClient.active) PlayerSelection.SetActive(true);
-        CheckIfHost();
-        
+
         if (NetworkServer.active)
         {
             AudioManager.Instance.SetBGMVolume(0f); // BGM 볼륨 0
             AudioManager.Instance.SetSFXVolume(0f); // SFX 볼륨 0
         }
-        
+
         AudioManager.Instance.PlayBGM(Constants.SoundType.BGM_Lobby);
 
         ChangeTeamButton.onClick.AddListener(OnClickChangeTeam);
@@ -60,96 +58,89 @@ public class GameLobbyUI : MonoBehaviour
     public virtual void UpdatePlayerInRoon()
     {
         Debug.Log("UpdatePlayerInRoon 실행");
-        // ✅ 모든 PlayerCharacter 가져오기
-        foundCharacters = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None)
+
+        // 1. playerId가 유효한 캐릭터 수집
+        var characters = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None)
             .Where(p => p.playerId >= 0)
-            .OrderBy(p => p.playerId)
-            .ToArray();
+            .ToList();
 
-        // ✅ PlayerCharacters 배열 재구성
-        var maxPlayerId = foundCharacters.Length > 0 ? foundCharacters.Max(p => p.playerId) : 0;
-        PlayerCharacters = new GameObject[maxPlayerId + 1];
+        // 2. 딕셔너리 생성
+        foundCharactersDict = characters.ToDictionary(p => p.playerId, p => p);
 
-        foreach (var player in foundCharacters)
-            if (player.playerId >= 0 && player.playerId < PlayerCharacters.Length)
-                PlayerCharacters[player.playerId] = player.gameObject;
+        // 3. 배열 초기화 (playerId 순서 유지)
+        var maxPlayerId = foundCharactersDict.Keys.Count > 0 ? foundCharactersDict.Keys.Max() : 0;
 
-        // ✅ 내 플레이어 찾기
-        var myPlayer = foundCharacters.FirstOrDefault(p => p.isOwned);
-        if (myPlayer != null) PlayerSetting.PlayerId = myPlayer.playerId;
+        // 4. 내 플레이어 찾기
+        var myPlayer = foundCharactersDict.Values.FirstOrDefault(p => p.isOwned);
 
-        // ✅ GameRoomData 가져와서 최대 인원, 팀 타입 확인
+        // 5. UI 표시
         var gameRoomData = FindFirstObjectByType<GameRoomData>();
         if (gameRoomData != null)
         {
-            PlayerInRoonText.text = $"현재 인원 {foundCharacters.Length} / {gameRoomData.maxPlayerCount}";
+            PlayerInRoonText.text = $"현재 인원 {foundCharactersDict.Count} / {gameRoomData.maxPlayerCount}";
 
-            if (gameRoomData.roomType == Constants.RoomType.Team && myPlayer != null)
+            if (gameRoomData.roomType == Constants.RoomType.Team && myPlayer != null &&
+                myPlayer.team == Constants.TeamType.None)
             {
-                if (myPlayer.team == Constants.TeamType.None)
-                {
-                    var teamACount = foundCharacters.Count(p => p.team == Constants.TeamType.TeamA);
-                    var teamBCount = foundCharacters.Count(p => p.team == Constants.TeamType.TeamB);
+                var teamACount = foundCharactersDict.Values.Count(p => p.team == Constants.TeamType.TeamA);
+                var teamBCount = foundCharactersDict.Values.Count(p => p.team == Constants.TeamType.TeamB);
 
-                    var assignedTeam = teamACount > teamBCount ? Constants.TeamType.TeamB : Constants.TeamType.TeamA;
-                    myPlayer.CmdSetTeam(assignedTeam);
-                    PlayerSetting.TeamType = assignedTeam;
-                }
+                var assignedTeam = teamACount > teamBCount ? Constants.TeamType.TeamB : Constants.TeamType.TeamA;
+
+                myPlayer.CmdSetTeam(assignedTeam);
+                PlayerSetting.TeamType = assignedTeam;
             }
-            else
+
+            if (gameRoomData.roomType == Constants.RoomType.Solo)
             {
+                ChangeTeamButton.gameObject.SetActive(false);
                 PlayerSetting.TeamType = Constants.TeamType.None;
             }
-
-            // 팀 변경 버튼 숨기기 (solo 방인 경우)
-            if (gameRoomData.roomType == Constants.RoomType.Solo) ChangeTeamButton.gameObject.SetActive(false);
+            
         }
 
-        // ✅ 상태창 UI 초기화
-        playerStatusUI.Setup(foundCharacters, PlayerSetting.PlayerId);
+        // 6. 상태창 UI 업데이트
+        if (myPlayer != null)
+            playerStatusUI.Setup(foundCharactersDict, myPlayer.playerId);
 
-        // ✅ 방장 여부 확인하여 버튼 활성화
-        CheckIfHost(PlayerSetting.PlayerId);
-
-        if (myPlayer)
-        {
-            Debug.Log("UpdatePlayerInRoon : " + myPlayer.playerId + ", " + myPlayer.nickname + ", " + foundCharacters.Length);
-        }
+        if (myPlayer != null)
+            Debug.Log(
+                $"UpdatePlayerInRoon : playerId={myPlayer.playerId}, nickname={myPlayer.nickname}, 총 인원={foundCharactersDict.Count}");
     }
 
 
-    public void OnServerPlayerListUpdated(string netIdListStr)
+    public void OnServerPlayerListUpdated(string playerIdsStr)
     {
-        var parts = netIdListStr.Split(',');
-        var netIds = parts.Select(p => uint.TryParse(p, out var id) ? id : 0).ToArray();
+        foundCharactersDict.Clear();
 
+        var idStrings = playerIdsStr.Split(',');
         var allPlayers = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None);
-        var orderedPlayers = netIds
-            .Select(id => allPlayers.FirstOrDefault(p => p.GetComponent<NetworkIdentity>().netId == id))
-            .Where(p => p != null)
-            .ToArray();
 
-        PlayerCharacters = orderedPlayers.Select(p => p.gameObject).ToArray();
-        foundCharacters = orderedPlayers;
-
-        // 내 플레이어 식별
-        var myPlayer = orderedPlayers.FirstOrDefault(p => p.isOwned);
-        if (myPlayer != null)
+        foreach (var idStr in idStrings)
         {
-            var myIndex = Array.IndexOf(PlayerCharacters, myPlayer.gameObject);
-            PlayerSetting.PlayerId = myIndex;
+            if (int.TryParse(idStr, out int playerId))
+            {
+                var player = allPlayers.FirstOrDefault(p => p.playerId == playerId);
+                if (player != null)
+                {
+                    foundCharactersDict[playerId] = player;
+                }
+            }
         }
 
-        // UI 표시
-        var roomData = FindFirstObjectByType<GameRoomData>();
-        PlayerInRoonText.text = $"현재 인원 {PlayerCharacters.Length} / {roomData.maxPlayerCount}";
+        // 필요 시 정렬된 배열 생성
+        var orderedCharacters = foundCharactersDict.OrderBy(kv => kv.Key).Select(kv => kv.Value).ToArray();
 
-        playerStatusUI.Setup(orderedPlayers, PlayerSetting.PlayerId);
-        CheckIfHost(PlayerSetting.PlayerId);
+        var myPlayer = orderedCharacters.FirstOrDefault(p => p.isOwned);
+        if (myPlayer != null)
+        {
+            playerStatusUI.Setup(foundCharactersDict, myPlayer.playerId);
+            CheckIfHost(myPlayer.playerId);
+        }
     }
 
     // ✅ 방장인지 확인 후 버튼 활성화
-    private void CheckIfHost(int playerNum = -1)
+    private void CheckIfHost(int myPlayerId)
     {
         if (StartGameButton == null || ChangeMapNextButton == null || ChangeMapBeforeButton == null)
         {
@@ -157,12 +148,14 @@ public class GameLobbyUI : MonoBehaviour
             return;
         }
 
-        if (NetworkServer.active || playerNum == hostNum)
+        // 호스트 판별: 가장 작은 playerId가 호스트
+        int minPlayerId = foundCharactersDict.Keys.Min();
+
+        if (myPlayerId == minPlayerId)
         {
             StartGameButton.gameObject.SetActive(true);
             ChangeMapNextButton.gameObject.SetActive(true);
             ChangeMapBeforeButton.gameObject.SetActive(true);
-
             StartGameButton.onClick.AddListener(StartGame);
         }
         else
@@ -172,6 +165,7 @@ public class GameLobbyUI : MonoBehaviour
             ChangeMapNextButton.gameObject.SetActive(false);
         }
     }
+
 
     // ✅ 방장이 게임 시작 버튼을 클릭하면 실행
     private void StartGame()
@@ -195,24 +189,31 @@ public class GameLobbyUI : MonoBehaviour
         }
         else
         {
-            PlayerCharacters[0].GetComponent<PlayerCharacter>().CmdStartGame();
+            var hostEntry = foundCharactersDict.OrderBy(kv => kv.Key).FirstOrDefault();
+            if (hostEntry.Value != null)
+            {
+                hostEntry.Value.CmdStartGame();
+            }
+            else
+            {
+                Debug.LogWarning("[GameLobbyUI] 방장을 찾을 수 없습니다. 플레이어가 없을 수 있습니다.");
+            }
         }
     }
 
-    public void UpdateKillLog(int deadId, int skillid, int killerId, bool isFall)
+    public void UpdateKillLog(int deadId, int skillId, int killerId, bool isFall)
     {
         if (killerId < 0) killerId = deadId;
-
-        if (foundCharacters == null ||
-            deadId < 0 || deadId >= foundCharacters.Length ||
-            killerId < 0 || killerId >= foundCharacters.Length)
+        
+        if (!foundCharactersDict.TryGetValue(deadId, out var deadPlayer) ||
+            !foundCharactersDict.TryGetValue(killerId, out var killerPlayer))
         {
             Debug.LogWarning(
-                $"[UpdateKillLog] 잘못된 인덱스 접근: deadId={deadId}, killerId={killerId}, foundCharacters.Length={foundCharacters?.Length}");
+                $"[UpdateKillLog] 잘못된 플레이어 ID 접근: deadId={deadId}, killerId={killerId}");
             return;
         }
 
-        killLogUI?.AddKillLog(foundCharacters[killerId], foundCharacters[deadId], skillid, isFall);
+        killLogUI?.AddKillLog(killerPlayer, deadPlayer, skillId, isFall);
     }
 
     private void ShowWarningMessage(string message)

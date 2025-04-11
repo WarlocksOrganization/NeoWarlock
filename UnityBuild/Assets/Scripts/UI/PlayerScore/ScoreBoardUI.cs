@@ -155,7 +155,7 @@ public class ScoreBoardUI : MonoBehaviour
                     record.GetScoreAtRound(roundIndex),
                     roundIndex,
                     includeCurrentRound: false,
-                    localPlayerId: PlayerSetting.PlayerId
+                    localPlayerId: GamePlayer.GetLocalPlayerId()
                 );
             }
             else
@@ -164,7 +164,7 @@ public class ScoreBoardUI : MonoBehaviour
             }
             panel.gameObject.SetActive(true);
 
-            panel.SetupWithScore(record, record.GetScoreAtRound(roundIndex), roundIndex, false, PlayerSetting.PlayerId);
+            panel.SetupWithScore(record, record.GetScoreAtRound(roundIndex), roundIndex, false, GamePlayer.GetLocalPlayerId());
             panel.SetRoundRanks(record.roundStatsList.Take(roundIndex).Select(r => r.rank).ToList());
             panel.GetComponent<RectTransform>().anchoredPosition = panelPositions[i].anchoredPosition;
         }
@@ -191,7 +191,7 @@ public class ScoreBoardUI : MonoBehaviour
                     record.GetScoreAtRound(roundIndex),
                     roundIndex,
                     includeCurrentRound: false,
-                    localPlayerId: PlayerSetting.PlayerId
+                    localPlayerId: GamePlayer.GetLocalPlayerId()
                 );
             }
             else
@@ -200,7 +200,7 @@ public class ScoreBoardUI : MonoBehaviour
             }
 
             var score = record.GetTotalScoreUpToRound(roundIndex - 1);
-            panel.SetupWithScore(record, score, roundIndex - 1, true, PlayerSetting.PlayerId);
+            panel.SetupWithScore(record, score, roundIndex - 1, true, GamePlayer.GetLocalPlayerId());
             panel.GetComponent<RectTransform>().anchoredPosition = panelPositions[i].anchoredPosition;
         }
         
@@ -248,7 +248,7 @@ public class ScoreBoardUI : MonoBehaviour
             int before = preSorted.FirstOrDefault(p => p.playerId == record.playerId)?.GetTotalScoreUpToRound(roundIndex - 1) ?? 0;
             int after = record.GetTotalScoreUpToRound(roundIndex);
 
-            panel.SetupWithScore(record, after, roundIndex, true, PlayerSetting.PlayerId);
+            panel.SetupWithScore(record, after, roundIndex, true, GamePlayer.GetLocalPlayerId());
             panel.AnimateScore(before, after);
             panel.MoveTo(panelPositions[i].anchoredPosition);
             
@@ -353,9 +353,7 @@ public class ScoreBoardUI : MonoBehaviour
 
         bestPlayer = records
             .OrderByDescending(r => r.GetTotalScoreUpToRound(2))
-            .ThenByDescending(r => r.roundStatsList.Sum(rs => rs.kills + rs.outKills))
-            .ThenByDescending(r => r.roundStatsList.Sum(rs => rs.damageDone))
-            .First();
+            .FirstOrDefault();
 
         var bestKill = records
             .OrderByDescending(r => r.roundStatsList.Sum(rs => rs.kills + rs.outKills)) // 1차 기준: 킬 수
@@ -376,7 +374,7 @@ public class ScoreBoardUI : MonoBehaviour
             return;
         }
 
-        var myId = PlayerSetting.PlayerId;
+        var myId = GamePlayer.GetLocalPlayerId();;
 
         string ColorizeName(string name, int id)
         {

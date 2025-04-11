@@ -34,25 +34,29 @@ public class GamePlayUI : GameLobbyUI
 
     public override void UpdatePlayerInRoon()
     {
-        foundCharacters = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None)
-            .OrderBy(player => player.playerId)
-            .ToArray();
+        foundCharactersDict.Clear();
 
-        int maxPlayerId = foundCharacters.Length > 0 ? foundCharacters.Max(p => p.playerId) : 0;
-        PlayerCharacters = new GameObject[maxPlayerId + 1];
-
-        foreach (var player in foundCharacters)
+        var allPlayers = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None);
+        foreach (var player in allPlayers)
         {
-            if (player.playerId >= 0 && player.playerId < PlayerCharacters.Length)
+            if (player.playerId >= 0 && !foundCharactersDict.ContainsKey(player.playerId))
             {
-                PlayerCharacters[player.playerId] = player.gameObject;
+                foundCharactersDict[player.playerId] = player;
             }
         }
 
-        survivePlayers = foundCharacters.Count(p => !p.isDead);
+        // 정렬된 리스트 필요할 때
+        var orderedPlayers = foundCharactersDict.OrderBy(kv => kv.Key).Select(kv => kv.Value).ToList();
+        
+        survivePlayers = orderedPlayers.Count(p => !p.isDead);
+
         PlayerInRoonText.text = $"남은 인원 : {survivePlayers} 명";
 
-        playerStatusUI.Setup(foundCharacters, PlayerSetting.PlayerId);
+        var myPlayer = orderedPlayers.FirstOrDefault(p => p.isOwned);
+        if (myPlayer != null)
+        {
+            playerStatusUI.Setup(foundCharactersDict, myPlayer.playerId); // ✅ 딕셔너리 전달
+        }
     }
 
     public void CallGameStart()
@@ -123,8 +127,10 @@ public class GamePlayUI : GameLobbyUI
                 countDownText.text = "SMASH!";
                 countDownAnimator.SetTrigger("isStart"); // ✅ 트리거 설정
 
-                foreach (var player in foundCharacters)
-                    player.SetState(Constants.PlayerState.Start);
+                foreach (var player in foundCharactersDict.Values)
+                {
+                    player.SetState(Constants.PlayerState.Start); // 또는 Start
+                }
 
                 gameState = Constants.GameState.Start;
                 UpdatePlayerInRoon();
@@ -139,8 +145,11 @@ public class GamePlayUI : GameLobbyUI
 
                 AudioManager.Instance.ApplyBGMVolumeToMixer(0);
                 AudioManager.Instance.PlaySFX(Constants.SoundType.SFX_Count);
-                foreach (var player in foundCharacters)
-                    player.SetState(Constants.PlayerState.Counting);
+                
+                foreach (var player in foundCharactersDict.Values)
+                {
+                    player.SetState(Constants.PlayerState.Counting); // 또는 Start
+                }
             }
         }
         else if (phase == 2)
