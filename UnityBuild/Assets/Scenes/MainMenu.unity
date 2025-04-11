@@ -16382,9 +16382,9 @@ RectTransform:
   - {fileID: 588890736}
   m_Father: {fileID: 982760776}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 700, y: -120}
+  m_AnchorMin: {x: 1, y: 0.5}
+  m_AnchorMax: {x: 1, y: 0.5}
+  m_AnchoredPosition: {x: 650, y: -120}
   m_SizeDelta: {x: 307.3587, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &808113887
@@ -20736,7 +20736,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   socketServerIP: j12a509.p.ssafy.io
-  socketServerPort: 8082
+  socketServerPort: 8080
   bufferSize: 8192
   maxRetries: 5
   nickName: 
@@ -31499,7 +31499,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: 350, y: -120}
+  m_AnchoredPosition: {x: 650, y: -20}
   m_SizeDelta: {x: 307.3587, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1684250020
@@ -39584,7 +39584,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &2097371759
 RectTransform:
   m_ObjectHideFlags: 0

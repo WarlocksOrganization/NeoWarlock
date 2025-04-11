@@ -436,6 +436,11 @@ namespace Player
                 nicknameText.color = new Color(0.3f,0.3f,1);
             }
             
+            if (newTeam == Constants.TeamType.None)
+            {
+                nicknameText.color = new Color(1,1,1);
+            }
+            
             var ui = FindFirstObjectByType<GameLobbyUI>();
             ui?.UpdatePlayerInRoon(); // ✅ 팀 바뀌면 내 UI 갱신
         }

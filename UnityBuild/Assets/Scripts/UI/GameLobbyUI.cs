@@ -177,7 +177,6 @@ public class GameLobbyUI : MonoBehaviour
         var players = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None)
             .OrderBy(p => p.playerId)
             .ToArray();
-
         int hostNumber = players[0].playerId; // 방장 ID는 제일 작은 ID로 설정
         if (NetworkServer.active || playerNum == hostNumber)
         {

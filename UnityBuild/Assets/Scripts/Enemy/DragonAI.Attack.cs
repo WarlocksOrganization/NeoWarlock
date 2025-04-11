@@ -229,9 +229,9 @@ public partial class DragonAI
         Transform firePoint = firePoints[0]; // 기준 발사 위치
         GameObject prefab = projectilePrefabs[0];
 
-        for (int i = 0; i < 8; i++)
+        for (int i = 0; i < 4; i++)
         {
-            float angle = i * 45f; // 360 / 8 = 45도씩
+            float angle = i * 90f + 45f;
             Quaternion rotation = Quaternion.Euler(0f, angle, 0f);
             Vector3 dir = rotation * Vector3.forward;
 
@@ -260,9 +260,9 @@ public partial class DragonAI
 
         if (curHp <= maxHp / 2f)
         {
-            for (int i = 0; i < 8; i++)
+            for (int i = 0; i < 4; i++)
             {
-                float angle = i * 45f + 22.5f; // 360 / 8 = 45도씩
+                float angle = i * 90f; // 360 / 8 = 45도씩
                 Quaternion rotation = Quaternion.Euler(0f, angle, 0f);
                 Vector3 dir = rotation * Vector3.forward;
 
@@ -303,14 +303,10 @@ public partial class DragonAI
 
     private void MoveTowardsTarget()
     {
+        float speedMultiplier = curHp <= maxHp / 2 ? 2f : 1f; // 체력이 절반 이하일 때 1.5배 속도
+
         Vector3 dir = (target.transform.position - transform.position).normalized;
-        
-        transform.position += dir * moveSpeed * Time.deltaTime;
-        
-        if (curHp <= maxHp / 2)
-        {
-            transform.position += dir * moveSpeed * Time.deltaTime * 0.5f;
-        }
+        transform.position += dir * moveSpeed * speedMultiplier * Time.deltaTime;
 
         animator.SetBool("isMoving", true);
     }
