@@ -212,6 +212,14 @@ public partial class DragonAI : NetworkBehaviour, IDamagable
             }
         }
         RpcHideHealthUI(); // 체력바 숨기기 호출
+        
+        StartCoroutine(DelayGameOverCheckAfterDeath());
+    }
+    
+    private IEnumerator DelayGameOverCheckAfterDeath()
+    {
+        yield return new WaitForSeconds(3f);
+        GameManager.Instance.TryCheckGameOver();
     }
     
     // 체력바 숨기기 Rpc 추가
