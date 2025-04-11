@@ -4,6 +4,7 @@ using System.Linq;
 using Mirror;
 using UnityEngine;
 using DataSystem;
+using DataSystem.Database;
 using Player;
 using UI;
 using UnityEngine.Rendering.LookDev;
@@ -42,6 +43,14 @@ namespace GameManagement
             {
                 gameLobbyUI.RoomNameText.text = roomName;
             }
+        }
+        
+        public override void OnStartServer()
+        {
+            base.OnStartServer();
+
+            Debug.Log("🟢 [GameRoomData] OnStartServer - 공격 데이터 초기화 중");
+            Database.LoadAttackData(); // ✅ 서버에서만 초기 1회 실행
         }
         
         public override void OnStartClient()
