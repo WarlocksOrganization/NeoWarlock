@@ -15,7 +15,7 @@ MonoBehaviour:
   attackName: "\uBC14\uB78C\uACF5\uACA9"
   animTrigger: isAttack
   blendnum: 3
-  attackDuration: 7
+  attackDuration: 8
   cooldown: 10
   range: 20
   radius: 5

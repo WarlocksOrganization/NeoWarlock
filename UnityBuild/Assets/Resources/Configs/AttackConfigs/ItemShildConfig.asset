@@ -13,13 +13,15 @@ MonoBehaviour:
   m_Name: ItemShildConfig
   m_EditorClassIdentifier: 
   attackType: 5
-  attackDelay: 0
-  recoveryTime: 3
+  attackDelay: 0.5
+  recoveryTime: 1
   attackDuration: 0
   attackInterval: 0
-  animParameter: isAttack3
-  attackTrans: {x: 0, y: 0, z: 0}
+  animParameter: isUseItem
+  attackTrans: {x: 0, y: 0, z: -0.5}
   Prefab: {fileID: 322783647940636695, guid: 3debe98b2148b9b4fa96e032065c9777, type: 3}
   explosionEffectPrefab: {fileID: 5412338807302183837, guid: 68a8102c387cfd24583565c4ddfae556, type: 3}
-  skillType: 23
+  particlePrefab: {fileID: 0}
+  particlePrefab2: {fileID: 0}
+  skillType: 1005
   appliedBuff: {fileID: 11400000, guid: 539a04351fd36564db57f34a30e52222, type: 2}

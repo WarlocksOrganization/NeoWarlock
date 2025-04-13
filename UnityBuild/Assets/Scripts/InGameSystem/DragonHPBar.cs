@@ -53,6 +53,8 @@ public class DragonHPBar : MonoBehaviour
         if (curHpText != null) curHpText.text = ((int)newHp).ToString();
         if (maxHpText != null) maxHpText.text = ((int)maxHp).ToString();
 
+        maxHp = Mathf.Max(maxHp, newHp);
+
         float newValue = newHp / maxHp;
         healthSlider.value = newValue;
 

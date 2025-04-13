@@ -16,6 +16,8 @@ namespace Player
         [SerializeField] private float tiltLerpSpeed = 5f;
 
         [SerializeField] private GameObject playerModel;
+        
+        private Vector3 cameraVelocity = Vector3.zero;
 
         private void UpdateCameraTarget()
         {
@@ -69,24 +71,5 @@ namespace Player
                 );
             }
         }
-        
-        public void AddTargetToCamera(Transform target)
-        {
-            var group = FindFirstObjectByType<Cinemachine.CinemachineTargetGroup>();
-            if (group == null) return;
-
-            var targets = group.m_Targets.ToList();
-            if (targets.Any(t => t.target == target)) return;
-
-            targets.Add(new CinemachineTargetGroup.Target
-            {
-                target = target,
-                weight = 0.5f,
-                radius = 3f
-            });
-
-            group.m_Targets = targets.ToArray();
-        }
-
     }
 }

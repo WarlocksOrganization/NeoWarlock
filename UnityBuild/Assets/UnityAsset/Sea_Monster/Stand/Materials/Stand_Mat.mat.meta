@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 71c75dbd9e268b34d96bb5a1f2e905a4
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 239153
+  packageName: Sea Monster
+  packageVersion: 1.0
+  assetPath: Assets/Sea_Monster/Stand/Materials/Stand_Mat.mat
+  uploadId: 543172

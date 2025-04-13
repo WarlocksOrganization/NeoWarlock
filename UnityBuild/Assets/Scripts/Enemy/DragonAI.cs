@@ -21,19 +21,21 @@ public partial class DragonAI : NetworkBehaviour, IDamagable
     public float attackCooldown = 2f;
 
     [Header("Components")]
-    [SerializeField] private Animator animator;
-    [SerializeField] private NetworkAnimator networkAnimator;
-    [SerializeField] private Transform EnemyModel;
+    [SerializeField] protected Animator animator;
+    [SerializeField] protected NetworkAnimator networkAnimator;
+    [SerializeField] protected Transform EnemyModel;
 
     [Header("Health UI")] 
-    [SerializeField] private DragonHPBar hpBarUI;
+    protected DragonHPBar hpBarUI;
     
-    [SerializeField] private CapsuleCollider capsuleCollider;
+    [SerializeField] protected CapsuleCollider capsuleCollider;
 
     [Header("ETC")]
-    [SerializeField] private GameObject floatingDamageTextPrefab;
+    [SerializeField] protected GameObject floatingDamageTextPrefab;
 
-    private bool isLanded = false;
+    [SerializeField] protected string BossName;
+
+    protected bool isLanded = false;
 
     private void Awake()
     {
@@ -42,7 +44,6 @@ public partial class DragonAI : NetworkBehaviour, IDamagable
             SetCollider(false); // 🛡️ 무적 설정은 서버에서만
         }
         
-        UpdateHealthUI();
         animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
     }
 
@@ -50,9 +51,13 @@ public partial class DragonAI : NetworkBehaviour, IDamagable
     {
         base.OnStartClient();
         UpdateHealthUI();
+        
+        var hpBar = FindFirstObjectByType<DragonHPBar>();
+        if (hpBar != null)
+            hpBar.SetBossName(BossName);
     }
 
-    public void Init()
+    public virtual void Init()
     {
         var gameRoomData = FindFirstObjectByType<GameRoomData>();
         if (gameRoomData != null && isServer)
@@ -81,7 +86,7 @@ public partial class DragonAI : NetworkBehaviour, IDamagable
         StartCoroutine(StartLandingSequence());
     }
     
-    private IEnumerator DelaySetTeam()
+    protected IEnumerator DelaySetTeam()
     {
         yield return new WaitForSeconds(1f);
 
@@ -93,7 +98,7 @@ public partial class DragonAI : NetworkBehaviour, IDamagable
     }
 
 
-    public IEnumerator StartLandingSequence()
+    public virtual IEnumerator StartLandingSequence()
     {
         SelectRandomTarget();
         
@@ -113,7 +118,7 @@ public partial class DragonAI : NetworkBehaviour, IDamagable
     }
 
     [ServerCallback]
-    private void FixedUpdate()
+    protected void FixedUpdate()
     {
         if (!isServer || !isLanded || curHp <= 0 || isFlying) return;
 
@@ -177,7 +182,6 @@ public partial class DragonAI : NetworkBehaviour, IDamagable
         if (curHp <= 0 || damage <= 0) return 0;
 
         curHp -= damage;
-        Debug.Log("용체력 : " + curHp);
 
         RpcShowFloatingDamage(damage);
         
@@ -193,7 +197,7 @@ public partial class DragonAI : NetworkBehaviour, IDamagable
     }
 
     [Server]
-    private void Die()
+    protected virtual void Die()
     {
         animator.SetTrigger("isDead");
         RpcPlayAnimation("isDead");
@@ -204,39 +208,50 @@ public partial class DragonAI : NetworkBehaviour, IDamagable
         {
             gameRoomData.SetRoomType(Constants.RoomType.Solo);
 
-            // ✅ 모든 플레이어 팀을 TeamA로 설정
-            var players = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None);
-            foreach (var player in players)
-            {
-                player.team = Constants.TeamType.None;
-            }
+            RpcResetTeamsToClientLocal();
         }
         RpcHideHealthUI(); // 체력바 숨기기 호출
+        RpcPlaySound(Constants.SoundType.SFX_DragonDead);
         
         StartCoroutine(DelayGameOverCheckAfterDeath());
     }
     
-    private IEnumerator DelayGameOverCheckAfterDeath()
+    protected IEnumerator DelayGameOverCheckAfterDeath()
     {
         yield return new WaitForSeconds(3f);
         GameManager.Instance.TryCheckGameOver();
     }
     
+    [ClientRpc]
+    protected void RpcResetTeamsToClientLocal()
+    {
+        var players = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None);
+
+        foreach (var player in players)
+        {
+            if (player.isLocalPlayer)
+            {
+                player.team = PlayerSetting.TeamType;
+                Debug.Log($"[Client] 로컬 플레이어 {player.name} 팀을 {PlayerSetting.TeamType}로 설정했습니다.");
+            }
+        }
+    }
+    
     // 체력바 숨기기 Rpc 추가
     [ClientRpc]
-    private void RpcHideHealthUI()
+    protected void RpcHideHealthUI()
     {
         var hpBar = FindFirstObjectByType<DragonHPBar>();
         if (hpBar != null)
             hpBar.HideHpBar();
     }
 
-    private void OnHpChanged(int oldHp, int newHp)
+    protected void OnHpChanged(int oldHp, int newHp)
     {
         UpdateHealthUI();
     }
 
-    private void UpdateHealthUI()
+    protected void UpdateHealthUI()
     {
         Debug.Log(curHp + " / " + maxHp);
         if (hpBarUI == null)
@@ -255,7 +270,7 @@ public partial class DragonAI : NetworkBehaviour, IDamagable
     }
 
     [ClientRpc]
-    private void RpcShowFloatingDamage(int damage)
+    protected void RpcShowFloatingDamage(int damage)
     {
         if (floatingDamageTextPrefab == null) return;
 
@@ -264,7 +279,7 @@ public partial class DragonAI : NetworkBehaviour, IDamagable
     }
     
     [ClientRpc]
-    private void RpcPlayAnimation(string anim)
+    protected void RpcPlayAnimation(string anim)
     {
         animator.SetTrigger(anim);
     }
@@ -281,12 +296,38 @@ public partial class DragonAI : NetworkBehaviour, IDamagable
     }
 
     [ClientRpc]
-    private void RpcSetColliderState(bool enabled)
+    protected void RpcSetColliderState(bool enabled)
     {
         Debug.Log($"[Client] RpcSetColliderState({enabled})");
     
         if (capsuleCollider != null)
             capsuleCollider.enabled = enabled;
+    }
+    
+    [ClientRpc]
+    protected void RpcAddToTargetGroup(Transform target)
+    {
+        var group = GameObject.FindFirstObjectByType<CinemachineTargetGroup>();
+        if (group == null)
+        {
+            Debug.LogWarning("CinemachineTargetGroup을 찾을 수 없습니다.");
+            return;
+        }
+
+        var targets = group.m_Targets.ToList();
+
+        // 이미 존재하는 타겟인지 확인
+        if (targets.Any(t => t.target == target)) return;
+
+        // 새 타겟 추가
+        targets.Add(new CinemachineTargetGroup.Target
+        {
+            target = target,
+            weight = 0.5f,
+            radius = 3f
+        });
+
+        group.m_Targets = targets.ToArray();
     }
     
     [ClientRpc]
@@ -310,14 +351,44 @@ public partial class DragonAI : NetworkBehaviour, IDamagable
     }
     
     [ClientRpc]
-    private void RpcPlaySound(Constants.SoundType soundType)
+    protected void RpcPlaySound(Constants.SoundType soundType)
     {
         AudioManager.Instance.PlaySFX(soundType, gameObject);
     }
     
     [ClientRpc]
-    private void RpcPlaySound(Constants.SkillType soundType)
+    protected void RpcPlaySound(Constants.SkillType soundType)
     {
         AudioManager.Instance.PlaySFX(soundType, gameObject);
+    }
+    
+    protected virtual void RotateTowardsTarget()
+    {
+        Vector3 direction = (target.transform.position - transform.position).normalized;
+        if (direction == Vector3.zero) return;
+
+        Quaternion lookRotation = Quaternion.LookRotation(direction);
+        Vector3 rotation = Quaternion.Lerp(EnemyModel.rotation, lookRotation, Time.deltaTime * 5f).eulerAngles;
+        EnemyModel.rotation = Quaternion.Euler(0f, rotation.y, 0f);
+    }
+    
+    protected virtual void RotateToForward()
+    {
+        Vector3 direction = (Vector3.zero - transform.position).normalized;
+        if (direction == Vector3.zero) return;
+
+        Quaternion lookRotation = Quaternion.LookRotation(direction);
+        Vector3 rotation = Quaternion.Lerp(EnemyModel.rotation, lookRotation, Time.deltaTime * 5f).eulerAngles;
+        EnemyModel.rotation = Quaternion.Euler(0f, rotation.y, 0f);
+    }
+
+    protected void MoveTowardsTarget()
+    {
+        float speedMultiplier = curHp <= maxHp / 2 ? 2f : 1f; // 체력이 절반 이하일 때 1.5배 속도
+
+        Vector3 dir = (target.transform.position - transform.position).normalized;
+        transform.position += dir * moveSpeed * speedMultiplier * Time.deltaTime;
+
+        animator.SetBool("isMoving", true);
     }
 }

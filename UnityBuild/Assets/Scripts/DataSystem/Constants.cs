@@ -55,6 +55,7 @@ namespace DataSystem
             Sea = 4,
             
             LavaDragon = 12,
+            SeaMonster = 14,
         }
 
         public enum PlayerState
@@ -166,6 +167,9 @@ namespace DataSystem
             DragonBlade = 2001,
             DragonWind = 2002,
             
+            SeaMonsterBubble = 2501,
+            SeaMonsterBlade = 2502,
+            
             None = 100,
         }
         
@@ -182,6 +186,7 @@ namespace DataSystem
             BGM_Lava_GameStart = 1105,
             BGM_Space_GameStart = 1110,
             BGM_Sea_GameStart = 1115,
+            BGM_Sea_Monster_GameStart = 1116,
             
             BGM_Dragon_GameStart = 1120,
 
@@ -213,6 +218,17 @@ namespace DataSystem
             SFX_DragonRoar = 2400,
             SFX_DragonFire = 2401,
             SFX_DragonWing = 2402,
+            SFX_DragonWind = 2403,
+            SFX_DragonDead = 2404,
+            
+            SFX_MonsterLaser = 2501,
+            SFX_MonsterLaserAttack = 2502,
+            SFX_MonsterBlade = 2503,
+            SFX_MonsterBubble = 2504,
+            SFX_MonsterScream = 2505,
+            SFX_MonsterStart = 2506,
+            SFX_MonsterDead = 2510
+            
         }
         
         [System.Serializable]

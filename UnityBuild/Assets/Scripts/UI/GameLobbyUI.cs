@@ -289,6 +289,11 @@ public class GameLobbyUI : MonoBehaviour
         Debug.Log(config?.mapName);
         MapImage.sprite = config?.mapSprite; // 또는 따로 image 설정
         MapName.text = config?.mapName;
+
+        if (type == Constants.RoomMapType.LavaDragon || type == Constants.RoomMapType.SeaMonster)
+        {
+            ShowWarningMessage("협동모드는 보스 처치 전까지 같은 팀이 됩니다.");
+        }
     }
 
     private void OnClickChangeTeam()

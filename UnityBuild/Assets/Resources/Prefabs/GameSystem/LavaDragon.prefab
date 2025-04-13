@@ -3803,9 +3803,10 @@ MonoBehaviour:
   animator: {fileID: 2645769465888699459}
   networkAnimator: {fileID: 4193991849302396199}
   EnemyModel: {fileID: 8239200944980700729}
-  healthSlider: {fileID: 0}
+  hpBarUI: {fileID: 0}
   capsuleCollider: {fileID: 2081581271655993573}
   floatingDamageTextPrefab: {fileID: 7419919620569818252, guid: e91df33ee3e256a4d80b9260a3d087e4, type: 3}
+  BossName: "\uD654\uC5FC\uC758 \uAD70\uC8FC, \uC778\uD398\uB9AC\uC6B0\uC2A4"
 --- !u!114 &2776906202225454518
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3890,12 +3891,12 @@ CapsuleCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
-  m_Radius: 5.82
-  m_Height: 1
+  m_Radius: 4.64
+  m_Height: 14.331137
   m_Direction: 1
-  m_Center: {x: 0, y: 5, z: 0}
+  m_Center: {x: 0, y: 2.0889177, z: 0}
 --- !u!1 &7223525191560138142
 GameObject:
   m_ObjectHideFlags: 0

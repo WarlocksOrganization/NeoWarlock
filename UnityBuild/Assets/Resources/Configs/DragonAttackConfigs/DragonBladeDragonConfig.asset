@@ -18,7 +18,7 @@ MonoBehaviour:
   attackDuration: 7
   cooldown: 10
   range: 20
-  radius: 5
+  radius: 1
   speed: 30
   damage: 20
   knockback: 1

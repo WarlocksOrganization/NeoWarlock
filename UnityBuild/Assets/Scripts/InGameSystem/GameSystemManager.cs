@@ -93,6 +93,12 @@ public class GameSystemManager : NetworkBehaviour
     {
         AudioManager.Instance.PlaySFX(soundType);
     }
+    
+    [ClientRpc]
+    public void PlaySFX(Constants.SoundType soundType, GameObject gO)
+    {
+        AudioManager.Instance.PlaySFX(soundType, gO);
+    }
 
     private void OnDestroy()
     {
