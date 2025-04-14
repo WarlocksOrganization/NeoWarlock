@@ -270,7 +270,7 @@ public partial class DragonAI : NetworkBehaviour, IDamagable
     }
 
     [ClientRpc]
-    protected void RpcShowFloatingDamage(int damage)
+    protected virtual void RpcShowFloatingDamage(int damage)
     {
         if (floatingDamageTextPrefab == null) return;
 

@@ -132,9 +132,11 @@ public class GameSyatemSeaManager : GameSystemManager
         MeteorExplosion(position);
 
         // 이름으로 찾아서 Fall 실행 (네트워크 객체 찾기 위해 이름 활용)
+        
         GameObject target = GameObject.Find(groundName);
         if (target != null)
         {
+            // 자식 포함 전체에서 FallGround 컴포넌트 찾기
             FallGround[] fallGrounds = target.GetComponentsInChildren<FallGround>(true);
             foreach (var fg in fallGrounds)
             {
@@ -186,7 +188,8 @@ public class GameSyatemSeaManager : GameSystemManager
         GameObject nextGround = FallGrounds[index];
         if (nextGround != null)
         {
-            FallGround[] nextFallGrounds = nextGround.GetComponentsInChildren<FallGround>();
+            // 자식 포함 전체에서 FallGround 컴포넌트 찾기
+            FallGround[] nextFallGrounds = nextGround.GetComponentsInChildren<FallGround>(true);
             foreach (var nextFallGround in nextFallGrounds)
             {
                 nextFallGround.NextFall();

@@ -8,6 +8,8 @@ using UnityEngine;
 
 public partial class SeaMonsterAI : DragonAI
 {
+    [SerializeField] private Transform floatingTransform;
+    
     private void Start()
     {
         transform.position = new Vector3(0, -40, 30);
@@ -85,5 +87,14 @@ public partial class SeaMonsterAI : DragonAI
     protected override void RpcPlaySound(Constants.SkillType soundType)
     {
         AudioManager.Instance.PlaySFX(soundType);
+    }
+    
+    [ClientRpc]
+    protected override void RpcShowFloatingDamage(int damage)
+    {
+        if (floatingDamageTextPrefab == null) return;
+
+        GameObject instance = Instantiate(floatingDamageTextPrefab, floatingTransform.position, Quaternion.identity);
+        instance.GetComponent<FloatingDamageText>().SetDamageText(damage);
     }
 }
