@@ -74,4 +74,16 @@ public partial class SeaMonsterAI : DragonAI
         
         StartCoroutine(DelayGameOverCheckAfterDeath());
     }
+    
+    [ClientRpc]
+    protected override void RpcPlaySound(Constants.SoundType soundType)
+    {
+        AudioManager.Instance.PlaySFX(soundType);
+    }
+    
+    [ClientRpc]
+    protected override void RpcPlaySound(Constants.SkillType soundType)
+    {
+        AudioManager.Instance.PlaySFX(soundType);
+    }
 }

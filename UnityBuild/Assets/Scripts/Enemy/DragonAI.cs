@@ -351,13 +351,13 @@ public partial class DragonAI : NetworkBehaviour, IDamagable
     }
     
     [ClientRpc]
-    protected void RpcPlaySound(Constants.SoundType soundType)
+    protected virtual void RpcPlaySound(Constants.SoundType soundType)
     {
         AudioManager.Instance.PlaySFX(soundType, gameObject);
     }
     
     [ClientRpc]
-    protected void RpcPlaySound(Constants.SkillType soundType)
+    protected virtual void RpcPlaySound(Constants.SkillType soundType)
     {
         AudioManager.Instance.PlaySFX(soundType, gameObject);
     }
