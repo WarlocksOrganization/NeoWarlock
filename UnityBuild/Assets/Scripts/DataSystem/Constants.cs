@@ -227,6 +227,7 @@ namespace DataSystem
             SFX_MonsterBubble = 2504,
             SFX_MonsterScream = 2505,
             SFX_MonsterStart = 2506,
+            SFX_MonsterCharge = 2507,
             SFX_MonsterDead = 2510
             
         }

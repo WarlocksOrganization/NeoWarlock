@@ -21,5 +21,5 @@ MonoBehaviour:
   radius: 3
   speed: 5
   damage: 10
-  knockback: 2
+  knockback: 3
   config: {fileID: 11400000, guid: 7a6d81b4e29a21147a21906ded2a1640, type: 2}

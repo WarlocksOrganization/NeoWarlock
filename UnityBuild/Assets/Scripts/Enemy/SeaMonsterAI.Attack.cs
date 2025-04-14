@@ -55,7 +55,7 @@ public partial class SeaMonsterAI
         if (selectedAttack.attackName == "버블공격")
         {
             yield return new WaitForSeconds(2.5f);
-            for (int i = 0; i < 50; i++)
+            for (int i = 0; i < 35; i++)
             {
                 BubbleRandomProjectile();
             }
@@ -67,6 +67,8 @@ public partial class SeaMonsterAI
         }
         else if (selectedAttack.attackName == "직선레이저공격")
         {
+            RpcPlaySound(Constants.SoundType.SFX_MonsterCharge);
+            
             float rotateDuration = 1.5f;
             float elapsed = 0f;
 
@@ -105,10 +107,13 @@ public partial class SeaMonsterAI
         }
         else if (selectedAttack.attackName == "회전레이저공격")
         {
+            RpcPlaySound(Constants.SoundType.SFX_MonsterCharge);
+            
             float rotateDuration = 2f;
             float elapsed = 0f;
 
-            if (Random.Range(0f, 1f) < 0.5f)
+            float rad = Random.Range(0f, 1f);
+            if (rad < 0.5f)
             {
                 animator.SetFloat("Blend", selectedAttack.blendnum + 1);
             }

@@ -41213,7 +41213,9 @@ MonoBehaviour:
   - type: 2506
     clip: {fileID: 8300000, guid: 6665e2850442f7343a56c6243723207a, type: 3}
   - type: 2502
-    clip: {fileID: 8300000, guid: 57d6d50a095e8e04e8d53739333d968d, type: 3}
+    clip: {fileID: 8300000, guid: 095122ee5717ea841901852d51373331, type: 3}
+  - type: 2507
+    clip: {fileID: 8300000, guid: dbc972c14f7a8414999dc2f5b25292c8, type: 3}
   skillSFXList:
   - skillType: 0
     clip: {fileID: 8300000, guid: 3e8f64b2e83646e40b55c4f016c2ff31, type: 3}

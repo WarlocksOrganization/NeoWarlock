@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   attackName: "\uD68C\uC804\uB808\uC774\uC800\uACF5\uACA9"
   animTrigger: isAttack
-  blendnum: 4
+  blendnum: 3
   attackDuration: 7
   cooldown: 7
   range: 9999
