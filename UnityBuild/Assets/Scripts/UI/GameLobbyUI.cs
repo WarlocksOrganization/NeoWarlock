@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using DataSystem;
 using DataSystem.Database;
@@ -121,22 +122,38 @@ public class GameLobbyUI : MonoBehaviour
     public void OnServerPlayerListUpdated(string netIdListStr)
     {
         var parts = netIdListStr.Split(',');
-        var netIds = parts.Select(p => uint.TryParse(p, out var id) ? id : 0).ToArray();
+        Dictionary<uint, int> netIdsDict = new Dictionary<uint, int>();
+        List<uint> netIds = new List<uint>(parts.Length);
+        int idx = 0;
+        foreach (var part in parts)
+        {
+            var subParts = part.Split(':');
+            if (subParts.Length == 2 && uint.TryParse(subParts[0], out var netId) && int.TryParse(subParts[1], out var playerId))
+            {
+                netIdsDict[netId] = playerId;
+                netIds[idx++] = netId;
+            }
+        }
 
+        netIds.Sort();
         var allPlayers = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None);
         var orderedPlayers = netIds
             .Select(id => allPlayers.FirstOrDefault(p => p.GetComponent<NetworkIdentity>().netId == id))
             .Where(p => p != null)
+            .OrderBy(p => p.GetComponent<NetworkIdentity>().netId)
             .ToArray();
-
-        PlayerCharacters = orderedPlayers.Select(p => p.gameObject).ToArray();
+            
+        PlayerCharacters = orderedPlayers.Select(p => p.gameObject)
+            .OrderBy(p => p.GetComponent<NetworkIdentity>().netId)
+            .ToArray();
         foundCharacters = orderedPlayers;
 
         // 내 플레이어 식별
         var myPlayer = orderedPlayers.FirstOrDefault(p => p.isOwned);
         if (myPlayer != null)
         {
-            var myIndex = Array.IndexOf(PlayerCharacters, myPlayer.gameObject);
+            // var myIndex = Array.IndexOf(PlayerCharacters, myPlayer.gameObject);
+            int myIndex = netIdsDict[myPlayer.GetComponent<NetworkIdentity>().netId];
             PlayerSetting.PlayerId = myIndex;
         }
 
@@ -151,13 +168,17 @@ public class GameLobbyUI : MonoBehaviour
     // ✅ 방장인지 확인 후 버튼 활성화
     private void CheckIfHost(int playerNum = -1)
     {
-        if (StartGameButton == null || ChangeMapNextButton == null || ChangeMapBeforeButton == null)
+        if (StartGameButton == null || ChangeMapNextButton == null || ChangeMapBeforeButton == null || playerNum == -1)
         {
             Debug.LogWarning("[CheckIfHost] UI 요소가 아직 초기화되지 않음");
             return;
         }
 
-        if (NetworkServer.active || playerNum == hostNum)
+        var players = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None)
+            .OrderBy(p => p.playerId)
+            .ToArray();
+        int hostNumber = players[0].playerId; // 방장 ID는 제일 작은 ID로 설정
+        if (NetworkServer.active || playerNum == hostNumber)
         {
             StartGameButton.gameObject.SetActive(true);
             ChangeMapNextButton.gameObject.SetActive(true);
@@ -179,7 +200,9 @@ public class GameLobbyUI : MonoBehaviour
         if (NetworkServer.active)
         {
             // ✅ 게임 시작 전에 플레이어 정보로 Stats 초기화
-            var allPlayers = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None);
+            var allPlayers = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None)
+                .OrderBy(p => p.playerId)
+                .ToArray();
             if (GameManager.Instance != null) GameManager.Instance.Init(allPlayers);
 
             var players = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None);
@@ -266,6 +289,11 @@ public class GameLobbyUI : MonoBehaviour
         Debug.Log(config?.mapName);
         MapImage.sprite = config?.mapSprite; // 또는 따로 image 설정
         MapName.text = config?.mapName;
+
+        if (type == Constants.RoomMapType.LavaDragon || type == Constants.RoomMapType.SeaMonster)
+        {
+            ShowWarningMessage("협동모드는 보스 처치 전까지 같은 팀이 됩니다.");
+        }
     }
 
     private void OnClickChangeTeam()

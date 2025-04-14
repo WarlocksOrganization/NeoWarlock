@@ -73,6 +73,17 @@ public class MatrixManager : MonoBehaviour
             }
 
             MatrixLoadState.HasMatrixData = true;
+            // matrixMap이 영행렬인 경우
+            bool isAllDiagonalZero = matrix.matrixMap.Values
+                .SelectMany(list => list)
+                .Where(row => row.Count > 0)
+                .Select((row, idx) => row[Mathf.Min(idx, row.Count - 1)])
+                .All(x => x == 0);
+            if (isAllDiagonalZero)
+            {
+                Debug.LogWarning("[MatrixManager] 매트릭스의 모든 대각선 값이 0입니다.");
+            }
+            MatrixLoadState.IsMatrixValid = !isAllDiagonalZero;
             currentMatrix = matrix;
             return matrix;
         }
@@ -83,25 +94,6 @@ public class MatrixManager : MonoBehaviour
             return null;
         }
     }
-    // public MatrixDocument LoadMatrixFromJson(string jsonText)
-    // {
-    //     MatrixDocumentWrapper wrapper = JsonConvert.DeserializeObject<MatrixDocumentWrapper>(jsonText);
-        
-    //     int classCode = (int)PlayerSetting.PlayerCharacterClass;
-
-    //     var matrix = wrapper.data.FirstOrDefault(doc =>
-    //         doc.type == "T" && doc.id.Split('/')[3] == classCode.ToString());
-
-    //     if (matrix == null)
-    //     {
-    //         MatrixLoadState.HasMatrixData = false;
-    //         Debug.LogError($"[MatrixManager] 일치하는 매트릭스 문서가 없습니다: classCode={classCode}");
-    //         return null;
-    //     }
-    //     MatrixLoadState.HasMatrixData = true;
-    //     currentMatrix = matrix;
-    //     return matrix;
-    // }
 
     public MatrixDocument LoadMatrixFromPersistentOrResources()
     {
@@ -113,17 +105,6 @@ public class MatrixManager : MonoBehaviour
             jsonText = MatrixFileManager.LoadMatrixJson();
             Debug.Log("[MatrixManager] PersistentData에서 매트릭스 파일 로드");
         }
-        // else
-        // {
-            // 없으면 Resources에서 fallback
-        //     var textAsset = Resources.Load<TextAsset>("Data/CardMatrixList");
-        //     if (textAsset != null)
-        //     {
-        //         MatrixLoadState.HasMatrixData = false;
-        //         Debug.LogError("[MatrixManager] 매트릭스 데이터를 불러올 수 없습니다.");
-        //         return null;
-        //     }
-        // }
 
         if (string.IsNullOrEmpty(jsonText))
         {

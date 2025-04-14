@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Mirror;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace DataSystem.Database
@@ -12,7 +13,7 @@ namespace DataSystem.Database
         {
             if (attackDataDictionary.TryGetValue(id, out var attack))
             {
-                return attack;
+                return new AttackData(attack); // ✅ 깊은 복사
             }
 
             Debug.LogWarning($"[Database] GetAttackData(): No AttackData found for id {id}.");

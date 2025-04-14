@@ -53,6 +53,8 @@ public class DragonHPBar : MonoBehaviour
         if (curHpText != null) curHpText.text = ((int)newHp).ToString();
         if (maxHpText != null) maxHpText.text = ((int)maxHp).ToString();
 
+        maxHp = Mathf.Max(maxHp, newHp);
+
         float newValue = newHp / maxHp;
         healthSlider.value = newValue;
 
@@ -95,4 +97,20 @@ public class DragonHPBar : MonoBehaviour
 
         canvasGroup.alpha = 0f;
     }
+        
+    public void HideHpBar()
+    {
+        if (canvasGroup == null)
+            canvasGroup = GetComponent<CanvasGroup>();
+
+        if (canvasGroup != null)
+            canvasGroup.alpha = 0f;
+
+        if (delayedRoutine != null)
+            StopCoroutine(delayedRoutine);
+
+        if (fadeOutRoutine != null)
+            StopCoroutine(fadeOutRoutine);
+    }
+
 }

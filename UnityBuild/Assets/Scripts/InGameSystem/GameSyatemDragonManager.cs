@@ -98,6 +98,38 @@ public class GameSyatemDragonManager : GameSystemManager
     private IEnumerator SpawnFallingAttacks(int count, Vector3 pos)
     {
         yield return new WaitForSeconds(1.5f);
+        var players = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None);
+    
+        foreach (var player in players)
+        {
+            if (player.isDead)
+            {
+                continue;
+            }
+            Quaternion downRotation = Quaternion.LookRotation(Vector3.down);
+
+            GameObject attack = Instantiate(AttackPrefab, pos + player.transform.position + Vector3.up * 40f, downRotation);
+            
+            GameObject dragon = FindFirstObjectByType<DragonAI>().gameObject;
+
+            attack.GetComponent<AttackProjectile>().SetProjectileData(
+                10, // damage
+                20, // speed
+                7.5f, // radius
+                5, // range
+                10, // duration
+                3, // knockback
+                attackConfig,
+                dragon,
+                -1,
+                -1
+            );
+
+            NetworkServer.Spawn(attack);
+
+            // ✅ 0.1초 지연
+            yield return new WaitForSeconds(0.25f);
+        }
         
         for (int i = 0; i < count; i++)
         {

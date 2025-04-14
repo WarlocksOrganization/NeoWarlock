@@ -315,6 +315,77 @@ namespace GameManagement
         {
             Debug.Log("[GameManager] 게임 종료. 결과 기록 중...");
             // 결과 기록 로직 생략
+            if (Application.platform != RuntimePlatform.LinuxServer)
+            {
+                Debug.LogWarning("[GameManager] 서버 모드에서 실행 중이 아닙니다.");
+                return;
+            }
+
+            Debug.Log("[GameManager] 게임 종료. 결과 기록 중...");
+            List<Dictionary<string, object>> playerLogs = new List<Dictionary<string, object>>();
+            var allPlayerRecords = GameManager.Instance.GetAllPlayerRecords();
+            foreach (Constants.PlayerRecord playerRecord in allPlayerRecords)
+            {
+                List<int> roundRanks = new List<int> 
+                {
+                    playerRecord.roundStatsList[0].rank,
+                    playerRecord.roundStatsList[1].rank,
+                    playerRecord.roundStatsList[2].rank
+                };
+
+                List<int> roundScore = new List<int> 
+                {
+                    playerRecord.GetScoreAtRound(0),
+                    playerRecord.GetScoreAtRound(1),
+                    playerRecord.GetScoreAtRound(2)
+                };
+
+                int[] thisPlayerCards = playerCards.ContainsKey(playerRecord.userId) ? playerCards[playerRecord.userId] : new int[9];
+                if (thisPlayerCards.Length != 9)
+                {
+                    Debug.LogWarning($"[GameManager] {playerRecord.nickname}의 카드 세트가 유효하지 않습니다.");
+                    int cardCount = thisPlayerCards.Length;
+                    thisPlayerCards = new int[9]
+                    {
+                        cardCount > 0 ? thisPlayerCards[0] : 0,
+                        cardCount > 1 ? thisPlayerCards[1] : 0,
+                        cardCount > 2 ? thisPlayerCards[2] : 0,
+                        cardCount > 3 ? thisPlayerCards[3] : 0,
+                        cardCount > 4 ? thisPlayerCards[4] : 0,
+                        cardCount > 5 ? thisPlayerCards[5] : 0,
+                        cardCount > 6 ? thisPlayerCards[6] : 0,
+                        cardCount > 7 ? thisPlayerCards[7] : 0,
+                        cardCount > 8 ? thisPlayerCards[8] : 0
+                    };
+                }           
+
+                Dictionary<string, object> playerLog = new Dictionary<string, object>
+                {
+                    ["userId"] = playerRecord.userId,
+                    ["classCode"] = (int)playerRecord.characterClass,
+                    ["round1Set"] = new int[] {thisPlayerCards[0], thisPlayerCards[1], thisPlayerCards[2]},
+                    ["round2Set"] = new int[] {thisPlayerCards[3], thisPlayerCards[4], thisPlayerCards[5]},
+                    ["round3Set"] = new int[] {thisPlayerCards[6], thisPlayerCards[7], thisPlayerCards[8]},
+                    ["roundRank"] = roundRanks,
+                    ["roundScore"] = roundScore
+                };
+                playerLogs.Add(playerLog);
+            }
+            
+            var manager = Networking.RoomManager.singleton as Networking.RoomManager;
+            Dictionary<string, string> roomData = manager.GetRoomData();
+            var socketManager = Networking.SocketManager.singleton as Networking.SocketManager;
+            if (socketManager != null && socketManager.IsConnected())
+            {
+                int roomId = int.TryParse(roomData["roomId"], out roomId) ? roomId : 0;
+                int gameId = int.TryParse(roomData["gameId"], out gameId) ? gameId : 0;
+                socketManager.RequestGameEnd(roomId, gameId);
+            }
+            else
+            {
+                Debug.LogWarning("[GameManager] SocketManager가 존재하지 않거나 연결되지 않았습니다.");
+            }
+            FileLogger.LogGameEnd(manager.GetMapId(), playerLogs.Count(), playerLogs);
         }
 
         public void Reset()
@@ -345,6 +416,6 @@ namespace GameManagement
         }
 
         public Constants.PlayerStats GetPlayerStats(int playerId) => playerStatsArray.First(p => p.playerId == playerId);
-        public Constants.PlayerRecord[] GetAllPlayerRecords() => playerRecords.Values.ToArray();
+        public Constants.PlayerRecord[] GetAllPlayerRecords() => playerRecords.Values.ToArray().OrderBy(r => r.playerId).ToArray();
     }
 }

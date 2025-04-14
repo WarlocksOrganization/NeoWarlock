@@ -28,6 +28,9 @@ namespace Player
         private Vector3 gravityVelocity = Vector3.zero; // ✅ 중력 가속도를 저장할 변수
         private float gravity = -9.81f; // ✅ Unity 기본 중력 값
         
+        private float rightClickHoldTimer = 0f; // 마우스 우클릭 누르고 있는 시간 체크용
+        private float rightClickInterval = 0.1f; // 0.1초마다 실행
+        
         public GameObject moveIndicatorPrefab; // ✅ 이동 위치를 표시할 이펙트 프리팹
         private void OnMoveSpeedChanged(float _, float __) => NotifyStatChanged();
         private void OnKnockbackChanged(float _, float __) => NotifyStatChanged();
@@ -119,21 +122,47 @@ namespace Player
         
         private void HandleMouseMovement()
         {
-            if (Input.GetMouseButtonDown(1)) // 마우스 우클릭으로 목표 위치 설정
+            // ✅ 마우스 우클릭을 처음 눌렀을 때 (즉시 이동)
+            if (Input.GetMouseButtonDown(1))
             {
-                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-                if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, mouseTargetLayer))
+                HandleRightClick();
+                rightClickHoldTimer = 0f;
+            }
+
+            // ✅ 마우스 우클릭을 누르고 있는 동안 0.1초마다 실행
+            if (Input.GetMouseButton(1))
+            {
+                rightClickHoldTimer += Time.deltaTime;
+                if (rightClickHoldTimer >= rightClickInterval)
                 {
-                    _targetPosition = hit.point;
-                    isMovingToTarget = true;
-                    
-                    // ✅ 이동 위치 이펙트 표시
-                    ShowMoveIndicator(_targetPosition);
+                    HandleRightClick();
+                    rightClickHoldTimer = 0f;
                 }
             }
+
+            // ✅ S 키를 누르면 현재 위치에 정지
+            if (Input.GetKeyDown(KeyCode.S))
+            {
+                isMovingToTarget = false;
+                _moveDirection = Vector3.zero;
+            }
+
             if (isMovingToTarget && attackLockTime <= 0 && canMove)
             {
                 MoveTowardsTarget();
+            }
+        }
+        
+        private void HandleRightClick()
+        {
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, mouseTargetLayer))
+            {
+                _targetPosition = hit.point;
+                isMovingToTarget = true;
+
+                // ✅ 이동 위치 이펙트 표시
+                ShowMoveIndicator(_targetPosition);
             }
         }
 

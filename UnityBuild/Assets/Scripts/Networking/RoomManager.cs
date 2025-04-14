@@ -146,6 +146,20 @@ namespace Networking
 
             base.OnServerConnect(conn);
         }
+
+        public override void OnServerDisconnect(NetworkConnectionToClient conn)
+        {
+            base.OnServerDisconnect(conn);
+
+            StartCoroutine(WaitForFullyDisconnect());
+        }
+
+        private IEnumerator WaitForFullyDisconnect()
+        {
+            yield return new WaitForSeconds(0.2f); // 잠시 대기 후 방 데이터 초기화
+            roomDataInstance?.RpcUpdatePlayer();
+        }
+
         public void StartGame()
         {
             if (roomDataInstance.gameId > 0)

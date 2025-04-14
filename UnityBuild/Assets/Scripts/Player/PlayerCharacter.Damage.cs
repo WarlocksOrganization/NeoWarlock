@@ -149,7 +149,7 @@ namespace Player
                 }
 
                 PlayerCharacter[] playerCharacters = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None)
-                    .OrderBy(player => player.GetComponent<NetworkIdentity>().netId)
+                    .OrderBy(player => player.playerId)
                     .ToArray();
                 if (playerCharacters.Count() > attackPlayerId)
                 {

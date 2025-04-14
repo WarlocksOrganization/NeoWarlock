@@ -12968,7 +12968,6 @@ MonoBehaviour:
   - {fileID: 3622867063374222405, guid: ab7c75548118a3d468ad99e1b58b764f, type: 3}
   - {fileID: 5686090464823823962, guid: 1f3c75247312101499501410db72fd1f, type: 3}
   - {fileID: 322783647940636695, guid: a408ba58521f6a742b9cfee37f8bf882, type: 3}
-  - {fileID: 5686090464823823962, guid: 606df0497a136824b8de681a0a5ab317, type: 3}
   - {fileID: 5686090464823823962, guid: f7568a4ee603c8d429b335064de24a78, type: 3}
   - {fileID: 5412338807302183837, guid: ae1e3abd238802042840d15d7e4377c8, type: 3}
   - {fileID: 5353179313893722497, guid: 7658cf58f0cd914469a7c9a7fe73dcd2, type: 3}
@@ -12976,6 +12975,11 @@ MonoBehaviour:
   - {fileID: 7201318047736419435, guid: 024d21bf68670324e9fd2dbda7bb6507, type: 3}
   - {fileID: 5686090464823823962, guid: 385ed141775e6b2459b013bbbca3ec78, type: 3}
   - {fileID: 5427001185167510217, guid: 1675226a2b8765042b676e5baed9094e, type: 3}
+  - {fileID: 5686090464823823962, guid: 4ad431c2684082c42978b4e64797b3aa, type: 3}
+  - {fileID: 5686090464823823962, guid: c8c29cb27cf40e34789c4f02f206c64e, type: 3}
+  - {fileID: 4288150329913291611, guid: eecb9f04da18df44ea13bc4a8f9a059b, type: 3}
+  - {fileID: 8727302835194505351, guid: b5037ab036b406f44828047a497d80d5, type: 3}
+  - {fileID: 5427001185167510217, guid: bb1ab6c490470384da10062280bd8d8b, type: 3}
   exceptionsDisconnect: 1
   snapshotSettings:
     bufferTimeMultiplier: 2
@@ -16382,9 +16386,9 @@ RectTransform:
   - {fileID: 588890736}
   m_Father: {fileID: 982760776}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 700, y: -120}
+  m_AnchorMin: {x: 1, y: 0.5}
+  m_AnchorMax: {x: 1, y: 0.5}
+  m_AnchoredPosition: {x: 650, y: -120}
   m_SizeDelta: {x: 307.3587, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &808113887
@@ -20736,7 +20740,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   socketServerIP: j12a509.p.ssafy.io
-  socketServerPort: 8082
+  socketServerPort: 8080
   bufferSize: 8192
   maxRetries: 5
   nickName: 
@@ -31499,7 +31503,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: 350, y: -120}
+  m_AnchoredPosition: {x: 650, y: -20}
   m_SizeDelta: {x: 307.3587, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1684250020
@@ -39584,7 +39588,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &2097371759
 RectTransform:
   m_ObjectHideFlags: 0
@@ -41145,9 +41149,11 @@ MonoBehaviour:
   - type: 1110
     clip: {fileID: 8300000, guid: c59aa37163b19f5428e230325da72b78, type: 3}
   - type: 1115
-    clip: {fileID: 8300000, guid: aacdac1fd68180f458bd27a995e19fd2, type: 3}
+    clip: {fileID: 8300000, guid: 33894e3a786220b48945ff5138fb0f0e, type: 3}
   - type: 1120
     clip: {fileID: 8300000, guid: d6c4f497954bc4942a501a0c0f4706b5, type: 3}
+  - type: 1116
+    clip: {fileID: 8300000, guid: 5c52fdb8f43bf634385dcd90aa7361d2, type: 3}
   uiSFXList:
   - type: 2001
     clip: {fileID: 8300000, guid: 91553fd9dcf9e7948968f6a3273017a6, type: 3}
@@ -41190,6 +41196,24 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 1cfaf128e28ddc7408956eede3794c15, type: 3}
   - type: 2402
     clip: {fileID: 8300000, guid: ceebc32ce18f4a54aae2b1abb0d08914, type: 3}
+  - type: 2403
+    clip: {fileID: 8300000, guid: b3f3c599ec0b35d48967e359c588078f, type: 3}
+  - type: 2404
+    clip: {fileID: 8300000, guid: 29b1c3c341e555746bee5e610a117a2d, type: 3}
+  - type: 2501
+    clip: {fileID: 8300000, guid: 81dc7b4042d74d94d906f0e21b89beeb, type: 3}
+  - type: 2503
+    clip: {fileID: 8300000, guid: c1b541e2ca448454d97a10fd42f1ba8c, type: 3}
+  - type: 2504
+    clip: {fileID: 8300000, guid: bea44d03a89e642459ae2de64cc8000a, type: 3}
+  - type: 2505
+    clip: {fileID: 8300000, guid: 2848edd82cad3de4a8f52067dfef9909, type: 3}
+  - type: 2510
+    clip: {fileID: 8300000, guid: 5d786cb8033eea9449b4feac410b5845, type: 3}
+  - type: 2506
+    clip: {fileID: 8300000, guid: 6665e2850442f7343a56c6243723207a, type: 3}
+  - type: 2502
+    clip: {fileID: 8300000, guid: 57d6d50a095e8e04e8d53739333d968d, type: 3}
   skillSFXList:
   - skillType: 0
     clip: {fileID: 8300000, guid: 3e8f64b2e83646e40b55c4f016c2ff31, type: 3}
@@ -41308,6 +41332,9 @@ MonoBehaviour:
   - skillType: 25
     clip: {fileID: 8300000, guid: 2a0cb0b368330cd4b9b872e20292fd5f, type: 3}
     hitClip: {fileID: 0}
+  - skillType: 2501
+    clip: {fileID: 0}
+    hitClip: {fileID: 8300000, guid: a7ba853c3eed50f4c809b9e16925f22e, type: 3}
   bgmSource: {fileID: 748880585236253846}
   sfxPrefab: {fileID: 7925833501838690345, guid: f5517e83d2cdd6646a4a67146b59e991, type: 3}
   bgmVolume: 0.5

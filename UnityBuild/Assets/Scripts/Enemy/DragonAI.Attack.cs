@@ -10,27 +10,27 @@ using UnityEngine.UI;
 public partial class DragonAI
 {
     [Header("Attack Settings")]
-    [SerializeField] private DragonAttackConfig[] attackPatterns;
+    [SerializeField] protected DragonAttackConfig[] attackPatterns;
 
-    private DragonAttackConfig selectedAttack;
-    private bool isAttacking = false;
-    private float attackCooldownTimer = 0f;
+    protected DragonAttackConfig selectedAttack;
+    protected bool isAttacking = false;
+    protected float attackCooldownTimer = 0f;
 
     [Header("Target")]
-    private PlayerCharacter target;
+    protected PlayerCharacter target;
     
     public GameObject[] projectilePrefabs;              // 발사체 프리팹
     public Transform[] firePoints;                      // 발사 기준점
     
-    private bool isFlying = false;
+    protected bool isFlying = false;
     
-    private int flyAttackCounter = 0; // ✅ 추가: Fly 공격 누적 카운터
-    private int totalAttackCounter = 0; // ✅ 추가: 전체 공격 횟수 카운터
+    protected int flyAttackCounter = 0; // ✅ 추가: Fly 공격 누적 카운터
+    protected int totalAttackCounter = 0; // ✅ 추가: 전체 공격 횟수 카운터
     
-    private Vector3 centerPoint =  new Vector3(0, 2.78f, 0);
+    protected Vector3 centerPoint =  new Vector3(0, 2.78f, 0);
     
     [Server]
-    private void SelectRandomTarget()
+    protected void SelectRandomTarget()
     {
         var players = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None)
             .Where(p => !p.isDead)
@@ -42,7 +42,7 @@ public partial class DragonAI
         }
     }
 
-    private IEnumerator PerformAttack()
+    protected virtual IEnumerator PerformAttack()
     {
         RotateTowardsTarget(); 
         
@@ -91,7 +91,7 @@ public partial class DragonAI
         {
             yield return new WaitForSeconds(1.5f);
 
-            RpcPlaySound(Constants.SoundType.SFX_DragonRoar);
+            RpcPlaySound(Constants.SoundType.SFX_DragonWind);
             
             FireProjectilesIn8Directions(); // ✅ 8방향 발사
             RpcPlaySound(Constants.SkillType.Slash); // 원하시는 효과음으로 교체 가능
@@ -134,7 +134,7 @@ public partial class DragonAI
         }
     }
     
-    private IEnumerator FlyAndAttackSequence()
+    protected IEnumerator FlyAndAttackSequence()
     {
         isFlying = true;
         animator.SetTrigger("isFly");
@@ -158,7 +158,7 @@ public partial class DragonAI
         }
     }
     
-    private IEnumerator FlyAndAttack2Sequence()
+    protected IEnumerator FlyAndAttack2Sequence()
     {
         isFlying = true;
         animator.SetTrigger("isFly");
@@ -186,7 +186,7 @@ public partial class DragonAI
     }
     
     [Server]
-    private void FireRandomProjectile()
+    protected void FireRandomProjectile()
     {
         Transform firePoint = firePoints[0]; // 기준점 (입, 앞 등)
         
@@ -224,14 +224,14 @@ public partial class DragonAI
     }
     
     [Server]
-    private void FireProjectilesIn8Directions()
+    protected void FireProjectilesIn8Directions()
     {
         Transform firePoint = firePoints[0]; // 기준 발사 위치
         GameObject prefab = projectilePrefabs[0];
 
-        for (int i = 0; i < 8; i++)
+        for (int i = 0; i < 4; i++)
         {
-            float angle = i * 45f; // 360 / 8 = 45도씩
+            float angle = i * 90f + 45f;
             Quaternion rotation = Quaternion.Euler(0f, angle, 0f);
             Vector3 dir = rotation * Vector3.forward;
 
@@ -260,9 +260,9 @@ public partial class DragonAI
 
         if (curHp <= maxHp / 2f)
         {
-            for (int i = 0; i < 8; i++)
+            for (int i = 0; i < 4; i++)
             {
-                float angle = i * 45f + 22.5f; // 360 / 8 = 45도씩
+                float angle = i * 90f; // 360 / 8 = 45도씩
                 Quaternion rotation = Quaternion.Euler(0f, angle, 0f);
                 Vector3 dir = rotation * Vector3.forward;
 
@@ -288,42 +288,6 @@ public partial class DragonAI
 
                 NetworkServer.Spawn(projectile);
             }
-        }
-    }
-
-    private void RotateTowardsTarget()
-    {
-        Vector3 direction = (target.transform.position - transform.position).normalized;
-        if (direction == Vector3.zero) return;
-
-        Quaternion lookRotation = Quaternion.LookRotation(direction);
-        Vector3 rotation = Quaternion.Lerp(EnemyModel.rotation, lookRotation, Time.deltaTime * 5f).eulerAngles;
-        EnemyModel.rotation = Quaternion.Euler(0f, rotation.y, 0f);
-    }
-
-    private void MoveTowardsTarget()
-    {
-        Vector3 dir = (target.transform.position - transform.position).normalized;
-        
-        transform.position += dir * moveSpeed * Time.deltaTime;
-        
-        if (curHp <= maxHp / 2)
-        {
-            transform.position += dir * moveSpeed * Time.deltaTime * 0.5f;
-        }
-
-        animator.SetBool("isMoving", true);
-    }
-
-    [ClientRpc]
-    private void RpcAddToTargetGroup(Transform target)
-    {
-        var localPlayer = FindObjectsByType<PlayerCharacter>(FindObjectsSortMode.None)
-            .FirstOrDefault(p => p.isOwned);
-
-        if (localPlayer != null)
-        {
-            localPlayer.AddTargetToCamera(target);
         }
     }
 }

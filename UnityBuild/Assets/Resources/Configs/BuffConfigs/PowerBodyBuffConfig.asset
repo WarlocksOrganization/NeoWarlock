@@ -15,7 +15,7 @@ MonoBehaviour:
   buffName: PowerBody
   BuffType: 7
   duration: 10
-  moveSpeedModifier: 0
+  moveSpeedModifier: -1
   attackDamageModifier: 0
   defenseModifier: 3
   knonkbackModifier: -0.5
@@ -23,5 +23,6 @@ MonoBehaviour:
   moveDirection: {x: 0, y: 0, z: 0}
   buffIcon: {fileID: 21300000, guid: 375525eee5ef91c45b2e2eff1c6bad65, type: 3}
   displayName: "\uAC15\uD654\uC758 \uBE44\uC57D"
-  description: "\uCCB4\uB825\uC744 \uD68C\uBCF5\uD558\uACE0 \uBC29\uC5B4\uB825\uACFC
-    \uB109\uBC31 \uC800\uD56D\uB825\uC774 \uC99D\uAC00\uD569\uB2C8\uB2E4."
+  description: "\uC774\uB3D9\uC18D\uB3C4\uAC00 \uAC10\uC18C\uD558\uC9C0\uB9CC \uCCB4\uB825\uC744
+    \uD68C\uBCF5\uD558\uACE0 \uBC29\uC5B4\uB825\uACFC \uB109\uBC31 \uC800\uD56D\uB825\uC774
+    \uC99D\uAC00\uD569\uB2C8\uB2E4."

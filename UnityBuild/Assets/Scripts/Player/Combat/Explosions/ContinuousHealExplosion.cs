@@ -70,7 +70,12 @@ namespace Player.Combat
                     {
                         continue;
                     }
-                    
+
+                    if (damagable is DragonAI)
+                    {
+                        totalDamageDealt += (int)(dealt*0.5f);
+                        continue;
+                    }
                     totalDamageDealt += dealt;
                 }
             }

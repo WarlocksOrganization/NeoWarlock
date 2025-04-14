@@ -4,6 +4,7 @@ using System.Linq;
 using Mirror;
 using UnityEngine;
 using DataSystem;
+using DataSystem.Database;
 using Player;
 using UI;
 using UnityEngine.Rendering.LookDev;
@@ -28,6 +29,8 @@ namespace GameManagement
         
         [SerializeField] private GameObject[] LavaDragonObjects;
         
+        [SerializeField] private GameObject[] SeaMonsterObjects;
+        
         [SerializeField] private List<GameObject> spawnedObjects = new();
         
         [SyncVar] public int currentRound = 0;
@@ -42,6 +45,14 @@ namespace GameManagement
             {
                 gameLobbyUI.RoomNameText.text = roomName;
             }
+        }
+        
+        public override void OnStartServer()
+        {
+            base.OnStartServer();
+
+            Debug.Log("🟢 [GameRoomData] OnStartServer - 공격 데이터 초기화 중");
+            Database.LoadAttackData(); // ✅ 서버에서만 초기 1회 실행
         }
         
         public override void OnStartClient()
@@ -77,8 +88,10 @@ namespace GameManagement
                 Constants.RoomMapType.Random,
                 Constants.RoomMapType.SSAFY,
                 Constants.RoomMapType.Lava,
-                Constants.RoomMapType.Space,
                 Constants.RoomMapType.LavaDragon,
+                Constants.RoomMapType.Space,
+                Constants.RoomMapType.Sea,
+                Constants.RoomMapType.SeaMonster
             };
 
             int currentIndex = System.Array.IndexOf(mapCycle, roomMapType);
@@ -108,7 +121,7 @@ namespace GameManagement
             if (roomMapType == Constants.RoomMapType.Random)
             {
                 // 1~3 사이 랜덤 맵으로 설정 (SSAFY, Lava, Space)
-                int randomIndex = UnityEngine.Random.Range(1, 4); // 1, 2, 3
+                int randomIndex = UnityEngine.Random.Range(1, 5); // 1, 2, 3, 4
                 roomMapType = (Constants.RoomMapType)randomIndex;
 
                 Debug.Log($"[GameRoomData] 랜덤 맵 선택됨: {roomMapType}");
@@ -126,6 +139,7 @@ namespace GameManagement
                 Constants.RoomMapType.Lava => LavaObjects,
                 Constants.RoomMapType.Space => SpaceObjects,
                 Constants.RoomMapType.Sea => SeaObjects,
+                Constants.RoomMapType.SeaMonster => SeaMonsterObjects,
                 Constants.RoomMapType.LavaDragon => LavaDragonObjects,
                 _ => null
             };
@@ -238,13 +252,20 @@ namespace GameManagement
                 players[i].playerId = i; // 직접 playerId 설정
             }
 
-            playerNetIdsString = string.Join(",", players.Select(p => p.GetComponent<NetworkIdentity>().netId));
+            playerNetIdsString = string.Join(",", players.Select(p => p.GetComponent<NetworkIdentity>().netId.ToString() + ":" + p.playerId.ToString()));
         }
 
         private void OnPlayerListChanged(string oldVal, string newVal)
         {
             // 클라이언트에서 필요 시 처리
             FindFirstObjectByType<GameLobbyUI>()?.OnServerPlayerListUpdated(newVal);
+        }
+
+        [ClientRpc]
+        public void RpcUpdatePlayer()
+        {
+            var ui = FindFirstObjectByType<GameLobbyUI>();
+            ui?.UpdatePlayerInRoon(); // ✅ 팀 바뀌면 내 UI 갱신
         }
     }
 }
