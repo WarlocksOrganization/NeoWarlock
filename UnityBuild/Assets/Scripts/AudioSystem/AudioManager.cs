@@ -165,6 +165,18 @@ public class AudioManager : MonoBehaviour
     // 공통 클립 재생 함수
     private void PlayClip(AudioClip clip, GameObject parent)
     {
+        if (clip == null)
+        {
+            Debug.LogError("[AudioManager] 클립이 null입니다. 사운드 설정을 확인하세요.");
+            return;
+        }
+
+        if (sfxPrefab == null)
+        {
+            Debug.LogError("[AudioManager] sfxPrefab이 null입니다. Inspector에서 할당했는지 확인하세요.");
+            return;
+        }
+        
         AudioSource sfx = Instantiate(sfxPrefab, parent != null ? parent.transform : null);
         sfx.clip = clip;
         sfx.volume = sfxVolume;

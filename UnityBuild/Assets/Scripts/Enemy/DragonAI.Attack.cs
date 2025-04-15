@@ -94,7 +94,6 @@ public partial class DragonAI
             RpcPlaySound(Constants.SoundType.SFX_DragonWind);
             
             FireProjectilesIn8Directions(); // ✅ 8방향 발사
-            RpcPlaySound(Constants.SkillType.Slash); // 원하시는 효과음으로 교체 가능
 
             float remainTime = selectedAttack.attackDuration - 1.5f;
             if (remainTime > 0)

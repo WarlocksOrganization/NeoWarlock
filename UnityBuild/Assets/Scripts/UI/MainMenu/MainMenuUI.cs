@@ -67,7 +67,7 @@ namespace UI
         }
         private IEnumerator TryFetchMatrixFromServer()
         {
-            if (!MatrixUpdateTracker.ShouldUpdateAfterHours(1)) yield break;
+            //if (!MatrixUpdateTracker.ShouldUpdateAfterHours(1)) yield break;
 
             string url = "http://j12a509.p.ssafy.io:8081/hints";
 
