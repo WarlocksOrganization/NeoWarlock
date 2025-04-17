@@ -362,6 +362,7 @@ public class ScoreBoardUI : MonoBehaviour
 
         var bestDamage = records
             .OrderByDescending(r => r.roundStatsList.Sum(rs => rs.damageDone))
+            .ThenByDescending(r => r.GetTotalScoreUpToRound(2))
             .FirstOrDefault();
 
         Debug.Log(
