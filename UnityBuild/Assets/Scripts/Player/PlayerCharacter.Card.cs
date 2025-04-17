@@ -10,33 +10,45 @@ namespace Player
 {
     public partial class PlayerCharacter
     {
-        // ✅ 카드 효과 적용 (클라이언트에서 먼저 호출 가능)
+        // 카드 보너스 효과를 적용하는 메서드 (클라이언트에서 호출됨)
         public void ApplyCardBonuses(List<Database.PlayerCardData> cards)
         {
+            // 자신이 조작하는 캐릭터가 아닐 경우 무시
             if (!isOwned) return;
 
+            // 가장 마지막에 선택한 3장의 카드만 효과 적용
             var last3Cards = cards.Skip(Mathf.Max(0, cards.Count - 3)).ToList();
 
+            // 각 카드에 대해 효과 적용
             foreach (var card in last3Cards)
+            {
                 if (IsBasicStat(card.StatType))
                 {
+                    // 체력, 방어력 등의 기본 스탯 보너스는 직접 캐릭터에 적용
                     CmdModifyPlayerStat(card.StatType, card.BonusStat);
                 }
                 else if (IsAttackStat(card.StatType))
                 {
+                    // 스킬 데미지/쿨다운 등 공격 관련 스탯일 경우
                     CmdModifyPlayerAttackStat(card.AppliedSkill, card.StatType, card.BonusStat);
 
-                    // ✅ 강화된 스킬 ID로 재등록 (강화카드니까 skill + 100임)
+                    // 강화 카드로 인해 스킬 ID가 변경된 경우 (ex. 기본 101 -> 강화 201)
                     var upgradedSkillId = card.AppliedSkill + 100;
                     var index = Array.IndexOf(AttackSkills, card.AppliedSkill);
-                    if (index != -1) CmdSetAvailableAttack(index, upgradedSkillId); // 서버도 강화된 스킬로 갱신
-                }
 
+                    // 기존 스킬 자리에 강화된 스킬 ID 등록 (서버에서도 적용)
+                    if (index != -1)
+                        CmdSetAvailableAttack(index, upgradedSkillId);
+                }
+            }
+
+            // UI나 다른 시스템에 스탯이 변경되었음을 알림
             NotifyStatChanged();
 
+            // 플레이어 UI 참조 (추후 UI 업데이트용)
             var ui = FindFirstObjectByType<PlayerCharacterUI>();
         }
-
+        
         // ✅ 기본 스탯 적용 (서버 전용)
         [Command]
         private void CmdModifyPlayerStat(PlayerStatType statType, float bonusPercent)

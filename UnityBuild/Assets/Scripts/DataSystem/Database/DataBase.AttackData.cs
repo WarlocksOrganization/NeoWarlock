@@ -1,25 +1,27 @@
 using System.Collections.Generic;
 using Mirror;
-using Unity.VisualScripting;
 using UnityEngine;
 
 namespace DataSystem.Database
 {
     public static partial class Database
     {
-        private static readonly Dictionary<int, AttackData > attackDataDictionary = new();
-        
-        public static AttackData  GetAttackData(int id)
+        // 공격 데이터 저장용 딕셔너리
+        private static readonly Dictionary<int, AttackData> attackDataDictionary = new();
+
+        // ID로 공격 데이터를 가져오는 메서드 (깊은 복사 반환)
+        public static AttackData GetAttackData(int id)
         {
             if (attackDataDictionary.TryGetValue(id, out var attack))
             {
-                return new AttackData(attack); // ✅ 깊은 복사
+                return new AttackData(attack); // 깊은 복사
             }
 
             Debug.LogWarning($"[Database] GetAttackData(): No AttackData found for id {id}.");
             return null;
         }
 
+        // CSV에서 공격 데이터를 읽어오는 메서드
         public static void LoadAttackData()
         {
             string csvFileName = Constants.CsvFileName;
@@ -40,14 +42,15 @@ namespace DataSystem.Database
 
                 string[] columns = row.Split(',');
 
+                // 공격 설정 ScriptableObject 로드
                 AttackConfig attackConfig = Resources.Load<AttackConfig>(Constants.ConfigPath + columns[1] + "Config");
-
                 if (attackConfig == null)
                 {
                     Debug.LogError($"공격 설정을 찾을 수 없습니다. Config: {columns[1]}");
                     continue;
                 }
 
+                // 아이콘 로드
                 Sprite attackIcon = Resources.Load<Sprite>(Constants.IconPath + columns[1] + "_icon");
                 if (attackIcon == null)
                 {
@@ -55,12 +58,13 @@ namespace DataSystem.Database
                     continue;
                 }
 
+                // AttackData 생성 및 저장
                 AttackData data = new()
                 {
                     ID = int.Parse(columns[0]),
                     Name = columns[1],
-                    DisplayName = columns[2], // ✅ 추가된 필드 반영
-                    Description = columns[3], // ✅ 추가된 필드 반영
+                    DisplayName = columns[2],
+                    Description = columns[3],
                     Speed = float.Parse(columns[4]),
                     Range = float.Parse(columns[5]),
                     Radius = float.Parse(columns[6]),
@@ -77,23 +81,25 @@ namespace DataSystem.Database
             Debug.Log($"총 {attackDataDictionary.Count}개의 공격 데이터를 로드했습니다.");
         }
 
-
+        // 공격 스킬의 데이터 구조 정의
         public class AttackData
         {
             public int ID;
             public string Name;
-            public string DisplayName; // ✅ 스킬의 한글 이름
-            public string Description; // ✅ 스킬 설명
-            [SyncVar]  public float Speed;
-            [SyncVar]  public float Range;
-            [SyncVar]  public float Radius;
-            [SyncVar]  public float Damage;
-            [SyncVar]  public float KnockbackForce;
-            [SyncVar]  public float Cooldown;
-    
-            public AttackConfig config; // ✅ 공격 설정을 ScriptableObject로 참조
+            public string DisplayName;
+            public string Description;
+
+            [SyncVar] public float Speed;
+            [SyncVar] public float Range;
+            [SyncVar] public float Radius;
+            [SyncVar] public float Damage;
+            [SyncVar] public float KnockbackForce;
+            [SyncVar] public float Cooldown;
+
+            public AttackConfig config;
             public Sprite Icon;
-            
+
+            // 깊은 복사 생성자
             public AttackData(AttackData other)
             {
                 ID = other.ID;
@@ -110,7 +116,7 @@ namespace DataSystem.Database
                 Icon = other.Icon;
             }
 
-            // 기본 생성자도 명시해주면 좋음
+            // 기본 생성자
             public AttackData() { }
         }
     }

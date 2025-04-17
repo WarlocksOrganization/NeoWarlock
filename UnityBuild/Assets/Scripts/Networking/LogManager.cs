@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
 using Newtonsoft.Json;
@@ -16,20 +17,21 @@ namespace Networking
 { 
     public class LogManager : MonoBehaviour
     {
-        public string logServerIP = "localhost";
-        public ushort logServerPort = 8081;
-        public ushort Port = 7777;
-        private Thread _logThread;
+        public string logServerIP = "localhost";          // 로그 서버 IP
+        public ushort logServerPort = 8081;               // 로그 서버 포트
+        public ushort Port = 7777;                        // 게임 서버 포트
+        private Thread _logThread;                        // (예비) 로그 쓰레드
         private bool _isRunning = false;
 
-        private int _lastTimeLogSend = -998244353; // 마지막 로그 전송 시각
-        [SerializeField]private int _logSendInterval = 300; // 로그 전송 간격 (초)
-        private Queue<string> _logWriterQueue = new Queue<string>();
+        private int _lastTimeLogSend = -998244353;        // 마지막 로그 전송 시각
+        [SerializeField] private int _logSendInterval = 300; // 로그 전송 주기 (초 단위)
+        private Queue<string> _logWriterQueue = new();    // 로그 저장 큐
 
         public static LogManager singleton;
 
         void Awake()
         {
+            // 싱글톤 설정
             if (singleton != null)
             {
                 Destroy(gameObject);
@@ -41,12 +43,14 @@ namespace Networking
 
         private void Start()
         {
+            // 서버 환경에서만 동작
             if (!Application.platform.Equals(RuntimePlatform.LinuxServer))
             {
                 Debug.LogWarning("[LogManager] 서버 모드에서 실행 중이 아닙니다.");
                 return;
             }
 
+            // 명령행 인자에 따라 환경 설정 변경
             var args = System.Environment.GetCommandLineArgs();
             for (int i = 0; i < args.Length; i++)
             {
@@ -62,10 +66,6 @@ namespace Networking
                         logServerPort = port;
                         Debug.Log($"[LogManager] 로그 서버 포트 변경: {logServerPort}");
                     }
-                    else
-                    {
-                        Debug.LogWarning($"[LogManager] 로그 서버 포트 변경 실패: {args[i].Substring(15)}");
-                    }
                 }
                 else if (args[i].StartsWith("-logFilepath="))
                 {
@@ -77,74 +77,60 @@ namespace Networking
                     if (ushort.TryParse(args[i].Substring(6), out ushort port))
                     {
                         Port = port;
-                        Debug.Log($"[LogManager] 포트 변경: {Port}");
                         Constants.LogFilename = $"log_{Port}.log";
-                    }
-                    else
-                    {
-                        Debug.LogWarning($"[LogManager] 포트 변경 실패: {args[i].Substring(6)}");
+                        Debug.Log($"[LogManager] 포트 변경: {Port}");
                     }
                 }
             }
         }
 
-        [Server]            
+        [Server]
         public IEnumerator SendLogsToServer()
         {
+            // 테스트 모드 혹은 클라이언트 환경에서는 비활성
             if (Constants.IsTestMode || !Application.platform.Equals(RuntimePlatform.LinuxServer))
-            {
-                Debug.LogWarning("[LogManager] 서버 모드에서 실행 중이 아닙니다.");
                 yield break;
-            }
 
-            // Port 번호에 따라 10분 단위로 대기
-            // Port 번호의 마지막 자리와 현재 시간의 분을 비교하여 대기
-            var roomManager = RoomManager.singleton as RoomManager;
+            // 포트 기준으로 전송 주기 조정
             while ((DateTime.Now.Minute % 5) != (int)(Port % 5))
-            {
-                // 10분 단위로 대기
                 yield return new WaitForSeconds(20);
-            }
 
-            // 로그 파일 읽기
+            // 로그 파일 경로 설정
             string logPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + Constants.LogFilepath + Constants.LogFilename;
             if (!File.Exists(logPath))
-            {
-                Debug.LogWarning("[LogManager] 로그 파일이 존재하지 않습니다.");
                 yield break;
-            }
+
             string logText = $"[{File.ReadAllText(logPath)}]";
             if (string.IsNullOrEmpty(logText) || logText == "[]")
-            {
-                Debug.LogWarning("[LogManager] 로그 파일이 비어있습니다.");
                 yield break;
-            }
-            // 로그 파일 json 객체로 변환
-            JObject logJson = new JObject();
-            JArray logArray = JArray.Parse(logText);
-            logJson["data"] = logArray;
-            logJson["timestamp"] = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-            
-            string logJsonString = logJson.ToString();
 
-            // 서버에 로그 전송
-            UnityWebRequest request = new UnityWebRequest($"http://{logServerIP}:{logServerPort}/api/log", "POST");
-            byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(logJsonString);
-            request.uploadHandler = (UploadHandler)new UploadHandlerRaw(bodyRaw);
-            request.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
-            request.SetRequestHeader("Content-Type", "application/json");
-            yield return request.SendWebRequest();
-            if (request.result != UnityWebRequest.Result.Success)
+            // 로그 JSON 포맷 구성
+            JObject logJson = new JObject
             {
-                Debug.LogWarning("[LogManager] 로그 전송 실패: " + request.error);
+                ["data"] = JArray.Parse(logText),
+                ["timestamp"] = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+            };
+
+            // 서버로 전송
+            UnityWebRequest request = new UnityWebRequest($"http://{logServerIP}:{logServerPort}/api/log", "POST");
+            byte[] bodyRaw = Encoding.UTF8.GetBytes(logJson.ToString());
+            request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+            request.downloadHandler = new DownloadHandlerBuffer();
+            request.SetRequestHeader("Content-Type", "application/json");
+
+            yield return request.SendWebRequest();
+
+            // 결과 처리
+            if (request.result == UnityWebRequest.Result.Success)
+            {
+                string backupPath = logPath + $".{DateTime.Now:yyyyMMdd_HHmmss}.bak";
+                File.Copy(logPath, backupPath);
+                File.WriteAllText(logPath, ""); // 원본 초기화
+                Debug.Log("[LogManager] 로그 전송 성공");
             }
             else
             {
-                // 이전 로그 백업
-                string backupPath = logPath + $".{DateTime.Now:yyyyMMdd_HHmmss}.bak";
-                File.Copy(logPath, backupPath);
-                File.WriteAllText(logPath, "");
-                Debug.Log("[LogManager] 로그 전송 성공");
+                Debug.LogWarning("[LogManager] 로그 전송 실패: " + request.error);
             }
 
             request.Dispose();
@@ -153,94 +139,66 @@ namespace Networking
         [Server]
         public void EnqueueLog(string log)
         {
-            // 로그를 큐에 추가
-            if (!Application.platform.Equals(RuntimePlatform.LinuxServer))
-            {
-                Debug.LogWarning("[LogManager] 서버 모드에서 실행 중이 아닙니다.");
-                return;
-            }
-
+            // 서버 환경에서 로그 큐에 추가
+            if (!Application.platform.Equals(RuntimePlatform.LinuxServer)) return;
             _logWriterQueue.Enqueue(log);
         }
 
         private void Update()
         {
-            if (!Application.platform.Equals(RuntimePlatform.LinuxServer))
-            {
-                // 로그 서버 모드가 아닐 경우 로그 전송을 하지 않음
-                return;
-            }
+            // 클라이언트 환경에서는 미작동
+            if (!Application.platform.Equals(RuntimePlatform.LinuxServer)) return;
 
-            // 로그 큐에 있는 로그를 서버에 전송
+            // 주기적 로그 전송
             if (_lastTimeLogSend + _logSendInterval < Time.time)
             {
                 _lastTimeLogSend = (int)Time.time;
                 StartCoroutine(SendLogsToServer());
             }
 
-            // 로그 파일에 기록
+            // 로그 파일 저장 처리
             if (_logWriterQueue.Count > 0)
             {
                 string log = _logWriterQueue.Dequeue();
                 string logDirPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + Constants.LogFilepath;
                 if (!Directory.Exists(logDirPath))
-                {
                     Directory.CreateDirectory(logDirPath);
-                }
+
                 string logPath = logDirPath + Constants.LogFilename;
-                // 로그 파일이 존재하지 않으면 생성
                 if (!File.Exists(logPath))
-                {
                     File.Create(logPath).Close();
-                }
-                // 로그 파일에 기록
-                using (StreamWriter writer = new StreamWriter(logPath, true))
-                {
-                    writer.WriteLine(log + ",");
-                }
+
+                using StreamWriter writer = new StreamWriter(logPath, true);
+                writer.WriteLine(log + ",");
             }
         }
 
         private void HandleLog(string logString, string stackTrace, LogType type)
         {
-            // 일반 로그는 무시
-            if (type == LogType.Log)
-            {
-                return;
-            }
-
-            // 커스텀 클라이언트 로그 기록
+            // 경고 및 에러만 별도 저장
+            if (type == LogType.Log) return;
             WriteCustomClientLog(logString, stackTrace);
         }
 
         private void WriteCustomClientLog(string logString, string stackTrace)
         {
-            // 게임 디렉토리 내에 생성
             string logDirPath = Path.Combine(Application.dataPath, "../Logs");
             string logFilePath = Path.Combine(logDirPath, "client_log.txt");
 
             if (!Directory.Exists(logDirPath))
-            {
                 Directory.CreateDirectory(logDirPath);
-            }
             if (!File.Exists(logFilePath))
-            {
                 File.Create(logFilePath).Close();
-            }
 
-            using (StreamWriter writer = new StreamWriter(logFilePath, true))
-            {
-                writer.WriteLine($"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] {logString}");
-                if (!string.IsNullOrEmpty(stackTrace))
-                {
-                    writer.WriteLine(stackTrace);
-                }
-            }
+            using StreamWriter writer = new StreamWriter(logFilePath, true);
+            writer.WriteLine($"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] {logString}");
+            if (!string.IsNullOrEmpty(stackTrace))
+                writer.WriteLine(stackTrace);
         }
 
         private void OnApplicationQuit()
         {
-            // 애플리케이션이 종료될 때 로그 전송 중지
+            // 종료 시 스레드 정리 및 핸들러 제거
             if (_logThread != null)
             {
                 _isRunning = false;
@@ -248,9 +206,7 @@ namespace Networking
             }
 
             if (!Application.platform.Equals(RuntimePlatform.LinuxServer))
-            {
                 Application.logMessageReceived -= HandleLog;
-            }
         }
     }
 }

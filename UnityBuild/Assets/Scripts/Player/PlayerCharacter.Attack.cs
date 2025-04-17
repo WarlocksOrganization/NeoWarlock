@@ -18,22 +18,30 @@ namespace Player
         [SerializeField] private PlayerProjector playerProjector;
         private Vector3 aimPosition;
 
+        // 현재 선택된 공격 인덱스를 서버와 클라이언트 간 동기화
         [SyncVar(hook = nameof(OnCurrentAttackChanged))]
         private int currentAttackIndex = -1;
         private IAttack currentAttack;
 
+        // 플레이어가 선택 가능한 공격 스킬 배열 (기본 4개 + 아이템 스킬 1개)
         public IAttack[] availableAttacks = new IAttack[5];
+
+        // 특정 상황에서만 사용하는 공격 모음
         private Dictionary<int, IAttack> certainAttacks = new();
         private Dictionary<int, AttackBase> activeAttacks = new();
 
         public readonly float BaseAttackPower = 1;
+        
+        // 공격력 수치를 동기화 (버프/디버프에 따라 변경 가능)
         [SyncVar(hook = nameof(OnAttackPowerChanged))] public float AttackPower = 1;
         public float BasePower => BaseAttackPower;
         public float CurrentAttackPower => AttackPower;
 
+        // 아이템에 의해 획득한 스킬 ID 동기화
         [SyncVar(hook = nameof(OnItemSkillChanged))]
         public int itemSkillId = -1;
 
+        // 공격 키 입력 처리 (Classic / AOS 방식 지원)
         private void UpdateAttack()
         {
             if (PlayerSetting.PlayerKeyType == Constants.KeyType.Classic)
@@ -51,10 +59,11 @@ namespace Player
                 if (Input.GetKeyDown(KeyCode.R)) SetAttackType(4);
             }
 
-            if (Input.GetKeyDown(KeyCode.Escape)) SetAttackType(0);
+            if (Input.GetKeyDown(KeyCode.Escape)) SetAttackType(0); // 스킬 선택 해제
 
             if (currentAttack == null) return;
 
+            // 마우스 클릭 시 공격 실행
             if (Input.GetMouseButtonDown(0) && currentAttack.IsReady())
             {
                 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -64,7 +73,9 @@ namespace Player
                 }
             }
         }
+
         private void OnAttackPowerChanged(float oldValue, float newValue) => NotifyStatChanged();
+
         private void OnCurrentAttackChanged(int oldIndex, int newIndex)
         {
             if (newIndex >= 0 && newIndex < availableAttacks.Length)
@@ -73,6 +84,7 @@ namespace Player
             }
         }
 
+        // 공격 스킬 선택
         private void SetAttackType(int index)
         {
             if (index == 0)
@@ -80,10 +92,7 @@ namespace Player
                 playerUI?.SelectSkill(index, false);
                 currentAttackIndex = 0;
                 currentAttack = null;
-
-                // 💡 이 시점에 명확하게 projector 비활성화
-                playerProjector.CloseProjectile();
-
+                playerProjector.CloseProjectile(); // 조준 이펙트 제거
                 return;
             }
 
@@ -91,10 +100,11 @@ namespace Player
             {
                 currentAttackIndex = index;
                 currentAttack = availableAttacks[index];
-                CmdSetAttackType(index);
+                CmdSetAttackType(index); // 서버에 선택 사실 전송
             }
         }
 
+        // 아이템으로 인해 스킬이 추가되었을 때 실행
         private void OnItemSkillChanged(int _, int newSkillId)
         {
             if (newSkillId > 0)
@@ -107,6 +117,7 @@ namespace Player
             }
         }
 
+        // 특정 인덱스에 스킬 할당
         public void SetAvailableAttack(int index, int skillId)
         {
             var data = Database.GetAttackData(skillId);
@@ -116,7 +127,7 @@ namespace Player
                 return;
             }
 
-            var clone = new Database.AttackData(data);
+            var clone = new Database.AttackData(data); // 공격 데이터 복사
             IAttack attack = CreateAttackInstance(clone);
             availableAttacks[index] = attack;
 
@@ -126,10 +137,14 @@ namespace Player
                 playerUI?.SetQuickSlotData(index, clone.Icon, clone.Cooldown, clone.DisplayName, clone.Description);
             }
 
+            // 서버에 정보 전달
             if (NetworkClient.active)
+            {
                 CmdSetAvailableAttack(index, skillId);
+            }
         }
 
+        // AttackConfig를 기반으로 공격 객체 생성
         private IAttack CreateAttackInstance(Database.AttackData data)
         {
             if (data.config == null)
@@ -165,6 +180,7 @@ namespace Player
             return attack;
         }
 
+        // 서버에 스킬 설정 요청
         [Command(requiresAuthority = false)]
         public void CmdSetAvailableAttack(int index, int skillId)
         {
@@ -177,6 +193,7 @@ namespace Player
             TargetUpdateAvailableAttack(connectionToClient, index, skillId);
         }
 
+        // 클라이언트에 스킬 설정 동기화
         [TargetRpc]
         private void TargetUpdateAvailableAttack(NetworkConnectionToClient target, int index, int skillId)
         {
@@ -191,6 +208,7 @@ namespace Player
                 PlayerSetting.ItemSkillID = skillId;
         }
 
+        // 서버에서 선택된 스킬 인덱스 적용 후 전체 클라이언트에 전파
         [Command(requiresAuthority = false)]
         private void CmdSetAttackType(int index)
         {
@@ -199,6 +217,7 @@ namespace Player
             RpcSetAttackType(index);
         }
 
+        // 클라이언트에서 UI, 투사체 조준기 등 처리
         [ClientRpc(includeOwner = true)]
         private void RpcSetAttackType(int index)
         {
@@ -208,6 +227,7 @@ namespace Player
             playerProjector.SetDecalProjector(currentAttack, mouseTargetLayer, transform);
         }
 
+        // 공격 실행 요청
         public void Attack(Vector3 target)
         {
             if (Time.time < attackLockTime) return;
@@ -229,10 +249,11 @@ namespace Player
                 isMovingToTarget = false;
                 _targetPosition = transform.position;
             }
-            
+
             StartCoroutine(ExecuteAttack(target, delay));
         }
 
+        // 공격 실행 전 애니메이션 및 이펙트 처리
         private IEnumerator ExecuteAttack(Vector3 target, float delay)
         {
             CmdTriggerAnimation(currentAttack.GetAttackData().config.animParameter);
@@ -240,7 +261,7 @@ namespace Player
             int index = currentAttackIndex;
 
             CmdPlaySkillEffect(currentAttack.GetAttackData().config.skillType);
-            SetAttackType(0);
+            SetAttackType(0); // 선택 해제
 
             yield return new WaitForSeconds(delay);
 
@@ -261,21 +282,20 @@ namespace Player
             effectSystem?.PlaySkillEffect(type);
         }
 
+        // 서버에서 실제 공격 처리
         [Command(requiresAuthority = false)]
         public void CmdAttack(Vector3 target, int index, int id, int skillId)
         {
             var serverSkillId = availableAttacks[index]?.GetAttackData()?.ID ?? -1;
 
+            // 서버와 클라이언트 간 스킬 ID 불일치 시 보정
             if (serverSkillId != skillId)
             {
                 Debug.LogWarning($"[CmdAttack] 서버와 클라이언트 스킬 ID 불일치! 서버: {serverSkillId}, 클라: {skillId}");
-
-                // ✅ 서버도 일치하도록 다시 생성해줌
                 var data = Database.GetAttackData(skillId);
                 if (data != null)
                 {
                     availableAttacks[index] = CreateAttackInstance(data);
-                    Debug.Log($"[CmdAttack] 서버 스킬 재등록: index {index}, skillId {skillId}");
                 }
             }
 
@@ -289,7 +309,7 @@ namespace Player
             Vector3 firePos = attackTransform.position + dir;
             availableAttacks[index].Execute(target, firePos, gameObject, id, skillId, AttackPower);
 
-            // 아이템 스킬 처리
+            // 아이템 스킬은 한 번 사용 후 제거
             if (index == 4)
             {
                 itemSkillId = -1;
@@ -298,23 +318,21 @@ namespace Player
                 availableAttacks[4] = null;
             }
         }
-        
+
+        // 서버에서 아이템 스킬 설정
         [Server]
         public void ServerSetItemSkill(int skillId)
         {
             itemSkillId = skillId;
             SetAvailableAttack(4, skillId);
-            Debug.Log($"[서버] id : {playerId} 아이템 스킬 설정됨 → {skillId}");
-
-            // ✅ 클라이언트에도 알려줘야 함
             TargetSetItemSkill(connectionToClient, skillId);
         }
 
+        // 클라이언트에 아이템 스킬 ID 설정 전파
         [TargetRpc]
         private void TargetSetItemSkill(NetworkConnection target, int skillId)
         {
             PlayerSetting.ItemSkillID = skillId;
-            Debug.Log($"[클라이언트] 아이템 스킬 ID 설정됨: {skillId}");
         }
     }
 }

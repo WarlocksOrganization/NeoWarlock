@@ -186,8 +186,10 @@ namespace Player
             }
         }
 
+        // 카드 선택 완료 후 호출되는 함수 (클라이언트에서 실행)
         public void OnCardSelectionConfirmed()
         {
+            // 현재 플레이어의 캐릭터 객체를 찾음
             if (playerCharacter == null)
             {
                 playerCharacter = FindObjectsByType<LobbyPlayerCharacter>(FindObjectsSortMode.None)
@@ -200,7 +202,10 @@ namespace Player
                 return;
             }
 
+            // 선택된 강화 카드들의 ID 배열로 추출
             int[] selectedCardIds = PlayerSetting.PlayerCards.Select(card => card.ID).ToArray();
+
+            // 서버에 캐릭터 설정 요청 (직업, 이동기, 공격 스킬, 팀, 카드 ID)
             CmdSetCharacterDataOnServer(
                 PlayerSetting.PlayerCharacterClass,
                 PlayerSetting.MoveSkill,
@@ -208,15 +213,26 @@ namespace Player
                 PlayerSetting.TeamType,
                 selectedCardIds
             );
-            
+
+            // 스탯 적용을 지연 실행 (UI 업데이트를 위해)
             StartCoroutine(DelayedStatSetup());
+
+            // 선택한 카드 ID를 서버에 저장
             CmdSetPlayerCards(UserId, selectedCardIds);
+
+            // 서버에서 캐릭터 상태를 Ready로 설정하고 강화 효과 적용
             CmdMarkPlayerReady(selectedCardIds);
         }
-        
+
         [Command]
-        public void CmdSetCharacterDataOnServer(Constants.CharacterClass cls, Constants.SkillType moveSkill, int[] attackSkills, Constants.TeamType team, int[] cardIDs)
+        public void CmdSetCharacterDataOnServer(
+            Constants.CharacterClass cls,
+            Constants.SkillType moveSkill,
+            int[] attackSkills,
+            Constants.TeamType team,
+            int[] cardIDs)
         {
+            // 현재 클라이언트와 연결된 캐릭터를 서버에서 탐색
             var target = FindObjectsByType<LobbyPlayerCharacter>(FindObjectsSortMode.None)
                 .FirstOrDefault(pc => pc.connectionToClient == connectionToClient);
 
@@ -226,6 +242,7 @@ namespace Player
                 return;
             }
 
+            // 캐릭터 클래스 및 스킬, 팀 정보 설정
             target.SetCharacterData(cls, moveSkill, attackSkills);
             target.team = team;
 
