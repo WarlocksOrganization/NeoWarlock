@@ -1,6 +1,10 @@
 ![image](https://github.com/user-attachments/assets/0c5b6b45-6ca1-4276-af48-e7e9a12824b5) <br>
 > 누구나 쉽게 즐기는 귀여운 캐릭터들의 전략 스킬 배틀로얄 게임 **Smash Up!**
 
+> [게임 소개 영상](https://youtu.be/YDjhizPPxTc) <br>
+> [협동전 - 용의 둥지 업데이트 영상](https://youtu.be/K3M_rw6I-HU) <br>
+> [협동전 - 심해의 괴물 업데이트 영상](https://youtu.be/wsJfSZi5GUk)
+
 # **1. 프로젝트 개요**
 ![image](https://github.com/user-attachments/assets/e18ca190-3ae3-479b-825d-8566c4ce38cf)
 <Smash Up!>은 빠르고 전략적인 전투가 펼쳐지는 쿼터뷰 액션 배틀 게임입니다.
