@@ -39,7 +39,7 @@
 # 4. 기술 스택
 - 클라이언트 : Unity C#
 - 네트워크 : Mirror(Unity), AWS EC2, Kubernetes(K8s), ArgoCD
-- 서버 : C++ (Boost), PostgreSQL, Spring Boot
+- 서버 : C++ (Boost), PostgreSQL, Spring Boot, MongoDB
 - 로그/분석 : Kafka, Logstash, ElasticSearch, Kibana
 - 협업 툴 : GitLab, Jira
 
